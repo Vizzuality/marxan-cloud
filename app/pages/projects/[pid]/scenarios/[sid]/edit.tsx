@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
+// import { useEffect, useState } from 'react';
 
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 
-import { useRouter } from 'next/router';
+// import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 import { withProject } from 'hoc/projects';
 import { withScenario, withScenarioLock } from 'hoc/scenarios';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+// import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { useSaveScenario, useScenario } from 'hooks/scenarios';
+// import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
@@ -32,23 +32,23 @@ export const getServerSideProps = withProtection(
 );
 
 const EditScenarioPage = (): JSX.Element => {
-  const [submitting, setSubmitting] = useState(false);
-  const { query } = useRouter();
-  const { sid } = query as { sid: string };
-  const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
-  const { tab: metaTab, subtab: metaSubtab, lastJobCheck } = scenarioEditingMetadata || {};
+  // const [submitting, setSubmitting] = useState(false);
+  // const { query } = useRouter();
+  // const { sid } = query as { sid: string };
+  // const { data: scenarioData } = useScenario(sid);
+  // const { metadata } = scenarioData || {};
+  // const { scenarioEditingMetadata } = metadata || {};
+  // const { tab: metaTab, subtab: metaSubtab, lastJobCheck } = scenarioEditingMetadata || {};
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTab, setSubTab } = scenarioSlice.actions;
-  const dispatch = useDispatch();
+  // const scenarioSlice = getScenarioEditSlice(sid);
+  // const { setTab, setSubTab } = scenarioSlice.actions;
+  // const dispatch = useDispatch();
 
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
+  // const saveScenarioMutation = useSaveScenario({
+  //   requestConfig: {
+  //     method: 'PATCH',
+  //   },
+  // });
 
   // useEffect(() => {
   //   if (metaTab) dispatch(setTab(metaTab));
