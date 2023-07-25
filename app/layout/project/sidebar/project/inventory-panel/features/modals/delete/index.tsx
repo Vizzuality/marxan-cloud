@@ -16,10 +16,10 @@ import { ProjectFeature } from 'types/project-model';
 import ALERT_SVG from 'svgs/ui/new-layout/alert.svg?sprite';
 
 const DeleteModal = ({
-  selectedFeatures,
+  selectedFeaturesIds,
   handleModal,
 }: {
-  selectedFeatures: ProjectFeature[];
+  selectedFeaturesIds: ProjectFeature['id'][];
   handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
   const { data: session } = useSession();
@@ -28,12 +28,11 @@ const DeleteModal = ({
   const { pid } = query as { pid: string };
   const { addToast } = useToasts();
 
-  const selectedFeatureIds = selectedFeatures.map((f) => f.id);
-  const selectedFeatureNames = selectedFeatures.map((f) => f.featureClassName);
-  const selectedFeatureMultipleScenarios = selectedFeatures.some((f) => f.scenarios > 1);
+  // const selectedFeaturesNames = selectedFeatures.map((f) => f.featureClassName);
+  // const selectedFeatureMultiplesScenarios = selectedFeatures.some((f) => f.scenarios > 1);
 
   const handleBulkDelete = useCallback(async () => {
-    await deleteProjectFeatureBulk(pid, selectedFeatureIds, session)
+    await deleteProjectFeatureBulk(pid, selectedFeaturesIds, session)
       .then(async () => {
         await queryClient.invalidateQueries(['all-features', pid]);
 
@@ -60,13 +59,15 @@ const DeleteModal = ({
           }
         );
       });
-  }, [selectedFeatureIds, addToast, pid, queryClient, session]);
+  }, [selectedFeaturesIds, addToast, pid, queryClient, session]);
 
   return (
     <div className="flex flex-col space-y-5 px-8 py-1">
       <h2 className="font-heading font-bold text-black">Delete feauture</h2>
       <p className="font-heading text-sm font-medium text-black">
-        Are you sure you want to delete &quot;{selectedFeatureNames}&quot;? You can’t undo this
+        {/* Are you sure you want to delete &quot;{selectedFeaturesNames}&quot;? You can’t undo this
+        action. */}
+        Are you sure you want to delete &quot;{selectedFeaturesIds}&quot;? You can’t undo this
         action.
       </p>
       <div className="flex items-center space-x-1.5 rounded border-l-[5px] border-red-600 bg-red-50/50 px-1.5 py-4">
@@ -88,7 +89,7 @@ const DeleteModal = ({
           theme="danger-alt"
           size="lg"
           className="w-full"
-          disabled={selectedFeatureMultipleScenarios}
+          // disabled={selectedFeaturesMultipleScenarios}
           onClick={handleBulkDelete}
         >
           Delete
