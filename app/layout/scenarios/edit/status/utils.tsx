@@ -40,7 +40,7 @@ export const useScenarioJobs = (jobs: Job[]): Job[] => {
 
       return {
         kind: k,
-        isoDate: isoDateJob.isoDate,
+        isoDate: isoDateJob?.isoDate,
         status,
       } satisfies Job;
     });
