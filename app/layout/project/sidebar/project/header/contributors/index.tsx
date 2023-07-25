@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -18,7 +18,7 @@ import EditDropdown from './edit-dropdown';
 
 const PROJECT_USERS_SIZE = 3;
 
-export const Contributors: React.FC = () => {
+export const Contributors = (): JSX.Element => {
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
