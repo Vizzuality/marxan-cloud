@@ -1,7 +1,11 @@
 import { useCallback, useState } from 'react';
 
+import { useSelector } from 'react-redux';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
+import Modal from 'components/modal/component';
+import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete/index';
 import { ProjectFeature } from 'types/project-model';
 
 import EDIT_SVG from 'svgs/project/edit.svg?sprite';
@@ -16,10 +20,14 @@ const FeaturesBulkActionMenu = ({
 }: {
   selectedFeaturesIds: ProjectFeature['id'][];
 }): JSX.Element => {
+  const { selectedFeatures } = useSelector((state) => state['/projects/[id]']);
+
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
     edit: false,
     delete: false,
   });
+
+  console.log('selectedFeaturesIds', selectedFeaturesIds);
 
   const handleModal = useCallback((modalKey: keyof typeof modalState, isVisible: boolean) => {
     setModalState((prevState) => ({ ...prevState, [modalKey]: isVisible }));
@@ -55,7 +63,16 @@ const FeaturesBulkActionMenu = ({
       </div>
 
       {modalState.edit && <>{/* // ! implement edit bulk modal here */}</>}
-      {modalState.delete && <>{/* // ! implement delete bulk modal here */}</>}
+
+      <Modal
+        id="delete-features-modal"
+        dismissable
+        open={modalState.delete}
+        size="narrow"
+        onDismiss={() => () => handleModal('delete', false)}
+      >
+        <DeleteModal selectedFeatures={selectedFeatures} handleModal={handleModal} />
+      </Modal>
     </>
   );
 };
