@@ -23,6 +23,7 @@ import { ItemProps } from 'components/scenarios/item/component';
 import { Project } from 'types/api/project';
 import { Job } from 'types/job';
 import { Scenario } from 'types/scenario';
+import { createDownloadLink } from 'utils/download';
 
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
@@ -1155,13 +1156,7 @@ export function useDownloadSolutionsSummary() {
       const { data: blob } = data;
       const { id } = variables;
 
-      const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `solutions-summary-${id}.zip`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      createDownloadLink(blob, `solutions-${id}.zip`);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
