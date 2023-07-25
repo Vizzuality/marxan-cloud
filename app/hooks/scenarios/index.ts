@@ -1135,22 +1135,18 @@ export function useDeletePUScenaro() {
   });
 }
 
-export function useDownloadSolutionsSummary({
-  requestConfig = {
-    method: 'GET',
-  },
-}) {
+export function useDownloadSolutionsSummary() {
   const { data: session } = useSession();
 
   const downloadScenarioSolutionsSummary = ({ id }: { id: Project['id'] }) => {
-    return DOWNLOADS.request({
+    return DOWNLOADS.request<BlobPart>({
+      method: 'GET',
       url: `/projects/${id}/output-summary`,
       responseType: 'arraybuffer',
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
         'Content-Type': 'application/zip',
       },
-      ...requestConfig,
     });
   };
 
