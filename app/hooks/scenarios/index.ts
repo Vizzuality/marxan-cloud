@@ -1140,7 +1140,7 @@ export function useDownloadSolutionsSummary() {
   const { data: session } = useSession();
 
   const downloadScenarioSolutionsSummary = ({ id }: { id: Project['id'] }) => {
-    return DOWNLOADS.request<BlobPart>({
+    return DOWNLOADS.request<ArrayBuffer>({
       method: 'GET',
       url: `/projects/${id}/output-summary`,
       responseType: 'arraybuffer',

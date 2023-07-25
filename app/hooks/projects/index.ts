@@ -567,7 +567,7 @@ export function useDownloadExport({
   const { data: session } = useSession();
 
   const downloadProject = ({ pid, exportId }: DownloadExportProps) => {
-    return PROJECTS.request<BlobPart>({
+    return PROJECTS.request<ArrayBuffer>({
       url: `/${pid}/export/${exportId}`,
       responseType: 'arraybuffer',
       headers: {
