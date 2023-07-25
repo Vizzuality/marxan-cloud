@@ -116,6 +116,10 @@ describe('Project - update feature Name', () => {
       newName,
     );
     await fixtures.ThenGeoFeaturesIsUpdated(result, featureId, newName);
+    await fixtures.ThenResponseContainsUpdatedFeatureInJsonApiFormat(
+      result,
+      newName,
+    );
   });
 });
 
@@ -263,6 +267,13 @@ const getFixtures = async () => {
         },
       });
       expect(feature?.featureClassName).toEqual(newName);
+    },
+    ThenResponseContainsUpdatedFeatureInJsonApiFormat: async (
+      result: request.Response,
+      newName: string,
+    ) => {
+      expect(result.body?.data.attributes.featureClassName).toEqual(newName);
+      expect(result.body?.data.type).toEqual('geo_features');
     },
   };
 };
