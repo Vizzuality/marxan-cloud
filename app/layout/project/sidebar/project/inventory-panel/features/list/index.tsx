@@ -175,9 +175,9 @@ export const ProjectFeatureList = (): JSX.Element => {
               </li>
             ))}
           </ul>
-          {/* {selectedFeaturesIds.length > 0 && ( */}
-          <FeaturesBulkActionMenu selectedFeaturesIds={selectedFeaturesIds} />
-          {/* )} */}
+          {selectedFeaturesIds.length > 0 && (
+            <FeaturesBulkActionMenu selectedFeaturesIds={selectedFeaturesIds} />
+          )}
         </div>
       </div>
     </div>
