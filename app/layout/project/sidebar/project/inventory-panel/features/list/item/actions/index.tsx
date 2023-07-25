@@ -78,7 +78,7 @@ const FeatureActions = ({
               size="narrow"
               onDismiss={() => handleModal('delete', false)}
             >
-              <DeleteModal selectedFeatures={[feature]} handleModal={handleModal} />
+              <DeleteModal selectedFeaturesIds={[feature.id]} handleModal={handleModal} />
             </Modal>
           </li>
         )}
