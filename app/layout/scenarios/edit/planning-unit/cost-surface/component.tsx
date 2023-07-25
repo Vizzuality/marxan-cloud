@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { DropzoneProps, useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
