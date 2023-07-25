@@ -1,16 +1,16 @@
-// import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-// import { useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 import { withProject } from 'hoc/projects';
 import { withScenario, withScenarioLock } from 'hoc/scenarios';
 
-// import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-// import { useSaveScenario, useScenario } from 'hooks/scenarios';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
@@ -32,59 +32,47 @@ export const getServerSideProps = withProtection(
 );
 
 const EditScenarioPage = (): JSX.Element => {
-  // const [submitting, setSubmitting] = useState(false);
-  // const { query } = useRouter();
-  // const { sid } = query as { sid: string };
-  // const { data: scenarioData } = useScenario(sid);
-  // const { metadata } = scenarioData || {};
-  // const { scenarioEditingMetadata } = metadata || {};
-  // const { tab: metaTab, subtab: metaSubtab, lastJobCheck } = scenarioEditingMetadata || {};
+  const { query } = useRouter();
+  const { sid } = query as { sid: string };
+  const scenarioQuery = useScenario(sid);
+  const { metadata } = scenarioQuery.data || {};
+  const { scenarioEditingMetadata } = metadata || {};
 
-  // const scenarioSlice = getScenarioEditSlice(sid);
-  // const { setTab, setSubTab } = scenarioSlice.actions;
-  // const dispatch = useDispatch();
+  const { tab: metaTab, subtab: metaSubtab, lastJobCheck } = scenarioEditingMetadata || {};
 
-  // const saveScenarioMutation = useSaveScenario({
-  //   requestConfig: {
-  //     method: 'PATCH',
-  //   },
-  // });
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setTab, setSubTab } = scenarioSlice.actions;
+  const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   if (metaTab) dispatch(setTab(metaTab));
-  //   if (metaSubtab) dispatch(setSubTab(metaSubtab));
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [metaTab, metaSubtab]);
+  const { mutate } = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
 
-  // // If fo some reason we dont't have lastJobCheck set in the metadata, let's add one
-  // useEffect(() => {
-  //   if (!lastJobCheck && !submitting) {
-  //     setSubmitting(true);
+  useEffect(() => {
+    if (metaTab) dispatch(setTab(metaTab));
+    if (metaSubtab) dispatch(setSubTab(metaSubtab));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [metaTab, metaSubtab]);
 
-  //     saveScenarioMutation.mutate(
-  //       {
-  //         id: `${sid}`,
-  //         data: {
-  //           metadata: {
-  //             ...metadata,
-  //             scenarioEditingMetadata: {
-  //               lastJobCheck: new Date().getTime(),
-  //               ...scenarioEditingMetadata,
-  //             },
-  //           },
-  //         },
-  //       },
-  //       {
-  //         onSuccess: () => {
-  //           setSubmitting(false);
-  //         },
-  //         onError: () => {
-  //           setSubmitting(false);
-  //         },
-  //       }
-  //     );
-  //   }
-  // }, [sid, submitting, metadata, scenarioEditingMetadata, lastJobCheck, saveScenarioMutation]);
+  // If fo some reason we dont't have lastJobCheck set in the metadata, let's add one
+  useEffect(() => {
+    if (!lastJobCheck && !scenarioQuery.isSuccess) {
+      mutate({
+        id: `${sid}`,
+        data: {
+          metadata: {
+            ...metadata,
+            scenarioEditingMetadata: {
+              lastJobCheck: new Date().getTime(),
+              ...scenarioEditingMetadata,
+            },
+          },
+        },
+      });
+    }
+  }, [lastJobCheck, metadata, mutate, scenarioEditingMetadata, scenarioQuery.isSuccess, sid]);
 
   return (
     <Protected>
