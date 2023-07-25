@@ -9,7 +9,7 @@ import { SpringOptions } from 'popmotion';
 import Arrow from './arrow';
 import { TooltipProps } from './types';
 
-export const Tooltip: React.FC<TooltipProps> = ({
+export const Tooltip = ({
   children,
   content,
   contentClassName,
