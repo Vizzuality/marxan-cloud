@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
 
+import { setSelectedFeatures } from 'store/slices/projects/[id]';
+
 import InfoButton from 'components/info-button';
 import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add/add-modal';
 
@@ -49,7 +51,7 @@ const InventoryPanelFeatures = (): JSX.Element => {
       <div className="h-full">
         <ProjectFeatureList />
       </div>
-      {/* <FeaturesBulkActionMenu pid={pid} selectedFeatureIds={[]} /> */}
+      <FeaturesBulkActionMenu selectedFeatureIds={[]} />
     </section>
   );
 };
