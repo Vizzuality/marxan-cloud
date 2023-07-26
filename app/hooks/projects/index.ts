@@ -769,3 +769,23 @@ export function useImportLegacyProject({
     },
   });
 }
+
+// TAGS
+export function useProjectTags(id: Project['id']) {
+  const { data: session } = useSession();
+
+  return useQuery({
+    queryKey: ['project-tags', id],
+    queryFn: async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${id}/tags`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }).then((response) => response.data.data),
+    enabled: !!id,
+    placeholderData: {},
+  });
+}
