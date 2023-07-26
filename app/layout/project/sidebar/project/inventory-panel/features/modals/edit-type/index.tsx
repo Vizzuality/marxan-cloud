@@ -111,6 +111,12 @@ const EditTypeModal = ({
                             onFocus={() => handleTagsMenu(true)}
                             onKeyDown={(e) => handleKeyPress(e)}
                           />
+                          {!tagsMenuOpen && (
+                            <p className="mt-1 font-sans text-xxs text-gray-300">
+                              * Changes to selected features will automatically update related
+                              scenarios.
+                            </p>
+                          )}
 
                           {tagsMenuOpen && (
                             <div className="relative mt-2 h-24 w-full">
