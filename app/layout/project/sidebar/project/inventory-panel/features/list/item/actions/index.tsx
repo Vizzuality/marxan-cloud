@@ -72,7 +72,7 @@ const FeatureActions = ({
             <EditModal featureId={feature.id} handleModal={handleModal} />
           </Modal>
         </li>
-        {feature.scenarios === 1 && (
+        {feature.scenarioUsageCount === 1 && (
           <li>
             <button
               type="button"
@@ -92,7 +92,7 @@ const FeatureActions = ({
               size="narrow"
               onDismiss={() => handleModal('delete', false)}
             >
-              <DeleteModal selectedFeaturesIds={[feature.id]} handleModal={handleModal} />
+              <DeleteModal selectedFeaturesIds={[feature.id]} />
             </Modal>
           </li>
         )}
