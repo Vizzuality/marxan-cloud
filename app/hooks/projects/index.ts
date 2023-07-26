@@ -790,3 +790,40 @@ export function useProjectTags(id: Project['id']) {
     placeholderData: {},
   });
 }
+
+export function useEditProjectTags() {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const editProjectTags = ({
+    projectId,
+    data,
+  }: {
+    projectId: Project['id'];
+    data: {
+      tagName: string;
+      updatedTagName: string;
+    };
+  }) => {
+    return PROJECTS.request({
+      method: 'PATCH',
+      url: `/${projectId}/tags`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(editProjectTags, {
+    onSuccess: async (data, variables, context) => {
+      const { projectId: id } = variables;
+      await queryClient.invalidateQueries(['project-tags', id]);
+
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
