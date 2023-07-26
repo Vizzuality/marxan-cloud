@@ -133,11 +133,11 @@ const FeatureItemList = ({
             })}
             onKeyDown={handleNameChanges}
           />
-          {Boolean(feature.scenarios) && (
+          {Boolean(feature.scenarioUsageCount) && (
             <span className="flex space-x-1 text-xs">
               <span>Currently in use in</span>
               <span className="block rounded-[4px]  bg-blue-400/25 px-1 text-xs font-semibold text-blue-400">
-                {feature.scenarios}
+                {feature.scenarioUsageCount}
               </span>
               <span>scenarios.</span>
             </span>
