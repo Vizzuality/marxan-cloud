@@ -27,53 +27,49 @@ const EditTypeModal = ({
   const { pid } = query as { pid: string };
 
   const formRef = useRef(null);
-  const [selectedTag, selectTag] = useState(null);
+  const [selectedTag, selectTag] = useState<string | null>(null);
   const [tagsMenuOpen, handleTagsMenu] = useState(false);
 
   const tagsQuery = useProjectTags(pid);
 
   const editProjectTagsMutation = useEditProjectTags();
 
-  const onEditSubmit = useCallback(
-    (values) => {
-      console.log('VALUES', values);
-      const data = {
-        tagName: feature.tag,
-        updatedTagName: selectedTag,
-      };
+  const onEditSubmit = useCallback(() => {
+    const data = {
+      tagName: feature.tag,
+      updatedTagName: selectedTag,
+    };
 
-      editProjectTagsMutation.mutate(
-        { projectId: `${pid}`, data },
-        {
-          onSuccess: () => {
-            addToast(
-              'success-edit-project-tag',
-              <>
-                <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Tag edited</p>
-              </>,
-              {
-                level: 'success',
-              }
-            );
-          },
-          onError: () => {
-            addToast(
-              'error-edit-project-tag',
-              <>
-                <h2 className="font-medium">Error!</h2>
-                <p className="text-sm">It is not possible to edit this type</p>
-              </>,
-              {
-                level: 'error',
-              }
-            );
-          },
-        }
-      );
-    },
-    [pid, addToast, editProjectTagsMutation, feature, selectedTag]
-  );
+    editProjectTagsMutation.mutate(
+      { projectId: `${pid}`, data },
+      {
+        onSuccess: () => {
+          addToast(
+            'success-edit-project-tag',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">Tag edited</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+        },
+        onError: () => {
+          addToast(
+            'error-edit-project-tag',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">It is not possible to edit this type</p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
+  }, [pid, addToast, editProjectTagsMutation, feature, selectedTag]);
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
@@ -82,7 +78,7 @@ const EditTypeModal = ({
   };
 
   return (
-    <FormRFF<{ featureClassName: ProjectFeature['featureClassName']; tag: ProjectFeature['tag'] }>
+    <FormRFF<{ tag: ProjectFeature['tag'] }>
       initialValues={{
         tag: '',
       }}
@@ -114,28 +110,29 @@ const EditTypeModal = ({
                             className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             placeholder="Type to pick or create tag..."
                             value={fprops.input.value}
-                            onFocus={() => handleTagsMenu(!tagsMenuOpen)}
+                            onFocus={() => handleTagsMenu(true)}
+                            onBlur={() => handleTagsMenu(false)}
                             onKeyDown={(e) => handleKeyPress(e)}
                           />
 
                           {tagsMenuOpen && (
-                            <div className="mt-2 flex w-full flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
-                              <div className="text-sm text-gray-800">Recent:</div>
-                              <div className="flex flex-wrap gap-2.5">
-                                {tagsQuery.isFetched &&
-                                  tagsQuery.data?.map((tag) => {
-                                    return (
-                                      <button
-                                        key={tag}
-                                        className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
-                                        onClick={() => selectTag(tag)}
-                                      >
-                                        <p className="text-sm capitalize text-gray-800">
-                                          {tag.replace(/_/g, ' ')}
-                                        </p>
-                                      </button>
-                                    );
-                                  })}
+                            <div className="relative mt-2 h-24 w-full">
+                              <div className="absolute -left-[2%] z-50 flex w-[104%] flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
+                                <div className="text-sm text-gray-800">Recent:</div>
+                                <div className="flex flex-wrap gap-2.5">
+                                  {tagsQuery.isFetched &&
+                                    tagsQuery.data?.map((tag) => {
+                                      return (
+                                        <button
+                                          key={tag}
+                                          className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
+                                          onClick={() => selectTag(tag)}
+                                        >
+                                          <p className="text-sm capitalize text-gray-800">{tag}</p>
+                                        </button>
+                                      );
+                                    })}
+                                </div>
                               </div>
                             </div>
                           )}
