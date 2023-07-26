@@ -45,6 +45,7 @@ import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { UpdateFeatureNameDto } from './dto/update-feature-name.dto';
 import { isLeft } from 'fp-ts/Either';
+import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -100,21 +101,10 @@ export class GeoFeaturesController {
     );
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case featureNotFound:
-          throw new NotFoundException(`Feature with id ${featureId} not found`);
-        case featureNotEditable:
-          throw new ForbiddenException(
-            `Feature with id ${featureId} is not editable`,
-          );
-        case featureNameAlreadyInUse:
-          throw new ForbiddenException(
-            `Feature with id ${featureId} cannot be updated: name is already in use (${body.featureClassName})`,
-          );
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      throw mapAclDomainToHttpError(result.left, {
+        featureId,
+        featureClassName: body.featureClassName,
+      });
     } else {
       return this.geoFeatureService.serialize(result.right);
     }

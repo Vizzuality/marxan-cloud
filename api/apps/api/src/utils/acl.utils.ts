@@ -83,6 +83,9 @@ import {
 } from '@marxan-api/modules/access-control/access-control.types';
 import {
   featureDataCannotBeUploadedWithCsv,
+  featureNameAlreadyInUse,
+  featureNotEditable,
+  featureNotFound,
   importedFeatureNameAlreadyExist,
   missingPuidColumnInFeatureAmountCsvUpload,
   unknownPuidsInFeatureAmountCsvUpload,
@@ -94,7 +97,6 @@ import {
 } from '@marxan-api/modules/geo-features/import/csv.parser';
 import {
   featureNotEditableByUserWithinProject,
-  featureNotFound,
   featureNotFoundWithinProject,
   tagNotFoundForProject,
 } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
@@ -108,6 +110,7 @@ interface ErrorHandlerOptions {
   scenarioId?: string;
   userId?: string;
   exportId?: string;
+  featureClassName?: string;
 }
 
 export const mapAclDomainToHttpError = (
@@ -155,9 +158,11 @@ export const mapAclDomainToHttpError = (
     | typeof projectNotFoundForExport
     | typeof projectIsNotPublished
     | typeof deleteScenarioFailed
+    | typeof featureNameAlreadyInUse
     | typeof featureNotFound
     | typeof featureNotFoundWithinProject
     | typeof featureNotEditableByUserWithinProject
+    | typeof featureNotEditable
     | typeof projectNotFound
     | typeof projectNotEditable
     | typeof projectNotVisible
@@ -319,6 +324,10 @@ export const mapAclDomainToHttpError = (
       return new BadRequestException(
         `Scenario ${options?.scenarioId} and associated resources could not be deleted.`,
       );
+    case featureNameAlreadyInUse:
+      throw new ForbiddenException(
+        `Feature with id ${options?.featureId} cannot be updated: name is already in use (${options?.featureClassName})`,
+      );
     case featureNotFound:
       throw new NotFoundException(
         `Feature with id ${options?.featureId} not found`,
@@ -330,6 +339,10 @@ export const mapAclDomainToHttpError = (
     case featureNotEditableByUserWithinProject:
       throw new ForbiddenException(
         `Feature with id ${options?.featureId} is not editable by user ${options?.userId} within Project with id ${options?.projectId}`,
+      );
+    case featureNotEditable:
+      throw new ForbiddenException(
+        `Feature with id ${options?.featureId} is not editable`,
       );
     case projectNotEditable:
       throw new ForbiddenException(

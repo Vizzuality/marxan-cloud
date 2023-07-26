@@ -13,7 +13,6 @@ import {
 } from '@marxan-api/modules/projects/projects.service';
 import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
 
-export const featureNotFound = Symbol('feature not found');
 export const featureNotFoundWithinProject = Symbol(
   'feature not found within project',
 );
