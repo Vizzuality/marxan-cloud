@@ -59,8 +59,6 @@ export interface ProjectFeature {
   intersection: unknown;
   featureClassName: string;
   alias: string;
-  properties: Record<string, unknown>[];
-  // ! these new properties are not in the API yet
+  scenarioUsageCount: number;
   tag?: string;
-  scenarios?: number;
 }

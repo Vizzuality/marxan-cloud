@@ -34,13 +34,7 @@ export const ProjectFeatureList = (): JSX.Element => {
       ...filters,
     },
     {
-      select: ({ data: features }) =>
-        // todo: remove this when the API is ready
-        features.map((feature, index) => ({
-          ...feature,
-          tag: feature.tag ?? `random tag ${index}`,
-          scenarios: feature.scenarios ?? 10,
-        })),
+      select: ({ data }) => data,
       placeholderData: { data: [] },
       keepPreviousData: true,
     }
@@ -170,7 +164,7 @@ export const ProjectFeatureList = (): JSX.Element => {
                   feature={feature}
                   projectId={pid}
                   onSelectFeature={handleSelectFeature}
-                  isSelected={featureIds.includes(feature.id)}
+                  isSelected={selectedFeaturesIds.includes(feature.id)}
                 />
               </li>
             ))}

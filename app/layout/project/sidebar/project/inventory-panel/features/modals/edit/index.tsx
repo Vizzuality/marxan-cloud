@@ -53,7 +53,7 @@ const EditModal = ({
               <h2 className="font-heading font-bold text-black">Edit type</h2>
 
               <div>
-                <FieldRFF
+                <FieldRFF<string>
                   name="featureClassName"
                   validate={composeValidators([{ presence: true }])}
                 >
@@ -67,7 +67,7 @@ const EditModal = ({
                         {...fprops.input}
                         className="rounded-md text-black"
                         placeholder="Type name..."
-                        defaultValue={fprops.input.value as string}
+                        defaultValue={fprops.input.value}
                       />
                     </Field>
                   )}
@@ -75,7 +75,7 @@ const EditModal = ({
               </div>
 
               <div>
-                <FieldRFF name="tag">
+                <FieldRFF<string> name="tag">
                   {(fprops) => (
                     <Field id="tag" {...fprops} className="relative">
                       <Label theme="light" className="mb-3 uppercase">

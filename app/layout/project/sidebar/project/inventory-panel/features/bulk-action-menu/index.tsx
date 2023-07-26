@@ -60,12 +60,12 @@ const FeaturesBulkActionMenu = ({
 
       <Modal
         id="delete-features-modal"
-        dismissable
         open={modalState.delete}
         size="narrow"
+        dismissable
         onDismiss={() => handleModal('delete', false)}
       >
-        <DeleteModal selectedFeaturesIds={selectedFeaturesIds} handleModal={handleModal} />
+        <DeleteModal selectedFeaturesIds={selectedFeaturesIds} />
       </Modal>
     </>
   );
