@@ -54,6 +54,28 @@ When dealing with non-CRUD-ish flows where the `nestjs-base-service` machinery
 may not make sense, query and response should be agreed as needed between
 frontend and backend developers.
 
+## Responses for CRUD operations
+
+When updating creating/updating/deleting entities synchronously (that is, _not_
+as part of long-running operations: for these, see the [Asynchronous
+jobs](#asynchronous-jobs) section below), the API should follow these
+conventions:
+
+- successful `POST` requests should normally return the created entities in
+  JSON:API format in the response payload
+- successful `PUT` and `PATCH` requests should likewise normally return the
+  replaced or updated entities in JSON:API format; this is so that the frontend
+  app can avoid having to do a further fetch to retrieve the latest state of the
+  entities that have been updated
+- successful `DELETE` requests should normally return an empty body
+
+In some cases (see [JSON:API for queries and
+responses](#jsonapi-for-queries-and-responses) section above), it may not be
+possible or desirable for the response payload to be in JSON:API format: in
+these cases, however, the general conventions in this section about returning
+some representation of the created/replaced/updated entities in response
+payloads still apply.
+
 ## Access control
 
 TL;DR For every endpoint we should ensure that appropriate access control checks
