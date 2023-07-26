@@ -13,7 +13,6 @@ import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
 import partition from 'lodash/partition';
 import { useSession } from 'next-auth/react';
-import { isArray } from 'validate.js';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
