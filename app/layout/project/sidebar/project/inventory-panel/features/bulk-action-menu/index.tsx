@@ -9,6 +9,8 @@ import { ProjectFeature } from 'types/project-model';
 import EDIT_SVG from 'svgs/project/edit.svg?sprite';
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
 
+import EditTypeModal from '../modals/edit-type';
+
 const BUTTON_CLASSES =
   'col-span-1 flex items-center space-x-2 rounded-lg bg-gray-700 px-4 text-xs text-gray-50';
 const ICON_CLASSES = 'h-5 w-5 transition-colors text-gray-400 group-hover:text-gray-50';
@@ -56,7 +58,15 @@ const FeaturesBulkActionMenu = ({
         </Button>
       </div>
 
-      {modalState.edit && <>{/* // ! implement edit bulk modal here */}</>}
+      <Modal
+        id="edit-feaure-modal"
+        title="All features"
+        open={modalState.edit}
+        size="narrow"
+        onDismiss={() => handleModal('edit', false)}
+      >
+        <EditTypeModal handleModal={handleModal} />
+      </Modal>
 
       <Modal
         id="delete-features-modal"
