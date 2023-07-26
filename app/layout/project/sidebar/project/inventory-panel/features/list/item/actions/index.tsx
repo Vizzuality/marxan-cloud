@@ -3,7 +3,8 @@ import { useCallback, useState, ButtonHTMLAttributes } from 'react';
 import { FileEdit, Trash2, Tag } from 'lucide-react';
 
 import Modal from 'components/modal/component';
-import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete/index';
+import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete';
+import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
 import { Project, ProjectFeature } from 'types/project-model';
 import { cn } from 'utils/cn';
 
@@ -53,10 +54,23 @@ const FeatureActions = ({
           </button>
         </li>
         <li>
-          <button type="button" onClick={onEditType} className={BUTTON_CLASSES}>
+          <button
+            type="button"
+            onClick={() => handleModal('edit', true)}
+            className={BUTTON_CLASSES}
+          >
             <Tag className={ICON_CLASSES} size={20} />
             <span>Edit Type</span>
           </button>
+          <Modal
+            id="edit-feaure-modal"
+            title="All features"
+            open={modalState.edit}
+            size="narrow"
+            onDismiss={() => handleModal('edit', false)}
+          >
+            <EditModal featureId={feature.id} handleModal={handleModal} />
+          </Modal>
         </li>
         {feature.scenarios === 1 && (
           <li>
