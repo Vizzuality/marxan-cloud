@@ -60,7 +60,7 @@ const FeatureActions = ({
             className={BUTTON_CLASSES}
           >
             <Tag className={ICON_CLASSES} size={20} />
-            <span>Edit Type</span>
+            <span>Edit</span>
           </button>
           <Modal
             id="edit-feaure-modal"
@@ -69,7 +69,7 @@ const FeatureActions = ({
             size="narrow"
             onDismiss={() => handleModal('edit', false)}
           >
-            <EditTypeModal feature={feature} handleModal={handleModal} />
+            {/* // !TODO: Add edit feature modal  */}
           </Modal>
         </li>
         {feature.scenarioUsageCount === 1 && (

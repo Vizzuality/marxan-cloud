@@ -16,10 +16,8 @@ import { ProjectFeature } from 'types/project-model';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 const EditTypeModal = ({
-  feature,
   handleModal,
 }: {
-  feature: ProjectFeature;
   handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
   const { query } = useRouter();
@@ -36,7 +34,7 @@ const EditTypeModal = ({
 
   const onEditSubmit = useCallback(() => {
     const data = {
-      tagName: feature.tag,
+      // tagName: feature.tag,
       updatedTagName: selectedTag,
     };
 
@@ -69,7 +67,7 @@ const EditTypeModal = ({
         },
       }
     );
-  }, [pid, addToast, editProjectTagsMutation, feature, selectedTag]);
+  }, [pid, addToast, editProjectTagsMutation, selectedTag]);
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
@@ -111,27 +109,24 @@ const EditTypeModal = ({
                             placeholder="Type to pick or create tag..."
                             value={fprops.input.value}
                             onFocus={() => handleTagsMenu(true)}
-                            onBlur={() => handleTagsMenu(false)}
                             onKeyDown={(e) => handleKeyPress(e)}
                           />
 
                           {tagsMenuOpen && (
                             <div className="relative mt-2 h-24 w-full">
-                              <div className="absolute -left-[2%] z-50 flex w-[104%] flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
+                              <div className=" -left-[2%] flex w-[104%] flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
                                 <div className="text-sm text-gray-800">Recent:</div>
                                 <div className="flex flex-wrap gap-2.5">
                                   {tagsQuery.isFetched &&
-                                    tagsQuery.data?.map((tag) => {
-                                      return (
-                                        <button
-                                          key={tag}
-                                          className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
-                                          onClick={() => selectTag(tag)}
-                                        >
-                                          <p className="text-sm capitalize text-gray-800">{tag}</p>
-                                        </button>
-                                      );
-                                    })}
+                                    tagsQuery.data?.map((tag) => (
+                                      <button
+                                        key={tag}
+                                        className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
+                                        onClick={() => selectTag(tag)}
+                                      >
+                                        <p className="text-sm capitalize text-gray-800">{tag}</p>
+                                      </button>
+                                    ))}
                                 </div>
                               </div>
                             </div>
@@ -142,9 +137,7 @@ const EditTypeModal = ({
                       {selectedTag && (
                         <div className="flex items-center space-x-1">
                           <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5">
-                            <p className="text-sm capitalize text-gray-800">
-                              {selectedTag.replace(/_/g, ' ')}
-                            </p>
+                            <p className="text-sm capitalize text-gray-800">{selectedTag}</p>
                           </div>
                           <button
                             className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-300"
