@@ -9,10 +9,8 @@ import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
-import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import Icon from 'components/icon/component';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import { ProjectFeature } from 'types/project-model';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
@@ -30,6 +28,7 @@ const EditTypeModal = ({
 
   const formRef = useRef(null);
   const [selectedTag, selectTag] = useState(null);
+  const [tagsMenuOpen, handleTagsMenu] = useState(false);
 
   const tagsQuery = useProjectTags(pid);
 
@@ -76,10 +75,16 @@ const EditTypeModal = ({
     [pid, addToast, editProjectTagsMutation, feature, selectedTag]
   );
 
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      selectTag(event.target.value);
+    }
+  };
+
   return (
     <FormRFF<{ featureClassName: ProjectFeature['featureClassName']; tag: ProjectFeature['tag'] }>
       initialValues={{
-        tag: feature.tag,
+        tag: '',
       }}
       ref={formRef}
       onSubmit={onEditSubmit}
@@ -103,23 +108,18 @@ const EditTypeModal = ({
                       </Label>
 
                       {!selectedTag && (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <input
-                              {...fprops.input}
-                              className="w-full rounded-md border border-gray-300 text-black"
-                              placeholder="Type to pick or create tag..."
-                              value={selectedTag}
-                            />
-                          </PopoverTrigger>
+                        <>
+                          <input
+                            {...fprops.input}
+                            className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            placeholder="Type to pick or create tag..."
+                            value={fprops.input.value}
+                            onFocus={() => handleTagsMenu(!tagsMenuOpen)}
+                            onKeyDown={(e) => handleKeyPress(e)}
+                          />
 
-                          <PopoverContent
-                            side="bottom"
-                            sideOffset={20}
-                            className="!top-6 w-[600px] rounded-[10px] !border-none bg-white p-3"
-                            collisionPadding={48}
-                          >
-                            <div className="flex w-full flex-col space-y-2.5 font-sans text-gray-800">
+                          {tagsMenuOpen && (
+                            <div className="mt-2 flex w-full flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
                               <div className="text-sm text-gray-800">Recent:</div>
                               <div className="flex flex-wrap gap-2.5">
                                 {tagsQuery.isFetched &&
@@ -138,8 +138,8 @@ const EditTypeModal = ({
                                   })}
                               </div>
                             </div>
-                          </PopoverContent>
-                        </Popover>
+                          )}
+                        </>
                       )}
 
                       {selectedTag && (
