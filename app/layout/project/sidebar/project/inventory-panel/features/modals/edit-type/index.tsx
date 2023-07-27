@@ -1,8 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
+
+import { useSession } from 'next-auth/react';
 
 import { useEditFeatureTag } from 'hooks/features';
 import { useProjectTags } from 'hooks/projects';
@@ -12,6 +15,7 @@ import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Icon from 'components/icon/component';
+import { editFeaturesTagsBulk } from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu/utils';
 import { ProjectFeature } from 'types/project-model';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
@@ -23,6 +27,8 @@ const EditTypeModal = ({
   selectedFeaturesIds: ProjectFeature['id'][];
   handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid } = query as { pid: string };
@@ -35,42 +41,40 @@ const EditTypeModal = ({
 
   const editFeatureTagMutation = useEditFeatureTag();
 
-  const onEditSubmit = useCallback(() => {
+  const handleBulkEdit = useCallback(async () => {
     const data = {
       tagName: selectedTag,
     };
-    editFeatureTagMutation.mutate(
-      { projectId: `${pid}`, featureId: selectedFeaturesIds[0], data },
-      {
-        onSuccess: () => {
-          addToast(
-            'success-edit-project-tag',
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Tag edited</p>
-            </>,
-            {
-              level: 'success',
-            }
-          );
 
-          handleModal('edit', false);
-        },
-        onError: () => {
-          addToast(
-            'error-edit-project-tag',
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">It is not possible to edit this type</p>
-            </>,
-            {
-              level: 'error',
-            }
-          );
-        },
-      }
-    );
-  }, [pid, addToast, selectedTag, selectedFeaturesIds, editFeatureTagMutation, handleModal]);
+    await editFeaturesTagsBulk(pid, selectedFeaturesIds, session, data)
+      .then(async () => {
+        await queryClient.invalidateQueries(['all-features', pid]);
+        handleModal('edit', false);
+
+        addToast(
+          'success-edit-features-tags',
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Types edited</p>
+          </>,
+          {
+            level: 'success',
+          }
+        );
+      })
+      .catch(() => {
+        addToast(
+          'error-edit-features-tags',
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">It is not possible to edit this types</p>
+          </>,
+          {
+            level: 'error',
+          }
+        );
+      });
+  }, [addToast, handleModal, pid, selectedTag, selectedFeaturesIds, session, queryClient]);
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
@@ -84,7 +88,7 @@ const EditTypeModal = ({
         tag: '',
       }}
       ref={formRef}
-      onSubmit={onEditSubmit}
+      onSubmit={handleBulkEdit}
       render={({ form, handleSubmit }) => {
         formRef.current = form;
 
