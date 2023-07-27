@@ -11,9 +11,9 @@ import { useToasts } from 'hooks/toast';
 import { Button } from 'components/button/component';
 import Icon from 'components/icon/component';
 import { ModalProps } from 'components/modal';
-import { deleteProjectFeatureBulk } from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu/utils';
+import { bulkDeleteFeatureFromProject } from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu/utils';
 import { Pagination } from 'types/api-model';
-import { ProjectFeature } from 'types/project-model';
+import { Feature } from 'types/feature';
 
 import ALERT_SVG from 'svgs/ui/new-layout/alert.svg?sprite';
 
@@ -21,7 +21,7 @@ const DeleteModal = ({
   selectedFeaturesIds,
   onDismiss,
 }: {
-  selectedFeaturesIds: ProjectFeature['id'][];
+  selectedFeaturesIds: Feature['id'][];
   onDismiss?: ModalProps['onDismiss'];
 }): JSX.Element => {
   const { data: session } = useSession();
@@ -32,7 +32,7 @@ const DeleteModal = ({
 
   const selectedFeatures =
     queryClient
-      .getQueryData<{ data: ProjectFeature[]; meta: Pagination }>(['all-features', pid], {
+      .getQueryData<{ data: Feature[]; meta: Pagination }>(['all-features', pid], {
         exact: false,
       })
       ?.data?.filter(({ id, isCustom }) => selectedFeaturesIds.includes(id) && isCustom) ?? [];
@@ -44,7 +44,7 @@ const DeleteModal = ({
   );
 
   const handleBulkDelete = useCallback(async () => {
-    await deleteProjectFeatureBulk(pid, selectedFeaturesIds, session)
+    await bulkDeleteFeatureFromProject(pid, selectedFeaturesIds, session)
       .then(async () => {
         await queryClient.invalidateQueries(['all-features', pid]);
 

@@ -7,14 +7,15 @@ import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects
 
 import { MoreHorizontal } from 'lucide-react';
 
-import { useEditProjectFeature } from 'hooks/features';
+import { useEditFeature } from 'hooks/features';
 import { useToasts } from 'hooks/toast';
 
 import Checkbox from 'components/forms/checkbox';
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tag from 'components/tag';
-import { Project, ProjectFeature } from 'types/project-model';
+import { Feature } from 'types/feature';
+import { Project } from 'types/project-model';
 import { cn } from 'utils/cn';
 
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
@@ -28,7 +29,7 @@ const FeatureItemList = ({
   isSelected,
   onSelectFeature,
 }: {
-  feature: ProjectFeature;
+  feature: Feature;
   projectId: Project['id'];
   isSelected: boolean;
   onSelectFeature: (evt: ChangeEvent<HTMLInputElement>) => void;
@@ -39,7 +40,7 @@ const FeatureItemList = ({
   const { selectedFeatures: visibleFeatures } = useSelector((state) => state['/projects/[id]']);
   const [isEditable, setEditable] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const { mutate: editProjectFeature } = useEditProjectFeature();
+  const { mutate: editFeature } = useEditFeature();
 
   const handleRename = useCallback(() => {
     setEditable(true);
@@ -54,9 +55,8 @@ const FeatureItemList = ({
         setEditable(false);
         nameInputRef.current?.blur();
 
-        editProjectFeature(
+        editFeature(
           {
-            pid: projectId,
             fid: feature.id,
             body: {
               featureClassName: evt.currentTarget.value,
@@ -93,11 +93,11 @@ const FeatureItemList = ({
         );
       }
     },
-    [nameInputRef, projectId, feature.id, editProjectFeature, addToast, queryClient]
+    [nameInputRef, projectId, feature.id, editFeature, addToast, queryClient]
   );
 
   const toggleSeeOnMap = useCallback(
-    (featureId: ProjectFeature['id']) => {
+    (featureId: Feature['id']) => {
       const newSelectedFeatures = [...visibleFeatures];
 
       if (!newSelectedFeatures.includes(featureId)) {
@@ -168,7 +168,6 @@ const FeatureItemList = ({
             align="start"
           >
             <FeatureActions
-              pid={projectId}
               feature={feature}
               onEditName={handleRename}
               onEditType={handleEditType}
