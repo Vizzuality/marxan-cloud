@@ -4,7 +4,8 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { useEditProjectTags, useProjectTags } from 'hooks/projects';
+import { useEditFeatureTag } from 'hooks/features';
+import { useProjectTags } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -16,8 +17,10 @@ import { ProjectFeature } from 'types/project-model';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 const EditTypeModal = ({
+  selectedFeaturesIds,
   handleModal,
 }: {
+  selectedFeaturesIds: ProjectFeature['id'][];
   handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
   const { query } = useRouter();
@@ -30,16 +33,14 @@ const EditTypeModal = ({
 
   const tagsQuery = useProjectTags(pid);
 
-  const editProjectTagsMutation = useEditProjectTags();
+  const editFeatureTagMutation = useEditFeatureTag();
 
   const onEditSubmit = useCallback(() => {
     const data = {
-      // tagName: feature.tag,
-      updatedTagName: selectedTag,
+      tagName: selectedTag,
     };
-
-    editProjectTagsMutation.mutate(
-      { projectId: `${pid}`, data },
+    editFeatureTagMutation.mutate(
+      { projectId: `${pid}`, featureId: selectedFeaturesIds[0], data },
       {
         onSuccess: () => {
           addToast(
@@ -52,6 +53,8 @@ const EditTypeModal = ({
               level: 'success',
             }
           );
+
+          handleModal('edit', false);
         },
         onError: () => {
           addToast(
@@ -67,7 +70,7 @@ const EditTypeModal = ({
         },
       }
     );
-  }, [pid, addToast, editProjectTagsMutation, selectedTag]);
+  }, [pid, addToast, selectedTag, selectedFeaturesIds, editFeatureTagMutation]);
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
