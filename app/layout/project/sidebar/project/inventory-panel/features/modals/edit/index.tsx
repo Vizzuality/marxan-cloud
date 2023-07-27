@@ -118,7 +118,7 @@ const EditModal = ({
         formRef.current = form;
 
         return (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="relative">
             <div className="flex flex-col space-y-5 px-8 py-1">
               <h2 className="font-heading font-bold text-black">Edit feature</h2>
 
@@ -173,8 +173,8 @@ const EditModal = ({
                           )}
 
                           {tagsMenuOpen && (
-                            <div className="relative mt-2 h-24 w-full">
-                              <div className=" -left-[2%] flex w-[104%] flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
+                            <div className="mt-2 h-24 w-full">
+                              <div className="absolute -left-[2%] flex w-[104%] flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
                                 <div className="text-sm text-gray-800">Recent:</div>
                                 <div className="flex flex-wrap gap-2.5">
                                   {tagsQuery.isFetched &&
@@ -196,14 +196,17 @@ const EditModal = ({
 
                       {selectedTag && (
                         <div className="flex items-center space-x-1">
-                          <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5">
+                          <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5 hover:bg-yellow-600">
                             <p className="text-sm capitalize text-gray-800">{selectedTag}</p>
                           </div>
                           <button
-                            className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-300"
+                            className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 hover:bg-gray-500"
                             onClick={() => selectTag(null)}
                           >
-                            <Icon icon={CLOSE_SVG} className="h-2 w-2 text-gray-400" />
+                            <Icon
+                              icon={CLOSE_SVG}
+                              className="h-2 w-2 text-gray-400 group-hover:text-white"
+                            />
                           </button>
                         </div>
                       )}
