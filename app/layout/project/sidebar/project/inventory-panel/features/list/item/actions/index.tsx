@@ -5,7 +5,7 @@ import { FileEdit, Trash2, Tag } from 'lucide-react';
 import Modal from 'components/modal/component';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete';
 import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
-import { Project, ProjectFeature } from 'types/project-model';
+import { Feature } from 'types/feature';
 import { cn } from 'utils/cn';
 
 const BUTTON_CLASSES =
@@ -14,13 +14,11 @@ const BUTTON_CLASSES =
 const ICON_CLASSES = 'text-gray-400 group-hover:text-white';
 
 const FeatureActions = ({
-  pid,
   feature,
   onEditName,
   onEditType,
 }: {
-  pid: Project['id'];
-  feature: ProjectFeature;
+  feature: Feature;
   onEditName: (evt: Parameters<ButtonHTMLAttributes<HTMLButtonElement>['onClick']>[0]) => void;
   onEditType: (evt: Parameters<ButtonHTMLAttributes<HTMLButtonElement>['onClick']>[0]) => void;
 }): JSX.Element => {
