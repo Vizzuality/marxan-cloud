@@ -15,7 +15,7 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Icon from 'components/icon/component';
 import { editFeaturesTagsBulk } from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu/utils';
-import { ProjectFeature } from 'types/project-model';
+import { Feature } from 'types/feature';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -23,7 +23,7 @@ const EditTypeModal = ({
   selectedFeaturesIds,
   handleModal,
 }: {
-  selectedFeaturesIds: ProjectFeature['id'][];
+  selectedFeaturesIds: Feature['id'][];
   handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
   const { data: session } = useSession();
@@ -94,7 +94,7 @@ const EditTypeModal = ({
   };
 
   return (
-    <FormRFF<{ tag: ProjectFeature['tag'] }>
+    <FormRFF<{ tag: Feature['tag'] }>
       initialValues={{
         tag: '',
       }}

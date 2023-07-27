@@ -5,7 +5,7 @@ import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
-import { useEditFeatureTag, useEditProjectFeature, useProjectFeatures } from 'hooks/features';
+import { useEditFeatureTag, useEditFeature, useProjectFeatures } from 'hooks/features';
 import { useProjectTags } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -14,7 +14,7 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon/component';
-import { ProjectFeature } from 'types/project-model';
+import { Feature } from 'types/feature';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -22,7 +22,7 @@ const EditModal = ({
   featureId,
   handleModal,
 }: {
-  featureId: ProjectFeature['id'];
+  featureId: Feature['id'];
   handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
   const queryClient = useQueryClient();
@@ -42,7 +42,7 @@ const EditModal = ({
 
   const editFeatureTagMutation = useEditFeatureTag();
 
-  const editProjectFeatureMutation = useEditProjectFeature();
+  const editFeatureMutation = useEditFeature();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -59,8 +59,7 @@ const EditModal = ({
   const onEditSubmit = useCallback(
     async (values) => {
       const { featureClassName } = values;
-      const editProjectFeature = await editProjectFeatureMutation.mutate({
-        pid,
+      const editFeature = await editFeatureMutation.mutate({
         fid: featureId,
         body: {
           featureClassName,
@@ -73,7 +72,7 @@ const EditModal = ({
           tagName: selectedTag,
         },
       });
-      return Promise.all([editProjectFeature, editFeatureTag])
+      return Promise.all([editFeature, editFeatureTag])
         .then(async () => {
           await queryClient.invalidateQueries(['all-features', pid]);
           handleModal('edit', false);
@@ -105,7 +104,7 @@ const EditModal = ({
     [
       addToast,
       editFeatureTagMutation,
-      editProjectFeatureMutation,
+      editFeatureMutation,
       featureId,
       handleModal,
       pid,
@@ -121,7 +120,7 @@ const EditModal = ({
   };
 
   return (
-    <FormRFF<{ featureClassName: ProjectFeature['featureClassName']; tag: ProjectFeature['tag'] }>
+    <FormRFF<{ featureClassName: Feature['featureClassName']; tag: Feature['tag'] }>
       initialValues={{
         featureClassName: featureQuery.data?.[0]?.featureClassName,
         tag: featureQuery.data?.[0]?.tag,
