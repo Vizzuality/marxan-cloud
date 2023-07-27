@@ -1,6 +1,6 @@
-import React, { ElementRef, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ElementRef, useCallback, useRef, InputHTMLAttributes } from 'react';
 
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
 import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
@@ -14,9 +14,12 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon/component';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import { Feature } from 'types/feature';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
+
+export type FormValues = { featureClassName: Feature['featureClassName']; tag: Feature['tag'] };
 
 const EditModal = ({
   featureId,
@@ -30,49 +33,32 @@ const EditModal = ({
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
-  const formRef = useRef(null);
+  const formRef = useRef<FormProps<FormValues>['form']>(null);
   const tagsSectionRef = useRef<ElementRef<'div'>>(null);
 
-  const [selectedTag, selectTag] = useState<string | null>(null);
-  const [tagsMenuOpen, handleTagsMenu] = useState(false);
-
   const tagsQuery = useProjectTags(pid);
-
   const featureQuery = useProjectFeatures(pid, featureId);
-
   const editFeatureTagMutation = useEditFeatureTag();
-
   const editFeatureMutation = useEditFeature();
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (tagsSectionRef.current && !tagsSectionRef.current.contains(event.target)) {
-        handleTagsMenu(false);
-      }
-    };
-    document.addEventListener('click', handleClickOutside, true);
-    return () => {
-      document.removeEventListener('click', handleClickOutside, true);
-    };
-  }, []);
-
   const onEditSubmit = useCallback(
-    async (values) => {
-      const { featureClassName } = values;
-      const editFeature = await editFeatureMutation.mutate({
+    (values: FormValues) => {
+      const { featureClassName, tag } = values;
+      const editFeaturePromise = editFeatureMutation.mutateAsync({
         fid: featureId,
         body: {
           featureClassName,
         },
       });
-      const editFeatureTag = await editFeatureTagMutation.mutate({
+      const editFeatureTagPromise = editFeatureTagMutation.mutateAsync({
         projectId: pid,
         featureId,
         data: {
-          tagName: selectedTag,
+          tagName: tag,
         },
       });
-      return Promise.all([editFeature, editFeatureTag])
+
+      Promise.all([editFeaturePromise, editFeatureTagPromise])
         .then(async () => {
           await queryClient.invalidateQueries(['all-features', pid]);
           handleModal('edit', false);
@@ -109,25 +95,27 @@ const EditModal = ({
       handleModal,
       pid,
       queryClient,
-      selectedTag,
     ]
   );
 
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-      selectTag(event.target.value);
-    }
-  };
+  const handleKeyPress = useCallback(
+    (event: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
+      if (event.key === 'Enter') {
+        formRef.current.change('tag', event.currentTarget.value);
+      }
+    },
+    [formRef]
+  );
 
   return (
-    <FormRFF<{ featureClassName: Feature['featureClassName']; tag: Feature['tag'] }>
+    <FormRFF<FormValues>
       initialValues={{
         featureClassName: featureQuery.data?.[0]?.featureClassName,
         tag: featureQuery.data?.[0]?.tag,
       }}
       ref={formRef}
       onSubmit={onEditSubmit}
-      render={({ form, handleSubmit }) => {
+      render={({ form, handleSubmit, values }) => {
         formRef.current = form;
 
         return (
@@ -158,7 +146,7 @@ const EditModal = ({
               </div>
 
               <div ref={tagsSectionRef}>
-                <FieldRFF name="tag">
+                <FieldRFF<string> name="tag">
                   {(fprops) => (
                     <Field id="tag" {...fprops} className="relative">
                       <Label
@@ -168,53 +156,50 @@ const EditModal = ({
                         Add type
                       </Label>
 
-                      {!selectedTag && (
-                        <>
-                          <input
-                            {...fprops.input}
-                            className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            placeholder="Type to pick or create tag..."
-                            value={fprops.input.value}
-                            onFocus={() => handleTagsMenu(true)}
-                            onKeyDown={(e) => handleKeyPress(e)}
-                          />
-                          {!tagsMenuOpen && (
-                            <p className="mt-1 font-sans text-xxs text-gray-300">
-                              * Changes to selected features will automatically update related
-                              scenarios.
-                            </p>
-                          )}
+                      {!values.tag && (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <input
+                              {...fprops.input}
+                              className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              placeholder="Type to pick or create tag..."
+                              value={fprops.input.value}
+                              onKeyDown={handleKeyPress}
+                            />
+                          </PopoverTrigger>
 
-                          {tagsMenuOpen && (
-                            <div className="mt-2 h-24 w-full">
-                              <div className="absolute -left-[2%] flex w-[104%] flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
-                                <div className="text-sm text-gray-800">Recent:</div>
-                                <div className="flex flex-wrap gap-2.5">
-                                  {tagsQuery.isFetched &&
-                                    tagsQuery.data?.map((tag) => (
-                                      <button
-                                        key={tag}
-                                        className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
-                                        onClick={() => selectTag(tag)}
-                                      >
-                                        <p className="text-sm capitalize text-gray-800">{tag}</p>
-                                      </button>
-                                    ))}
-                                </div>
-                              </div>
+                          <p className="mt-1 font-sans text-xxs text-gray-300">
+                            * Changes to selected features will automatically update related
+                            scenarios.
+                          </p>
+
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] space-y-2 rounded-md bg-white p-4">
+                            <div className="text-sm text-gray-800">Recent:</div>
+                            <div className="flex flex-wrap gap-2.5">
+                              {tagsQuery.data?.map((tag) => (
+                                <button
+                                  key={tag}
+                                  className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
+                                  onClick={() => {
+                                    form.change('tag', tag);
+                                  }}
+                                >
+                                  <p className="text-sm capitalize text-gray-800">{tag}</p>
+                                </button>
+                              ))}
                             </div>
-                          )}
-                        </>
+                          </PopoverContent>
+                        </Popover>
                       )}
 
-                      {selectedTag && (
+                      {values.tag && (
                         <div className="flex items-center space-x-1">
                           <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5 hover:bg-yellow-600">
-                            <p className="text-sm capitalize text-gray-800">{selectedTag}</p>
+                            <p className="text-sm capitalize text-gray-800">{values.tag}</p>
                           </div>
                           <button
                             className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 hover:bg-gray-500"
-                            onClick={() => selectTag(null)}
+                            onClick={() => form.change('tag', null)}
                           >
                             <Icon
                               icon={CLOSE_SVG}
