@@ -65,7 +65,7 @@ const FeaturesBulkActionMenu = ({
         size="narrow"
         onDismiss={() => handleModal('edit', false)}
       >
-        <EditTypeModal handleModal={handleModal} />
+        <EditTypeModal selectedFeaturesIds={selectedFeaturesIds} handleModal={handleModal} />
       </Modal>
 
       <Modal
