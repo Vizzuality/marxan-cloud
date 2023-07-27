@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useQueryClient } from 'react-query';
 
@@ -30,21 +30,26 @@ const DeleteModal = ({
   const { pid } = query as { pid: string };
   const { addToast } = useToasts();
 
-  const selectedFeatures =
-    queryClient
-      .getQueryData<{ data: Feature[]; meta: Pagination }>(['all-features', pid], {
-        exact: false,
-      })
-      ?.data?.filter(({ id, isCustom }) => selectedFeaturesIds.includes(id) && isCustom) ?? [];
+  const selectedFeatures = useMemo(
+    () =>
+      queryClient
+        .getQueryData<{ data: Feature[]; meta: Pagination }>(['all-features', pid], {
+          exact: false,
+        })
+        ?.data?.filter(({ id, isCustom }) => selectedFeaturesIds.includes(id) && isCustom) ?? [],
+    [queryClient, selectedFeaturesIds, pid]
+  );
 
   const featureNames = selectedFeatures.map(({ featureClassName }) => featureClassName);
-  // ? features are only deletable if they do not have scenarios associated
+  // ? the user will be able to delete the features only if they are not being used by any scenario.
   const haveScenarioAssociated = selectedFeatures.some(({ scenarioUsageCount }) =>
     Boolean(scenarioUsageCount)
   );
 
-  const handleBulkDelete = useCallback(async () => {
-    await bulkDeleteFeatureFromProject(pid, selectedFeaturesIds, session)
+  const handleBulkDelete = useCallback(() => {
+    const deletableFeatureIds = selectedFeatures.map(({ id }) => id);
+
+    bulkDeleteFeatureFromProject(pid, deletableFeatureIds, session)
       .then(async () => {
         await queryClient.invalidateQueries(['all-features', pid]);
 
@@ -73,7 +78,7 @@ const DeleteModal = ({
           }
         );
       });
-  }, [selectedFeaturesIds, addToast, onDismiss, pid, queryClient, session]);
+  }, [selectedFeatures, addToast, onDismiss, pid, queryClient, session]);
 
   return (
     <div className="flex flex-col space-y-5 px-8 py-1">
