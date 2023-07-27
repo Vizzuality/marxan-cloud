@@ -11,6 +11,7 @@ import orderBy from 'lodash/orderBy';
 import { useSession } from 'next-auth/react';
 
 import { ItemProps } from 'layout/projects/all/list/item/component';
+import { Feature } from 'types/feature';
 import { Project } from 'types/project-model';
 import { createDownloadLink } from 'utils/download';
 
@@ -772,21 +773,21 @@ export function useImportLegacyProject({
 }
 
 // TAGS
-export function useProjectTags(id: Project['id']) {
+export function useProjectTags(pid: Project['id']) {
   const { data: session } = useSession();
 
   return useQuery({
-    queryKey: ['project-tags', id],
+    queryKey: ['project-tags', pid],
     queryFn: async () =>
-      PROJECTS.request({
+      PROJECTS.request<{ data: Feature['tag'][] }>({
         method: 'GET',
-        url: `/${id}/tags`,
+        url: `/${pid}/tags`,
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
         transformResponse: (data) => JSON.parse(data),
       }).then((response) => response.data.data),
-    enabled: !!id,
-    placeholderData: {},
+    enabled: !!pid,
+    placeholderData: [],
   });
 }
