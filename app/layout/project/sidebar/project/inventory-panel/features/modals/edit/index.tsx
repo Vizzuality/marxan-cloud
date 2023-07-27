@@ -29,7 +29,7 @@ const EditModal = ({
   const { pid } = query as { pid: string };
 
   const formRef = useRef(null);
-  const [selectedTag, selectTag] = useState(null);
+  const [selectedTag, selectTag] = useState<string | null>(null);
   const [tagsMenuOpen, handleTagsMenu] = useState(false);
 
   const tagsQuery = useProjectTags(pid);
@@ -38,42 +38,46 @@ const EditModal = ({
 
   const editFeatureTagMutation = useEditFeatureTag();
 
-  const onEditSubmit = useCallback(() => {
-    const data = {
-      tagName: selectedTag,
-    };
-    editFeatureTagMutation.mutate(
-      { projectId: `${pid}`, featureId, data },
-      {
-        onSuccess: () => {
-          addToast(
-            'success-edit-project-tag',
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Tag edited</p>
-            </>,
-            {
-              level: 'success',
-            }
-          );
+  const onEditSubmit = useCallback(
+    (values) => {
+      // !TODO: change feature name
+      const data = {
+        tagName: selectedTag,
+      };
+      editFeatureTagMutation.mutate(
+        { projectId: `${pid}`, featureId, data }
+        // {
+        //   onSuccess: () => {
+        //     addToast(
+        //       'success-edit-project-tag',
+        //       <>
+        //         <h2 className="font-medium">Success!</h2>
+        //         <p className="text-sm">Tag edited</p>
+        //       </>,
+        //       {
+        //         level: 'success',
+        //       }
+        //     );
 
-          handleModal('edit', false);
-        },
-        onError: () => {
-          addToast(
-            'error-edit-project-tag',
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">It is not possible to edit this type</p>
-            </>,
-            {
-              level: 'error',
-            }
-          );
-        },
-      }
-    );
-  }, [pid, addToast, selectedTag, featureId, editFeatureTagMutation, handleModal]);
+        //     handleModal('edit', false);
+        //   },
+        //   onError: () => {
+        //     addToast(
+        //       'error-edit-project-tag',
+        //       <>
+        //         <h2 className="font-medium">Error!</h2>
+        //         <p className="text-sm">It is not possible to edit this type</p>
+        //       </>,
+        //       {
+        //         level: 'error',
+        //       }
+        //     );
+        //   },
+        // }
+      );
+    },
+    [pid, addToast, selectedTag, featureId, editFeatureTagMutation, handleModal]
+  );
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
