@@ -243,11 +243,12 @@ export class OutputProjectSummariesService {
     projectId: string,
     summaryZipFullPath: string,
   ): Promise<void> {
-    await this.outputSummaryRepo.save(
+    await this.outputSummaryRepo.upsert(
       this.outputSummaryRepo.create({
         projectId,
         summaryZippedData: readFileSync(summaryZipFullPath),
       }),
+      ['projectId'],
     );
   }
 
