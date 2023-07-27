@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 
 import { useSession } from 'next-auth/react';
 
-import { useEditFeatureTag } from 'hooks/features';
 import { useProjectTags } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -38,8 +37,6 @@ const EditTypeModal = ({
   const [tagsMenuOpen, handleTagsMenu] = useState(false);
 
   const tagsQuery = useProjectTags(pid);
-
-  const editFeatureTagMutation = useEditFeatureTag();
 
   const handleBulkEdit = useCallback(async () => {
     const data = {
