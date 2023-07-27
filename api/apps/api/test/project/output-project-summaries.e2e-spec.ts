@@ -29,7 +29,83 @@ beforeEach(async () => {
 afterEach(async () => {
   await fixtures.cleanup();
 });
+
 describe('when generating output summary metadata for a project', () => {
+  const scenarioPuDataForScenario1 = [
+    { puid: 1, includedCount: 5, values: [true, true, true, true, true] },
+    { puid: 2, includedCount: 2, values: [false, false, true, false, true] },
+    { puid: 3, includedCount: 1, values: [false, false, true, false, false] },
+    {
+      puid: 4,
+      includedCount: 0,
+      values: [false, false, false, false, false],
+    },
+    { puid: 5, includedCount: 4, values: [true, true, true, false, true] },
+  ];
+  const scenarioRunResultsForScenario1 = [
+    { runNumber: 1, best: false },
+    { runNumber: 2, best: false },
+    { runNumber: 3, best: false },
+    { runNumber: 4, best: false },
+    { runNumber: 5, best: true },
+  ];
+  const scenarioPuDataForScenario2 = [
+    { puid: 1, includedCount: 4, values: [false, true, true, false, true] },
+    { puid: 2, includedCount: 2, values: [false, false, true, false, true] },
+    { puid: 3, includedCount: 2, values: [false, true, true, false, false] },
+    {
+      puid: 4,
+      includedCount: 1,
+      values: [true, false, false, false, false],
+    },
+    { puid: 5, includedCount: 3, values: [true, true, false, false, false] },
+  ];
+  const scenarioRunResultsForScenario2 = [
+    { runNumber: 1, best: true },
+    { runNumber: 2, best: false },
+    { runNumber: 3, best: false },
+    { runNumber: 4, best: false },
+    { runNumber: 5, best: false },
+  ];
+
+  const marxanSummaryDataForProject = [
+    {
+      puid: '1',
+      S001_best: 'true',
+      S001_ssoln: '5',
+      S002_best: 'false',
+      S002_ssoln: '4',
+    },
+    {
+      puid: '2',
+      S001_best: 'true',
+      S001_ssoln: '2',
+      S002_best: 'false',
+      S002_ssoln: '2',
+    },
+    {
+      puid: '3',
+      S001_best: 'false',
+      S001_ssoln: '1',
+      S002_best: 'false',
+      S002_ssoln: '2',
+    },
+    {
+      puid: '4',
+      S001_best: 'false',
+      S001_ssoln: '0',
+      S002_best: 'true',
+      S002_ssoln: '1',
+    },
+    {
+      puid: '5',
+      S001_best: 'true',
+      S001_ssoln: '4',
+      S002_best: 'true',
+      S002_ssoln: '3',
+    },
+  ];
+
   it('should generate zip files', async () => {
     // This test will arrange 2 scenarios, with 5 runs, and 5 Planning Units
     const projectId = await fixtures.GivenProjectExistsOnAPI('project');
@@ -41,6 +117,19 @@ describe('when generating output summary metadata for a project', () => {
       'scenario2Name',
       projectId,
     );
+
+    const scenarioIdToNameMapping = [
+      {
+        projectScenarioId: '001',
+        uuid: scenario1Id,
+        name: 'scenario1Name',
+      },
+      {
+        projectScenarioId: '002',
+        uuid: scenario2Id,
+        name: 'scenario2Name',
+      },
+    ];
 
     const projectPus = await fixtures.GivenProjectPuDataExists(projectId);
     await fixtures.GivenScenarioPuDataExists(
@@ -54,87 +143,57 @@ describe('when generating output summary metadata for a project', () => {
       projectPus,
     );
 
-    await fixtures.GivenOutputScenarioPuDataExists(projectId, scenario1Id, [
-      { puid: 1, includedCount: 5, values: [true, true, true, true, true] },
-      { puid: 2, includedCount: 2, values: [false, false, true, false, true] },
-      { puid: 3, includedCount: 1, values: [false, false, true, false, false] },
-      {
-        puid: 4,
-        includedCount: 0,
-        values: [false, false, false, false, false],
-      },
-      { puid: 5, includedCount: 4, values: [true, true, true, false, true] },
-    ]);
-    await fixtures.GivenOutputScenarioResultsExists(projectId, scenario1Id, [
-      { runNumber: 1, best: false },
-      { runNumber: 2, best: false },
-      { runNumber: 3, best: false },
-      { runNumber: 4, best: false },
-      { runNumber: 5, best: true },
-    ]);
-    await fixtures.GivenOutputScenarioPuDataExists(projectId, scenario2Id, [
-      { puid: 1, includedCount: 4, values: [false, true, true, false, true] },
-      { puid: 2, includedCount: 2, values: [false, false, true, false, true] },
-      { puid: 3, includedCount: 2, values: [false, true, true, false, false] },
-      {
-        puid: 4,
-        includedCount: 1,
-        values: [true, false, false, false, false],
-      },
-      { puid: 5, includedCount: 3, values: [true, true, false, false, false] },
-    ]);
-    await fixtures.GivenOutputScenarioResultsExists(projectId, scenario2Id, [
-      { runNumber: 1, best: true },
-      { runNumber: 2, best: false },
-      { runNumber: 3, best: false },
-      { runNumber: 4, best: false },
-      { runNumber: 5, best: false },
-    ]);
+    await fixtures.GivenOutputScenarioPuDataExists(
+      projectId,
+      scenario1Id,
+      scenarioPuDataForScenario1,
+    );
+    await fixtures.GivenOutputScenarioResultsExists(
+      projectId,
+      scenario1Id,
+      scenarioRunResultsForScenario1,
+    );
 
-    await fixtures.WhenSavingOutputMetdataForProject(scenario1Id);
+    await fixtures.GivenOutputScenarioPuDataExists(
+      projectId,
+      scenario2Id,
+      scenarioPuDataForScenario2,
+    );
+    await fixtures.GivenOutputScenarioResultsExists(
+      projectId,
+      scenario2Id,
+      scenarioRunResultsForScenario2,
+    );
+
+    await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
 
     const summaryEntity = await fixtures.ThenOutputSummaryForProjectIsPersisted(
       projectId,
     );
 
-    await fixtures.ThenSummaryCSVWasProperlyGenerated(summaryEntity, [
-      {
-        puid: '1',
-        S001_best: 'true',
-        S001_ssoln: '5',
-        S002_best: 'false',
-        S002_ssoln: '4',
-      },
-      {
-        puid: '2',
-        S001_best: 'true',
-        S001_ssoln: '2',
-        S002_best: 'false',
-        S002_ssoln: '2',
-      },
-      {
-        puid: '3',
-        S001_best: 'false',
-        S001_ssoln: '1',
-        S002_best: 'false',
-        S002_ssoln: '2',
-      },
-      {
-        puid: '4',
-        S001_best: 'false',
-        S001_ssoln: '0',
-        S002_best: 'true',
-        S002_ssoln: '1',
-      },
-      {
-        puid: '5',
-        S001_best: 'true',
-        S001_ssoln: '4',
-        S002_best: 'true',
-        S002_ssoln: '3',
-      },
-    ]);
-    await fixtures.ThenScenariosCSVWasProperlyGenerated(summaryEntity, [
+    await fixtures.ThenSummaryCSVWasProperlyGenerated(
+      summaryEntity,
+      marxanSummaryDataForProject,
+    );
+    await fixtures.ThenScenariosCSVWasProperlyGenerated(
+      summaryEntity,
+      scenarioIdToNameMapping,
+    );
+  });
+
+  it('should generate zip files for any subsequent scenario runs', async () => {
+    // This test will arrange 2 scenarios, with 5 runs, and 5 Planning Units
+    const projectId = await fixtures.GivenProjectExistsOnAPI('project');
+    const scenario1Id = await fixtures.GivenScenarioExistsOnAPI(
+      'scenario1Name',
+      projectId,
+    );
+    const scenario2Id = await fixtures.GivenScenarioExistsOnAPI(
+      'scenario2Name',
+      projectId,
+    );
+
+    const scenarioIdToNameMapping = [
       {
         projectScenarioId: '001',
         uuid: scenario1Id,
@@ -145,8 +204,74 @@ describe('when generating output summary metadata for a project', () => {
         uuid: scenario2Id,
         name: 'scenario2Name',
       },
-    ]);
-  }, 100000);
+    ];
+
+    const projectPus = await fixtures.GivenProjectPuDataExists(projectId);
+    await fixtures.GivenScenarioPuDataExists(
+      projectId,
+      scenario1Id,
+      projectPus,
+    );
+    await fixtures.GivenScenarioPuDataExists(
+      projectId,
+      scenario2Id,
+      projectPus,
+    );
+
+    await fixtures.GivenOutputScenarioPuDataExists(
+      projectId,
+      scenario1Id,
+      scenarioPuDataForScenario1,
+    );
+    await fixtures.GivenOutputScenarioResultsExists(
+      projectId,
+      scenario1Id,
+      scenarioRunResultsForScenario1,
+    );
+
+    await fixtures.GivenOutputScenarioPuDataExists(
+      projectId,
+      scenario2Id,
+      scenarioPuDataForScenario2,
+    );
+    await fixtures.GivenOutputScenarioResultsExists(
+      projectId,
+      scenario2Id,
+      scenarioRunResultsForScenario2,
+    );
+
+    // Simulate saving output metadata after running a scenario
+    await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
+
+    const summaryEntityRun1 = await fixtures.ThenOutputSummaryForProjectIsPersisted(
+      projectId,
+    );
+
+    await fixtures.ThenSummaryCSVWasProperlyGenerated(
+      summaryEntityRun1,
+      marxanSummaryDataForProject,
+    );
+    await fixtures.ThenScenariosCSVWasProperlyGenerated(
+      summaryEntityRun1,
+      scenarioIdToNameMapping,
+    );
+
+    // Simulate saving output metadata after running a scenario again (or another scenario)
+    await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
+
+    const summaryEntityRun2 = await fixtures.ThenOutputSummaryForProjectIsPersisted(
+      projectId,
+    );
+
+    await fixtures.ThenSummaryCSVWasProperlyGenerated(
+      summaryEntityRun2,
+      marxanSummaryDataForProject,
+    );
+    await fixtures.ThenScenariosCSVWasProperlyGenerated(
+      summaryEntityRun2,
+      scenarioIdToNameMapping,
+    );
+  });
 });
 
 const NUMBER_OF_PU_IN_SAMPLE = 5;
@@ -267,7 +392,7 @@ const getFixtures = async () => {
       await apiEntityManager.insert('output_scenarios_summaries', insertValues);
     },
 
-    WhenSavingOutputMetdataForProject: async (scenarioId: string) => {
+    WhenSavingOutputMetadataForProject: async (scenarioId: string) => {
       await outputSummaryService.saveSummaryForProjectOfScenario(scenarioId);
     },
 
