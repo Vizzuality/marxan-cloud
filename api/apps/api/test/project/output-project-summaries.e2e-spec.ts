@@ -171,8 +171,8 @@ const getFixtures = async () => {
 
   return {
     cleanup: async () => {
-      const clearTable = (em: EntityManager, tableName: string) => {
-        em.createQueryBuilder().delete().from(tableName).execute();
+      const clearTable = async (em: EntityManager, tableName: string) => {
+        await em.createQueryBuilder().delete().from(tableName).execute();
       };
 
       await scenarioRepo.delete({});
