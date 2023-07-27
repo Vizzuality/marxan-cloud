@@ -1,10 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
-import { useEditFeatureTag, useProjectFeatures } from 'hooks/features';
+import { useEditFeatureTag, useEditProjectFeature, useProjectFeatures } from 'hooks/features';
 import { useProjectTags } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -24,6 +25,7 @@ const EditModal = ({
   featureId: ProjectFeature['id'];
   handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
+  const queryClient = useQueryClient();
   const { addToast } = useToasts();
   const { query } = useRouter();
   const { pid } = query as { pid: string };
@@ -38,45 +40,64 @@ const EditModal = ({
 
   const editFeatureTagMutation = useEditFeatureTag();
 
-  const onEditSubmit = useCallback(
-    (values) => {
-      // !TODO: change feature name
-      const data = {
-        tagName: selectedTag,
-      };
-      editFeatureTagMutation.mutate(
-        { projectId: `${pid}`, featureId, data }
-        // {
-        //   onSuccess: () => {
-        //     addToast(
-        //       'success-edit-project-tag',
-        //       <>
-        //         <h2 className="font-medium">Success!</h2>
-        //         <p className="text-sm">Tag edited</p>
-        //       </>,
-        //       {
-        //         level: 'success',
-        //       }
-        //     );
+  const editProjectFeatureMutation = useEditProjectFeature();
 
-        //     handleModal('edit', false);
-        //   },
-        //   onError: () => {
-        //     addToast(
-        //       'error-edit-project-tag',
-        //       <>
-        //         <h2 className="font-medium">Error!</h2>
-        //         <p className="text-sm">It is not possible to edit this type</p>
-        //       </>,
-        //       {
-        //         level: 'error',
-        //       }
-        //     );
-        //   },
-        // }
-      );
+  const onEditSubmit = useCallback(
+    async (values) => {
+      const { featureClassName } = values;
+      const editProjectFeature = await editProjectFeatureMutation.mutate({
+        pid,
+        fid: featureId,
+        body: {
+          featureClassName,
+        },
+      });
+      const editFeatureTag = await editFeatureTagMutation.mutate({
+        projectId: pid,
+        featureId,
+        data: {
+          tagName: selectedTag,
+        },
+      });
+      return Promise.all([editProjectFeature, editFeatureTag])
+        .then(async () => {
+          await queryClient.invalidateQueries(['all-features', pid]);
+          handleModal('edit', false);
+
+          addToast(
+            'success-edit-feature',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">Features edited</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+        })
+        .catch(() => {
+          addToast(
+            'error-edit-feature',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">It is not possible to edit this feature</p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        });
     },
-    [pid, addToast, selectedTag, featureId, editFeatureTagMutation, handleModal]
+    [
+      addToast,
+      editFeatureTagMutation,
+      editProjectFeatureMutation,
+      featureId,
+      handleModal,
+      pid,
+      queryClient,
+      selectedTag,
+    ]
   );
 
   const handleKeyPress = (event) => {
