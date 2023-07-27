@@ -1,0 +1,32 @@
+import argparse
+import geopandas as gpd
+import numpy as np
+
+# Given a shapefile at `shapefile_path` (this needs to be a .shp file: using a
+# zipped shapefile directly as exported from the Marxan Cloud app is not
+# supported), generate a `num_attributes`` set of new attributes, using random
+# float numbers as values for each shapefile feature. The new attributes are
+# _added_ to the shapefile.
+def add_random_attributes(shapefile_path, num_attributes):
+    # Read the shapefile using geopandas
+    gdf = gpd.read_file(f'{shapefile_path}')
+
+    # Generate random float values between 0 and 1
+    random_values = np.random.uniform(0, 1, size=(len(gdf), num_attributes))
+
+    # Create new attributes and assign random values to each row
+    for i in range(num_attributes):
+        attribute_index = i+1
+        attribute_name = f'f_{attribute_index:06}'
+        gdf[attribute_name] = random_values[:, i]
+
+    # Save the modified shapefile
+    gdf.to_file(shapefile_path)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Add configurable number of random attributes to a shapefile.")
+    parser.add_argument("shapefile_path", help="Path to the input shapefile.")
+    parser.add_argument("num_attributes", type=int, help="Number of random attributes to add.")
+    args = parser.parse_args()
+
+    add_random_attributes(args.shapefile_path, args.num_attributes)

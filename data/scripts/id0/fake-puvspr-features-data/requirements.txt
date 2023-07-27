@@ -1,0 +1,2 @@
+geopandas==0.13.2
+numpy==1.25.1
