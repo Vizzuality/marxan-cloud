@@ -12,7 +12,7 @@ import { useAllFeatures } from 'hooks/features';
 
 import Checkbox from 'components/forms/checkbox';
 import Loading from 'components/loading';
-import { ProjectFeature } from 'types/project-model';
+import { Feature } from 'types/feature';
 import { cn } from 'utils/cn';
 
 import FeaturesBulkActionMenu from '../bulk-action-menu';
@@ -25,10 +25,10 @@ export const ProjectFeatureList = (): JSX.Element => {
   const [filters, setFilters] = useState<Parameters<typeof useAllFeatures>[1]>({
     sort: 'featureClassName',
   });
-  const [selectedFeaturesIds, setSelectedFeaturesIds] = useState<ProjectFeature['id'][]>([]);
+  const [selectedFeaturesIds, setSelectedFeaturesIds] = useState<Feature['id'][]>([]);
   const { query } = useRouter();
   const { pid } = query as { pid: string };
-  const allFeaturesQuery = useAllFeatures<ProjectFeature[]>(
+  const allFeaturesQuery = useAllFeatures<Feature[]>(
     pid,
     {
       ...filters,
@@ -73,7 +73,7 @@ export const ProjectFeatureList = (): JSX.Element => {
   // ! this feature is partially implement until the API is ready
   // ! This is about previewing the feature on the map
   const toggleSeeOnMap = useCallback(
-    (featureId: ProjectFeature['id']) => {
+    (featureId: Feature['id']) => {
       const newSelectedFeatures = [...visibleFeatures];
 
       if (!newSelectedFeatures.includes(featureId)) {

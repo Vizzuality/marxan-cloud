@@ -4,7 +4,7 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal/component';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete/index';
-import { ProjectFeature } from 'types/project-model';
+import { Feature } from 'types/feature';
 
 import EDIT_SVG from 'svgs/project/edit.svg?sprite';
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
@@ -18,7 +18,7 @@ const ICON_CLASSES = 'h-5 w-5 transition-colors text-gray-400 group-hover:text-g
 const FeaturesBulkActionMenu = ({
   selectedFeaturesIds,
 }: {
-  selectedFeaturesIds: ProjectFeature['id'][];
+  selectedFeaturesIds: Feature['id'][];
 }): JSX.Element => {
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
     edit: false,
