@@ -26,7 +26,7 @@ export function deleteProjectFeatureBulk(
   return Promise.all(fids.map((fid) => deleteProjectFeature({ pid, fid })));
 }
 
-export function editFeaturesTags(
+export function editFeaturesTagsBulk(
   projectId: Project['id'],
   featureIds: ProjectFeature['id'][],
   session: Session,
