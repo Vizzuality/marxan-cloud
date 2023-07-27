@@ -47,8 +47,6 @@ const FeatureItemList = ({
     nameInputRef.current?.focus();
   }, [nameInputRef]);
 
-  const handleEditType = useCallback(() => {}, []);
-
   const handleNameChanges = useCallback(
     (evt: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
       if (evt.key === 'Enter') {
@@ -170,7 +168,7 @@ const FeatureItemList = ({
             <FeatureActions
               feature={feature}
               onEditName={handleRename}
-              onEditType={handleEditType}
+              isDeletable={feature.isCustom && !feature.scenarioUsageCount}
             />
           </PopoverContent>
         </Popover>
