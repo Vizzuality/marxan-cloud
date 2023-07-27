@@ -70,7 +70,7 @@ const EditTypeModal = ({
         },
       }
     );
-  }, [pid, addToast, selectedTag, selectedFeaturesIds, editFeatureTagMutation]);
+  }, [pid, addToast, selectedTag, selectedFeaturesIds, editFeatureTagMutation, handleModal]);
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
