@@ -4,7 +4,7 @@ import { FileEdit, Trash2, Tag } from 'lucide-react';
 
 import Modal from 'components/modal/component';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete';
-import EditTypeModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit-type';
+import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
 import { Project, ProjectFeature } from 'types/project-model';
 import { cn } from 'utils/cn';
 
@@ -69,7 +69,7 @@ const FeatureActions = ({
             size="narrow"
             onDismiss={() => handleModal('edit', false)}
           >
-            {/* // !TODO: Add edit feature modal  */}
+            <EditModal featureId={feature.id} handleModal={handleModal} />
           </Modal>
         </li>
         {feature.scenarioUsageCount === 1 && (
