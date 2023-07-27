@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { ElementRef, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useQueryClient } from 'react-query';
@@ -31,6 +31,8 @@ const EditModal = ({
   const { pid } = query as { pid: string };
 
   const formRef = useRef(null);
+  const tagsSectionRef = useRef<ElementRef<'div'>>(null);
+
   const [selectedTag, selectTag] = useState<string | null>(null);
   const [tagsMenuOpen, handleTagsMenu] = useState(false);
 
@@ -41,6 +43,18 @@ const EditModal = ({
   const editFeatureTagMutation = useEditFeatureTag();
 
   const editProjectFeatureMutation = useEditProjectFeature();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tagsSectionRef.current && !tagsSectionRef.current.contains(event.target)) {
+        handleTagsMenu(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, []);
 
   const onEditSubmit = useCallback(
     async (values) => {
@@ -144,7 +158,7 @@ const EditModal = ({
                 </FieldRFF>
               </div>
 
-              <div>
+              <div ref={tagsSectionRef}>
                 <FieldRFF name="tag">
                   {(fprops) => (
                     <Field id="tag" {...fprops} className="relative">
