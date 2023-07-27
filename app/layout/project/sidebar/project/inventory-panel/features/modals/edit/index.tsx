@@ -50,7 +50,7 @@ const EditModal = ({
         return (
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col space-y-5 px-8 py-1">
-              <h2 className="font-heading font-bold text-black">Edit type</h2>
+              <h2 className="font-heading font-bold text-black">Edit feature</h2>
 
               <div>
                 <FieldRFF<string>
@@ -65,7 +65,7 @@ const EditModal = ({
 
                       <input
                         {...fprops.input}
-                        className="rounded-md text-black"
+                        className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                         placeholder="Type name..."
                         defaultValue={fprops.input.value}
                       />
@@ -86,7 +86,7 @@ const EditModal = ({
                         <PopoverTrigger asChild>
                           <input
                             {...fprops.input}
-                            className="w-full rounded-md border border-gray-300 text-black"
+                            className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                             placeholder="Type to pick or create tag..."
                           />
                         </PopoverTrigger>

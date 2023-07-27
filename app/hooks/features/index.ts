@@ -632,7 +632,6 @@ export function useDeleteProjectFeature() {
 }
 
 export function useEditProjectFeature() {
-  const queryClient = useQueryClient();
   const { data: session } = useSession();
 
   const editProjectFeature = ({
@@ -658,6 +657,43 @@ export function useEditProjectFeature() {
   };
 
   return useMutation(editProjectFeature);
+}
+
+export function useEditFeatureTag() {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const editFeatureTag = ({
+    featureId,
+    projectId,
+    data,
+  }: {
+    featureId: ProjectFeature['id'];
+    projectId: Project['id'];
+    data: {
+      tagName: string;
+    };
+  }) => {
+    return PROJECTS.request({
+      method: 'PATCH',
+      url: `/${projectId}/features/${featureId}/tags`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(editFeatureTag, {
+    onSuccess: async (data, variables) => {
+      const { featureId, projectId } = variables;
+      await queryClient.invalidateQueries(['feature', featureId]);
+      await queryClient.invalidateQueries(['all-features', projectId]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
 }
 
 export function useProjectFeatures(
