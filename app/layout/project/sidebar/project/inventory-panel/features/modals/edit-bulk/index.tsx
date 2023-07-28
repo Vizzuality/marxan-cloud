@@ -19,7 +19,7 @@ import { Feature } from 'types/feature';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-const EditTypeModal = ({
+const EditBulkModal = ({
   selectedFeaturesIds,
   handleModal,
 }: {
@@ -196,4 +196,4 @@ const EditTypeModal = ({
   );
 };
 
-export default EditTypeModal;
+export default EditBulkModal;
