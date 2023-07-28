@@ -1,4 +1,5 @@
 import InfoButton from 'components/info-button';
+import ProtectedAreasList from 'layout/project/sidebar/project/inventory-panel/protected-areas/list';
 import UploadProtectedAreasButton from 'layout/project/sidebar/project/inventory-panel/protected-areas/uploader-btn';
 
 const InventoryPanelProtectedAreas = (): JSX.Element => {
@@ -18,8 +19,25 @@ const InventoryPanelProtectedAreas = (): JSX.Element => {
         </div>
         <UploadProtectedAreasButton />
       </header>
-      {/* filters */}
-      {/* <ProjectFeatureList /> */}
+
+      <ProtectedAreasList />
+      <div className="flex flex-col space-y-6">
+        <p className="font-sans text-xs leading-4 text-gray-300">
+          UNEP-WCMC and IUCN (2022), Protected Planet: The World Database on Protected Areas (WDPA)
+          [On-line], [05/2022], Cambridge, UK: UNEP-WCMC and IUCN.
+        </p>
+        <p className="font-sans text-xxs font-medium text-white">
+          Available at:{' '}
+          <a
+            href="www.protectedplanet.net"
+            className="text-primary-500"
+            rel="noreferrer"
+            target="_blank"
+          >
+            www.protectedplanet.net.
+          </a>
+        </p>
+      </div>
     </section>
   );
 };
