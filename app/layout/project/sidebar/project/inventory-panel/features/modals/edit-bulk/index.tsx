@@ -1,4 +1,11 @@
-import React, { ElementRef, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  ElementRef,
+  InputHTMLAttributes,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useQueryClient } from 'react-query';
@@ -14,10 +21,15 @@ import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Icon from 'components/icon/component';
-import { editFeaturesTagsBulk } from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu/utils';
+import {
+  deleteFeaturesTagsBulk,
+  editFeaturesTagsBulk,
+} from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu/utils';
 import { Feature } from 'types/feature';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
+
+export type FormValues = { tag: Feature['tag'] };
 
 const EditBulkModal = ({
   selectedFeaturesIds,
@@ -35,15 +47,15 @@ const EditBulkModal = ({
   const formRef = useRef(null);
   const tagsSectionRef = useRef<ElementRef<'div'>>(null);
 
-  const [selectedTag, selectTag] = useState<string | null>(null);
-  const [tagsMenuOpen, handleTagsMenu] = useState(false);
+  const [tagsMenuOpen, setTagsMenuOpen] = useState(false);
+  const [tagIsDone, setTagIsDone] = useState(false);
 
   const tagsQuery = useProjectTags(pid);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (tagsSectionRef.current && !tagsSectionRef.current.contains(event.target)) {
-        handleTagsMenu(false);
+        setTagsMenuOpen(false);
       }
     };
     document.addEventListener('click', handleClickOutside, true);
@@ -52,46 +64,85 @@ const EditBulkModal = ({
     };
   }, []);
 
-  const handleBulkEdit = useCallback(async () => {
-    const data = {
-      tagName: selectedTag,
-    };
+  const handleBulkEdit = useCallback(
+    (values: FormValues) => {
+      const data = {
+        tagName: values.tag,
+      };
 
-    await editFeaturesTagsBulk(pid, selectedFeaturesIds, session, data)
-      .then(async () => {
-        await queryClient.invalidateQueries(['all-features', pid]);
-        handleModal('edit', false);
+      if (values.tag) {
+        editFeaturesTagsBulk(pid, selectedFeaturesIds, session, data)
+          .then(async () => {
+            await queryClient.invalidateQueries(['all-features', pid]);
+            handleModal('edit', false);
 
-        addToast(
-          'success-edit-features-tags',
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Types edited</p>
-          </>,
-          {
-            level: 'success',
-          }
-        );
-      })
-      .catch(() => {
-        addToast(
-          'error-edit-features-tags',
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">It is not possible to edit this types</p>
-          </>,
-          {
-            level: 'error',
-          }
-        );
-      });
-  }, [addToast, handleModal, pid, selectedTag, selectedFeaturesIds, session, queryClient]);
+            addToast(
+              'success-edit-features-tags',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Types edited</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          })
+          .catch(() => {
+            addToast(
+              'error-edit-features-tags',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">It is not possible to edit this types</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          });
+      } else {
+        deleteFeaturesTagsBulk(pid, selectedFeaturesIds, session)
+          .then(async () => {
+            await queryClient.invalidateQueries(['all-features', pid]);
+            handleModal('edit', false);
 
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-      selectTag(event.target.value);
-    }
-  };
+            addToast(
+              'success-delete-features-tags',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Types removed</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          })
+          .catch(() => {
+            addToast(
+              'error-delete-features-tags',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">It is not possible to remove this types</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          });
+      }
+    },
+    [addToast, handleModal, pid, selectedFeaturesIds, session, queryClient]
+  );
+
+  const handleKeyPress = useCallback(
+    (event: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
+      if (event.key === 'Enter') {
+        setTagIsDone(true);
+        formRef.current.change('tag', event.currentTarget.value);
+        setTagsMenuOpen(false);
+      }
+    },
+    [formRef]
+  );
 
   return (
     <FormRFF<{ tag: Feature['tag'] }>
@@ -100,7 +151,7 @@ const EditBulkModal = ({
       }}
       ref={formRef}
       onSubmit={handleBulkEdit}
-      render={({ form, handleSubmit }) => {
+      render={({ form, handleSubmit, values }) => {
         formRef.current = form;
 
         return (
@@ -119,15 +170,15 @@ const EditBulkModal = ({
                         Add type
                       </Label>
 
-                      {!selectedTag && (
+                      {(!values.tag || !tagIsDone) && (
                         <>
                           <input
                             {...fprops.input}
                             className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                             placeholder="Type to pick or create tag..."
                             value={fprops.input.value}
-                            onFocus={() => handleTagsMenu(true)}
-                            onKeyDown={(e) => handleKeyPress(e)}
+                            onFocus={() => setTagsMenuOpen(true)}
+                            onKeyDown={handleKeyPress}
                           />
                           {!tagsMenuOpen && (
                             <p className="mt-1 font-sans text-xxs text-gray-300">
@@ -141,16 +192,18 @@ const EditBulkModal = ({
                               <div className="absolute -left-[2%] flex w-[104%] flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
                                 <div className="text-sm text-gray-800">Recent:</div>
                                 <div className="flex flex-wrap gap-2.5">
-                                  {tagsQuery.isFetched &&
-                                    tagsQuery.data?.map((tag) => (
-                                      <button
-                                        key={tag}
-                                        className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
-                                        onClick={() => selectTag(tag)}
-                                      >
-                                        <p className="text-sm capitalize text-gray-800">{tag}</p>
-                                      </button>
-                                    ))}
+                                  {tagsQuery.data?.map((tag) => (
+                                    <button
+                                      key={tag}
+                                      className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
+                                      onClick={() => {
+                                        form.change('tag', tag);
+                                        setTagIsDone(true);
+                                      }}
+                                    >
+                                      <p className="text-sm capitalize text-gray-800">{tag}</p>
+                                    </button>
+                                  ))}
                                 </div>
                               </div>
                             </div>
@@ -158,14 +211,17 @@ const EditBulkModal = ({
                         </>
                       )}
 
-                      {selectedTag && (
+                      {values.tag && tagIsDone && (
                         <div className="flex items-center space-x-1">
                           <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5 hover:bg-yellow-600">
-                            <p className="text-sm capitalize text-gray-800">{selectedTag}</p>
+                            <p className="text-sm capitalize text-gray-800">{values.tag}</p>
                           </div>
                           <button
                             className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 hover:bg-gray-500"
-                            onClick={() => selectTag(null)}
+                            onClick={() => {
+                              form.change('tag', null);
+                              setTagIsDone(false);
+                            }}
                           >
                             <Icon
                               icon={CLOSE_SVG}
@@ -184,7 +240,7 @@ const EditBulkModal = ({
                   Cancel
                 </Button>
 
-                <Button theme="primary" size="xl" type="submit" disabled={!selectedTag}>
+                <Button theme="primary" size="xl" type="submit">
                   Save
                 </Button>
               </div>
