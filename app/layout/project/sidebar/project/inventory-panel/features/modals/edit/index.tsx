@@ -102,6 +102,7 @@ const EditModal = ({
 
   const handleKeyPress = useCallback(
     (event: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
+      console.log('-----> IS SUBMIT', formRef.current.submit());
       if (event.key === 'Enter') {
         setTagIsDone(true);
         formRef.current.change('tag', event.currentTarget.value);
