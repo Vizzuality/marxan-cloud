@@ -122,11 +122,13 @@ export const getProjectTagsFixtures = async () => {
       projectId: string,
       tags?: string[],
       omitTag?: boolean,
+      sort?: 'ASC' | 'DESC',
     ) => {
       const queryParams: any = {};
       queryParams.filter = {};
       tags?.length ? (queryParams.filter.tag = tags.join(',')) : '';
       omitTag ? (queryParams.omitFields = ['tag'].join(',')) : '';
+      sort ? (queryParams.sort = `${sort === 'DESC' ? '-' : ''}tag`) : '';
 
       return request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/features?`)
