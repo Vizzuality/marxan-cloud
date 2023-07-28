@@ -117,7 +117,7 @@ const FeatureItemList = ({
         <Checkbox
           id={`item-${feature.id}`}
           theme="light"
-          className="form-checkbox-dark block h-4 w-4 text-yellow-200"
+          className="block h-4 w-4 checked:bg-blue-400"
           onChange={onSelectFeature}
           checked={isSelected}
           value={feature.id}
