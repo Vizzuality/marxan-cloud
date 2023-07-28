@@ -8,6 +8,7 @@ import { DeepReadonly } from 'utility-types';
 import {
   DataSource,
   EntityManager,
+  Not,
   Repository,
   SelectQueryBuilder,
 } from 'typeorm';
@@ -450,6 +451,7 @@ export class GeoFeaturesService extends AppBaseService<
 
     const projectFeaturesWithSameName = await this.geoFeaturesRepository.count({
       where: {
+        id: Not(feature.id),
         featureClassName: updateFeatureNameDto.featureClassName,
         projectId: feature.projectId,
       },
