@@ -5,8 +5,6 @@ import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
-import { de } from 'date-fns/locale';
-
 import {
   useEditFeatureTag,
   useEditFeature,
