@@ -649,7 +649,7 @@ export function useEditFeatureTag() {
     featureId: Feature['id'];
     projectId: Project['id'];
     data: {
-      tagName: string;
+      tagName: Feature['tag'];
     };
   }) => {
     return PROJECTS.request({
@@ -663,6 +663,43 @@ export function useEditFeatureTag() {
   };
 
   return useMutation(editFeatureTag, {
+    onSuccess: async (data, variables) => {
+      const { featureId, projectId } = variables;
+      await queryClient.invalidateQueries(['feature', featureId]);
+      await queryClient.invalidateQueries(['all-features', projectId]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteFeatureTag() {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const deleteFeatureTag = ({
+    featureId,
+    projectId,
+    data,
+  }: {
+    featureId: Feature['id'];
+    projectId: Project['id'];
+    data: {
+      tagName: Feature['tag'];
+    };
+  }) => {
+    return PROJECTS.request({
+      method: 'DELETE',
+      url: `/${projectId}/features/${featureId}/tags`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(deleteFeatureTag, {
     onSuccess: async (data, variables) => {
       const { featureId, projectId } = variables;
       await queryClient.invalidateQueries(['feature', featureId]);
