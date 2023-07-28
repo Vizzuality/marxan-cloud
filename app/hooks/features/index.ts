@@ -681,18 +681,14 @@ export function useDeleteFeatureTag() {
   const deleteFeatureTag = ({
     featureId,
     projectId,
-    data,
   }: {
     featureId: Feature['id'];
     projectId: Project['id'];
-    data: {
-      tagName: Feature['tag'];
-    };
   }) => {
     return PROJECTS.request({
       method: 'DELETE',
       url: `/${projectId}/features/${featureId}/tags`,
-      data,
+
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
