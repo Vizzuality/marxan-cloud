@@ -18,8 +18,14 @@ import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { range } from 'lodash';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { GivenUserExists } from './steps/given-user-exists';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 let world: PromiseType<ReturnType<typeof createWorld>>;
+let fixtures: FixtureType<typeof getGeoFeatureFixtures>;
 
 /**
  * Tests for API contracts for the management of geo features within scenarios.
@@ -44,6 +50,7 @@ describe('GeoFeaturesModule (e2e)', () => {
     if (!world) {
       throw new Error('Could not create fixtures');
     }
+    fixtures = await getGeoFeatureFixtures(app);
   });
 
   /**
@@ -60,32 +67,66 @@ describe('GeoFeaturesModule (e2e)', () => {
     expect(response.body.data[0].type).toBe(geoFeatureResource.name.plural);
   });
 
-  test('should include scenarioUsageCount', async () => {
+  test('should include correct scenarioUsageCounts for the given project', async () => {
+    // This tests accounts for both cases of having platform wide features and custom features assigned to projects
+
     //ARRANGE
-    await GivenScenarioFeaturesData(app, 'demo_panthera_pardus', 3);
-    await GivenScenarioFeaturesData(app, 'demo_kobus_leche', 5);
+    // The features created in createdWorld  is created as a platform wide feature, while the ones in GiuvenFeatureWithData are custom
+    const projectId1 = world.projectWithCountry;
+    const projectId2 = world.projectWithGid1;
+
+    // Note: These test features have geometries based off Namidia
+    const featureSqlName = 'generic_namidia_feature_data';
+    await fixtures.GivenFeatureWithData('feature1', featureSqlName, projectId1);
+    await fixtures.GivenFeatureWithData('feature2', featureSqlName, projectId2);
+
+    await fixtures.GivenScenarioFeaturesData('feature1', 5, projectId1);
+    await fixtures.GivenScenarioFeaturesData(
+      'demo_panthera_pardus',
+      3,
+      projectId1,
+    );
+    await fixtures.GivenScenarioFeaturesData('feature2', 1, projectId2);
+    await fixtures.GivenScenarioFeaturesData('demo_kobus_leche', 2, projectId2);
 
     //ACT
-    const multipleResponse = await request(app.getHttpServer())
-      .get(`/api/v1/projects/${world.projectWithCountry}/features`)
+    const multipleResponse1 = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${projectId1}/features`)
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(HttpStatus.OK);
+    const multipleResponse2 = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${projectId2}/features`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .expect(HttpStatus.OK);
 
     // endpoint for retrieving a single feature by id is not implmenented, however the usageCount functionality is still there
 
     //ASSERT
-    const geoFeaturesForProject = multipleResponse.body.data;
-    expect(geoFeaturesForProject.length).toBeGreaterThan(0);
-    expect(multipleResponse.body.data[0].type).toBe(
+    expect(multipleResponse1.body.data.length).toBeGreaterThan(0);
+    expect(multipleResponse1.body.data[0].type).toBe(
       geoFeatureResource.name.plural,
     );
-    for (const geoFeature of geoFeaturesForProject) {
-      if (geoFeature.attributes.featureClassName === 'demo_panthera_pardus') {
+    for (const geoFeature of multipleResponse1.body.data) {
+      const featureClassName = geoFeature.attributes.featureClassName;
+      if (featureClassName === 'demo_panthera_pardus') {
         expect(geoFeature.attributes.scenarioUsageCount).toBe(3);
-      } else if (
-        geoFeature.attributes.featureClassName === 'demo_kobus_leche'
-      ) {
+      } else if (featureClassName === 'feature1') {
         expect(geoFeature.attributes.scenarioUsageCount).toBe(5);
+      } else {
+        expect(geoFeature.attributes.scenarioUsageCount).toBe(0);
+      }
+    }
+
+    expect(multipleResponse2.body.data.length).toBeGreaterThan(0);
+    expect(multipleResponse2.body.data[0].type).toBe(
+      geoFeatureResource.name.plural,
+    );
+    for (const geoFeature of multipleResponse2.body.data) {
+      const featureClassName = geoFeature.attributes.featureClassName;
+      if (featureClassName === 'feature2') {
+        expect(geoFeature.attributes.scenarioUsageCount).toBe(1);
+      } else if (featureClassName === 'demo_kobus_leche') {
+        expect(geoFeature.attributes.scenarioUsageCount).toBe(2);
       } else {
         expect(geoFeature.attributes.scenarioUsageCount).toBe(0);
       }
@@ -151,42 +192,95 @@ describe('GeoFeaturesModule (e2e)', () => {
   });
 });
 
-export async function GivenScenarioFeaturesData(
-  app: INestApplication,
-  featureClassName: string,
-  amountOfScenariosForFeature: number,
-) {
-  const geoEM = app.get(getEntityManagerToken(DbConnections.geoprocessingDB));
+//TODO This tests suite could use further fixtures refactoring
+export const getGeoFeatureFixtures = async (app: INestApplication) => {
+  //const app = await bootstrapApplication();
+  //const userToken = await GivenUserIsLoggedIn(app, 'aa');
+  const apiEntityManager = app.get(getEntityManagerToken());
+  const geoEntityManager = app.get(
+    getEntityManagerToken(DbConnections.geoprocessingDB),
+  );
   const featureRepo: Repository<GeoFeature> = app.get(
     getRepositoryToken(GeoFeature),
   );
   const featureGeoRepo: Repository<GeoFeatureGeometry> = app.get(
     getRepositoryToken(GeoFeatureGeometry, DbConnections.geoprocessingDB),
   );
+  const scenarioRepo: Repository<Scenario> = app.get(
+    getRepositoryToken(Scenario),
+  );
 
-  const feature = await featureRepo.findOneOrFail({
-    where: { featureClassName },
-  });
-  const featureGeo = await featureGeoRepo.findOneOrFail({
-    where: { featureId: feature.id },
-  });
+  return {
+    GivenFeatureWithData: async (
+      name: string,
+      sqlFilename: string,
+      projectId?: string,
+    ) => {
+      // If not passing the projectId, it effectively makes the feature platform-wide
 
-  const insertValues = range(1, amountOfScenariosForFeature + 1).map((data) => {
-    return {
-      id: v4(),
-      featureDataId: featureGeo.id,
-      scenarioId: v4(), //there's no relational integratity with the API,
-      apiFeatureId: feature.id,
-      featureId: data,
-    };
-  });
+      const [result]: {
+        feature_class_name: string;
+        id: string;
+      }[] = await apiEntityManager.query(`INSERT INTO features
+          (feature_class_name, alias, description, project_id, property_name,  intersection, creation_status, created_by)
+          VALUES
+             ('${name}', '${name}', null,'${
+        projectId ? projectId : 'null'
+      }', ' name', null, 'created', (SELECT id FROM users WHERE email = 'aa@example.com'))
+              RETURNING feature_class_name, id;
+          `);
 
-  await geoEM
-    .createQueryBuilder()
-    .insert()
-    .into(ScenarioFeaturesData)
-    .values(insertValues as QueryDeepPartialEntity<ScenarioFeaturesData>[])
-    .execute();
+      const featureId = result?.id;
+      if (!featureId) throw new Error(`Could not create feature ${name}`);
 
-  return insertValues;
-}
+      const filePath = path.join(
+        __dirname,
+        './fixtures/',
+        `${sqlFilename}.sql`,
+      );
+      const content = await fs.readFile(filePath, 'utf-8');
+
+      return geoEntityManager.query(
+        content.replace(/\$feature_id/g, featureId),
+      );
+    },
+    GivenScenarioFeaturesData: async (
+      featureClassName: string,
+      amountOfScenariosForFeature: number,
+      projectId: string,
+    ) => {
+      const feature = await featureRepo.findOneOrFail({
+        where: { featureClassName },
+      });
+      const featureGeo = await featureGeoRepo.findOneOrFail({
+        where: { featureId: feature.id },
+      });
+
+      const insertValues = [];
+      for (const index of range(1, amountOfScenariosForFeature + 1)) {
+        const scenarioId = v4();
+        await scenarioRepo.insert({
+          id: scenarioId,
+          name: scenarioId,
+          projectId,
+        });
+        insertValues.push({
+          id: v4(),
+          featureDataId: featureGeo.id,
+          scenarioId: scenarioId,
+          apiFeatureId: feature.id,
+          featureId: index,
+        });
+      }
+
+      await geoEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into(ScenarioFeaturesData)
+        .values(insertValues as QueryDeepPartialEntity<ScenarioFeaturesData>[])
+        .execute();
+
+      return insertValues;
+    },
+  };
+};

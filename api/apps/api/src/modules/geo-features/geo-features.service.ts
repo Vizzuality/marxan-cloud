@@ -320,9 +320,16 @@ export class GeoFeaturesService extends AppBaseService<
       );
     }
 
-    if (!(omitFields && omitFields.includes('scenarioUsageCount'))) {
+    if (
+      !(omitFields && omitFields.includes('scenarioUsageCount')) &&
+      info?.params?.projectId
+    ) {
+      // Note: Scenario usage is calculated within a given project, so a projectId is expected on the request
+      // Currently there's no endpoint/call to geofeature's find method without it, but a check is still put in place
+      // unless the need for opposite rises in the future
       extendedResults[0] = await this.extendFindAllGeoFeatureWithScenarioUsage(
         extendedResults[0],
+        info?.params?.projectId,
       );
     }
 
@@ -347,8 +354,15 @@ export class GeoFeaturesService extends AppBaseService<
       );
     }
 
-    if (!(omitFields && omitFields.includes('scenarioUsageCount'))) {
-      extendedResult = await this.extendFindGeoFeatureWithScenarioUsage(entity);
+    if (
+      !(omitFields && omitFields.includes('scenarioUsageCount')) &&
+      _info?.params?.projectId
+      // See notes on the corresponding section in extendFindAllResult
+    ) {
+      extendedResult = await this.extendFindGeoFeatureWithScenarioUsage(
+        entity,
+        _info?.params?.projectId,
+      );
     }
 
     return extendedResult;
@@ -696,20 +710,33 @@ export class GeoFeaturesService extends AppBaseService<
 
   private async extendFindAllGeoFeatureWithScenarioUsage(
     geoFeatures: GeoFeature[],
+    projectId: string,
   ): Promise<GeoFeature[]> {
     const featureIds = geoFeatures.map((i) => i.id);
 
-    const scenarioUsages: {
+    const scenarioIds = (
+      await this.scenarioRepository.find({
+        select: { id: true },
+        where: { projectId },
+      })
+    ).map((scenario) => scenario.id);
+
+    let scenarioUsages: {
       id: string;
       usage: number;
-    }[] = await this.geoEntityManager
-      .createQueryBuilder()
-      .select('api_feature_id', 'id')
-      .addSelect('COUNT(DISTINCT sfd.scenario_id)', 'usage')
-      .from('scenario_features_data', 'sfd')
-      .where('sfd.api_feature_id IN (:...featureIds)', { featureIds })
-      .groupBy('api_feature_id')
-      .execute();
+    }[] = [];
+
+    if (scenarioIds.length > 0) {
+      scenarioUsages = await this.geoEntityManager
+        .createQueryBuilder()
+        .select('api_feature_id', 'id')
+        .addSelect('COUNT(DISTINCT sfd.scenario_id)', 'usage')
+        .from('scenario_features_data', 'sfd')
+        .where('sfd.api_feature_id IN (:...featureIds)', { featureIds })
+        .andWhere('sfd.scenario_id IN (:...scenarioIds)', { scenarioIds })
+        .groupBy('api_feature_id')
+        .execute();
+    }
 
     return geoFeatures.map((feature) => {
       const scenarioUsage = scenarioUsages.find((el) => el.id === feature.id);
@@ -723,7 +750,15 @@ export class GeoFeaturesService extends AppBaseService<
 
   private async extendFindGeoFeatureWithScenarioUsage(
     feature: GeoFeature,
+    projectId: string,
   ): Promise<GeoFeature> {
+    const scenarioIds = (
+      await this.scenarioRepository.find({
+        select: { id: true },
+        where: { projectId },
+      })
+    ).map((scenario) => scenario.id);
+
     const [usage]: {
       count: number;
     }[] = await this.geoEntityManager
@@ -731,6 +766,7 @@ export class GeoFeaturesService extends AppBaseService<
       .select('COUNT(DISTINCT sfd.scenario_id', 'count')
       .from('scenario_features_data', 'sfd')
       .where('sfd.api_feature_id = featureId', { featureId: feature.id })
+      .andWhere('sfd.scenario_id IN (:...scenarioIds)', { scenarioIds })
       .execute();
 
     return {
