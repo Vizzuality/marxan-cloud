@@ -55,7 +55,10 @@ const FeatureActions = ({
           <button
             type="button"
             onClick={() => handleModal('edit', true)}
-            className={BUTTON_CLASSES}
+            className={cn({
+              [BUTTON_CLASSES]: true,
+              'last:rounded-b-2xl': true,
+            })}
           >
             <Tag className={ICON_CLASSES} size={20} />
             <span>Edit</span>
