@@ -5,7 +5,14 @@ import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
-import { useEditFeatureTag, useEditFeature, useProjectFeatures } from 'hooks/features';
+import { de } from 'date-fns/locale';
+
+import {
+  useEditFeatureTag,
+  useEditFeature,
+  useProjectFeatures,
+  useDeleteFeatureTag,
+} from 'hooks/features';
 import { useProjectTags } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -41,6 +48,7 @@ const EditModal = ({
   const tagsQuery = useProjectTags(pid);
   const featureQuery = useProjectFeatures(pid, featureId);
   const editFeatureTagMutation = useEditFeatureTag();
+  const deleteFeatureTagMutation = useDeleteFeatureTag();
   const editFeatureMutation = useEditFeature();
 
   const onEditSubmit = useCallback(
@@ -52,15 +60,25 @@ const EditModal = ({
           featureClassName,
         },
       });
-      const editFeatureTagPromise = editFeatureTagMutation.mutateAsync({
-        projectId: pid,
-        featureId,
-        data: {
-          tagName: tag,
-        },
-      });
 
-      Promise.all([editFeaturePromise, editFeatureTagPromise])
+      const editFeatureTagPromise = () => {
+        if (values.tag) {
+          return editFeatureTagMutation.mutateAsync({
+            projectId: pid,
+            featureId,
+            data: {
+              tagName: tag,
+            },
+          });
+        } else {
+          return deleteFeatureTagMutation.mutateAsync({
+            projectId: pid,
+            featureId,
+          });
+        }
+      };
+
+      Promise.all([editFeaturePromise, editFeatureTagPromise()])
         .then(async () => {
           await queryClient.invalidateQueries(['all-features', pid]);
           handleModal('edit', false);
@@ -91,6 +109,7 @@ const EditModal = ({
     },
     [
       addToast,
+      deleteFeatureTagMutation,
       editFeatureTagMutation,
       editFeatureMutation,
       featureId,
@@ -102,7 +121,6 @@ const EditModal = ({
 
   const handleKeyPress = useCallback(
     (event: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
-      console.log('-----> IS SUBMIT', formRef.current.submit());
       if (event.key === 'Enter') {
         setTagIsDone(true);
         formRef.current.change('tag', event.currentTarget.value);
