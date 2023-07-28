@@ -45,7 +45,7 @@ const ShowProjectsPage = (): JSX.Element => {
           {!tab && <ScenariosList />}
         </Sidebar>
         <ProjectStatus />
-        {/* <ProjectMap /> */}
+        <ProjectMap />
       </ProjectLayout>
     </Protected>
   );

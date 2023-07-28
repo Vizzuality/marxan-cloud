@@ -171,7 +171,7 @@ const EditBulkModal = ({
                       </Label>
 
                       {(!values.tag || !tagIsDone) && (
-                        <>
+                        <div className="space-y-2">
                           <input
                             {...fprops.input}
                             className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -189,27 +189,25 @@ const EditBulkModal = ({
                           )}
 
                           {tagsMenuOpen && (
-                            <div className="mt-2 h-24 w-full">
-                              <div className="absolute -left-[2%] flex w-[104%] flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
-                                <div className="text-sm text-gray-800">Recent:</div>
-                                <div className="flex flex-wrap gap-2.5">
-                                  {tagsQuery.data?.map((tag) => (
-                                    <button
-                                      key={tag}
-                                      className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
-                                      onClick={() => {
-                                        form.change('tag', tag);
-                                        setTagIsDone(true);
-                                      }}
-                                    >
-                                      <p className="text-sm capitalize text-gray-800">{tag}</p>
-                                    </button>
-                                  ))}
-                                </div>
+                            <div className="w-full space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
+                              <div className="text-sm text-gray-800">Recent:</div>
+                              <div className="flex flex-wrap gap-2.5">
+                                {tagsQuery.data?.map((tag) => (
+                                  <button
+                                    key={tag}
+                                    className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
+                                    onClick={() => {
+                                      form.change('tag', tag);
+                                      setTagIsDone(true);
+                                    }}
+                                  >
+                                    <p className="text-sm capitalize text-gray-800">{tag}</p>
+                                  </button>
+                                ))}
                               </div>
                             </div>
                           )}
-                        </>
+                        </div>
                       )}
 
                       {values.tag && tagIsDone && (
