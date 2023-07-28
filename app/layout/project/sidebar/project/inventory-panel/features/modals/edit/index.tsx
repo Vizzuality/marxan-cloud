@@ -1,4 +1,11 @@
-import React, { ElementRef, useCallback, useRef, InputHTMLAttributes, useState } from 'react';
+import React, {
+  ElementRef,
+  useCallback,
+  useRef,
+  InputHTMLAttributes,
+  useState,
+  useEffect,
+} from 'react';
 
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
 import { useQueryClient } from 'react-query';
@@ -48,6 +55,18 @@ const EditModal = ({
   const editFeatureTagMutation = useEditFeatureTag();
   const deleteFeatureTagMutation = useDeleteFeatureTag();
   const editFeatureMutation = useEditFeature();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tagsSectionRef.current && !tagsSectionRef.current.contains(event.target)) {
+        setTagsMenuOpen(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, []);
 
   const onEditSubmit = useCallback(
     (values: FormValues) => {
@@ -184,6 +203,7 @@ const EditModal = ({
                             placeholder="Type to pick or create tag..."
                             value={fprops.input.value}
                             onFocus={() => setTagsMenuOpen(true)}
+                            onBlur={() => setTagIsDone(true)}
                             onKeyDown={handleKeyPress}
                           />
 
