@@ -178,6 +178,7 @@ const EditBulkModal = ({
                             placeholder="Type to pick or create tag..."
                             value={fprops.input.value}
                             onFocus={() => setTagsMenuOpen(true)}
+                            onBlur={() => setTagIsDone(true)}
                             onKeyDown={handleKeyPress}
                           />
                           {!tagsMenuOpen && (
