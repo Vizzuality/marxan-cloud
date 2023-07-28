@@ -4,12 +4,11 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal/component';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete/index';
+import EditBulkModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit-bulk';
 import { Feature } from 'types/feature';
 
 import EDIT_SVG from 'svgs/project/edit.svg?sprite';
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
-
-import EditTypeModal from '../modals/edit-type';
 
 const BUTTON_CLASSES =
   'col-span-1 flex items-center space-x-2 rounded-lg bg-gray-700 px-4 text-xs text-gray-50';
@@ -65,7 +64,7 @@ const FeaturesBulkActionMenu = ({
         size="narrow"
         onDismiss={() => handleModal('edit', false)}
       >
-        <EditTypeModal selectedFeaturesIds={selectedFeaturesIds} handleModal={handleModal} />
+        <EditBulkModal selectedFeaturesIds={selectedFeaturesIds} handleModal={handleModal} />
       </Modal>
 
       <Modal
