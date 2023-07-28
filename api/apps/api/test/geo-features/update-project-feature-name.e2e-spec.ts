@@ -35,7 +35,6 @@ describe('Project - update feature Name', () => {
 
   test('should not permit updating a given feature when the feature is associated to a different project', async () => {
     const originalName = 'someName';
-    const projectId = fixtures.projectId;
     const anotherProjectId = fixtures.anotherProjectId;
     const featureId = await fixtures.GivenBaseFeature(
       originalName,
@@ -55,7 +54,6 @@ describe('Project - update feature Name', () => {
 
   test('should not permit updating a given feature, when it is not a custom feature', async () => {
     const originalName = 'someName';
-    const projectId = fixtures.projectId;
     const featureId = await fixtures.GivenBaseFeature(originalName);
     const result = await fixtures.WhenUpdatingFeatureForProject(
       featureId,
@@ -92,19 +90,40 @@ describe('Project - update feature Name', () => {
     const originalName = 'originalFeatureName';
     const sameName = 'sameName';
     const projectId = fixtures.projectId;
-    const featureId = await fixtures.GivenBaseFeature(originalName, projectId);
+    const originalFeatureId = await fixtures.GivenBaseFeature(
+      originalName,
+      projectId,
+    );
     await fixtures.GivenBaseFeature(sameName, projectId);
+
+    const result = await fixtures.WhenUpdatingFeatureForProject(
+      originalFeatureId,
+      sameName,
+    );
+    await fixtures.ThenUpdateWasForbidden(
+      result,
+      originalFeatureId,
+      originalName,
+      `Feature with id ${originalFeatureId} cannot be updated: name is already in use (${sameName})`,
+    );
+    await fixtures.ThenGeoFeatureHasName(originalFeatureId, originalName);
+  });
+
+  test('should allow updating with the same name if the not permit updating a given feature, when another feature with the same name already exists for the same project', async () => {
+    // This is for a special use case when editing in bulk from the frontend
+    const sameName = 'sameName';
+    const projectId = fixtures.projectId;
+    const featureId = await fixtures.GivenBaseFeature(sameName, projectId);
 
     const result = await fixtures.WhenUpdatingFeatureForProject(
       featureId,
       sameName,
     );
-    await fixtures.ThenUpdateWasForbidden(
+    await fixtures.ThenResponseContainsUpdatedFeatureInJsonApiFormat(
       result,
-      featureId,
-      originalName,
-      `Feature with id ${featureId} cannot be updated: name is already in use (${sameName})`,
+      sameName,
     );
+    await fixtures.ThenGeoFeatureHasName(featureId, sameName);
   });
 
   test('should update the name of a feature, when permitted', async () => {
@@ -115,7 +134,7 @@ describe('Project - update feature Name', () => {
       featureId,
       newName,
     );
-    await fixtures.ThenGeoFeaturesIsUpdated(result, featureId, newName);
+    await fixtures.ThenGeoFeatureHasName(featureId, newName);
     await fixtures.ThenResponseContainsUpdatedFeatureInJsonApiFormat(
       result,
       newName,
@@ -247,20 +266,8 @@ const getFixtures = async () => {
       expect(response.status).toEqual(403);
       const error: any = response.body.errors[0];
       expect(error.title).toEqual(errorMessage);
-
-      const features = await geoFeaturesApiRepo.findOne({
-        where: {
-          id: featureId,
-        },
-      });
-      expect(features?.featureClassName).toEqual(originalName);
     },
-    ThenGeoFeaturesIsUpdated: async (
-      result: request.Response,
-      featureId: string,
-      newName: string,
-    ) => {
-      expect(result.status).toEqual(200);
+    ThenGeoFeatureHasName: async (featureId: string, newName: string) => {
       const feature = await geoFeaturesApiRepo.findOne({
         where: {
           id: featureId,
@@ -272,6 +279,7 @@ const getFixtures = async () => {
       result: request.Response,
       newName: string,
     ) => {
+      expect(result.status).toEqual(200);
       expect(result.body?.data.attributes.featureClassName).toEqual(newName);
       expect(result.body?.data.type).toEqual('geo_features');
     },
