@@ -51,3 +51,25 @@ export function editFeaturesTagsBulk(
   };
   return Promise.all(featureIds.map((featureId) => editFeatureTag({ projectId, featureId, data })));
 }
+
+export function deleteFeaturesTagsBulk(
+  projectId: Project['id'],
+  featureIds: Feature['id'][],
+  session: Session
+) {
+  const deleteFeatureTags = ({
+    projectId,
+    featureId,
+  }: {
+    projectId: Project['id'];
+    featureId: Feature['id'];
+  }) => {
+    return PROJECTS.delete(`/${projectId}/features/${featureId}/tags`, {
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return Promise.all(featureIds.map((featureId) => deleteFeatureTags({ projectId, featureId })));
+}
