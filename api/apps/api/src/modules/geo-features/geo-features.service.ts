@@ -37,6 +37,7 @@ import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
 import { isLeft } from 'fp-ts/Either';
+import { isNil } from 'lodash';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -220,18 +221,11 @@ export class GeoFeaturesService extends AppBaseService<
         }
       }
 
-      const tagFilters = fetchSpecification.filter?.tag;
-      if (tagFilters && Array.isArray(tagFilters) && tagFilters.length) {
-        query
-          .leftJoin(
-            GeoFeatureTag,
-            'feature_tag',
-            `feature_tag.feature_id = ${this.alias}.id`,
-          )
-          .andWhere(`feature_tag.tag IN (:...tagFilters)`, {
-            tagFilters,
-          });
-      }
+      query = this.extendFindAllGeoFeaturesWithTags(
+        query,
+        fetchSpecification,
+        info,
+      );
 
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
         `(${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL)`,
@@ -496,6 +490,70 @@ export class GeoFeaturesService extends AppBaseService<
     await this.repository.delete(featureId);
 
     return right(true);
+  }
+
+  private extendFindAllGeoFeaturesWithTags(
+    query: SelectQueryBuilder<GeoFeature>,
+    fetchSpecification: FetchSpecification,
+    info: GeoFeaturesRequestInfo,
+  ): SelectQueryBuilder<GeoFeature> {
+    const tagSortRegex = /^-?tag$/i;
+    //Check whether the request has any tag related parameter
+    const tagFilters = fetchSpecification.filter?.tag;
+
+    // check if user asked to sort by `tag` (ascending) or -tag (descending)
+    //
+    // if user asked for tag as filter in more than one way or capitalization,
+    // take the first occurrence; maybe we should throw an error instead?
+    //TODO explanation
+    const sortByTagSpec = fetchSpecification.sort?.filter(
+      (i) => i.match(tagSortRegex)?.length,
+    )[0];
+
+    if (
+      !(tagFilters && Array.isArray(tagFilters) && tagFilters.length) &&
+      !sortByTagSpec
+    ) {
+      return query;
+    }
+
+    // first join the tag table and then apply criteria to the main query as needed
+
+    const tagTableAlias = 'feature_tag';
+    query.leftJoin(
+      GeoFeatureTag,
+      'feature_tag',
+      `feature_tag.feature_id = "${this.alias}".id`,
+    );
+
+    if (tagFilters && Array.isArray(tagFilters) && tagFilters.length) {
+      query.andWhere(`${tagTableAlias}.tag IN (:...tagFilters)`, {
+        tagFilters,
+      });
+    }
+
+    if (sortByTagSpec) {
+      // because of the way that TypeORM handles pagination with
+      // if using an Order By on a query that is paginated using .take() and skip() on the querybuilder ( as nestjs-base-service
+      // does internally) and the query has a join, it is mandatory to include the sorting column in the select clause
+      // of the query because of how TypeORM processes the query internally on that specific case
+      // https://github.com/typeorm/typeorm/blob/ff6e8751d98dfe9999ee21906cca7d20b1c6b15d/src/query-builder/SelectQueryBuilder.ts#L3408-L3415
+      // https://github.com/typeorm/typeorm/issues/4742
+      query.addSelect(`${tagTableAlias}.tag`);
+
+      query.addOrderBy(
+        `${tagTableAlias}.tag`,
+        sortByTagSpec.match(/^-/) ? 'DESC' : 'ASC',
+        'NULLS LAST',
+      );
+
+      // remove `tag` or `-tag` from list of sort-by columns
+      fetchSpecification.sort = fetchSpecification.sort?.filter((i) =>
+        isNil(i.match(tagSortRegex)),
+      );
+    }
+
+    return query;
   }
 
   private async getIntersectingProjectFeatures(

@@ -440,4 +440,52 @@ describe('Projects Tag GET Features (e2e)', () => {
 
     mockedIntersectingProjectFeature.mockRestore();
   });
+
+  test('should return features sorted by tag if requested', async () => {
+    // ARRANGE
+    const projectId1 = await fixtures.GivenProject('someProject');
+    const featureId1 = await fixtures.GivenFeatureOnProject(projectId1, 'f1');
+    const featureId2 = await fixtures.GivenFeatureOnProject(projectId1, 'f2');
+    const featureId3 = await fixtures.GivenFeatureOnProject(projectId1, 'f3');
+    await fixtures.GivenTagOnFeature(projectId1, featureId1, 'another');
+    await fixtures.GivenTagOnFeature(projectId1, featureId3, 'SomeTAG');
+
+    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
+      [featureId1, featureId2, featureId3],
+    );
+
+    // ACT
+    const response1 = await fixtures.WhenGettingFeaturesFromProject(
+      projectId1,
+      [],
+      true,
+      'ASC',
+    );
+
+    const response2 = await fixtures.WhenGettingFeaturesFromProject(
+      projectId1,
+      [],
+      true,
+      'DESC',
+    );
+
+    //ASSERT
+    expect(response1.status).toBe(HttpStatus.OK);
+    expect(response1.body.data.length).toEqual(3);
+    expect(
+      response1.body.data.map(
+        (feature: any) => feature.attributes.featureClassName,
+      ),
+    ).toEqual(['f3', 'f1', 'f2']);
+
+    expect(response2.status).toBe(HttpStatus.OK);
+    expect(response2.body.data.length).toEqual(3);
+    expect(
+      response2.body.data.map(
+        (feature: any) => feature.attributes.featureClassName,
+      ),
+    ).toEqual(['f1', 'f3', 'f2']);
+
+    mockedIntersectingProjectFeature.mockRestore();
+  });
 });
