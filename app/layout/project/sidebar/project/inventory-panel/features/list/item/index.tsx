@@ -7,14 +7,15 @@ import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects
 
 import { MoreHorizontal } from 'lucide-react';
 
-import { useEditProjectFeature } from 'hooks/features';
+import { useEditFeature } from 'hooks/features';
 import { useToasts } from 'hooks/toast';
 
 import Checkbox from 'components/forms/checkbox';
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tag from 'components/tag';
-import { Project, ProjectFeature } from 'types/project-model';
+import { Feature } from 'types/feature';
+import { Project } from 'types/project-model';
 import { cn } from 'utils/cn';
 
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
@@ -28,7 +29,7 @@ const FeatureItemList = ({
   isSelected,
   onSelectFeature,
 }: {
-  feature: ProjectFeature;
+  feature: Feature;
   projectId: Project['id'];
   isSelected: boolean;
   onSelectFeature: (evt: ChangeEvent<HTMLInputElement>) => void;
@@ -39,14 +40,12 @@ const FeatureItemList = ({
   const { selectedFeatures: visibleFeatures } = useSelector((state) => state['/projects/[id]']);
   const [isEditable, setEditable] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const { mutate: editProjectFeature } = useEditProjectFeature();
+  const { mutate: editFeature } = useEditFeature();
 
   const handleRename = useCallback(() => {
     setEditable(true);
     nameInputRef.current?.focus();
   }, [nameInputRef]);
-
-  const handleEditType = useCallback(() => {}, []);
 
   const handleNameChanges = useCallback(
     (evt: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
@@ -54,9 +53,8 @@ const FeatureItemList = ({
         setEditable(false);
         nameInputRef.current?.blur();
 
-        editProjectFeature(
+        editFeature(
           {
-            pid: projectId,
             fid: feature.id,
             body: {
               featureClassName: evt.currentTarget.value,
@@ -93,11 +91,11 @@ const FeatureItemList = ({
         );
       }
     },
-    [nameInputRef, projectId, feature.id, editProjectFeature, addToast, queryClient]
+    [nameInputRef, projectId, feature.id, editFeature, addToast, queryClient]
   );
 
   const toggleSeeOnMap = useCallback(
-    (featureId: ProjectFeature['id']) => {
+    (featureId: Feature['id']) => {
       const newSelectedFeatures = [...visibleFeatures];
 
       if (!newSelectedFeatures.includes(featureId)) {
@@ -117,7 +115,7 @@ const FeatureItemList = ({
         <Checkbox
           id={`item-${feature.id}`}
           theme="light"
-          className="form-checkbox-dark block h-4 w-4 text-yellow-200"
+          className="block h-4 w-4 checked:bg-blue-400"
           onChange={onSelectFeature}
           checked={isSelected}
           value={feature.id}
@@ -133,11 +131,11 @@ const FeatureItemList = ({
             })}
             onKeyDown={handleNameChanges}
           />
-          {Boolean(feature.scenarios) && (
+          {Boolean(feature.scenarioUsageCount) && (
             <span className="flex space-x-1 text-xs">
               <span>Currently in use in</span>
               <span className="block rounded-[4px]  bg-blue-400/25 px-1 text-xs font-semibold text-blue-400">
-                {feature.scenarios}
+                {feature.scenarioUsageCount}
               </span>
               <span>scenarios.</span>
             </span>
@@ -168,10 +166,9 @@ const FeatureItemList = ({
             align="start"
           >
             <FeatureActions
-              pid={projectId}
               feature={feature}
               onEditName={handleRename}
-              onEditType={handleEditType}
+              isDeletable={feature.isCustom && !feature.scenarioUsageCount}
             />
           </PopoverContent>
         </Popover>

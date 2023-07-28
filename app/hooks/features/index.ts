@@ -17,7 +17,8 @@ import { useSession } from 'next-auth/react';
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
-import { Project, ProjectFeature } from 'types/project-model';
+import { Feature } from 'types/feature';
+import { Project } from 'types/project-model';
 
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
@@ -164,10 +165,10 @@ export function useAllPaginatedFeatures(projectId, options: UseFeaturesOptionsPr
   }, [query, pages]);
 }
 
-export function useAllFeatures<T = { data: ProjectFeature[] }>(
+export function useAllFeatures<T = { data: Feature[] }>(
   projectId: Project['id'],
   options: UseFeaturesOptionsProps = {},
-  queryOptions: QueryObserverOptions<{ data: ProjectFeature[] }, Error, T> = {}
+  queryOptions: QueryObserverOptions<{ data: Feature[] }, Error, T> = {}
 ) {
   const { data: session } = useSession();
 
@@ -181,7 +182,7 @@ export function useAllFeatures<T = { data: ProjectFeature[] }>(
   }, {});
 
   const fetchFeatures = () =>
-    PROJECTS.request<{ data: ProjectFeature[] }>({
+    PROJECTS.request<{ data: Feature[] }>({
       method: 'GET',
       url: `/${projectId}/features`,
       headers: {
@@ -610,42 +611,18 @@ export function useUploadFeaturesShapefile({
   });
 }
 
-export function useDeleteProjectFeature() {
-  const queryClient = useQueryClient();
+export function useEditFeature() {
   const { data: session } = useSession();
 
-  const deleteProjectFeature = ({
-    pid,
-    fid,
-  }: {
-    pid: Project['id'];
-    fid: ProjectFeature['id'];
-  }) => {
-    return PROJECTS.delete(`/${pid}/features/${fid}`, {
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    });
-  };
-
-  return useMutation(deleteProjectFeature);
-}
-
-export function useEditProjectFeature() {
-  const queryClient = useQueryClient();
-  const { data: session } = useSession();
-
-  const editProjectFeature = ({
-    pid,
+  const editFeature = ({
     fid,
     body = {},
   }: {
-    pid: Project['id'];
-    fid: ProjectFeature['id'];
+    fid: Feature['id'];
     body: Record<string, unknown>;
   }) => {
-    return PROJECTS.patch<ProjectFeature>(
-      `/${pid}/features/${fid}`,
+    return GEOFEATURES.patch<Feature>(
+      `/${fid}`,
       {
         ...body,
       },
@@ -657,5 +634,88 @@ export function useEditProjectFeature() {
     );
   };
 
-  return useMutation(editProjectFeature);
+  return useMutation(editFeature);
+}
+
+export function useEditFeatureTag() {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const editFeatureTag = ({
+    featureId,
+    projectId,
+    data,
+  }: {
+    featureId: Feature['id'];
+    projectId: Project['id'];
+    data: {
+      tagName: Feature['tag'];
+    };
+  }) => {
+    return PROJECTS.request({
+      method: 'PATCH',
+      url: `/${projectId}/features/${featureId}/tags`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(editFeatureTag, {
+    onSuccess: async (data, variables) => {
+      const { featureId, projectId } = variables;
+      await queryClient.invalidateQueries(['feature', featureId]);
+      await queryClient.invalidateQueries(['all-features', projectId]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteFeatureTag() {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const deleteFeatureTag = ({
+    featureId,
+    projectId,
+  }: {
+    featureId: Feature['id'];
+    projectId: Project['id'];
+  }) => {
+    return PROJECTS.request({
+      method: 'DELETE',
+      url: `/${projectId}/features/${featureId}/tags`,
+
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(deleteFeatureTag, {
+    onSuccess: async (data, variables) => {
+      const { featureId, projectId } = variables;
+      await queryClient.invalidateQueries(['feature', featureId]);
+      await queryClient.invalidateQueries(['all-features', projectId]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useProjectFeatures(
+  projectId: Project['id'],
+  featureIds: Feature['id'][] | Feature['id']
+) {
+  return useAllFeatures(
+    projectId,
+    {},
+    {
+      select: (data) => data?.data.filter((f) => featureIds.includes(f.id)),
+    }
+  );
 }

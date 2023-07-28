@@ -2,7 +2,10 @@ import { useCallback, useState } from 'react';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
-import { ProjectFeature } from 'types/project-model';
+import Modal from 'components/modal/component';
+import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete/index';
+import EditBulkModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit-bulk';
+import { Feature } from 'types/feature';
 
 import EDIT_SVG from 'svgs/project/edit.svg?sprite';
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
@@ -14,7 +17,7 @@ const ICON_CLASSES = 'h-5 w-5 transition-colors text-gray-400 group-hover:text-g
 const FeaturesBulkActionMenu = ({
   selectedFeaturesIds,
 }: {
-  selectedFeaturesIds: ProjectFeature['id'][];
+  selectedFeaturesIds: Feature['id'][];
 }): JSX.Element => {
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
     edit: false,
@@ -54,8 +57,25 @@ const FeaturesBulkActionMenu = ({
         </Button>
       </div>
 
-      {modalState.edit && <>{/* // ! implement edit bulk modal here */}</>}
-      {modalState.delete && <>{/* // ! implement delete bulk modal here */}</>}
+      <Modal
+        id="edit-feaure-modal"
+        title="All features"
+        open={modalState.edit}
+        size="narrow"
+        onDismiss={() => handleModal('edit', false)}
+      >
+        <EditBulkModal selectedFeaturesIds={selectedFeaturesIds} handleModal={handleModal} />
+      </Modal>
+
+      <Modal
+        id="delete-features-modal"
+        open={modalState.delete}
+        size="narrow"
+        dismissable
+        onDismiss={() => handleModal('delete', false)}
+      >
+        <DeleteModal selectedFeaturesIds={selectedFeaturesIds} />
+      </Modal>
     </>
   );
 };
