@@ -16,11 +16,11 @@ const ICON_CLASSES = 'text-gray-400 group-hover:text-white';
 const FeatureActions = ({
   feature,
   onEditName,
-  onEditType,
+  isDeletable,
 }: {
   feature: Feature;
+  isDeletable: boolean;
   onEditName: (evt: Parameters<ButtonHTMLAttributes<HTMLButtonElement>['onClick']>[0]) => void;
-  onEditType: (evt: Parameters<ButtonHTMLAttributes<HTMLButtonElement>['onClick']>[0]) => void;
 }): JSX.Element => {
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
     edit: false,
@@ -31,74 +31,72 @@ const FeatureActions = ({
     setModalState((prevState) => ({ ...prevState, [modalKey]: isVisible }));
   }, []);
 
-  const triggerDeleteModal = useCallback(() => {
-    handleModal('delete', true);
-  }, []);
-
   return (
-    <>
-      <ul className="rounded-2xl border-gray-500">
+    <ul className="rounded-2xl border-gray-500">
+      <li>
+        <button
+          type="button"
+          onClick={onEditName}
+          className={cn({
+            [BUTTON_CLASSES]: true,
+            'rounded-t-2xl': true,
+          })}
+        >
+          <FileEdit className={ICON_CLASSES} size={20} />
+          <span>Rename</span>
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          onClick={() => handleModal('edit', true)}
+          className={cn({
+            [BUTTON_CLASSES]: true,
+            'last:rounded-b-2xl': true,
+          })}
+        >
+          <Tag className={ICON_CLASSES} size={20} />
+          <span>Edit</span>
+        </button>
+        <Modal
+          id="edit-feaure-modal"
+          title="All features"
+          open={modalState.edit}
+          size="narrow"
+          onDismiss={() => handleModal('edit', false)}
+        >
+          <EditModal featureId={feature.id} handleModal={handleModal} />
+        </Modal>
+      </li>
+      {isDeletable && (
         <li>
           <button
             type="button"
-            onClick={onEditName}
+            onClick={() => {
+              handleModal('delete', true);
+            }}
             className={cn({
               [BUTTON_CLASSES]: true,
-              'rounded-t-2xl': true,
+              'rounded-b-2xl': true,
             })}
           >
-            <FileEdit className={ICON_CLASSES} size={20} />
-            <span>Rename</span>
-          </button>
-        </li>
-        <li>
-          <button
-            type="button"
-            onClick={() => handleModal('edit', true)}
-            className={cn({
-              [BUTTON_CLASSES]: true,
-              'last:rounded-b-2xl': true,
-            })}
-          >
-            <Tag className={ICON_CLASSES} size={20} />
-            <span>Edit</span>
+            <Trash2 className={ICON_CLASSES} size={20} />
+            <span>Delete</span>
           </button>
           <Modal
-            id="edit-feaure-modal"
-            title="All features"
-            open={modalState.edit}
+            id="delete-feature-modal"
+            dismissable
+            open={modalState.delete}
             size="narrow"
-            onDismiss={() => handleModal('edit', false)}
+            onDismiss={() => {
+              handleModal('delete', false);
+            }}
           >
-            <EditModal featureId={feature.id} handleModal={handleModal} />
+            <DeleteModal selectedFeaturesIds={[feature.id]} />
           </Modal>
         </li>
-        {feature.scenarioUsageCount === 1 && (
-          <li>
-            <button
-              type="button"
-              onClick={triggerDeleteModal}
-              className={cn({
-                [BUTTON_CLASSES]: true,
-                'rounded-b-2xl': true,
-              })}
-            >
-              <Trash2 className={ICON_CLASSES} size={20} />
-              <span>Delete</span>
-            </button>
-            <Modal
-              id="delete-feature-modal"
-              dismissable
-              open={modalState.delete}
-              size="narrow"
-              onDismiss={() => handleModal('delete', false)}
-            >
-              <DeleteModal selectedFeaturesIds={[feature.id]} />
-            </Modal>
-          </li>
-        )}
-      </ul>
-    </>
+      )}
+    </ul>
   );
 };
 
