@@ -1,4 +1,4 @@
-import React, { ElementRef, useCallback, useRef, InputHTMLAttributes } from 'react';
+import React, { ElementRef, useCallback, useRef, InputHTMLAttributes, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
 import { useQueryClient } from 'react-query';
@@ -14,7 +14,6 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon/component';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import { Feature } from 'types/feature';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
@@ -35,6 +34,9 @@ const EditModal = ({
 
   const formRef = useRef<FormProps<FormValues>['form']>(null);
   const tagsSectionRef = useRef<ElementRef<'div'>>(null);
+
+  const [tagsMenuOpen, setTagsMenuOpen] = useState(false);
+  const [tagIsDone, setTagIsDone] = useState(false);
 
   const tagsQuery = useProjectTags(pid);
   const featureQuery = useProjectFeatures(pid, featureId);
@@ -101,7 +103,9 @@ const EditModal = ({
   const handleKeyPress = useCallback(
     (event: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
       if (event.key === 'Enter') {
+        setTagIsDone(true);
         formRef.current.change('tag', event.currentTarget.value);
+        setTagsMenuOpen(false);
       }
     },
     [formRef]
@@ -155,51 +159,52 @@ const EditModal = ({
                       >
                         Add type
                       </Label>
+                      {(!values.tag || !tagIsDone) && (
+                        <>
+                          <input
+                            {...fprops.input}
+                            className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            placeholder="Type to pick or create tag..."
+                            value={fprops.input.value}
+                            onFocus={() => setTagsMenuOpen(true)}
+                            onKeyDown={handleKeyPress}
+                          />
 
-                      {!values.tag && (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <input
-                              {...fprops.input}
-                              className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              placeholder="Type to pick or create tag..."
-                              value={fprops.input.value}
-                              onKeyDown={handleKeyPress}
-                            />
-                          </PopoverTrigger>
-
-                          <p className="mt-1 font-sans text-xxs text-gray-300">
-                            * Changes to selected features will automatically update related
-                            scenarios.
-                          </p>
-
-                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] space-y-2 rounded-md bg-white p-4">
-                            <div className="text-sm text-gray-800">Recent:</div>
-                            <div className="flex flex-wrap gap-2.5">
-                              {tagsQuery.data?.map((tag) => (
-                                <button
-                                  key={tag}
-                                  className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
-                                  onClick={() => {
-                                    form.change('tag', tag);
-                                  }}
-                                >
-                                  <p className="text-sm capitalize text-gray-800">{tag}</p>
-                                </button>
-                              ))}
+                          {tagsMenuOpen && (
+                            <div className="mt-2 h-24 w-full">
+                              <div className="absolute -left-[2%] flex w-[104%] flex-col space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
+                                <div className="text-sm text-gray-800">Recent:</div>
+                                <div className="flex flex-wrap gap-2.5">
+                                  {tagsQuery.data?.map((tag) => (
+                                    <button
+                                      key={tag}
+                                      className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
+                                      onClick={() => {
+                                        form.change('tag', tag);
+                                        setTagIsDone(true);
+                                      }}
+                                    >
+                                      <p className="text-sm capitalize text-gray-800">{tag}</p>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
                             </div>
-                          </PopoverContent>
-                        </Popover>
+                          )}
+                        </>
                       )}
 
-                      {values.tag && (
+                      {values.tag && tagIsDone && (
                         <div className="flex items-center space-x-1">
                           <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5 hover:bg-yellow-600">
                             <p className="text-sm capitalize text-gray-800">{values.tag}</p>
                           </div>
                           <button
                             className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 hover:bg-gray-500"
-                            onClick={() => form.change('tag', null)}
+                            onClick={() => {
+                              form.change('tag', null);
+                              setTagIsDone(false);
+                            }}
                           >
                             <Icon
                               icon={CLOSE_SVG}
