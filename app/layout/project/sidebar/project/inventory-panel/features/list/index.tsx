@@ -94,7 +94,7 @@ export const ProjectFeatureList = (): JSX.Element => {
           <Checkbox
             id="select-all"
             theme="light"
-            className="form-checkbox-dark block h-4 w-4 text-yellow-200"
+            className="block h-4 w-4 checked:bg-blue-400"
             onChange={handleSelectAll}
           />
           <button
