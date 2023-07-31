@@ -4,22 +4,30 @@ interface ProjectShowStateProps {
   search: string;
   filters: Record<string, unknown> | [];
   sort: string;
-  layerSettings: Record<string, unknown>;
+  layerSettings: Record<string, {}>;
   selectedFeatures: string[];
+  isSidebarOpen: boolean;
 }
 
-const initialState = {
+const initialState: ProjectShowStateProps = {
   search: '',
   filters: {},
   sort: '-lastModifiedAt',
   layerSettings: {},
   selectedFeatures: [],
+  isSidebarOpen: true,
 } satisfies ProjectShowStateProps;
 
 const projectsDetailSlice = createSlice({
   name: '/projects/[id]',
   initialState,
   reducers: {
+    setSidebarVisibility: (
+      state,
+      action: PayloadAction<ProjectShowStateProps['isSidebarOpen']>
+    ) => {
+      state.isSidebarOpen = action.payload;
+    },
     setSearch: (state, action: PayloadAction<ProjectShowStateProps['search']>) => {
       state.search = action.payload;
     },
@@ -57,6 +65,13 @@ const projectsDetailSlice = createSlice({
   },
 });
 
-export const { setSearch, setFilters, setSort, setLayerSettings, setSelectedFeatures } =
-  projectsDetailSlice.actions;
+export const {
+  setSearch,
+  setFilters,
+  setSort,
+  setLayerSettings,
+  setSelectedFeatures,
+  setSidebarVisibility,
+} = projectsDetailSlice.actions;
+
 export default projectsDetailSlice.reducer;
