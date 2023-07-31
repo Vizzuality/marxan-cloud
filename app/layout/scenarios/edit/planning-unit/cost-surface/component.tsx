@@ -30,17 +30,9 @@ import { bytesToMegabytes } from 'utils/units';
 import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
 import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
 
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-export interface ScenariosCostSurfaceProps {
-  // todo: improve typing of "s"
-  onChangeSection: (s: string) => void;
-}
-
-export const ScenariosCostSurface = ({
-  onChangeSection,
-}: ScenariosCostSurfaceProps): JSX.Element => {
+export const ScenariosCostSurface = (): JSX.Element => {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState<{ name: string }>(null);
@@ -205,17 +197,8 @@ export const ScenariosCostSurface = ({
       exit={{ opacity: 0 }}
     >
       <header className="flex items-center space-x-3 pb-1 pt-5">
-        <button
-          aria-label="return"
-          type="button"
-          className="flex w-full items-center space-x-2 text-left focus:outline-none"
-          onClick={() => {
-            onChangeSection(null);
-          }}
-        >
-          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
-          <h4 className="font-heading text-xs uppercase text-primary-500">Cost surface</h4>
-        </button>
+        <h4 className="font-heading text-xs uppercase text-primary-500">Cost surface</h4>
+
         <InfoButton>
           <div>
             <h4 className="mb-2.5 font-heading text-lg">What is a Cost Surface?</h4>

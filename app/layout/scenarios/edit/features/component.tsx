@@ -34,9 +34,8 @@ const SECTIONS = [
       'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in the Protected Areas step and/or locked-in planning units). These amounts are shown in relation to the targets.',
   },
 ];
-export interface ScenariosSidebarFeaturesProps {}
 
-export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> = () => {
+export const ScenariosSidebarFeatures = (): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 

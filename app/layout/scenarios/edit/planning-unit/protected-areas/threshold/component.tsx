@@ -24,18 +24,11 @@ import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protecte
 
 import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
-export interface WDPAThresholdCategories {
-  onSuccess: () => void;
-  onBack: () => void;
-}
-
-export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
-  onBack,
-}: WDPAThresholdCategories) => {
+export const WDPAThreshold = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
 
   const { addToast } = useToasts();
-  const { query } = useRouter();
+  const { push, query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
@@ -180,8 +173,8 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   );
 
   const handleBack = useCallback(() => {
-    onBack();
-  }, [onBack]);
+    () => push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-preview`);
+  }, [push, pid, sid]);
 
   // Loading
   if (

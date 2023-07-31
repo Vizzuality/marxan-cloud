@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -13,20 +13,17 @@ import { useScenario } from 'hooks/scenarios';
 
 import Icon from 'components/icon';
 import TargetFeatures from 'layout/scenarios/edit/features/set-up/targets/list';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
+import { Tab } from 'types/navigation';
+import { ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 
-export interface ScenariosSidebarEditFeaturesProps {}
-
-export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = () => {
+export const ScenariosSidebarEditFeatures = (): JSX.Element => {
   const { query } = useRouter();
-  const { sid } = query as { sid: string };
+  const { sid, tab } = query as { sid: string; tab: Tab };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
-
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const dispatch = useDispatch();
 
@@ -34,7 +31,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
 
-  if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
+  if (!scenarioData || tab !== 'features-target') return null;
 
   return (
     <div className="flex h-full w-full flex-grow flex-col overflow-hidden">

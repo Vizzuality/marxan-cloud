@@ -28,9 +28,7 @@ export interface ScenariosSidebarAnalysisSectionsProps {
   onChangeSection: (s: string) => void;
 }
 
-export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysisSectionsProps> = ({
-  onChangeSection,
-}: ScenariosSidebarAnalysisSectionsProps) => {
+export const ScenariosSidebarAnalysisSections = (): JSX.Element => {
   const dispatch = useDispatch();
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
@@ -67,16 +65,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       exit={{ opacity: 0 }}
     >
       <header className="flex items-center space-x-3 pb-1 pt-5">
-        <button
-          type="button"
-          className="flex w-full items-center space-x-2 text-left focus:outline-none"
-          onClick={() => {
-            onChangeSection(null);
-          }}
-        >
-          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
-          <h4 className="font-heading text-xs uppercase text-primary-500">Adjust planning units</h4>
-        </button>
+        <h4 className="font-heading text-xs uppercase text-primary-500">Adjust planning units</h4>
 
         <InfoButton>
           <div>
