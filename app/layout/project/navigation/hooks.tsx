@@ -1,9 +1,12 @@
 import { useRouter } from 'next/router';
 
+import BLM_CALIBRATION_SVG from 'svgs/navigation/blm-calibration.svg?sprite';
 import COST_SURFACE_SVG from 'svgs/navigation/cost-surface.svg?sprite';
 import FEATURES_SVG from 'svgs/navigation/features.svg?sprite';
-import PLANNING_UNIT_STATUS_SVG from 'svgs/navigation/planning-unit-status.svg?sprite';
-import PROTECTED_AREA_SVG from 'svgs/navigation/protected-area.svg?sprite';
+import OVERVIEW_SVG from 'svgs/navigation/overview.svg?sprite';
+import PLANNING_UNITS_SVG from 'svgs/navigation/planning-units.svg?sprite';
+import PROTECTED_AREA_SVG from 'svgs/navigation/protected-areas.svg?sprite';
+import TARGET_SVG from 'svgs/navigation/target.svg?sprite';
 
 import type { SubMenuItem } from './submenu';
 
@@ -58,13 +61,13 @@ export const useGridSetupItems = (): SubMenuItem[] => {
     {
       name: 'Planning unit status',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=planning-unit-status`,
-      icon: PLANNING_UNIT_STATUS_SVG,
+      icon: PLANNING_UNITS_SVG,
       selected: isScenarioRoute && tab === 'planning-unit-status',
     },
     {
       name: 'Features',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=features`,
-      icon: PROTECTED_AREA_SVG,
+      icon: FEATURES_SVG,
       selected: isScenarioRoute && tab === 'features',
     },
   ];
@@ -79,13 +82,13 @@ export const useSolutionItems = (): SubMenuItem[] => {
     {
       name: 'Overview',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=solutions`,
-      icon: PROTECTED_AREA_SVG,
+      icon: OVERVIEW_SVG,
       selected: isScenarioRoute && tab === 'solutions',
     },
     {
       name: 'Target achievement',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=target-achievement`,
-      icon: PROTECTED_AREA_SVG,
+      icon: TARGET_SVG,
       selected: isScenarioRoute && tab === 'target-achievement',
     },
   ];
@@ -100,13 +103,13 @@ export const useAdvancedSettingsItems = (): SubMenuItem[] => {
     {
       name: 'Overview',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=advanced-settings`,
-      icon: PROTECTED_AREA_SVG,
+      icon: OVERVIEW_SVG,
       selected: isScenarioRoute && tab === 'advanced-settings',
     },
     {
       name: 'BLM calibration',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=blm-calibration`,
-      icon: PROTECTED_AREA_SVG,
+      icon: BLM_CALIBRATION_SVG,
       selected: isScenarioRoute && tab === 'blm-calibration',
     },
   ];
