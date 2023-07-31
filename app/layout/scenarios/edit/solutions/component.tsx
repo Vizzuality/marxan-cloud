@@ -23,8 +23,6 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import STAR_SVG from 'svgs/ui/star.svg?sprite';
 
-import { ScenariosSidebarShowSolutionsProps } from './types';
-
 export const SECTIONS = [
   // {
   //   id: ScenarioSidebarSubTabs.SCHEDULE_SCENARIO,
@@ -39,7 +37,7 @@ export const SECTIONS = [
   },
 ];
 
-export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutionsProps> = () => {
+export const ScenariosSidebarShowSolutions = (): JSX.Element => {
   const { query } = useRouter();
   const { sid } = query as { sid: string };
 
@@ -180,7 +178,9 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
                   )}
 
                   {subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS && (
-                    <PostGapAnalysis key="post-gap-analysis" onChangeSection={onChangeSection} />
+                    <PostGapAnalysis
+                      key="post-gap-analysis" /* onChangeSection={onChangeSection} */
+                    />
                   )}
                 </div>
                 <div className="absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
