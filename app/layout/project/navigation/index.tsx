@@ -146,7 +146,7 @@ export const Navigation = (): JSX.Element => {
         <Link href="/">
           <Image alt="Marxan logo" width={55} height={7} src={WHITE_LOGO_SVG} />
         </Link>
-        <div className="space-y-2 divide-y divide-gray-400">
+        <div className="space-y-2 divide-y divide-gray-600">
           {/* // ? Common menu */}
           <div className="flex flex-col items-center">
             <ul className={MENU_COMMON_CLASSES}>
@@ -174,7 +174,7 @@ export const Navigation = (): JSX.Element => {
                     <PopoverContent
                       side="right"
                       sideOffset={20}
-                      className="w-80 rounded-b-4xl rounded-tl-xl rounded-tr-4xl bg-white p-4"
+                      className="min-w-[410px] rounded-b-4xl rounded-tl-xl rounded-tr-4xl bg-white p-4"
                       collisionPadding={48}
                       onInteractOutside={() => toggleSubmenu('user')}
                     >
