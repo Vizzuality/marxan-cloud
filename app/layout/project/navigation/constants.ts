@@ -3,7 +3,7 @@ import { NavigationTreeCategories } from './types';
 export const NAVIGATION_TREE = {
   user: [],
   inventory: ['protected-areas', 'cost-surface', 'features'],
-  gridSetup: ['protected-areas', 'cost-surface', 'planning-unit-status'],
+  gridSetup: ['protected-areas-preview', 'cost-surface', 'planning-unit-status', 'features'],
   solutions: ['solutions', 'target-achievement'],
   advancedSettings: ['advanced-settings', 'blm-calibration'],
 } satisfies { [key in NavigationTreeCategories]: string[] };
