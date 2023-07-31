@@ -1,4 +1,7 @@
-import { PropsWithChildren, useCallback, useState } from 'react';
+import { PropsWithChildren, useCallback } from 'react';
+
+import { useAppSelector, useAppDispatch } from 'store/hooks';
+import { setSidebarVisibility } from 'store/slices/projects/[id]';
 
 import Icon from 'components/icon';
 import { cn } from 'utils/cn';
@@ -9,17 +12,18 @@ export const Sidebar = ({
   children,
   className,
 }: PropsWithChildren<{ className?: string }>): JSX.Element => {
-  const [isOpen, setSidebar] = useState(true);
+  const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
+  const dispatch = useAppDispatch();
 
   const handleSidebar = useCallback(() => {
-    setSidebar((prevState) => !prevState);
-  }, []);
+    dispatch(setSidebarVisibility(!isSidebarOpen));
+  }, [isSidebarOpen]);
 
   return (
     <aside
       className={cn({
-        'absolute z-20 flex h-full w-[550px] rounded-r-2xl bg-black  transition-transform': true,
-        '-translate-x-full': !isOpen,
+        'absolute z-20 flex h-full w-[550px] rounded-r-2xl bg-black transition-transform': true,
+        '-translate-x-full': !isSidebarOpen,
         [className]: !!className,
       })}
     >
@@ -29,14 +33,14 @@ export const Sidebar = ({
         onClick={handleSidebar}
         className={cn({
           'absolute left-full top-6 z-20 -translate-x-1/2 rounded-lg bg-black px-2 py-3': true,
-          'translate-x-3': !isOpen,
+          'translate-x-3': !isSidebarOpen,
         })}
       >
         <Icon
           icon={ARROW_RIGHT_SVG}
           className={cn({
             'h-3 w-3 transition-transform': true,
-            'rotate-180': isOpen,
+            'rotate-180': isSidebarOpen,
           })}
         />
       </button>

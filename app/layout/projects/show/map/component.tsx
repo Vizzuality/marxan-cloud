@@ -6,6 +6,7 @@ import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
+import { useAppSelector } from 'store/hooks';
 import { setLayerSettings } from 'store/slices/projects/[id]';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
@@ -38,6 +39,7 @@ import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import HelpBeacon from 'layout/help/beacon';
+import { cn } from 'utils/cn';
 
 export interface ProjectMapProps {}
 
@@ -45,6 +47,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const [open, setOpen] = useState(false);
   const [sid1, setSid1] = useState(null);
   const [sid2, setSid2] = useState(null);
+  const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
 
@@ -419,7 +422,12 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </div>
 
           {!!SCENARIOS_RUNNED.sid1Options.length && (
-            <div className="absolute right-24 top-0 flex space-x-5 p-5">
+            <div
+              className={cn({
+                'absolute right-24 top-5 flex space-x-5': true,
+                'left-16': !isSidebarOpen,
+              })}
+            >
               <div>
                 <Select
                   theme="dark"
