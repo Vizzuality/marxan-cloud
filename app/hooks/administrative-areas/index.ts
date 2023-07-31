@@ -1,25 +1,19 @@
-import { useMemo } from 'react';
-
 import { useQuery } from 'react-query';
 
 import { useSession } from 'next-auth/react';
 
-import { Region } from 'types/country-model';
+import { SubRegion } from 'types/location';
 
 import ADMINISTRATIVE_AREAS from 'services/administrative-areas';
 
-import { UseAdministrativeAreasProps, UseAdministrativeAreasResponse } from './types';
-
-export function useAdministrativeAreas(
-  props: UseAdministrativeAreasProps
-): UseAdministrativeAreasResponse {
+export function useAdministrativeAreas(props: { id: string; includeAll?: boolean }) {
   const { data: session } = useSession();
   const { includeAll, id } = props;
 
-  const query = useQuery(
+  return useQuery(
     ['administrative areas', id],
     async () =>
-      ADMINISTRATIVE_AREAS.request({
+      ADMINISTRATIVE_AREAS.request<{ data: SubRegion[] }>({
         method: 'GET',
         url: `/${id}/subdivisions`,
         params: {
@@ -33,26 +27,18 @@ export function useAdministrativeAreas(
       }),
     {
       enabled: !!id,
+      select: (data) => {
+        const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
+
+        return parsedData.map((r) => ({
+          name: r.name2,
+          id: r.id,
+          level: 2,
+          bbox: r.bbox,
+          minPuAreaSize: r.minPuAreaSize,
+          maxPuAreaSize: r.maxPuAreaSize,
+        }));
+      },
     }
   );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
-
-    const regions: Region[] = parsedData.map((r) => ({
-      name: r.name2,
-      id: r.id,
-      level: 2,
-      bbox: r.bbox,
-      minPuAreaSize: r.minPuAreaSize,
-      maxPuAreaSize: r.maxPuAreaSize,
-    }));
-
-    return {
-      ...query,
-      data: regions,
-    };
-  }, [query, data?.data?.data]);
 }

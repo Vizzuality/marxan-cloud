@@ -17,7 +17,6 @@ import UPLOADS from 'services/uploads';
 
 import {
   UseProjectsOptionsProps,
-  UseProjectsResponse,
   UseSaveProjectProps,
   SaveProjectProps,
   UseDeleteProjectProps,
@@ -52,7 +51,7 @@ import {
   LegacyProjectValidationResultsProps,
 } from './types';
 
-export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
+export function useProjects(options: UseProjectsOptionsProps) {
   const { push } = useRouter();
   const { data: session } = useSession();
 
