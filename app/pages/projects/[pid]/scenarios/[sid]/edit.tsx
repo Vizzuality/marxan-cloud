@@ -94,16 +94,12 @@ const EditScenarioPage = (): JSX.Element => {
           <ScenariosEditSidebar>
             {sid && tab === 'protected-areas-preview' && <ScenariosSidebarWDPACategories />}
             {sid && tab === 'protected-areas-threshold' && <ScenariosSidebarWDPAThreshold />}
-
             {sid && tab === 'cost-surface' && <ScenariosCostSurface />}
-
             {sid && tab === 'planning-unit-status' && <AdjustPanningUnits />}
-
             {sid && tab === 'features-add' && <ScenariosSidebarSetupFeaturesAdd />}
             {sid && tab === 'features-target' && <ScenariosSidebarSetupFeaturesTarget />}
 
             {sid && tab === 'blm-calibration' && <BLMCalibration />}
-
             {sid && tab === 'overview' && <AdvancedSettings />}
 
             {sid && tab === 'target-achievement' && <PostGapAnalysis />}
