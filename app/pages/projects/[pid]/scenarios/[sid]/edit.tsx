@@ -21,10 +21,12 @@ import ScenarioLock from 'layout/scenarios/edit/lock';
 import ScenarioEditMap from 'layout/scenarios/edit/map';
 import SidebarEditAnalysis from 'layout/scenarios/edit/parameters';
 import SidebarEditPlanningUnit from 'layout/scenarios/edit/planning-unit';
-import SidebarSolutions from 'layout/scenarios/edit/solutions';
+import PostGapAnalysis from 'layout/scenarios/edit/solutions/gap-analysis';
+import SolutionsDetails from 'layout/scenarios/edit/solutions/overview';
 import ScenarioStatus from 'layout/scenarios/edit/status';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
+import { Tab } from 'types/navigation';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 
 export const getServerSideProps = withProtection(
@@ -33,7 +35,7 @@ export const getServerSideProps = withProtection(
 
 const EditScenarioPage = (): JSX.Element => {
   const { query } = useRouter();
-  const { sid } = query as { sid: string };
+  const { sid, tab } = query as { sid: string; tab: Tab };
   const scenarioQuery = useScenario(sid);
   const { metadata } = scenarioQuery.data || {};
   const { scenarioEditingMetadata } = metadata || {};
@@ -74,6 +76,8 @@ const EditScenarioPage = (): JSX.Element => {
     }
   }, [lastJobCheck, metadata, mutate, scenarioEditingMetadata, scenarioQuery.isSuccess, sid]);
 
+  console.log({ tab });
+
   return (
     <Protected>
       <Title title="Edit" />
@@ -84,7 +88,9 @@ const EditScenarioPage = (): JSX.Element => {
             <SidebarEditPlanningUnit key={ScenarioSidebarTabs.PLANNING_UNIT} />
             <SidebarEditFeatures key={ScenarioSidebarTabs.FEATURES} />
             <SidebarEditAnalysis key={ScenarioSidebarTabs.PARAMETERS} />
-            <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
+
+            {tab === 'target-achievement' && <PostGapAnalysis />}
+            {tab === 'solutions-overview' && <SolutionsDetails />}
           </ScenariosEditSidebar>
         </Sidebar>
         <ScenarioEditMap />
