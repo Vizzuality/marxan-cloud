@@ -13,6 +13,7 @@ import { useScenario } from 'hooks/scenarios';
 import Icon from 'components/icon';
 import ScenariosSidebarSetupFeaturesAdd from 'layout/scenarios/edit/features/set-up/add';
 import ScenariosSidebarSetupFeaturesTarget from 'layout/scenarios/edit/features/set-up/targets';
+import { Tab } from 'types/navigation';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
@@ -21,12 +22,12 @@ export interface ScenariosSidebarSetUpProps {}
 
 export const ScenariosSidebarSetUp: React.FC<ScenariosSidebarSetUpProps> = () => {
   const { query } = useRouter();
-  const { sid } = query as { sid: string };
+  const { sid, tab } = query as { sid: string; tab: Tab };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
-  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const dispatch = useDispatch();
 

@@ -49,25 +49,25 @@ export const mergeScenarioStatusMetaData = (
     ...obj,
     scenarioEditingMetadata: {
       ...scenarioEditingMetadata,
-      status: {
-        ...scenarioEditingMetadata.status,
-        [tab]:
-          scenarioEditingMetadata.status[tab] === 'empty' || saveStatus
-            ? 'draft'
-            : scenarioEditingMetadata.status[tab],
-        ...(saveStatus && {
-          ...Object.keys(STATUS_VALUES[tab]).reduce((acc, v) => {
-            return {
-              ...acc,
-              [v]: scenarioEditingMetadata.status[v] !== 'empty' ? 'outdated' : 'empty',
-            };
-          }, {}),
-        }),
-      },
-      ...(saveTab && {
-        tab,
-        subtab,
-      }),
+      // status: {
+      //   ...scenarioEditingMetadata.status,
+      //   [tab]:
+      //     scenarioEditingMetadata.status[tab] === 'empty' || saveStatus
+      //       ? 'draft'
+      //       : scenarioEditingMetadata.status[tab],
+      //   ...(saveStatus && {
+      //     ...Object.keys(STATUS_VALUES[tab]).reduce((acc, v) => {
+      //       return {
+      //         ...acc,
+      //         [v]: scenarioEditingMetadata.status[v] !== 'empty' ? 'outdated' : 'empty',
+      //       };
+      //     }, {}),
+      //   }),
+      // },
+      // ...(saveTab && {
+      //   tab,
+      //   subtab,
+      // }),
       lastJobCheck: new Date().getTime(),
     },
     marxanInputParameterFile,
