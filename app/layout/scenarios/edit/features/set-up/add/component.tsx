@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { useSelector } from 'react-redux';
-
 import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
@@ -13,7 +11,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add/add-modal';
 import ListFeatures from 'layout/scenarios/edit/features/set-up/add/list';
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { Tab } from 'types/navigation';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
@@ -21,18 +19,15 @@ import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
 
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 
-export interface ScenariosSidebarEditFeaturesProps {}
-
-export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = () => {
+export const ScenariosSidebarEditFeatures = (): JSX.Element => {
   const { query } = useRouter();
-  const { sid } = query as { sid: string };
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { sid, tab } = query as { sid: string; tab: Tab };
 
   const { data: scenarioData } = useScenario(sid);
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
 
-  if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
+  if (!scenarioData || tab !== 'features-add') return null;
 
   return (
     <div className="flex h-full w-full flex-grow flex-col overflow-hidden">

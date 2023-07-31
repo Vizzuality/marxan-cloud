@@ -32,7 +32,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
   const [intersecting, setIntersecting] = useState(null);
   const [deleteFeature, setDeleteFeature] = useState(null);
 
-  const { query } = useRouter();
+  const { push, query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
@@ -265,7 +265,8 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
   const onContinue = useCallback(() => {
     setSubmitting(true);
     dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
-  }, [dispatch, setSubTab]);
+    push(`/projects/${pid}/scenarios/${sid}/edit?tab=features-target`);
+  }, [dispatch, setSubTab, push, pid, sid]);
 
   const toggleSeeOnMap = useCallback(
     (id) => {
