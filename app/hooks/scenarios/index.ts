@@ -481,7 +481,6 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
 export function useScenario(id: Scenario['id']) {
   const { data: session } = useSession();
-
   return useQuery({
     queryKey: ['scenario', id],
     queryFn: async () =>
