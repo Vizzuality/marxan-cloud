@@ -18,9 +18,11 @@ import { Switch } from 'components/forms/switch';
 import Icon from 'components/icon';
 import { cn } from 'utils/cn';
 
+import COMMUNITY_SVG from 'svgs/navigation/community.svg?sprite';
+import DOCUMENTATION_SVG from 'svgs/navigation/documentation.svg?sprite';
 import HELP_GUIDE_SVG from 'svgs/navigation/help-guide.svg?sprite';
 import EDIT_PROFILE_SVG from 'svgs/navigation/pencil.svg?sprite';
-import DOCUMENTATION_SVG from 'svgs/ui/documentation.svg?sprite';
+import PROJECT_DASHBOARD_SVG from 'svgs/navigation/project-dashboard.svg?sprite';
 import SIGN_OUT_SVG from 'svgs/ui/sign-out.svg?sprite';
 
 import {
@@ -28,6 +30,8 @@ import {
   ITEM_TITLE_COMMON_CLASSES,
   ITEM_DESCRIPTION_COMMON_CLASSES,
 } from './constants';
+
+const BUTTON_CLASSES = 'flex items-center space-x-2 rounded-xl text-gray-500 hover:text-white';
 
 export const UserMenu = (): JSX.Element => {
   const { data: session } = useSession();
@@ -65,8 +69,8 @@ export const UserMenu = (): JSX.Element => {
   }, [active, onActive, plausible, user.id, user.email]);
 
   return (
-    <div className="flex flex-col divide-y divide-gray-200 text-gray-500">
-      <div className="mb-3 flex space-x-2">
+    <div className="flex flex-col divide-y divide-gray-100 text-gray-500">
+      <div className="mb-3 flex space-x-4">
         <div>
           <Avatar
             bgImage={user.avatar}
@@ -82,22 +86,17 @@ export const UserMenu = (): JSX.Element => {
             <h3 className="text-sm text-gray-400">{user.email}</h3>
           </div>
           <div className="flex space-x-2">
-            <Button
-              href="/me"
-              theme="clear"
-              size="s"
-              className="flex items-center space-x-2 rounded-xl border border-gray-500"
-            >
-              <Icon icon={EDIT_PROFILE_SVG} className="h-5 w-5" />
+            <Button href="/me" theme="transparent-black" size="s" className={BUTTON_CLASSES}>
+              <Icon icon={EDIT_PROFILE_SVG} className="h-5 w-5 transition-none" />
               <span>Edit profile</span>
             </Button>
             <Button
-              theme="clear"
+              theme="transparent-black"
               size="s"
               onClick={handleSignOut}
-              className="flex items-center space-x-2 rounded-xl border border-gray-500"
+              className={BUTTON_CLASSES}
             >
-              <Icon icon={SIGN_OUT_SVG} className="h-5 w-5" />
+              <Icon icon={SIGN_OUT_SVG} className="h-5 w-5 stroke-current transition-none" />
               <span>Log out</span>
             </Button>
           </div>
@@ -110,11 +109,11 @@ export const UserMenu = (): JSX.Element => {
               href="/projects"
               className={cn({
                 [ITEM_COMMON_CLASSES]: true,
-                'items-start space-x-5 bg-transparent': true,
+                'group items-start space-x-5 bg-transparent': true,
               })}
             >
-              <div className="rounded-xl bg-gray-50 p-2">
-                <Icon icon={EDIT_PROFILE_SVG} className="h-5 w-5" />
+              <div className="rounded-xl bg-gray-50 p-2 group-hover:bg-blue-400">
+                <Icon icon={PROJECT_DASHBOARD_SVG} className="h-5 w-5 transition-none" />
               </div>
               <div className="space-y-1">
                 <h4 className={ITEM_TITLE_COMMON_CLASSES}>
@@ -129,41 +128,49 @@ export const UserMenu = (): JSX.Element => {
               </div>
             </Link>
           </li>
-          {/* <li>
-            <Link
-              href="/team"
+          <li className={ITEM_COMMON_CLASSES}>
+            <div className="flex w-full items-center justify-between">
+              <div className="flex space-x-2">
+                <div className="rounded-xl bg-white p-2 ">
+                  <Icon icon={HELP_GUIDE_SVG} className="h-5 w-5" />
+                </div>
+                <h4 className={ITEM_TITLE_COMMON_CLASSES}>Help Guide</h4>
+              </div>
+              <Switch
+                onCheckedChange={onToggleHelpGuide}
+                className="bg-gray-500 data-[state=checked]:bg-blue-500"
+              />
+            </div>
+          </li>
+          <li>
+            <a
+              href="https://marxansolutions.org/"
+              target="_blank"
+              rel="noreferrer noopener"
               className={cn({
                 [ITEM_COMMON_CLASSES]: true,
-                'items-start space-x-5 bg-transparent': true,
+                'flex items-center justify-start space-x-2': true,
               })}
             >
-              <div className="rounded-xl bg-gray-50 p-2">
-                <Icon icon={COMMUNITY_SVG} className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className={ITEM_TITLE_COMMON_CLASSES}>Manage team</h4>
-                <span className={ITEM_DESCRIPTION_COMMON_CLASSES}>
-                  Lorem ipsum dolor sit amet augue fringilla consequat
-                </span>
-              </div>
-            </Link>
-          </li> */}
-          <li className={ITEM_COMMON_CLASSES}>
-            <div className="flex items-center space-x-2">
               <div className="rounded-xl bg-white p-2">
-                <Icon icon={HELP_GUIDE_SVG} className="h-5 w-5" />
+                <Icon icon={DOCUMENTATION_SVG} className="h-5 w-5" />
               </div>
-              <span className={ITEM_TITLE_COMMON_CLASSES}>Help Guide</span>
-            </div>
-            <Switch onCheckedChange={onToggleHelpGuide} className="bg-gray-500" />
+              <h4
+                className={cn({
+                  [ITEM_TITLE_COMMON_CLASSES]: true,
+                })}
+              >
+                Marxan Documentation
+              </h4>
+            </a>
           </li>
           <li>
             <Link
               href="/community/projects"
-              className="flex items-center space-x-2 rounded-3xl bg-[url('/images/bg-community-projects.png')] bg-right-bottom p-4"
+              className="flex items-center space-x-2 rounded-3xl bg-black/40 bg-[url('/images/bg-community-projects.png')] bg-right-bottom p-4 hover:bg-blend-darken"
             >
               <div className="rounded-xl bg-blue-400 p-2 text-white">
-                <Icon icon={DOCUMENTATION_SVG} className="h-5 w-5" />
+                <Icon icon={COMMUNITY_SVG} className="h-5 w-5" />
               </div>
               <h4
                 className={cn({
