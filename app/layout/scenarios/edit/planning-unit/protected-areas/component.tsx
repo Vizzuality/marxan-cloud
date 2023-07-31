@@ -59,21 +59,21 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
 
         {subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW && (
           <ScenariosSidebarWDPACategories
-            onSuccess={() => {
+          /*   onSuccess={() => {
               dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD));
-            }}
+            }} */
           />
         )}
 
         {subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD && (
           <ScenariosSidebarWDPAThreshold
-            onSuccess={() => {
+          /* onSuccess={() => {
               dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));
               dispatch(setSubTab(null));
-            }}
-            onBack={() => {
+            }} */
+          /*  onBack={() => {
               dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
-            }}
+            }} */
           />
         )}
       </motion.div>
