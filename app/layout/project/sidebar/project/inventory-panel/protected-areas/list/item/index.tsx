@@ -108,8 +108,8 @@ const ProtectedAreaItemList = ({
   );
 
   return (
-    <>
-      <div className="col-span-3 flex space-x-2">
+    <div className="flex w-full items-center justify-between">
+      <div className="flex w-3/5 space-x-2">
         <Checkbox
           id={`item-${feature.id}`}
           theme="light"
@@ -124,14 +124,14 @@ const ProtectedAreaItemList = ({
           defaultValue={feature.featureClassName}
           readOnly={!isEditable}
           className={cn({
-            'text-ellipsis bg-transparent p-0 text-sm leading-none': true,
+            'w-full text-ellipsis bg-transparent p-0 text-sm leading-none': true,
             'border-transparent': isEditable,
           })}
           onKeyDown={handleNameChanges}
         />
       </div>
 
-      <div className="col-span-1 flex space-x-3">
+      <div className="flex space-x-3">
         <button type="button" onClick={() => toggleSeeOnMap(feature.id)}>
           <Icon className="h-4 w-4" icon={true ? SHOW_SVG : HIDE_SVG} />
         </button>
@@ -155,7 +155,7 @@ const ProtectedAreaItemList = ({
           </PopoverContent>
         </Popover>
       </div>
-    </>
+    </div>
   );
 };
 
