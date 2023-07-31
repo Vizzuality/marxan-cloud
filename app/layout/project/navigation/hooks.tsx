@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
 
+import { Tab } from 'types/navigation';
+
 import BLM_CALIBRATION_SVG from 'svgs/navigation/blm-calibration.svg?sprite';
 import COST_SURFACE_SVG from 'svgs/navigation/cost-surface.svg?sprite';
 import FEATURES_SVG from 'svgs/navigation/features.svg?sprite';
@@ -14,7 +16,7 @@ const SCENARIO_ROUTE = '/projects/[pid]/scenarios/';
 
 export const useInventoryItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
-  const { pid, tab } = query as { pid: string; tab: string };
+  const { pid, tab } = query as { pid: string; tab: Tab };
   const isProjectRoute = route.startsWith('/projects/[pid]');
 
   return [
@@ -42,7 +44,7 @@ export const useInventoryItems = (): SubMenuItem[] => {
 
 export const useGridSetupItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
-  const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
+  const { pid, sid, tab } = query as { pid: string; sid: string; tab: Tab };
   const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
 
   return [
@@ -50,7 +52,9 @@ export const useGridSetupItems = (): SubMenuItem[] => {
       name: 'Protected areas',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-preview`,
       icon: PROTECTED_AREA_SVG,
-      selected: isScenarioRoute && tab === 'protected-areas-preview',
+      selected:
+        isScenarioRoute &&
+        (tab === 'protected-areas-preview' || tab === 'protected-areas-threshold'),
     },
     {
       name: 'Cost Surface',
@@ -66,16 +70,16 @@ export const useGridSetupItems = (): SubMenuItem[] => {
     },
     {
       name: 'Features',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=features`,
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=features-add`,
       icon: FEATURES_SVG,
-      selected: isScenarioRoute && tab === 'features',
+      selected: isScenarioRoute && (tab === 'features-add' || tab === 'features-target'),
     },
   ];
 };
 
 export const useSolutionItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
-  const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
+  const { pid, sid, tab } = query as { pid: string; sid: string; tab: Tab };
   const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
 
   return [
@@ -96,7 +100,7 @@ export const useSolutionItems = (): SubMenuItem[] => {
 
 export const useAdvancedSettingsItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
-  const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
+  const { pid, sid, tab } = query as { pid: string; sid: string; tab: Tab };
   const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
 
   return [

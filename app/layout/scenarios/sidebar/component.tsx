@@ -1,6 +1,4 @@
-import React, { ReactNode } from 'react';
-
-import cx from 'classnames';
+import React from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -9,15 +7,13 @@ import { AnimatePresence } from 'framer-motion';
 import { useProject } from 'hooks/projects';
 
 import Breadcrumb from 'components/breadcrumb';
-import Tabs from 'layout/scenarios/edit/tabs';
+import { cn } from 'utils/cn';
 
-export interface ScenariosEditSidebarProps {
-  children: ReactNode;
-}
-
-export const ScenariosEditSidebar: React.FC<ScenariosEditSidebarProps> = ({
+export const ScenariosEditSidebar = ({
   children,
-}: ScenariosEditSidebarProps) => {
+}: {
+  children: JSX.Element | JSX.Element[];
+}): JSX.Element => {
   const { push, query } = useRouter();
   const { pid } = query as { pid: string };
 
@@ -27,7 +23,7 @@ export const ScenariosEditSidebar: React.FC<ScenariosEditSidebarProps> = ({
 
   return (
     <div
-      className={cx({
+      className={cn({
         'flex w-full flex-grow flex-col overflow-hidden': true,
       })}
     >
@@ -41,8 +37,6 @@ export const ScenariosEditSidebar: React.FC<ScenariosEditSidebarProps> = ({
         {name}
         &quot;
       </Breadcrumb>
-
-      <Tabs />
 
       <div className="mt-2.5 flex flex-grow flex-col overflow-hidden">
         <AnimatePresence>{children}</AnimatePresence>

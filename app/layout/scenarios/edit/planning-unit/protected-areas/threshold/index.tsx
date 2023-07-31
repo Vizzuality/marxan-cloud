@@ -98,11 +98,9 @@ export const WDPAThreshold = (): JSX.Element => {
   }, [wdpaData]);
 
   const INITIAL_VALUES = useMemo(() => {
-    const { wdpaThreshold, wdpaIucnCategories } = scenarioData;
-
     return {
-      wdpaThreshold: wdpaThreshold ? wdpaThreshold / 100 : 0.75,
-      wdpaIucnCategories: wdpaIucnCategories || [],
+      wdpaThreshold: scenarioData?.wdpaThreshold ? scenarioData.wdpaThreshold / 100 : 0.75,
+      wdpaIucnCategories: scenarioData?.wdpaIucnCategories || [],
     };
   }, [scenarioData]);
 
@@ -120,8 +118,9 @@ export const WDPAThreshold = (): JSX.Element => {
   const areProjectPAreasSelected = !!projectPAreasSelectedIds.length;
 
   useEffect(() => {
-    const { wdpaThreshold } = scenarioData;
-    dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
+    dispatch(
+      setWDPAThreshold(scenarioData?.wdpaThreshold ? scenarioData.wdpaThreshold / 100 : 0.75)
+    );
   }, [scenarioData]); //eslint-disable-line
 
   const handleSubmit = useCallback(
@@ -151,6 +150,7 @@ export const WDPAThreshold = (): JSX.Element => {
                 level: 'success',
               }
             );
+            push(`/projects/${pid}/scenarios/${sid}/edit?tab=cost-surface`);
           },
           onError: () => {
             setSubmitting(false);
@@ -173,7 +173,7 @@ export const WDPAThreshold = (): JSX.Element => {
   );
 
   const handleBack = useCallback(() => {
-    () => push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-preview`);
+    push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-preview`);
   }, [push, pid, sid]);
 
   // Loading
