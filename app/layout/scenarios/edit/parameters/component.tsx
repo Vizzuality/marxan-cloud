@@ -38,9 +38,8 @@ const SECTIONS = [
       'If desirable, you can adjust the runs, iterations and other default Marxan paramters. We recommend consulting the Marxan Manual before adjusting he default values.',
   },
 ];
-export interface ScenariosSidebarEditAnalysisProps {}
 
-export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysisProps> = () => {
+export const ScenariosSidebarEditAnalysis = (): JSX.Element => {
   const { addToast } = useToasts();
   const plausible = usePlausible();
   const { query } = useRouter();
@@ -209,11 +208,11 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
               )}
 
               {subtab === ScenarioSidebarSubTabs.BLM_CALIBRATION && (
-                <BLMCalibration key="blm-calibration" onChangeSection={onChangeSection} />
+                <BLMCalibration key="blm-calibration" /* onChangeSection={onChangeSection} */ />
               )}
 
               {subtab === ScenarioSidebarSubTabs.ADVANCED_SETTINGS && (
-                <AdvancedSettings key="advanced-settings" onChangeSection={onChangeSection} />
+                <AdvancedSettings key="advanced-settings" /* onChangeSection={onChangeSection} */ />
               )}
             </Pill>
 

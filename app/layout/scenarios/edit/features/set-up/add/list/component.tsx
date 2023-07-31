@@ -25,9 +25,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 
-export interface ScenariosFeaturesListProps {}
-
-export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () => {
+export const ScenariosFeaturesList = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [intersecting, setIntersecting] = useState(null);
   const [deleteFeature, setDeleteFeature] = useState(null);
@@ -244,6 +242,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                 }),
               },
             });
+            push(`/projects/${pid}/scenarios/${sid}/edit?tab=features-target`);
           },
           onError: () => {
             setSubmitting(false);
