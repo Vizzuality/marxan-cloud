@@ -45,9 +45,9 @@ export const useGridSetupItems = (): SubMenuItem[] => {
   return [
     {
       name: 'Protected areas',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas`,
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-preview`,
       icon: PROTECTED_AREA_SVG,
-      selected: isScenarioRoute && tab === 'protected-areas',
+      selected: isScenarioRoute && tab === 'protected-areas-preview',
     },
     {
       name: 'Cost Surface',
@@ -78,9 +78,9 @@ export const useSolutionItems = (): SubMenuItem[] => {
   return [
     {
       name: 'Overview',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=solutions`,
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=solutions-overview`,
       icon: PROTECTED_AREA_SVG,
-      selected: isScenarioRoute && tab === 'solutions',
+      selected: isScenarioRoute && tab === 'solutions-overview',
     },
     {
       name: 'Target achievement',
@@ -99,9 +99,9 @@ export const useAdvancedSettingsItems = (): SubMenuItem[] => {
   return [
     {
       name: 'Overview',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=advanced-settings`,
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=overview`,
       icon: PROTECTED_AREA_SVG,
-      selected: isScenarioRoute && tab === 'advanced-settings',
+      selected: isScenarioRoute && tab === 'overview',
     },
     {
       name: 'BLM calibration',
