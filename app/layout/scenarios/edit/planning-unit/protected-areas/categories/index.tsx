@@ -239,8 +239,6 @@ export const WDPACategories = (): JSX.Element => {
             />
 
             <div className="relative flex flex-grow flex-col overflow-hidden">
-              <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
-
               <div className="relative overflow-y-auto overflow-x-visible px-0.5">
                 <div className="py-6">
                   {/* WDPA */}
@@ -356,7 +354,6 @@ export const WDPACategories = (): JSX.Element => {
                   )}
                 </div>
               </div>
-              <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
             <div className="flex flex-col space-y-4 text-xs text-white">
               <p className="leading-relaxed opacity-50">

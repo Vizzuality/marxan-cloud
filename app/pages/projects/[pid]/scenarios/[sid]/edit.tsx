@@ -83,8 +83,6 @@ const EditScenarioPage = (): JSX.Element => {
     }
   }, [lastJobCheck, metadata, mutate, scenarioEditingMetadata, scenarioQuery.isSuccess, sid]);
 
-  console.log({ tab });
-
   return (
     <Protected>
       <Title title="Edit" />
@@ -92,18 +90,18 @@ const EditScenarioPage = (): JSX.Element => {
       <ProjectLayout className="z-10">
         <Sidebar>
           <ScenariosEditSidebar>
-            {sid && tab === 'protected-areas-preview' && <ScenariosSidebarWDPACategories />}
-            {sid && tab === 'protected-areas-threshold' && <ScenariosSidebarWDPAThreshold />}
-            {sid && tab === 'cost-surface' && <ScenariosCostSurface />}
-            {sid && tab === 'planning-unit-status' && <AdjustPanningUnits />}
-            {sid && tab === 'features-add' && <ScenariosSidebarSetupFeaturesAdd />}
-            {sid && tab === 'features-target' && <ScenariosSidebarSetupFeaturesTarget />}
+            {tab === 'protected-areas-preview' && <ScenariosSidebarWDPACategories />}
+            {tab === 'protected-areas-threshold' && <ScenariosSidebarWDPAThreshold />}
+            {tab === 'cost-surface' && <ScenariosCostSurface />}
+            {tab === 'planning-unit-status' && <AdjustPanningUnits />}
+            {tab === 'features-add' && <ScenariosSidebarSetupFeaturesAdd />}
+            {tab === 'features-target' && <ScenariosSidebarSetupFeaturesTarget />}
 
-            {sid && tab === 'blm-calibration' && <BLMCalibration />}
-            {sid && tab === 'overview' && <AdvancedSettings />}
+            {tab === 'blm-calibration' && <BLMCalibration />}
+            {tab === 'overview' && <AdvancedSettings />}
 
-            {sid && tab === 'target-achievement' && <PostGapAnalysis />}
-            {sid && tab === 'solutions-overview' && <SolutionsDetails />}
+            {tab === 'target-achievement' && <PostGapAnalysis />}
+            {tab === 'solutions-overview' && <SolutionsDetails />}
           </ScenariosEditSidebar>
         </Sidebar>
         <ScenarioEditMap />
