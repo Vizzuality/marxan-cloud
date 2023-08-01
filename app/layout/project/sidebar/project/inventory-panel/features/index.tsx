@@ -1,4 +1,10 @@
+import { useCallback } from 'react';
+
+import { useAppDispatch } from 'store/hooks';
+import { setSearch } from 'store/slices/projects/[id]';
+
 import InfoButton from 'components/info-button';
+import Search, { SearchProps } from 'components/search';
 import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add/add-modal';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
@@ -8,6 +14,15 @@ import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
 import ProjectFeatureList from './list';
 
 const InventoryPanelFeatures = (): JSX.Element => {
+  const dispatch = useAppDispatch();
+
+  const handleSearch = useCallback(
+    (value: Parameters<SearchProps['onChange']>[0]) => {
+      dispatch(setSearch(value));
+    },
+    [dispatch]
+  );
+
   return (
     <section className="relative space-y-2 rounded-[20px] bg-gray-700 p-6">
       <header className="flex items-center justify-between">
@@ -39,7 +54,14 @@ const InventoryPanelFeatures = (): JSX.Element => {
         </div>
         <AddFeaturesModal />
       </header>
-      {/* filters */}
+      <Search
+        id="feature-search"
+        size="sm"
+        placeholder="Search features"
+        aria-label="Search features"
+        onChange={handleSearch}
+        theme="dark"
+      />
       <ProjectFeatureList />
     </section>
   );
