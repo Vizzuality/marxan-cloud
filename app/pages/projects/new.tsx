@@ -4,10 +4,10 @@ import { useSelector } from 'react-redux';
 
 import { withProtection, withUser } from 'hoc/auth';
 
-import Breadcrumbs from 'components/new-layout/breadcrumbs';
 import HelpBeacon from 'layout/help/beacon';
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
+import Breadcrumbs from 'layout/project/navigation/breadcrumbs';
 import Sidebar from 'layout/project/sidebar';
 import ProjectNewForm from 'layout/projects/new/form';
 import { NewProjectFields } from 'layout/projects/new/form';

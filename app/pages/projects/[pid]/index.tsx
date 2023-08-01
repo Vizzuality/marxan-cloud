@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import { withProtection, withUser } from 'hoc/auth';
 import { withProject } from 'hoc/projects';
 
-import Breadcrumbs from 'components/new-layout/breadcrumbs';
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
+import Breadcrumbs from 'layout/project/navigation/breadcrumbs';
 import Sidebar from 'layout/project/sidebar';
 import InventoryProjectHeader from 'layout/project/sidebar/project/header';
 import InventoryPanelCostSurface from 'layout/project/sidebar/project/inventory-panel/cost-surface';
