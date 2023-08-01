@@ -71,7 +71,7 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
         }}
       >
         <span>Upload project</span>
-        <Icon className="ml-4 h-3 w-3" icon={UPLOAD_SVG} />
+        <Icon className="ml-4 h-3 w-3 stroke-current" icon={UPLOAD_SVG} />
       </Button>
 
       <Modal

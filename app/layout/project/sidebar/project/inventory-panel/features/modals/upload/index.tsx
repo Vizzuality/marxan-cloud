@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-
-import cx from 'classnames';
+import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import { AxiosError, isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 
 import { useUploadFeaturesShapefile } from 'hooks/features';
@@ -20,24 +19,33 @@ import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
-import Uploader from 'components/uploader';
+import Modal from 'components/modal';
 import { FEATURES_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import UploadFeaturesInfoButtonContent from 'constants/info-button-content/upload-features';
+import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-export interface ScenariosFeaturesAddUploaderProps {}
+export type FormValues = {
+  name: string;
+  file: File;
+};
 
-export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploaderProps> = () => {
-  const formRef = useRef(null);
+export const FeatureUploadModal = ({
+  isOpen = false,
+  onDismiss,
+}: {
+  isOpen?: boolean;
+  onDismiss: () => void;
+}): JSX.Element => {
+  const formRef = useRef<FormProps<FormValues>['form']>(null);
 
-  const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [successFile, setSuccessFile] = useState(null);
+  const [successFile, setSuccessFile] = useState<{ name: FormValues['name'] }>(null);
 
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
 
@@ -53,14 +61,10 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
     };
   }, []);
 
-  const onOpen = useCallback(() => {
-    setOpened(true);
-  }, []);
-
   const onClose = useCallback(() => {
-    setOpened(false);
+    onDismiss();
     setSuccessFile(null);
-  }, []);
+  }, [onDismiss]);
 
   const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     const f = acceptedFiles[0];
@@ -100,7 +104,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
   };
 
   const onUploadSubmit = useCallback(
-    (values) => {
+    (values: FormValues) => {
       setLoading(true);
       const { file, name } = values;
 
@@ -112,7 +116,6 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
         { data, id: `${pid}` },
         {
           onSuccess: () => {
-            setLoading(false);
             setSuccessFile({ ...successFile });
             onClose();
             addToast(
@@ -128,16 +131,22 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
 
             console.info('Feature shapefile uploaded');
           },
-          onError: ({ response }) => {
-            const { errors } = response.data;
+          onError: (error: AxiosError | Error) => {
+            let errors: { status: number; title: string }[] = [];
 
-            setLoading(false);
+            if (isAxiosError(error)) {
+              errors = [...error.response.data.errors];
+            } else {
+              // ? in case of unknown error (not request error), display generic error message
+              errors = [{ status: 500, title: 'Something went wrong' }];
+            }
+
             setSuccessFile(null);
 
             addToast(
               'error-upload-feature-shapefile',
               <>
-                <h2 className="font-medium">Error!</h2>
+                <h2 className="font-medium">Error</h2>
                 <ul className="text-sm">
                   {errors.map((e) => (
                     <li key={`${e.status}`}>{e.title}</li>
@@ -148,6 +157,9 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
                 level: 'error',
               }
             );
+          },
+          onSettled: () => {
+            setLoading(false);
           },
         }
       );
@@ -163,14 +175,8 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
   });
 
   return (
-    <Uploader
-      id="upload-features"
-      caption="Upload your own features"
-      open={opened}
-      onOpen={onOpen}
-      onClose={onClose}
-    >
-      <FormRFF
+    <Modal id="features-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
+      <FormRFF<FormValues>
         ref={formRef}
         onSubmit={onUploadSubmit}
         render={({ form, handleSubmit }) => {
@@ -210,7 +216,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
                           <div
                             {...props}
                             {...getRootProps()}
-                            className={cx({
+                            className={cn({
                               'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
                                 true,
                               'bg-gray-500': isDragActive,
@@ -312,8 +318,8 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
         className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-white bg-opacity-90"
         iconClassName="w-5 h-5 text-primary-500"
       />
-    </Uploader>
+    </Modal>
   );
 };
 
-export default ScenariosFeaturesAddUploader;
+export default FeatureUploadModal;
