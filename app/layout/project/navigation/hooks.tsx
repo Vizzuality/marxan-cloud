@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
 
+import { useScenario } from 'hooks/scenarios';
+
 import { Tab } from 'types/navigation';
 
 import BLM_CALIBRATION_SVG from 'svgs/navigation/blm-calibration.svg?sprite';
@@ -81,6 +83,7 @@ export const useSolutionItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: Tab };
   const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
+  const scenarioQuery = useScenario(sid);
 
   return [
     {
@@ -88,12 +91,14 @@ export const useSolutionItems = (): SubMenuItem[] => {
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=solutions-overview`,
       icon: OVERVIEW_SVG,
       selected: isScenarioRoute && tab === 'solutions-overview',
+      disabled: scenarioQuery.data.solutionsAreLocked,
     },
     {
       name: 'Target achievement',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=target-achievement`,
       icon: TARGET_SVG,
       selected: isScenarioRoute && tab === 'target-achievement',
+      disabled: scenarioQuery.data.solutionsAreLocked,
     },
   ];
 };
