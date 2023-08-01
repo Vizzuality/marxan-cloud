@@ -101,6 +101,7 @@ export const useSolutionItems = (): SubMenuItem[] => {
 export const useAdvancedSettingsItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: Tab };
+
   const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
 
   return [
