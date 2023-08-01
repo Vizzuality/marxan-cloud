@@ -12,8 +12,8 @@ import { Button } from 'components/button/component';
 import Icon from 'components/icon/component';
 import { ModalProps } from 'components/modal';
 import { bulkDeleteFeatureFromProject } from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu/utils';
-import { Pagination } from 'types/api-model';
-import { Feature } from 'types/feature';
+import { Feature } from 'types/api/feature';
+import { Pagination } from 'types/api/meta';
 
 import ALERT_SVG from 'svgs/ui/new-layout/alert.svg?sprite';
 

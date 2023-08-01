@@ -17,8 +17,8 @@ import { useSession } from 'next-auth/react';
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
-import { Feature } from 'types/feature';
-import { Project } from 'types/project-model';
+import { Feature } from 'types/api/feature';
+import { Project } from 'types/api/project';
 
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';

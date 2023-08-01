@@ -20,9 +20,9 @@ import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
+import { Job } from 'types/api/job';
 import { Project } from 'types/api/project';
-import { Job } from 'types/job';
-import { Scenario } from 'types/scenario';
+import { Scenario } from 'types/api/scenario';
 import { createDownloadLink } from 'utils/download';
 
 import DOWNLOADS from 'services/downloads';

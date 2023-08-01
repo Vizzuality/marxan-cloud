@@ -1,7 +1,7 @@
 import { Session } from 'next-auth';
 
-import { Feature } from 'types/feature';
-import { Project } from 'types/project-model';
+import { Feature } from 'types/api/feature';
+import { Project } from 'types/api/project';
 
 import PROJECTS from 'services/projects';
 

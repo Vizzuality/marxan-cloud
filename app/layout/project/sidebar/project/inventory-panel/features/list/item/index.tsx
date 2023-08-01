@@ -14,8 +14,8 @@ import Checkbox from 'components/forms/checkbox';
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tag from 'components/tag';
-import { Feature } from 'types/feature';
-import { Project } from 'types/project-model';
+import { Feature } from 'types/api/feature';
+import { Project } from 'types/api/project';
 import { cn } from 'utils/cn';
 
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';

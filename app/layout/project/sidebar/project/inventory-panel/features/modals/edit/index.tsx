@@ -26,7 +26,7 @@ import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon/component';
-import { Feature } from 'types/feature';
+import { Feature } from 'types/api/feature';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
