@@ -1,4 +1,4 @@
-import { Solution } from 'types/project-model';
+import { Solution } from 'types/api/project';
 
 const ITEMS: Solution[] = [
   {

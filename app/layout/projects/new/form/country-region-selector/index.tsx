@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, MouseEvent } from 'react';
 
 import { Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -12,16 +12,19 @@ import Field from 'components/forms/field';
 import Select from 'components/forms/select';
 import { composeValidators } from 'components/forms/validations';
 import Loading from 'components/loading';
-import { RegionLevel } from 'types/country-model';
+import { Country, Region, SubRegion } from 'types/api/location';
 
-import CountryRegionSelectorProps from './types';
-
-export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
+export const CountryRegionSelector = ({
   country,
   region,
   subRegion,
   onClick,
-}: CountryRegionSelectorProps) => {
+}: {
+  country?: Country['id'];
+  region?: Region['id'];
+  subRegion?: SubRegion['id'];
+  onClick?: (evt: MouseEvent<HTMLDivElement>) => void;
+}): JSX.Element => {
   const [selectedCountry, setSelectedCountry] = useState(country);
   const [selectedRegion, setSelectedRegion] = useState(region);
   const [selectedSubRegion, setSelectedSubRegion] = useState(subRegion);
@@ -37,7 +40,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
     data: regionsData,
     isFetching: isFetchingRegions,
     isFetched: isFetchedRegions,
-  } = useCountryRegions({ id: selectedCountry, includeAll: true, level: RegionLevel.ONE });
+  } = useCountryRegions({ id: selectedCountry, includeAll: true, level: 1 });
 
   const {
     data: subRegionsData,

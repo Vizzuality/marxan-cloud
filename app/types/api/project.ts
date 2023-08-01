@@ -6,22 +6,13 @@ export interface Project {
   contributors?: Record<string, unknown>[];
 }
 
+export type PlanningUnit = 'square' | 'hexagon' | 'from_shapefile';
+
 export interface PlanningArea {
   planningUnitGridShape: PlanningUnit;
   planningUnitAreakm2: number;
   country: Object;
   region?: Object;
-}
-
-export enum PlanningUnit {
-  SQUARE = 'square',
-  HEXAGON = 'hexagon',
-  FROM_SHAPEFILE = 'from_shapefile',
-}
-
-export enum PlanningUnitAreaSizeUnit {
-  KM2 = 'KM2',
-  ML2 = 'ML2',
 }
 
 export interface Area {

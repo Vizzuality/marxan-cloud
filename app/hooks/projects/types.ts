@@ -1,14 +1,11 @@
 import { AxiosRequestConfig } from 'axios';
 
-import { Response } from 'types/api-model';
-
 // useProjects
 export interface UseProjectsOptionsProps {
   search?: string;
   sort?: string;
   filters?: Record<string, unknown>;
 }
-export type UseProjectsResponse = Response;
 
 // useSaveProject
 export interface UseSaveProjectProps {

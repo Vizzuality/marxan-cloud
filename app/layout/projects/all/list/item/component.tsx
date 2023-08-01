@@ -11,7 +11,7 @@ import { useProjectUsers } from 'hooks/project-users';
 import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
-import type { Project } from 'types/project-model';
+import type { Project } from 'types/api/project';
 import { ROLES } from 'utils/constants-roles';
 
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';

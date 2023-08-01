@@ -1,9 +1,7 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
-import { PlanningUnit } from 'types/project-model';
+import { cn } from 'utils/cn';
 
 import HEXAGON_SELECTED_SVG from 'svgs/project/hexagon-selected.svg?sprite';
 import HEXAGON_SVG from 'svgs/project/hexagon.svg?sprite';
@@ -13,7 +11,7 @@ import SQUARE_SVG from 'svgs/project/square.svg?sprite';
 // import UPLOAD_SVG from 'svgs/project/upload.svg?sprite';
 // import UPLOAD_SVG_SELECTED from 'svgs/project/upload-selected.svg?sprite';
 
-import { PlanningUnitButtonSizeProps, PlanningUnitButtonProps } from './types';
+import { PlanningUnitButtonProps } from './types';
 
 export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
   unit,
@@ -22,15 +20,15 @@ export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
   onClick,
 }: PlanningUnitButtonProps) => {
   const getButtonClassName = () =>
-    cx({
+    cn({
       'mb-2': true,
-      'w-8 h-8': size === PlanningUnitButtonSizeProps.MEDIUM,
-      'w-16 h-16': size === PlanningUnitButtonSizeProps.LARGE,
-      'w-4 h-4': size === PlanningUnitButtonSizeProps.SMALL,
+      'w-8 h-8': size === 'md',
+      'w-16 h-16': size === 'lg',
+      'w-4 h-4': size === 'sm',
     });
   return (
     <div
-      className={cx({
+      className={cn({
         'mr-8 flex cursor-pointer flex-col text-xxs text-white': true,
         'opacity-50': !selected,
       })}
@@ -39,7 +37,7 @@ export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
       onKeyPress={() => onClick && onClick(unit)}
       onClick={() => onClick && onClick(unit)}
     >
-      {unit === PlanningUnit.HEXAGON && (
+      {unit === 'hexagon' && (
         <>
           <Icon
             icon={selected ? HEXAGON_SELECTED_SVG : HEXAGON_SVG}
@@ -48,7 +46,7 @@ export const PlanningUnitButton: React.FC<PlanningUnitButtonProps> = ({
           Hexagon
         </>
       )}
-      {unit === PlanningUnit.SQUARE && (
+      {unit === 'square' && (
         <>
           <Icon
             icon={selected ? SQUARE_SELECTED_SVG : SQUARE_SVG}
