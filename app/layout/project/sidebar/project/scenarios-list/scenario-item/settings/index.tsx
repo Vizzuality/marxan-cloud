@@ -8,7 +8,7 @@ import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
 import Loading from 'components/loading';
-import { Scenario } from 'types/scenario';
+import { Scenario } from 'types/api/scenario';
 
 const ScenarioSettings = ({ id }: { id: Scenario['id'] }): JSX.Element => {
   const { query } = useRouter();

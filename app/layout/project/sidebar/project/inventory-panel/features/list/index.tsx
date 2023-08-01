@@ -12,7 +12,7 @@ import { useAllFeatures } from 'hooks/features';
 
 import Checkbox from 'components/forms/checkbox';
 import Loading from 'components/loading';
-import { Feature } from 'types/feature';
+import { Feature } from 'types/api/feature';
 import { cn } from 'utils/cn';
 
 import FeaturesBulkActionMenu from '../bulk-action-menu';

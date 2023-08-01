@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import groupBy from 'lodash/groupBy';
 
-import { Job } from 'types/job';
+import { Job } from 'types/api/job';
 
 import { TEXTS_FAILURE, TEXTS_RUNNING } from './constants';
 

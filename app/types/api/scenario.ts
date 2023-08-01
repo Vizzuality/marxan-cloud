@@ -1,4 +1,4 @@
-import { Job } from 'types/job';
+import { Job } from 'types/api/job';
 
 export interface Scenario {
   id: string;
