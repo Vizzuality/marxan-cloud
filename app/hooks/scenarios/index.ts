@@ -445,7 +445,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
                 ranAtLeastOnce,
                 numberOfRuns,
                 onEdit: () => {
-                  push(`/projects/${projectId}/scenarios/${id}/edit?tab=protected-areas`);
+                  push(`/projects/${projectId}/scenarios/${id}/edit?tab=protected-areas-preview`);
                 },
               };
             });

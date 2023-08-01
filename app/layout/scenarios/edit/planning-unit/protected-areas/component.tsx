@@ -14,7 +14,6 @@ import Icon from 'components/icon';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/planning-unit/protected-areas/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/planning-unit/protected-areas/threshold';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
-// import Steps from 'components/steps';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
