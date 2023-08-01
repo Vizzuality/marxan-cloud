@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,17 +8,13 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { PUAction } from 'store/slices/scenarios/types';
 
 import { motion } from 'framer-motion';
-import { xor } from 'lodash';
 
 import { useCanEditScenario } from 'hooks/permissions';
 import { useScenarioPU } from 'hooks/scenarios';
 
-import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
 import LOCK_IN_OUT_IMG from 'images/info-buttons/img_lockin_lock_out.png';
-
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 import PlanningUnitMethods from './actions';
 import Tabs from './tabs';

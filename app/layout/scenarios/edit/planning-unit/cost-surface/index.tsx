@@ -4,8 +4,6 @@ import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
@@ -25,6 +23,7 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
 import { COST_SURFACE_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
@@ -290,7 +289,7 @@ export const ScenariosCostSurface = (): JSX.Element => {
                                     <div
                                       {...props}
                                       {...getRootProps()}
-                                      className={cx({
+                                      className={cn({
                                         'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
                                           true,
                                         'bg-gray-500': isDragActive,
