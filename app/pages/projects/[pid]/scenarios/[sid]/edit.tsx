@@ -29,6 +29,7 @@ import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/planning-unit/p
 import PostGapAnalysis from 'layout/scenarios/edit/solutions/gap-analysis';
 import SolutionsDetails from 'layout/scenarios/edit/solutions/overview';
 import ScenarioStatus from 'layout/scenarios/edit/status';
+import NewScenario from 'layout/scenarios/new/name';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
 import { Tab } from 'types/navigation';
@@ -87,6 +88,8 @@ const EditScenarioPage = (): JSX.Element => {
       <ProjectLayout className="z-10">
         <Sidebar>
           <ScenariosEditSidebar>
+            {!tab && <NewScenario />}
+
             {tab === 'protected-areas-preview' && <ScenariosSidebarWDPACategories />}
             {tab === 'protected-areas-threshold' && <ScenariosSidebarWDPAThreshold />}
             {tab === 'cost-surface' && <ScenariosCostSurface />}
