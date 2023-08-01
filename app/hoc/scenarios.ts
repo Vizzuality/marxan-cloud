@@ -3,6 +3,8 @@ import { QueryClient } from 'react-query';
 import { getSession } from 'next-auth/react';
 import { dehydrate } from 'react-query/hydration';
 
+import { Tab } from 'types/navigation';
+
 import ROLES from 'services/roles';
 import SCENARIOS from 'services/scenarios';
 import USERS from 'services/users';
@@ -91,7 +93,9 @@ export function withScenario(getServerSidePropsFunc?: Function) {
       };
     }
 
-    const { params } = context;
+    const { params, query } = context;
+
+    const { pid, tab } = query as { pid: string; tab: Tab };
 
     const { sid } = params;
 
@@ -110,6 +114,33 @@ export function withScenario(getServerSidePropsFunc?: Function) {
       };
     }
 
+    const tabsNeedToHaveRunAtLeastOnce = ['solutions-overview', 'target-achievement'];
+    if (
+      !scenario.data.runAtLeastOnce &&
+      !scenario.data.solutionsAreLocked &&
+      tabsNeedToHaveRunAtLeastOnce.includes(tab)
+    ) {
+      return {
+        props: {},
+        redirect: {
+          destination: `/projects/${pid}/scenarios/${sid}/edit?=overview`,
+          permanent: false,
+        },
+      };
+    }
+
+    console.log('scenario', scenario.data);
+
+    const tabsNeedToHaveFeatures = ['overview', 'blm-calibration'];
+    if (!scenario.data.runAtLeastOnce && tabsNeedToHaveFeatures.includes(tab)) {
+      return {
+        props: {},
+        redirect: {
+          destination: `/projects/${pid}/scenarios/${sid}/edit?=features-add`,
+          permanent: false,
+        },
+      };
+    }
     if (getServerSidePropsFunc) {
       const SSPF = (await getServerSidePropsFunc(context)) || {};
 
