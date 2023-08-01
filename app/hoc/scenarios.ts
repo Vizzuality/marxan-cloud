@@ -3,6 +3,7 @@ import { QueryClient } from 'react-query';
 import { getSession } from 'next-auth/react';
 import { dehydrate } from 'react-query/hydration';
 
+import { NAVIGATION_TREE } from 'layout/project/navigation/constants';
 import { Tab } from 'types/navigation';
 
 import ROLES from 'services/roles';
@@ -113,17 +114,16 @@ export function withScenario(getServerSidePropsFunc?: Function) {
         },
       };
     }
-    // //!TODO: COMMENT & READ NAVIGATION TREE
-    // const solutionsTabs = ['solutions-overview', 'target-achievement'];
-    // if (scenario.data?.solutionsAreLocked && solutionsTabs.includes(tab)) {
-    //   return {
-    //     props: {},
-    //     redirect: {
-    //       destination: `/projects/${pid}/scenarios/${sid}/edit?=overview`,
-    //       permanent: false,
-    //     },
-    //   };
-    // }
+
+    if (scenario && scenario.data?.runAtLeastOnce >= 1 && NAVIGATION_TREE.solutions.includes(tab)) {
+      return {
+        props: {},
+        redirect: {
+          destination: `/projects/${pid}/scenarios/${sid}/edit?=overview`,
+          permanent: false,
+        },
+      };
+    }
 
     if (getServerSidePropsFunc) {
       const SSPF = (await getServerSidePropsFunc(context)) || {};
