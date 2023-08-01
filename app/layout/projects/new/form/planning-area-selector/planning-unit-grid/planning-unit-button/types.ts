@@ -1,14 +1,10 @@
-import { PlanningUnit } from 'types/project-model';
+import { PlanningUnit } from 'types/api/project';
+
+export type PlanningUnitButtonSizeProps = 'sm' | 'md' | 'lg';
 
 export interface PlanningUnitButtonProps {
   unit: PlanningUnit;
   selected: boolean;
   size: PlanningUnitButtonSizeProps;
   onClick?: (unit: PlanningUnit) => void;
-}
-
-export enum PlanningUnitButtonSizeProps {
-  SMALL = 'sm',
-  MEDIUM = 'md',
-  LARGE = 'lg',
 }

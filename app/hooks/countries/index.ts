@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 
 import { useSession } from 'next-auth/react';
 
-import { Country, Region, RegionLevel } from 'types/location';
+import { Country, Region, RegionLevel } from 'types/api/location';
 
 import COUNTRIES from 'services/countries';
 

@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 
 import Label from 'components/forms/label';
 import InfoButton from 'components/info-button';
-import { PlanningUnit } from 'types/project-model';
+import { PlanningUnit } from 'types/api/project';
 
-import PlanningUnitButton from './planning-unit-button/component';
-import { PlanningUnitButtonSizeProps } from './planning-unit-button/types';
-import { PlanningUnitGridProps } from './types';
+import PlanningUnitButton from './planning-unit-button';
+import { PlanningUnitButtonProps } from './planning-unit-button/types';
 
-export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
+export const PlanningUnitGrid = ({
   unit,
   onChange,
-}: PlanningUnitGridProps) => {
+}: {
+  unit: PlanningUnit;
+  onChange?: (value: PlanningUnit) => void;
+}) => {
   const [unitSelected, setUnitSelected] = useState(unit);
-  const handleClick = (value) => {
+  const handleClick = (value: Parameters<PlanningUnitButtonProps['onClick']>[0]) => {
     setUnitSelected(value);
     if (onChange) {
       onChange(value);
@@ -40,15 +42,15 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
 
       <div className="mt-3 flex">
         <PlanningUnitButton
-          unit={PlanningUnit.SQUARE}
-          selected={unitSelected === PlanningUnit.SQUARE}
-          size={PlanningUnitButtonSizeProps.MEDIUM}
+          unit="square"
+          selected={unitSelected === 'square'}
+          size="md"
           onClick={handleClick}
         />
         <PlanningUnitButton
-          unit={PlanningUnit.HEXAGON}
-          selected={unitSelected === PlanningUnit.HEXAGON}
-          size={PlanningUnitButtonSizeProps.MEDIUM}
+          unit="hexagon"
+          selected={unitSelected === 'hexagon'}
+          size="md"
           onClick={handleClick}
         />
       </div>

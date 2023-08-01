@@ -20,7 +20,7 @@ import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
-import type { Project } from 'types/project-model';
+import type { Project } from 'types/api/project';
 
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';

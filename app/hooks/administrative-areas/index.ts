@@ -2,11 +2,11 @@ import { useQuery } from 'react-query';
 
 import { useSession } from 'next-auth/react';
 
-import { SubRegion } from 'types/location';
+import { Region, SubRegion } from 'types/api/location';
 
 import ADMINISTRATIVE_AREAS from 'services/administrative-areas';
 
-export function useAdministrativeAreas(props: { id: string; includeAll?: boolean }) {
+export function useAdministrativeAreas(props: { id: Region['id']; includeAll?: boolean }) {
   const { data: session } = useSession();
   const { includeAll, id } = props;
 

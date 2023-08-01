@@ -12,7 +12,7 @@ import Field from 'components/forms/field';
 import Select from 'components/forms/select';
 import { composeValidators } from 'components/forms/validations';
 import Loading from 'components/loading';
-import { Country, Region, SubRegion } from 'types/location';
+import { Country, Region, SubRegion } from 'types/api/location';
 
 export const CountryRegionSelector = ({
   country,

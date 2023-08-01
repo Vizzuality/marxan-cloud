@@ -1,5 +1,5 @@
 import { TableRow } from 'components/table/types';
-import { Solution } from 'types/project-model';
+import { Solution } from 'types/api/project';
 
 export interface SolutionRow extends TableRow, Solution {
   'view-on-map': boolean;
