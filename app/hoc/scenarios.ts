@@ -115,11 +115,7 @@ export function withScenario(getServerSidePropsFunc?: Function) {
     }
 
     const tabsNeedToHaveRunAtLeastOnce = ['solutions-overview', 'target-achievement'];
-    if (
-      !scenario.data.runAtLeastOnce &&
-      !scenario.data.solutionsAreLocked &&
-      tabsNeedToHaveRunAtLeastOnce.includes(tab)
-    ) {
+    if (scenario.data.solutionsAreLocked && tabsNeedToHaveRunAtLeastOnce.includes(tab)) {
       return {
         props: {},
         redirect: {
@@ -129,18 +125,6 @@ export function withScenario(getServerSidePropsFunc?: Function) {
       };
     }
 
-    console.log('scenario', scenario.data);
-
-    const tabsNeedToHaveFeatures = ['overview', 'blm-calibration'];
-    if (!scenario.data.runAtLeastOnce && tabsNeedToHaveFeatures.includes(tab)) {
-      return {
-        props: {},
-        redirect: {
-          destination: `/projects/${pid}/scenarios/${sid}/edit?=features-add`,
-          permanent: false,
-        },
-      };
-    }
     if (getServerSidePropsFunc) {
       const SSPF = (await getServerSidePropsFunc(context)) || {};
 
