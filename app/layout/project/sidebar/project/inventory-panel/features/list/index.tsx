@@ -1,9 +1,8 @@
-import { useCallback, useState, ChangeEvent } from 'react';
-
-import { useDispatch, useSelector } from 'react-redux';
+import { useCallback, useState, ChangeEvent, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects/[id]';
 
 import { ArrowDown, ArrowUp } from 'lucide-react';
@@ -20,8 +19,10 @@ import FeaturesBulkActionMenu from '../bulk-action-menu';
 import FeatureItemList from './item';
 
 export const ProjectFeatureList = (): JSX.Element => {
-  const dispatch = useDispatch();
-  const { selectedFeatures: visibleFeatures } = useSelector((state) => state['/projects/[id]']);
+  const dispatch = useAppDispatch();
+  const { selectedFeatures: visibleFeatures, search } = useAppSelector(
+    (state) => state['/projects/[id]']
+  );
   const [filters, setFilters] = useState<Parameters<typeof useAllFeatures>[1]>({
     sort: 'featureClassName',
   });
@@ -32,11 +33,11 @@ export const ProjectFeatureList = (): JSX.Element => {
     pid,
     {
       ...filters,
+      search,
     },
     {
       select: ({ data }) => data,
       placeholderData: { data: [] },
-      keepPreviousData: true,
     }
   );
   const featureIds = allFeaturesQuery.data?.map((feature) => feature.id);
@@ -86,6 +87,10 @@ export const ProjectFeatureList = (): JSX.Element => {
     },
     [dispatch, visibleFeatures]
   );
+
+  useEffect(() => {
+    setSelectedFeaturesIds([]);
+  }, [search]);
 
   return (
     <div className="space-y-4">
@@ -151,28 +156,37 @@ export const ProjectFeatureList = (): JSX.Element => {
           </button>
         </div>
       </div>
-      <div className="relative min-h-[200px]">
-        <Loading
-          visible={allFeaturesQuery.isFetching}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        />
-        <div className="space-y-6">
-          <ul className="max-h-[calc(100vh-400px)] divide-y divide-gray-400 overflow-y-auto pl-1 pr-2">
-            {allFeaturesQuery.data?.map((feature) => (
-              <li key={feature.id} className="flex items-center justify-between py-2 ">
-                <FeatureItemList
-                  feature={feature}
-                  projectId={pid}
-                  onSelectFeature={handleSelectFeature}
-                  isSelected={selectedFeaturesIds.includes(feature.id)}
-                />
-              </li>
-            ))}
-          </ul>
-          {selectedFeaturesIds.length > 0 && (
-            <FeaturesBulkActionMenu selectedFeaturesIds={selectedFeaturesIds} />
-          )}
-        </div>
+      <div>
+        {allFeaturesQuery.isFetching && (
+          <div className="relative min-h-[200px]">
+            <Loading
+              visible={allFeaturesQuery.isFetching}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            />
+          </div>
+        )}
+        {!allFeaturesQuery.data?.length && allFeaturesQuery.isFetching === false && (
+          <div className="flex h-[200px] items-center justify-center">No features found.</div>
+        )}
+        {!allFeaturesQuery.isFetching && (
+          <div className="space-y-6">
+            <ul className="max-h-[calc(100vh-400px)] divide-y divide-gray-400 overflow-y-auto pl-1 pr-2">
+              {allFeaturesQuery.data?.map((feature) => (
+                <li key={feature.id} className="flex items-center justify-between py-2 ">
+                  <FeatureItemList
+                    feature={feature}
+                    projectId={pid}
+                    onSelectFeature={handleSelectFeature}
+                    isSelected={selectedFeaturesIds.includes(feature.id)}
+                  />
+                </li>
+              ))}
+            </ul>
+            {selectedFeaturesIds.length > 0 && (
+              <FeaturesBulkActionMenu selectedFeaturesIds={selectedFeaturesIds} />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
