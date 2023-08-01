@@ -6,7 +6,7 @@ export class AddFeatureScenarioOutputEntity1611828857842
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
-    if (await PostgreSQLUtils.version13Plus()) {
+    if (await PostgreSQLUtils.version13Plus(queryRunner)) {
       await queryRunner.query(`
       ALTER TABLE scenario_features_data
       ADD COLUMN target_met float8,
@@ -21,7 +21,7 @@ export class AddFeatureScenarioOutputEntity1611828857842
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    if (await PostgreSQLUtils.version13Plus()) {
+    if (await PostgreSQLUtils.version13Plus(queryRunner)) {
       await queryRunner.query(`
         ALTER TABLE scenario_features_data
         DROP COLUMN target_met,
