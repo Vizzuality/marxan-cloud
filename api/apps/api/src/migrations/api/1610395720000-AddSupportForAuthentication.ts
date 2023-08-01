@@ -6,7 +6,7 @@ export class AddSupportForAuthentication1610395720000
   implements MigrationInterface {
   async up(queryRunner: QueryRunner): Promise<any> {
     // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
-    if (await PostgreSQLUtils.version13Plus()) {
+    if (await PostgreSQLUtils.version13Plus(queryRunner)) {
       await queryRunner.query(`
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
       `);
@@ -42,7 +42,7 @@ DROP TABLE issued_authn_tokens;
 ALTER TABLE users DROP COLUMN password_hash;
     `);
 
-    if (await PostgreSQLUtils.version13Plus()) {
+    if (await PostgreSQLUtils.version13Plus(queryRunner)) {
       await queryRunner.query(`
 DROP EXTENSION IF EXISTS pgcrypto;
       `);

@@ -1,4 +1,4 @@
-import { geoMigrationDataSource } from '@marxan-geoprocessing/ormconfig.migration';
+import { QueryRunner } from 'typeorm';
 
 /**
  * Utility functions related to lower-level interaction with PostgreSQL servers.
@@ -9,9 +9,8 @@ export class PostgreSQLUtils {
   /**
    * Check if the PostgreSQL server we are connected to is version 13 or higher.
    */
-  static async version13Plus(): Promise<boolean> {
-    // Here we do not need to initialize DataSource again, because it is happening internally when starting the migration process
-    const postgresqlMajorVersion = await geoMigrationDataSource
+  static async version13Plus(queryRunner: QueryRunner): Promise<boolean> {
+    const postgresqlMajorVersion = await queryRunner
       .query('show server_version')
       .then((result: [{ server_version: string }]) => {
         return result[0].server_version.split('.')[0];

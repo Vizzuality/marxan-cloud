@@ -4,7 +4,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
-    if (await PostgreSQLUtils.version13Plus()) {
+    if (await PostgreSQLUtils.version13Plus(queryRunner)) {
       await queryRunner.query(`
     CREATE EXTENSION IF NOT EXISTS plpgsql;
     CREATE EXTENSION IF NOT EXISTS postgis;
@@ -194,7 +194,7 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
     `);
 
     // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
-    if (await PostgreSQLUtils.version13Plus()) {
+    if (await PostgreSQLUtils.version13Plus(queryRunner)) {
       await queryRunner.query(`
       DROP EXTENSION postgis_topology; -- OPTIONAL
       DROP EXTENSION postgis_raster; -- OPTIONAL
