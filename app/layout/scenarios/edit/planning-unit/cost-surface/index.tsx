@@ -103,8 +103,6 @@ export const ScenariosCostSurface = (): JSX.Element => {
             }
           );
 
-          console.info('Cost surface uploaded', g);
-
           plausible('Upload cost surface', {
             props: {
               userId: `${user.id}`,

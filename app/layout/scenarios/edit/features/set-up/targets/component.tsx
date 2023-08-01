@@ -1,10 +1,6 @@
 import React from 'react';
 
-import { useDispatch } from 'react-redux';
-
 import { useRouter } from 'next/router';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
@@ -14,18 +10,12 @@ import { useScenario } from 'hooks/scenarios';
 import Icon from 'components/icon';
 import TargetFeatures from 'layout/scenarios/edit/features/set-up/targets/list';
 import { Tab } from 'types/navigation';
-import { ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 
 export const ScenariosSidebarEditFeatures = (): JSX.Element => {
-  const { query } = useRouter();
-  const { sid, tab } = query as { sid: string; tab: Tab };
-
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setSubTab } = scenarioSlice.actions;
-
-  const dispatch = useDispatch();
+  const { push, query } = useRouter();
+  const { sid, tab } = query as { pid: string; sid: string; tab: Tab };
 
   const { data: scenarioData } = useScenario(sid);
 
@@ -34,7 +24,7 @@ export const ScenariosSidebarEditFeatures = (): JSX.Element => {
   if (!scenarioData || tab !== 'features-target') return null;
 
   return (
-    <div className="flex h-full w-full flex-grow flex-col overflow-hidden">
+    <div className="flex h-full max-h-[90vh] w-full flex-grow flex-col overflow-hidden">
       <motion.div
         key="features"
         className="flex min-h-0 flex-col overflow-hidden"
@@ -83,9 +73,9 @@ export const ScenariosSidebarEditFeatures = (): JSX.Element => {
         </header>
 
         <TargetFeatures
-          onBack={() => {
-            dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_ADD));
-          }}
+          onBack={() =>
+            push(`/projects/${scenarioData.projectId}/scenarios/${sid}/edit?tab=features-add`)
+          }
         />
       </motion.div>
     </div>
