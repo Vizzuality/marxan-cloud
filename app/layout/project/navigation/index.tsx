@@ -93,7 +93,7 @@ export const Navigation = (): JSX.Element => {
       return Object.keys(prevState).reduce<typeof submenuState>(
         (acc, key) => ({
           ...acc,
-          [key]: key === submenuKey ? !prevState[key] : false,
+          [key]: key === submenuKey ? true : false,
         }),
         prevState
       );

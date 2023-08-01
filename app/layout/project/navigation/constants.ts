@@ -3,9 +3,16 @@ import { NavigationTreeCategories } from './types';
 export const NAVIGATION_TREE = {
   user: [],
   inventory: ['protected-areas', 'cost-surface', 'features'],
-  gridSetup: ['protected-areas-preview', 'cost-surface', 'planning-unit-status', 'features'],
-  solutions: ['solutions', 'target-achievement'],
-  advancedSettings: ['advanced-settings', 'blm-calibration'],
+  gridSetup: [
+    'protected-areas-preview',
+    'protected-areas-threshold',
+    'cost-surface',
+    'planning-unit-status',
+    'features-add',
+    'features-target',
+  ],
+  advancedSettings: ['overview', 'blm-calibration'],
+  solutions: ['solutions-overview', 'target-achievement'],
 } satisfies { [key in NavigationTreeCategories]: string[] };
 
 export const MENU_COMMON_CLASSES = 'flex flex-col items-center space-y-2';
