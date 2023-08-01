@@ -91,14 +91,14 @@ export const useSolutionItems = (): SubMenuItem[] => {
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=solutions-overview`,
       icon: OVERVIEW_SVG,
       selected: isScenarioRoute && tab === 'solutions-overview',
-      disabled: scenarioQuery.data.solutionsAreLocked,
+      disabled: scenarioQuery.data?.solutionsAreLocked,
     },
     {
       name: 'Target achievement',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=target-achievement`,
       icon: TARGET_SVG,
       selected: isScenarioRoute && tab === 'target-achievement',
-      disabled: scenarioQuery.data.solutionsAreLocked,
+      disabled: scenarioQuery.data?.solutionsAreLocked,
     },
   ];
 };
