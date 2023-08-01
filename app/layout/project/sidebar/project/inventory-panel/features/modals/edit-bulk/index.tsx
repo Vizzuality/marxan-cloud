@@ -145,7 +145,7 @@ const EditBulkModal = ({
   );
 
   return (
-    <FormRFF<{ tag: Feature['tag'] }>
+    <FormRFF<FormValues>
       initialValues={{
         tag: '',
       }}

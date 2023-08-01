@@ -1,17 +1,21 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useAppDispatch } from 'store/hooks';
 import { setSearch } from 'store/slices/projects/[id]';
 
+import Button from 'components/button';
+import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Search, { SearchProps } from 'components/search';
-import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add/add-modal';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
 import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
 
+import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
+
 import ProjectFeatureList from './list';
+import FeatureUploadModal from './modals/upload';
 
 const InventoryPanelFeatures = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -22,6 +26,15 @@ const InventoryPanelFeatures = (): JSX.Element => {
     },
     [dispatch]
   );
+  const [isOpenFeatureUploader, setOpenFeatureUploader] = useState(false);
+
+  const handleFeatureUploader = useCallback(() => {
+    setOpenFeatureUploader(true);
+  }, []);
+
+  const closeFeatureUploadModal = useCallback(() => {
+    setOpenFeatureUploader(false);
+  }, []);
 
   return (
     <section className="relative space-y-2 rounded-[20px] bg-gray-700 p-6">
@@ -52,7 +65,10 @@ const InventoryPanelFeatures = (): JSX.Element => {
             </InfoButton>
           </h3>
         </div>
-        <AddFeaturesModal />
+        <Button theme="primary" size="base" onClick={handleFeatureUploader} className="space-x-3">
+          <span>Upload</span>
+          <Icon icon={UPLOAD_SVG} className="h-5 w-5 stroke-current" />
+        </Button>
       </header>
       <Search
         id="feature-search"
@@ -63,6 +79,7 @@ const InventoryPanelFeatures = (): JSX.Element => {
         theme="dark"
       />
       <ProjectFeatureList />
+      <FeatureUploadModal isOpen={isOpenFeatureUploader} onDismiss={closeFeatureUploadModal} />
     </section>
   );
 };
