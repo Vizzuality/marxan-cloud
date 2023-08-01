@@ -114,8 +114,8 @@ export function withScenario(getServerSidePropsFunc?: Function) {
       };
     }
 
-    const tabsNeedToHaveRunAtLeastOnce = ['solutions-overview', 'target-achievement'];
-    if (scenario.data.solutionsAreLocked && tabsNeedToHaveRunAtLeastOnce.includes(tab)) {
+    const solutionsTabs = ['solutions-overview', 'target-achievement'];
+    if (scenario.data.solutionsAreLocked && solutionsTabs.includes(tab)) {
       return {
         props: {},
         redirect: {
