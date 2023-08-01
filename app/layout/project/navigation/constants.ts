@@ -16,6 +16,6 @@ export const MENU_ITEM_ACTIVE_CLASSES =
   'group/active bg-primary-400 border-primary-400 hover:border-primary-400';
 
 export const ICONS_COMMON_CLASSES =
-  'h-5 w-5 text-gray-500 group-hover:text-white group-hover/active:!text-gray-500';
+  'h-5 w-5 text-gray-400 group-hover:text-white group-[.bg-primary-400]:text-gray-500';
 
 export const MENU_ITEM_BUTTON_COMMON_CLASSES = 'flex p-[10px]';
