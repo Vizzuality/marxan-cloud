@@ -11,7 +11,7 @@ import ProgressBar from 'components/progress-bar';
 import Tooltip from 'components/tooltip';
 import { SCENARIO_STATES } from 'layout/project/sidebar/project/scenarios-list/scenario-item/constants';
 import ScenarioSettings from 'layout/project/sidebar/project/scenarios-list/scenario-item/settings';
-import { Scenario } from 'types/scenario';
+import { Scenario } from 'types/api/scenario';
 import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';

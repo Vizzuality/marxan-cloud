@@ -25,7 +25,7 @@ import {
   deleteFeaturesTagsBulk,
   editFeaturesTagsBulk,
 } from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu/utils';
-import { Feature } from 'types/feature';
+import { Feature } from 'types/api/feature';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 

@@ -5,7 +5,7 @@ import Icon from 'components/icon';
 import Modal from 'components/modal/component';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete/index';
 import EditBulkModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit-bulk';
-import { Feature } from 'types/feature';
+import { Feature } from 'types/api/feature';
 
 import EDIT_SVG from 'svgs/project/edit.svg?sprite';
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';

@@ -5,7 +5,7 @@ import { FileEdit, Trash2, Tag } from 'lucide-react';
 import Modal from 'components/modal/component';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete';
 import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
-import { Feature } from 'types/feature';
+import { Feature } from 'types/api/feature';
 import { cn } from 'utils/cn';
 
 const BUTTON_CLASSES =

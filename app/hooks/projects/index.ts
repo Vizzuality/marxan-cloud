@@ -11,8 +11,8 @@ import orderBy from 'lodash/orderBy';
 import { useSession } from 'next-auth/react';
 
 import { ItemProps } from 'layout/projects/all/list/item/component';
+import { Feature } from 'types/api/feature';
 import { Project } from 'types/api/project';
-import { Feature } from 'types/feature';
 import { createDownloadLink } from 'utils/download';
 
 import PROJECTS from 'services/projects';
