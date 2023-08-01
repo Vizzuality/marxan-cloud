@@ -51,7 +51,9 @@ export class FeatureAmountUploadService {
 
     let newFeaturesFromCsvUpload;
     try {
-      this.logger.log(`Parsing csv file and saving data to temporary storage`);
+      this.logger.log(
+        `Starting process of parsing csv file and saving amount data to temporary storage`,
+      );
       await this.events.createEvent(data);
       // saving feature data to temporary table
       const featuresRegistry = await this.saveCsvToRegistry(
@@ -64,17 +66,16 @@ export class FeatureAmountUploadService {
       }
       // Saving new features to apiDB 'features' table
 
-      this.logger.log(`Parsing csv file`);
-
+      this.logger.log(`Saving new features to (apiBD).features table...`);
       newFeaturesFromCsvUpload = await this.saveNewFeaturesFromCsvUpload(
         apiQueryRunner,
         featuresRegistry.right.id,
         data.projectId,
       );
-
+      this.logger.log(`New features saved in (apiBD).features table`);
       // Saving new features amounts and geoms to geoDB 'features_amounts' table
       this.logger.log(
-        `Saving uploaded features data from temporary table to permanent tables`,
+        `Starting the process of saving new features amounts and geoms to (geoDB).features_amounts table`,
       );
       await this.saveNewFeaturesAmountsFromCsvUpload(
         newFeaturesFromCsvUpload,
@@ -86,20 +87,24 @@ export class FeatureAmountUploadService {
 
       // Removing temporary data from apiDB uploads tables
       this.logger.log(
-        `Removing data from temporary tables after successful upload`,
+        `Removing data from temporary tables after successful upload...`,
       );
       await apiQueryRunner.manager.delete(FeatureAmountUploadRegistry, {
         id: featuresRegistry.right.id,
       });
 
+      this.logger.log(
+        `Upload temporary data removed from apiDB uploads tables`,
+      );
       // Setting project source to legacy-import to create puvspr.dat files from pre-calculated amounts, to allow to use new features after upload
-      this.logger.log(`Updating project sources value`);
+      this.logger.log(`Updating project sources value to legacy-import...`);
       await this.updateProjectSources(
         data.projectId,
         ProjectSourcesEnum.legacyImport,
         apiQueryRunner.manager,
       );
 
+      this.logger.log(`Csv file upload process finished successfully`);
       // Committing transaction
 
       await apiQueryRunner.commitTransaction();
@@ -131,13 +136,13 @@ export class FeatureAmountUploadService {
     queryRunner: QueryRunner,
   ): Promise<any> {
     try {
-      this.logger.log(`Parsing csv file`);
+      this.logger.log(`Parsing csv file...`);
 
       const parsedFile = await featureAmountCsvParser(data.fileBuffer);
 
       const { featureNames, puids } = this.getFeatureNamesAndPuids(parsedFile);
 
-      this.logger.log(`Validating parsed csv file`);
+      this.logger.log(`Validating parsed csv file...`);
 
       if (
         await this.areFeatureNamesNotAlreadyUsedInProject(
@@ -152,7 +157,7 @@ export class FeatureAmountUploadService {
         return left(unknownPuidsInFeatureAmountCsvUpload);
       }
 
-      this.logger.log(`Saving parsed data to temporary storage`);
+      this.logger.log(`Saving parsed data to temporary storage...`);
       const importedRegistry = await this.saveFeaturesToRegistry(
         parsedFile,
         data.projectId,
@@ -179,7 +184,7 @@ export class FeatureAmountUploadService {
       CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS,
     );
 
-    this.logger.log(`Saving a new upload data to temporary table`);
+    this.logger.log(`Saving a new upload data to temporary table...`);
     const newUpload = await entityManager
       .getRepository(FeatureAmountUploadRegistry)
       .save({
@@ -187,7 +192,7 @@ export class FeatureAmountUploadService {
         userId,
       });
     for (const [index, chunk] of featuresChunks.entries()) {
-      this.logger.log(`Inserting chunk ${index} to temporary table`);
+      this.logger.log(`Inserting chunk ${index} to temporary table...`);
       await entityManager
         .createQueryBuilder()
         .insert()
@@ -195,7 +200,7 @@ export class FeatureAmountUploadService {
         .values(chunk.map((feature) => ({ ...feature, upload: newUpload })))
         .execute();
     }
-    this.logger.log(`New upload data saved to temporary table`);
+    this.logger.log(`New csv upload data from saved to temporary tables`);
     return newUpload;
   }
 
@@ -239,7 +244,11 @@ export class FeatureAmountUploadService {
     projectId: string,
   ) {
     for (const [index, newFeature] of newFeaturesFromCsvUpload.entries()) {
-      this.logger.log(`Getting feature amounts for feature ${index}`);
+      this.logger.log(
+        `Getting feature amounts for feature number  ${index + 1}: ${
+          newFeature.feature_class_name
+        }`,
+      );
       const featureAmounts = await apiQueryRunner.manager
         .createQueryBuilder()
         .select(['fa.puid', 'fa.amount'])
@@ -255,14 +264,17 @@ export class FeatureAmountUploadService {
         CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS,
       );
 
+      this.logger.log(
+        `Feature data divided into  ${featuresChunks.length} chunks`,
+      );
       for (const [amountIndex, featureChunk] of featuresChunks.entries()) {
         this.logger.log(
-          `Saving chunk  ${amountIndex} of amounts of feature ${index}`,
+          `Starting the process of saving chunk with index ${amountIndex} of amounts of feature ${newFeature.feature_class_name}...`,
         );
         const firstParameterNumber = 2;
         const parameters: any[] = [projectId];
         this.logger.log(
-          `Generating values to insert for chunk ${amountIndex} of amounts of feature ${index}`,
+          `Generating values to insert for chunk with index ${amountIndex}...`,
         );
         const valuesToInsert = featureChunk.map((featureAmount, index) => {
           parameters.push(
@@ -288,7 +300,7 @@ export class FeatureAmountUploadService {
         });
 
         this.logger.log(
-          `Inserting amount values of chunk ${amountIndex} of amounts of feature ${index} into geoDB`,
+          `Inserting amount values of chunk with index ${amountIndex} into (geoDB).features_data table...`,
         );
         await geoQueryRunner.manager.query(
           `
@@ -303,12 +315,14 @@ export class FeatureAmountUploadService {
           parameters,
         );
         this.logger.log(
-          `Chunk  ${amountIndex} of amounts of feature ${index} saved to geoDB features_data`,
+          `Chunk with index ${amountIndex} saved to (geoDB).features_data`,
         );
       }
-      this.logger.log(`All chunks of feature ${index} saved`);
+      this.logger.log(
+        `All chunks of feature ${newFeature.feature_class_name} saved`,
+      );
     }
-    this.logger.log(`All features data saved`);
+    this.logger.log(`All new features data saved to (geoDB).features_data`);
   }
 
   private async areFeatureNamesNotAlreadyUsedInProject(
