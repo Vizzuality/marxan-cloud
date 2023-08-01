@@ -14,16 +14,14 @@ import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
 import Sidebar from 'layout/project/sidebar';
 import Protected from 'layout/protected';
-import SidebarEditFeatures from 'layout/scenarios/edit/features';
 import ScenariosSidebarSetupFeaturesAdd from 'layout/scenarios/edit/features/set-up/add';
 import ScenariosSidebarSetupFeaturesTarget from 'layout/scenarios/edit/features/set-up/targets';
 import ScenarioLock from 'layout/scenarios/edit/lock';
 import ScenarioEditMap from 'layout/scenarios/edit/map';
-import SidebarEditAnalysis from 'layout/scenarios/edit/parameters';
 import AdvancedSettings from 'layout/scenarios/edit/parameters/advanced-settings';
 import BLMCalibration from 'layout/scenarios/edit/parameters/blm-calibration';
 import AdjustPanningUnits from 'layout/scenarios/edit/planning-unit/adjust-planning-units';
-import ScenariosCostSurface from 'layout/scenarios/edit/planning-unit/cost-surface/component';
+import ScenariosCostSurface from 'layout/scenarios/edit/planning-unit/cost-surface';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/planning-unit/protected-areas/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/planning-unit/protected-areas/threshold';
 import PostGapAnalysis from 'layout/scenarios/edit/solutions/gap-analysis';
@@ -32,7 +30,6 @@ import ScenarioStatus from 'layout/scenarios/edit/status';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
 import { Tab } from 'types/navigation';
-import { ScenarioSidebarTabs } from 'utils/tabs';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 

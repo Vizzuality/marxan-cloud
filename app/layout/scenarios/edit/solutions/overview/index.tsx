@@ -8,7 +8,6 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
-// import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProject } from 'hooks/projects';
 import {
   useScenario,
@@ -17,8 +16,6 @@ import {
 } from 'hooks/scenarios';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
-
-// import SolutionFrequency from 'layout/solutions/frequency';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
