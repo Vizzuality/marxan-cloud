@@ -1,17 +1,14 @@
-import React, { useRef } from 'react';
-
-// react aria
-import cx from 'classnames';
+import { useRef } from 'react';
 
 import { useButton } from '@react-aria/button'; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { useSearchField } from '@react-aria/searchfield';
 import { useSearchFieldState } from '@react-stately/searchfield';
-// react types
 import { AriaSearchFieldProps } from '@react-types/searchfield';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite'; // eslint-disable-line @typescript-eslint/no-unused-vars
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import SEARCH_SVG from 'svgs/ui/search.svg?sprite';
 
 const THEME = {
@@ -29,11 +26,7 @@ export interface SearchProps extends AriaSearchFieldProps {
   size: 'sm' | 'base';
 }
 
-export const Search: React.FC<SearchProps> = ({
-  theme = 'dark',
-  size = 'base',
-  ...rest
-}: SearchProps) => {
+export const Search = ({ theme = 'dark', size = 'base', ...rest }: SearchProps) => {
   const { placeholder } = rest;
   const state = useSearchFieldState(rest);
 
@@ -43,14 +36,14 @@ export const Search: React.FC<SearchProps> = ({
 
   return (
     <div
-      className={cx('relative flex w-full border-b border-gray-400', {
+      className={cn('relative flex w-full border-b border-gray-600', {
         [THEME[theme]]: true,
         [SIZES[size]]: true,
       })}
     >
       <Icon
         icon={SEARCH_SVG}
-        className={cx({
+        className={cn({
           'absolute left-1 top-1/2 h-4.5 w-4.5 -translate-y-1/2 transform': true,
           [THEME[theme]]: true,
         })}
@@ -61,7 +54,7 @@ export const Search: React.FC<SearchProps> = ({
         ref={ref}
         placeholder={placeholder}
         type="search"
-        className={cx(
+        className={cn(
           'w-full truncate bg-transparent px-9 font-sans leading-4 placeholder-gray-300 placeholder-opacity-50 focus:outline-none',
           {
             [THEME[theme]]: true,
