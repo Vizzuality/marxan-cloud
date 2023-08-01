@@ -2,7 +2,7 @@ import React from 'react';
 
 import { AnimatePresence } from 'framer-motion';
 
-import Breadcrumbs from 'components/new-layout/breadcrumbs';
+import Breadcrumbs from 'layout/project/navigation/breadcrumbs';
 import { cn } from 'utils/cn';
 
 export const ScenariosEditSidebar = ({
