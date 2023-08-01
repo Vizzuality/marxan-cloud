@@ -113,17 +113,17 @@ export function withScenario(getServerSidePropsFunc?: Function) {
         },
       };
     }
-
-    const solutionsTabs = ['solutions-overview', 'target-achievement'];
-    if (scenario.data.solutionsAreLocked && solutionsTabs.includes(tab)) {
-      return {
-        props: {},
-        redirect: {
-          destination: `/projects/${pid}/scenarios/${sid}/edit?=overview`,
-          permanent: false,
-        },
-      };
-    }
+    // //!TODO: COMMENT & READ NAVIGATION TREE
+    // const solutionsTabs = ['solutions-overview', 'target-achievement'];
+    // if (scenario.data?.solutionsAreLocked && solutionsTabs.includes(tab)) {
+    //   return {
+    //     props: {},
+    //     redirect: {
+    //       destination: `/projects/${pid}/scenarios/${sid}/edit?=overview`,
+    //       permanent: false,
+    //     },
+    //   };
+    // }
 
     if (getServerSidePropsFunc) {
       const SSPF = (await getServerSidePropsFunc(context)) || {};
