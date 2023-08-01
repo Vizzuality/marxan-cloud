@@ -1,8 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
 import { useSelector } from 'react-redux';
-
-import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 
@@ -16,19 +14,14 @@ import ProjectNewMap from 'layout/projects/new/map';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
 
-import Breadcrumb from 'components/breadcrumb';
+import Breadcrumbs from 'components/new-layout/breadcrumbs';
 
 export const getServerSideProps = withProtection(withUser());
 
 const NewProjectsPage = (): JSX.Element => {
-  const { push } = useRouter();
   const [formValues, setFormValues] = useState<NewProjectFields>();
 
   const { bbox } = useSelector((state) => state['/projects/new']);
-
-  const handleClickBreadcrumb = useCallback(() => {
-    push('/projects');
-  }, [push]);
 
   return (
     <Protected>
@@ -37,7 +30,7 @@ const NewProjectsPage = (): JSX.Element => {
       <ProjectLayout className="z-10">
         <Sidebar>
           <div className="flex flex-col">
-            <Breadcrumb onClick={handleClickBreadcrumb}>All projects</Breadcrumb>
+            <Breadcrumbs />
             <ProjectNewForm
               onFormUpdate={(_formValues) => {
                 setFormValues(_formValues);
