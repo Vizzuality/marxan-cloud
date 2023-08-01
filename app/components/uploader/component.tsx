@@ -27,7 +27,7 @@ export const Uploader: React.FC<UploaderProps> = ({
         onClick={onOpen}
       >
         {caption || 'Upload'}
-        <Icon className="absolute right-6 h-4 w-4 text-white" icon={UPLOAD_SVG} />
+        <Icon className="absolute right-6 h-4 w-4 stroke-current text-white" icon={UPLOAD_SVG} />
       </Button>
 
       <Modal id={id} open={open} size="narrow" onDismiss={onClose}>

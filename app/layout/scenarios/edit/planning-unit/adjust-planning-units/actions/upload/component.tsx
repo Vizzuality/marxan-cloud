@@ -185,7 +185,10 @@ export const UploadPUMethod = (): JSX.Element => {
         <input {...getInputProps()} />
 
         <div className="flex w-full flex-col items-center justify-center space-y-4">
-          <Icon className="h-6 w-6 text-white group-hover:text-black" icon={UPLOAD_SVG} />
+          <Icon
+            className="h-6 w-6 stroke-current text-white group-hover:text-black"
+            icon={UPLOAD_SVG}
+          />
 
           <p className="text-center text-sm font-medium text-white">
             Drag and drop your polygon data file <br /> or click here to upload

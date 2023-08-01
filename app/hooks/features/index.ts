@@ -8,6 +8,7 @@ import {
   QueryObserverOptions,
 } from 'react-query';
 
+import { AxiosRequestConfig } from 'axios';
 import Fuse from 'fuse.js';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
@@ -30,8 +31,6 @@ import {
   UseFeaturesOptionsProps,
   UseSaveSelectedFeaturesProps,
   SaveSelectedFeaturesProps,
-  UseUploadFeaturesShapefileProps,
-  UploadFeaturesShapefileProps,
 } from './types';
 
 interface AllItemProps extends IntersectItemProps, RawItemProps {}
@@ -583,12 +582,14 @@ export function useUploadFeaturesShapefile({
   requestConfig = {
     method: 'POST',
   },
-}: UseUploadFeaturesShapefileProps) {
+}: {
+  requestConfig?: AxiosRequestConfig<FormData>;
+}) {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
 
-  const uploadFeatureShapefile = ({ id, data }: UploadFeaturesShapefileProps) => {
-    return UPLOADS.request({
+  const uploadFeatureShapefile = ({ id, data }: { id: Project['id']; data: FormData }) => {
+    return UPLOADS.request<{ success: true }>({
       url: `/projects/${id}/features/shapefile`,
       data,
       headers: {
@@ -596,17 +597,13 @@ export function useUploadFeaturesShapefile({
         'Content-Type': 'multipart/form-data',
       },
       ...requestConfig,
-    });
+    } as typeof requestConfig);
   };
 
   return useMutation(uploadFeatureShapefile, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: async (data, variables) => {
       const { id: projectId } = variables;
-      queryClient.invalidateQueries(['all-features', projectId]);
-      console.info('Succces', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      console.info('Error', error, variables, context);
+      await queryClient.invalidateQueries(['all-features', projectId]);
     },
   });
 }
