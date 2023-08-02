@@ -138,7 +138,6 @@ export const ProjectMap = (): JSX.Element => {
 
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
-
     active: tab === 'features',
     bbox,
     options: {
@@ -147,13 +146,26 @@ export const ProjectMap = (): JSX.Element => {
     },
   });
 
+  const selectedPreviewFeatures = useMemo(() => {
+    return selectedFeaturesData
+      ?.filter(({ id }) => selectedFeaturesIds.includes(id))
+      .map(({ featureClassName, id }) => ({ featureClassName, id }))
+      .sort((a, b) => {
+        const aIndex = selectedFeaturesIds.indexOf(a.id as string);
+        const bIndex = selectedFeaturesIds.indexOf(b.id as string);
+        return aIndex - bIndex;
+      });
+  }, [selectedFeaturesIds, selectedFeaturesData]);
+
   const LAYERS = [PUGridLayer, PUCompareLayer, PlanningAreaLayer, ...FeaturePreviewLayers].filter(
     (l) => !!l
   );
 
   const LEGEND = useLegend({
     layers: [
+      ...(tab === 'features' && selectedFeaturesData ? ['features-preview'] : []),
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
+
       ...(!!sid1 && !!sid2 ? ['compare'] : []),
       ...(rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2
         ? ['pugrid']
@@ -161,6 +173,7 @@ export const ProjectMap = (): JSX.Element => {
     ],
     options: {
       layerSettings,
+      items: selectedPreviewFeatures,
     },
   });
 
