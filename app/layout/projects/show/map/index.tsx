@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -472,7 +470,7 @@ export const ProjectMap = (): JSX.Element => {
               </div>
 
               <div
-                className={cx({
+                className={cn({
                   'invisible opacity-0': SCENARIOS_RUNNED.sid1Options.length <= 1,
                 })}
               >
