@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 import { withProject } from 'hoc/projects';
-import { withScenario, withScenarioLock } from 'hoc/scenarios';
+import { withScenario, withScenarioLock, withSolutions } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
@@ -35,7 +35,7 @@ import { Tab } from 'types/navigation';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 export const getServerSideProps = withProtection(
-  withUser(withProject(withScenario(withScenarioLock())))
+  withUser(withProject(withScenario(withScenarioLock(withSolutions()))))
 );
 
 const EditScenarioPage = (): JSX.Element => {
@@ -97,11 +97,11 @@ const EditScenarioPage = (): JSX.Element => {
             {tab === 'features-add' && <ScenariosSidebarSetupFeaturesAdd />}
             {tab === 'features-target' && <ScenariosSidebarSetupFeaturesTarget />}
 
+            {tab === 'advanced-settings' && <AdvancedSettings />}
             {tab === 'blm-calibration' && <BLMCalibration />}
-            {tab === 'overview' && <AdvancedSettings />}
 
+            {tab === 'solutions' && <SolutionsDetails />}
             {tab === 'target-achievement' && <PostGapAnalysis />}
-            {tab === 'solutions-overview' && <SolutionsDetails />}
           </ScenariosEditSidebar>
         </Sidebar>
         <ScenarioEditMap />

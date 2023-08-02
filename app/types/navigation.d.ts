@@ -9,7 +9,6 @@ export type Tab =
   | 'features-target'
   | 'pre-gap-analysis'
   | 'advanced-settings'
-  | 'overview'
   | 'blm-calibration'
-  | 'solutions-overview'
+  | 'solutions'
   | 'target-achievement';
