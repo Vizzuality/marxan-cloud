@@ -11,8 +11,8 @@ export const NAVIGATION_TREE = {
     'features-add',
     'features-target',
   ],
-  advancedSettings: ['overview', 'blm-calibration'],
-  solutions: ['solutions-overview', 'target-achievement'],
+  advancedSettings: ['advanced-settings', 'blm-calibration'],
+  solutions: ['solutions', 'target-achievement'],
 } satisfies { [key in NavigationTreeCategories]: string[] };
 
 export const MENU_COMMON_CLASSES = 'flex flex-col items-center space-y-2';
