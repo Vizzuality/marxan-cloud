@@ -7,6 +7,8 @@ import Icon from 'components/icon';
 import HEXAGON_SVG from 'svgs/map/hexagon.svg?sprite';
 import SQUARE_SVG from 'svgs/map/square.svg?sprite';
 
+import { UseLegend } from './types';
+
 export const COLORS = {
   primary: '#00BFFF',
   'features-preview': {
@@ -184,7 +186,7 @@ export const LEGEND_LAYERS = {
     },
   }),
 
-  'features-preview': (options) => {
+  'features-preview': (options: UseLegend['options']) => {
     const { items } = options;
 
     return {
@@ -202,7 +204,7 @@ export const LEGEND_LAYERS = {
             : COLORS['features-preview'].ramp[i];
 
         return {
-          value: item.name,
+          value: item.featureClassName,
           color: COLOR,
         };
       }),

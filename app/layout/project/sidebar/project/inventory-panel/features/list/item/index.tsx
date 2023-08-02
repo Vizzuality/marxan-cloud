@@ -161,7 +161,13 @@ const FeatureItemList = ({
       </div>
       <div className="col-span-1 flex space-x-3">
         <button type="button" onClick={() => toggleSeeOnMap(feature.id)}>
-          <Icon className="h-4 w-4" icon={isShown(feature.id) ? SHOW_SVG : HIDE_SVG} />
+          <Icon
+            className={cn({
+              'h-4 w-4': true,
+              'text-blue-400': isShown(feature.id),
+            })}
+            icon={isShown(feature.id) ? SHOW_SVG : HIDE_SVG}
+          />
         </button>
         <Popover>
           <PopoverTrigger asChild>
