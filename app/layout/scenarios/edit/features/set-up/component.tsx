@@ -32,7 +32,7 @@ export const ScenariosSidebarSetUp: React.FC<ScenariosSidebarSetUpProps> = () =>
 
   const { data: scenarioData } = useScenario(sid);
 
-  if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
+  // if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
 
   return (
     <div className="flex h-full w-full flex-grow flex-col overflow-hidden">
