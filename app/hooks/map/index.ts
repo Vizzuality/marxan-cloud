@@ -292,7 +292,6 @@ export function useFeaturePreviewLayers({
         return bIndex - aIndex;
       });
 
-    console.log('FEATURES', FEATURES);
     const { opacity = 1, visibility = true } = options || {};
 
     const getLayerVisibility = () => {

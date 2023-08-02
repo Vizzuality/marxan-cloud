@@ -46,7 +46,6 @@ export const ProjectMap = (): JSX.Element => {
   const [sid1, setSid1] = useState(null);
   const [sid2, setSid2] = useState(null);
   const {
-    cache,
     isSidebarOpen,
     layerSettings,
     selectedFeatures: selectedFeaturesIds,
@@ -139,12 +138,10 @@ export const ProjectMap = (): JSX.Element => {
 
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
-    cache,
+
     active: tab === 'features',
     bbox,
     options: {
-      // featuresRecipe,
-      // featureHoverId,
       selectedFeatures: selectedFeaturesIds,
       ...layerSettings['features-preview'],
     },
@@ -306,7 +303,6 @@ export const ProjectMap = (): JSX.Element => {
     [dispatch, layerSettings]
   );
 
-  console.log('ProjectMap render');
   return (
     <AnimatePresence>
       {id && (
