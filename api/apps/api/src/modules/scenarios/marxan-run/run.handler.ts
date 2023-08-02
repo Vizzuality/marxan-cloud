@@ -39,9 +39,6 @@ export class RunHandler {
       scenarioId: scenario.id,
       assets,
     });
-    await this.scenarios.update(scenario.id, {
-      ranAtLeastOnce: true,
-    });
     const kind = API_EVENT_KINDS.scenario__run__submitted__v1__alpha1;
     await this.apiEvents.create({
       topic: scenario.id,
