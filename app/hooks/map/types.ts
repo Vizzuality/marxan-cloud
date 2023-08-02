@@ -2,6 +2,7 @@ import { PUAction } from 'store/slices/scenarios/types';
 
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
 import { TargetSPFItemProps } from 'components/features/target-spf-item/types';
+import { Feature } from 'types/api/feature';
 
 export interface UseGeoJSONLayer {
   cache?: number;
@@ -78,7 +79,7 @@ export interface UseFeaturePreviewLayers {
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
-  features?: SelectedItemProps[];
+  features?: Feature[];
   options?: {
     featuresRecipe?: Record<string, any>[];
     featureHoverId?: string;

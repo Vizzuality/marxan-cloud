@@ -109,6 +109,16 @@ const FeatureItemList = ({
     [dispatch, visibleFeatures]
   );
 
+  const isShown = useCallback(
+    (id) => {
+      if (!visibleFeatures.includes(id)) {
+        return false;
+      }
+      return true;
+    },
+    [visibleFeatures]
+  );
+
   return (
     <>
       <div className="col-span-3 flex space-x-2">
@@ -151,7 +161,7 @@ const FeatureItemList = ({
       </div>
       <div className="col-span-1 flex space-x-3">
         <button type="button" onClick={() => toggleSeeOnMap(feature.id)}>
-          <Icon className="h-4 w-4" icon={true ? SHOW_SVG : HIDE_SVG} />
+          <Icon className="h-4 w-4" icon={isShown(feature.id) ? SHOW_SVG : HIDE_SVG} />
         </button>
         <Popover>
           <PopoverTrigger asChild>

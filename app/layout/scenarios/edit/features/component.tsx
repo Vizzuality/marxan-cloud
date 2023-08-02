@@ -38,12 +38,12 @@ export interface ScenariosSidebarFeaturesProps {}
 
 export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> = () => {
   const { query } = useRouter();
-  const { pid, sid } = query as { pid: string; sid: string };
+  const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
-  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const editable = useCanEditScenario(pid, sid);
@@ -100,7 +100,7 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
     );
   }, [sid, scenarioData?.metadata, dispatch, setTab, setSubTab, scenarioMutation]);
 
-  if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
+  if (!scenarioData || tab !== 'features') return null;
 
   return (
     <div className="flex h-full w-full flex-grow flex-col overflow-hidden">

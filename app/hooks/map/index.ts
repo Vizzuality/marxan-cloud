@@ -292,6 +292,7 @@ export function useFeaturePreviewLayers({
         return bIndex - aIndex;
       });
 
+    console.log('FEATURES', FEATURES);
     const { opacity = 1, visibility = true } = options || {};
 
     const getLayerVisibility = () => {
@@ -525,6 +526,7 @@ export function usePUGridPreviewLayer({
  * PROYECT LAYERS
  *******************************************************************
  */
+
 export function useProjectPlanningAreaLayer({
   active,
   pId,
