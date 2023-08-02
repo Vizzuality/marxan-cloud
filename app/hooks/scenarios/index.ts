@@ -484,7 +484,7 @@ export function useScenario(id: Scenario['id']) {
   return useQuery({
     queryKey: ['scenario', id],
     queryFn: async () =>
-      SCENARIOS.request<{ data?: Scenario }>({
+      SCENARIOS.request<{ data: Scenario }>({
         method: 'GET',
         url: `/${id}`,
         headers: {
@@ -492,7 +492,10 @@ export function useScenario(id: Scenario['id']) {
         },
       }).then((response) => response.data),
     enabled: !!id,
-    placeholderData: {},
+    placeholderData: {
+      // ? not a fan of this, but it's the only way to make the types work
+      data: {} as Scenario,
+    },
     select: ({ data }) => data,
   });
 }
@@ -521,7 +524,7 @@ export function useSaveScenario({
       const { id, projectId } = data?.data?.data;
 
       await queryClient.invalidateQueries(['scenarios', projectId]);
-      await queryClient.invalidateQueries(['scenario', id]);
+      // await queryClient.invalidateQueries(['scenario', id]);
       queryClient.setQueryData(['scenario', id], data?.data?.data);
     },
     onError: (error, variables, context) => {
