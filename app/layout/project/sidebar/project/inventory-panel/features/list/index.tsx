@@ -23,6 +23,7 @@ export const ProjectFeatureList = (): JSX.Element => {
   const { selectedFeatures: visibleFeatures, search } = useAppSelector(
     (state) => state['/projects/[id]']
   );
+
   const [filters, setFilters] = useState<Parameters<typeof useAllFeatures>[1]>({
     sort: 'featureClassName',
   });

@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
-
 import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
-import { useAppSelector } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { setLayerSettings } from 'store/slices/projects/[id]';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
@@ -15,12 +13,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import pick from 'lodash/pick';
 
 import { useAccessToken } from 'hooks/auth';
+import { useAllFeatures } from 'hooks/features';
 import {
   useLegend,
   usePUCompareLayer,
   usePUGridLayer,
   useProjectPlanningAreaLayer,
   useBBOX,
+  useFeaturePreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -41,13 +41,16 @@ import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import HelpBeacon from 'layout/help/beacon';
 import { cn } from 'utils/cn';
 
-export interface ProjectMapProps {}
-
-export const ProjectMap: React.FC<ProjectMapProps> = () => {
+export const ProjectMap = (): JSX.Element => {
   const [open, setOpen] = useState(false);
   const [sid1, setSid1] = useState(null);
   const [sid2, setSid2] = useState(null);
-  const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
+  const {
+    cache,
+    isSidebarOpen,
+    layerSettings,
+    selectedFeatures: selectedFeaturesIds,
+  } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
 
@@ -59,8 +62,10 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const { query } = useRouter();
-  const { pid } = query as { pid: string };
+  // !TODO: Type tab correctly
+  const { pid, tab } = query as { pid: string; tab: string };
   const { data = {} } = useProject(pid);
+
   const {
     id,
     bbox,
@@ -75,6 +80,12 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     bbox,
   });
 
+  const allFeaturesQuery = useAllFeatures(pid);
+
+  const selectedFeaturesData = useMemo(() => {
+    return allFeaturesQuery.data?.data.filter((f) => selectedFeaturesIds?.includes(f.id));
+  }, [selectedFeaturesIds]);
+
   const { data: rawScenariosData, isFetched: rawScenariosIsFetched } = useScenarios(pid, {
     filters: {
       projectId: pid,
@@ -82,12 +93,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     sort: '-lastModifiedAt',
   });
 
-  const {
-    // Settings
-    layerSettings,
-  } = useSelector((state) => state['/projects/[id]']);
-
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const sid = useMemo(() => {
     if (sid1) return sid1;
@@ -131,7 +137,22 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     },
   });
 
-  const LAYERS = [PUGridLayer, PUCompareLayer, PlanningAreaLayer].filter((l) => !!l);
+  const FeaturePreviewLayers = useFeaturePreviewLayers({
+    features: selectedFeaturesData,
+    cache,
+    active: tab === 'features',
+    bbox,
+    options: {
+      // featuresRecipe,
+      // featureHoverId,
+      selectedFeatures: selectedFeaturesIds,
+      ...layerSettings['features-preview'],
+    },
+  });
+
+  const LAYERS = [PUGridLayer, PUCompareLayer, PlanningAreaLayer, ...FeaturePreviewLayers].filter(
+    (l) => !!l
+  );
 
   const LEGEND = useLegend({
     layers: [
@@ -285,6 +306,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     [dispatch, layerSettings]
   );
 
+  console.log('ProjectMap render');
   return (
     <AnimatePresence>
       {id && (
