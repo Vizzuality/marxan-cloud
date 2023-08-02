@@ -16,56 +16,51 @@ export const Breadcrumbs = ({ className }: { className?: string }): JSX.Element 
   const scenarioQuery = useScenario(sid);
 
   return (
-    <nav className="flex text-xs text-white" aria-label="Breadcrumb">
+    <nav className="max-w-full" aria-label="Breadcrumb">
       <ol
         className={cn({
-          'flex items-center space-x-2': true,
+          'flex items-center space-x-2 text-xs text-white': true,
           [className]: !!className,
         })}
       >
-        <li>
+        <li className="flex items-center">
           <Link
             href="/projects"
             className={cn({
-              'flex h-6 items-center overflow-hidden hover:text-primary-500 focus:outline-none':
-                true,
+              'hover:text-primary-500': true,
               'font-semibold text-primary-500': pathname === '/projects',
             })}
           >
             Dashboard
           </Link>
         </li>
-        {pid && (
-          <li>
-            <div className="flex max-w-[220px] items-center">
-              <Icon className="mb-0.5 h-2 w-2 flex-shrink-0 text-gray-400" icon={ARROW_RIGHT_SVG} />
 
-              <Link
-                href={`/projects/${pid}`}
-                className={cn({
-                  'ml-2 overflow-hidden overflow-ellipsis whitespace-nowrap hover:text-primary-500':
-                    true,
-                  'font-semibold text-primary-500': pathname === '/projects/[pid]',
-                })}
-              >
-                {projectQuery.data?.name}
-              </Link>
-            </div>
+        {pid && (
+          <li className="flex items-center overflow-hidden">
+            <Icon className="mb-0.5 h-2 w-2 flex-shrink-0 text-gray-400" icon={ARROW_RIGHT_SVG} />
+
+            <Link
+              href={`/projects/${pid}`}
+              className={cn({
+                'ml-2 truncate  hover:text-primary-500': true,
+                'font-semibold text-primary-500': pathname === '/projects/[pid]',
+              })}
+            >
+              {projectQuery.data?.name}
+            </Link>
           </li>
         )}
         {sid && (
-          <li>
-            <div className="flex max-w-[200px] items-center">
-              <Icon className="mb-0.5 h-2 w-2 flex-shrink-0 text-gray-400" icon={ARROW_RIGHT_SVG} />
-              <div
-                className={cn({
-                  'ml-2 overflow-hidden overflow-ellipsis whitespace-nowrap': true,
-                  'font-semibold text-primary-500':
-                    pathname === '/projects/[pid]/scenarios/[sid]/edit',
-                })}
-              >
-                {scenarioQuery.data?.name}
-              </div>
+          <li className="flex items-center overflow-hidden">
+            <Icon className="mb-0.5 h-2 w-2 flex-shrink-0 text-gray-400" icon={ARROW_RIGHT_SVG} />
+            <div
+              className={cn({
+                'ml-2 truncate ': true,
+                'font-semibold text-primary-500':
+                  pathname === '/projects/[pid]/scenarios/[sid]/edit',
+              })}
+            >
+              {scenarioQuery.data?.name}
             </div>
           </li>
         )}
