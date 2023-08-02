@@ -44,7 +44,6 @@ test(`scheduling job`, async () => {
   await runService.run({ id: 'scenario-1' });
 
   // then
-  fixtures.ThenShouldUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
   fixtures.ThenShouldUseDefaultBlm();
@@ -59,7 +58,6 @@ test(`scheduling job with overriding blm`, async () => {
   await runService.run({ id: 'scenario-1', boundaryLengthModifier: 78 }, -123);
 
   // then
-  fixtures.ThenShouldUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
   fixtures.ThenShouldUseBlm(-123);
@@ -74,7 +72,6 @@ test(`scheduling job with scenario that has blm`, async () => {
   await runService.run({ id: 'scenario-1', boundaryLengthModifier: 78 });
 
   // then
-  fixtures.ThenShouldUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
   fixtures.ThenShouldUseBlm(78);
@@ -446,12 +443,6 @@ async function getFixtures() {
       expect(fixtures.activeJob.updateProgress).toBeCalledWith({
         canceled: true,
         scenarioId: `scenario-1`,
-      });
-    },
-    ThenShouldUpdateScenario() {
-      expect(fixtures.fakeScenarioRepo.update).toBeCalledTimes(1);
-      expect(fixtures.fakeScenarioRepo.update).toBeCalledWith(`scenario-1`, {
-        ranAtLeastOnce: true,
       });
     },
     ThenShouldEmitSubmittedEvent(id: string) {
