@@ -1,4 +1,4 @@
-import { useCallback, useState, ChangeEvent, useEffect, useMemo } from 'react';
+import { useCallback, useState, ChangeEvent, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -16,8 +16,6 @@ import { Feature } from 'types/api/feature';
 import { cn } from 'utils/cn';
 
 import FeaturesBulkActionMenu from '../bulk-action-menu';
-
-// import FeatureItemList from './item';
 
 export const ProjectFeatureList = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -174,12 +172,6 @@ export const ProjectFeatureList = (): JSX.Element => {
             <ul className="max-h-[calc(100vh-400px)] divide-y divide-gray-400 overflow-y-auto pl-1 pr-2">
               {allFeaturesQuery.data?.map((feature) => (
                 <li key={feature.id} className="flex items-center justify-between py-2 ">
-                  {/* <FeatureItemList
-                    feature={feature}
-                    projectId={pid}
-                    onSelectFeature={handleSelectFeature}
-                    isSelected={selectedFeaturesIds.includes(feature.id)}
-                  /> */}
                   <ItemList
                     item={feature}
                     projectId={pid}
