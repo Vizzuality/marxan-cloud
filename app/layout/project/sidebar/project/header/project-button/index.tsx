@@ -19,6 +19,8 @@ import { cn } from 'utils/cn';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 import DOTS_SVG from 'svgs/ui/dots.svg?sprite';
+import COMMUNITY_SVG from 'svgs/ui/new-layout/community.svg?sprite';
+import DOWNLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 import PublishModal from './publish-modal';
 
@@ -160,7 +162,7 @@ const ProjectButton = (): JSX.Element => {
           <PopoverContent
             side="left"
             sideOffset={20}
-            className="!z-40 w-32 rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-xs"
+            className="w-fit rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-sm"
             collisionPadding={48}
             onInteractOutside={() => setContent(false)}
           >
@@ -184,10 +186,14 @@ const ProjectButton = (): JSX.Element => {
                   }
                 >
                   <button
-                    className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
+                    className="group flex w-full cursor-pointer items-center space-x-2 rounded-t-2xl px-4 py-2 hover:bg-gray-500"
                     disabled={!isOwner || !SCENARIOS_RUNNED}
                     onClick={() => setPublishModal(true)}
                   >
+                    <Icon
+                      icon={COMMUNITY_SVG}
+                      className="h-5 w-5 text-gray-400 group-hover:text-white"
+                    />
                     <p>Publish</p>
                   </button>
                 </Tooltip>
@@ -210,10 +216,14 @@ const ProjectButton = (): JSX.Element => {
             {isPublic && (
               <>
                 <button
-                  className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
+                  className="group flex w-full cursor-pointer items-center space-x-2 rounded-t-2xl px-4 py-2 hover:bg-gray-500"
                   disabled={!isOwner}
                   onClick={() => setConfirmUnPublish(projectData)}
                 >
+                  <Icon
+                    icon={COMMUNITY_SVG}
+                    className="h-5 w-5 text-gray-400 group-hover:text-white"
+                  />
                   <p>Unpublish</p>
                 </button>
                 <ConfirmationPrompt
@@ -228,9 +238,14 @@ const ProjectButton = (): JSX.Element => {
             )}
 
             <button
-              className="group flex w-full cursor-pointer items-center space-x-3 rounded-b-2xl px-2.5 py-2 hover:bg-gray-500"
+              className="group flex w-full cursor-pointer items-center space-x-2 rounded-b-2xl px-4 py-2 hover:bg-gray-500"
               onClick={() => setDownloadModal(true)}
             >
+              <Icon
+                icon={DOWNLOAD_SVG}
+                className="h-5 w-5 rotate-180 stroke-current text-gray-400 group-hover:text-white"
+              />
+
               <p>Download</p>
             </button>
           </PopoverContent>
