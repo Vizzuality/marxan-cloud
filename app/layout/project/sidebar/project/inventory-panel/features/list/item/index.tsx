@@ -1,9 +1,6 @@
 import { useCallback, useState, ChangeEvent, useRef, InputHTMLAttributes } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
-
-import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects/[id]';
 
 import { MoreHorizontal } from 'lucide-react';
 
@@ -28,16 +25,19 @@ const FeatureItemList = ({
   projectId,
   isSelected,
   onSelectFeature,
+  toggleSeeOnMap,
+  isShown,
 }: {
   feature: Feature;
   projectId: Project['id'];
   isSelected: boolean;
   onSelectFeature: (evt: ChangeEvent<HTMLInputElement>) => void;
+  toggleSeeOnMap: () => void;
+  isShown: boolean;
 }): JSX.Element => {
   const queryClient = useQueryClient();
   const { addToast } = useToasts();
-  const dispatch = useDispatch();
-  const { selectedFeatures: visibleFeatures } = useSelector((state) => state['/projects/[id]']);
+
   const [isEditable, setEditable] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const { mutate: editFeature } = useEditFeature();
@@ -94,31 +94,6 @@ const FeatureItemList = ({
     [nameInputRef, projectId, feature.id, editFeature, addToast, queryClient]
   );
 
-  const toggleSeeOnMap = useCallback(
-    (featureId: Feature['id']) => {
-      const newSelectedFeatures = [...visibleFeatures];
-
-      if (!newSelectedFeatures.includes(featureId)) {
-        newSelectedFeatures.push(featureId);
-      } else {
-        const i = newSelectedFeatures.indexOf(featureId);
-        newSelectedFeatures.splice(i, 1);
-      }
-      dispatch(setVisibleFeatures(newSelectedFeatures));
-    },
-    [dispatch, visibleFeatures]
-  );
-
-  const isShown = useCallback(
-    (id) => {
-      if (!visibleFeatures.includes(id)) {
-        return false;
-      }
-      return true;
-    },
-    [visibleFeatures]
-  );
-
   return (
     <>
       <div className="col-span-3 flex space-x-2">
@@ -160,13 +135,13 @@ const FeatureItemList = ({
         )}
       </div>
       <div className="col-span-1 flex space-x-3">
-        <button type="button" onClick={() => toggleSeeOnMap(feature.id)}>
+        <button type="button" onClick={() => toggleSeeOnMap()}>
           <Icon
             className={cn({
               'h-4 w-4': true,
-              'text-blue-400': isShown(feature.id),
+              'text-blue-400': isShown,
             })}
-            icon={isShown(feature.id) ? SHOW_SVG : HIDE_SVG}
+            icon={isShown ? SHOW_SVG : HIDE_SVG}
           />
         </button>
         <Popover>
