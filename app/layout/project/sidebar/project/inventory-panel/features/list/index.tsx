@@ -185,7 +185,7 @@ export const ProjectFeatureList = (): JSX.Element => {
                     projectId={pid}
                     onSelectFeature={handleSelectFeature}
                     isSelected={selectedFeaturesIds.includes(feature.id)}
-                    id="features"
+                    id="feature"
                   />
                 </li>
               ))}
