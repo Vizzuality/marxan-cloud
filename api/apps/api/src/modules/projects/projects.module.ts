@@ -50,6 +50,7 @@ import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/outpu
 import { ProjectProtectedAreasController } from './project-protected-areas.controller';
 import { ProjectProtectedAreasService } from './project-protected-areas.service';
 import { ProjectAclModule } from '../access-control/projects-acl/project-acl.module';
+import { ProtectedAreasCrudModule } from '../protected-areas/protected-areas-crud.module';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { ProjectAclModule } from '../access-control/projects-acl/project-acl.mod
     LegacyProjectImportRepositoryModule,
     ApiEventsModule,
     OutputProjectSummariesModule,
+    ProtectedAreasCrudModule,
   ],
   providers: [
     ProjectProtectedAreasService,

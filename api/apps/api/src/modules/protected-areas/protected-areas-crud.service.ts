@@ -237,4 +237,22 @@ export class ProtectedAreasCrudService extends AppBaseService<
       )
       .getMany();
   }
+
+  async listForProject(projectId: string) {
+    const projectCustomAreas = await this.repository.find({
+      where: {
+        projectId,
+      },
+      order: {
+        fullName: 'ASC',
+      },
+    });
+
+    const serializer = new JSONAPISerializer.Serializer(
+      'protected_areas',
+      this.serializerConfig,
+    );
+
+  return serializer.serialize(projectCustomAreas);
+  }
 }
