@@ -1,9 +1,5 @@
-import {
-  forbiddenError,
-} from '@marxan-api/modules/access-control';
-import {
-  Injectable,
-} from '@nestjs/common';
+import { forbiddenError } from '@marxan-api/modules/access-control';
+import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/Either';
 
 import { ProjectsCrudService } from './projects-crud.service';
@@ -14,7 +10,6 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Repository } from 'typeorm';
 import { projectNotFound } from './projects.service';
 import { ProtectedAreasCrudService } from '../protected-areas/protected-areas-crud.service';
-
 
 @Injectable()
 export class ProjectProtectedAreasService {
@@ -29,15 +24,19 @@ export class ProjectProtectedAreasService {
   async listForProject(
     projectId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError | typeof projectNotFound, ProtectedArea[]>> {
+  ): Promise<
+    Either<typeof forbiddenError | typeof projectNotFound, ProtectedArea[]>
+  > {
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
       return left(forbiddenError);
     }
 
     const project = await this.projectsCrud.getById(projectId);
 
-    const projectCustomAreas = await this.protectedAreasCrudService.listForProject(project.id);
-    
+    const projectCustomAreas = await this.protectedAreasCrudService.listForProject(
+      project.id,
+    );
+
     return right(projectCustomAreas);
   }
 }
