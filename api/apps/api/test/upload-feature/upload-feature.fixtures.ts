@@ -253,6 +253,8 @@ export const getFixtures = async () => {
       });
       expect(newFeaturesAdded).toHaveLength(2);
       expect(newFeaturesAdded[0].projectId).toBe(projectId);
+      expect(newFeaturesAdded[0].isLegacy).toBe(true);
+      expect(newFeaturesAdded[1].isLegacy).toBe(true);
     },
 
     ThenNewFeaturesAmountsAreCreated: async () => {
