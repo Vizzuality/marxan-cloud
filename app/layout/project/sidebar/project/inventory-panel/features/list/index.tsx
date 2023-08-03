@@ -73,10 +73,13 @@ export const ProjectFeatureList = (): JSX.Element => {
     [filters.sort]
   );
 
+  useEffect(() => {
+    setSelectedFeaturesIds([]);
+  }, [search]);
+
   const toggleSeeOnMap = useCallback(
     (featureId: Feature['id']) => {
       const newSelectedFeatures = [...visibleFeatures];
-
       if (!newSelectedFeatures.includes(featureId)) {
         newSelectedFeatures.push(featureId);
       } else {
@@ -87,10 +90,6 @@ export const ProjectFeatureList = (): JSX.Element => {
     },
     [dispatch, visibleFeatures]
   );
-
-  useEffect(() => {
-    setSelectedFeaturesIds([]);
-  }, [search]);
 
   return (
     <div className="space-y-4">
@@ -191,6 +190,7 @@ export const ProjectFeatureList = (): JSX.Element => {
                     projectId={pid}
                     onSelect={handleSelectFeature}
                     isSelected={selectedFeaturesIds.includes(feature.id)}
+                    toggleSeeOnMap={() => toggleSeeOnMap(feature.id)}
                     id="feature"
                   />
                 </li>

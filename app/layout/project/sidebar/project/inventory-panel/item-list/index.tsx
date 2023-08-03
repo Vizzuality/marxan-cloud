@@ -28,6 +28,7 @@ const ItemList = ({
   projectId,
   isSelected,
   onSelect,
+  toggleSeeOnMap,
 }: {
   id: string;
   // !TODO: Add ProtectedArea | Feature | CostSurface types
@@ -35,11 +36,11 @@ const ItemList = ({
   projectId: Project['id'];
   isSelected: boolean;
   onSelect: (evt: ChangeEvent<HTMLInputElement>) => void;
+  toggleSeeOnMap: () => void;
 }): JSX.Element => {
   const queryClient = useQueryClient();
   const { addToast } = useToasts();
-  const dispatch = useAppDispatch();
-  const { selectedFeatures } = useAppSelector((state) => state['/projects/[id]']);
+
   const [isEditable, setEditable] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const { mutate: editFeature } = useEditFeature();
@@ -96,21 +97,6 @@ const ItemList = ({
     [nameInputRef, projectId, item.id, editFeature, addToast, queryClient]
   );
 
-  const toggleSeeOnMap = useCallback(
-    (featureId: Feature['id']) => {
-      const newSelectedFeatures = [...selectedFeatures];
-
-      if (!newSelectedFeatures.includes(featureId)) {
-        newSelectedFeatures.push(featureId);
-      } else {
-        const i = newSelectedFeatures.indexOf(featureId);
-        newSelectedFeatures.splice(i, 1);
-      }
-      dispatch(setVisibleFeatures(newSelectedFeatures));
-    },
-    [dispatch, selectedFeatures]
-  );
-
   const defaultValue = useMemo(() => {
     if (id === 'feature') return item.featureClassName;
   }, [id, item]);
@@ -158,7 +144,7 @@ const ItemList = ({
       </div>
 
       <div className="col-span-1 flex space-x-3">
-        <button type="button" onClick={() => toggleSeeOnMap(item.id)}>
+        <button type="button" onClick={() => toggleSeeOnMap()}>
           <Icon className="h-4 w-4" icon={true ? SHOW_SVG : HIDE_SVG} />
         </button>
         <Popover>
