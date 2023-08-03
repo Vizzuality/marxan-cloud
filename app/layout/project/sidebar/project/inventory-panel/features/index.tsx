@@ -30,7 +30,7 @@ const InventoryPanelFeatures = (): JSX.Element => {
           <span className="text-xs font-semibold text-blue-400">Inventory Panel</span>
           <h3 className="flex items-center space-x-2">
             <span className="text-lg font-medium">Features</span>
-            <InfoButton theme="primary">
+            <InfoButton theme="tertiary">
               <>
                 <h4 className="mb-2.5 font-heading text-lg">What are features?</h4>
                 <div className="space-y-2">

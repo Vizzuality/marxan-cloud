@@ -169,8 +169,9 @@ export const ProjectFeatureList = (): JSX.Element => {
           <div className="flex h-[200px] items-center justify-center">No features found.</div>
         )}
         {!allFeaturesQuery.isFetching && (
-          <div className="space-y-6">
-            <ul className="max-h-[calc(100vh-400px)] divide-y divide-gray-400 overflow-y-auto pl-1 pr-2">
+          <div className="relative flex min-h-0 flex-grow flex-col overflow-hidden">
+            <div className="absolute left-0 top-0 z-10 h-6 w-[calc(100%-20px)] bg-gradient-to-b from-gray-700 via-gray-700" />
+            <ul className="max-h-[calc(100vh-400px)] divide-y divide-gray-400 overflow-y-auto py-3 pl-1 pr-2">
               {allFeaturesQuery.data?.map((feature) => (
                 <li key={feature.id} className="flex items-center justify-between py-2 ">
                   <FeatureItemList
@@ -182,6 +183,7 @@ export const ProjectFeatureList = (): JSX.Element => {
                 </li>
               ))}
             </ul>
+            <div className="absolute bottom-0 left-0 z-10 h-6 w-[calc(100%-20px)] bg-gradient-to-t from-gray-700 via-gray-700" />
             {selectedFeaturesIds.length > 0 && (
               <FeaturesBulkActionMenu selectedFeaturesIds={selectedFeaturesIds} />
             )}
