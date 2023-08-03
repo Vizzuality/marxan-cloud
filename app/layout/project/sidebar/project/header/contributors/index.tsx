@@ -77,7 +77,7 @@ export const Contributors = (): JSX.Element => {
                     aria-label="add-contributor"
                     type="button"
                     className={cn({
-                      'z-50 -ml-3 rounded-full border border-gray-500 hover:border-white': true,
+                      'z-50 -ml-3 h-8 w-8 rounded-full': true,
                       'bg-gray-500': !open,
                     })}
                     onClick={handleClick}
@@ -86,7 +86,8 @@ export const Contributors = (): JSX.Element => {
                       size="s"
                       className={cn({
                         '!border-none': true,
-                        'bg-gray-500 text-white': !open,
+                        'bg-gray-500 text-white transition-colors hover:bg-white hover:text-gray-500':
+                          !open,
                         'bg-white text-gray-500': open,
                       })}
                     >
