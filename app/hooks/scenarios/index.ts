@@ -524,12 +524,8 @@ export function useSaveScenario({
       const { id, projectId } = data?.data?.data;
 
       await queryClient.invalidateQueries(['scenarios', projectId]);
-      // await queryClient.invalidateQueries(['scenario', id]);
+      await queryClient.invalidateQueries(['scenario', id]);
       queryClient.setQueryData(['scenario', id], data?.data?.data);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
     },
   });
 }
