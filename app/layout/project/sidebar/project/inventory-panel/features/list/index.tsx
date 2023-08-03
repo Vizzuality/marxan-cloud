@@ -72,8 +72,6 @@ export const ProjectFeatureList = (): JSX.Element => {
     [filters.sort]
   );
 
-  // ! this feature is partially implement until the API is ready
-  // ! This is about previewing the feature on the map
   const toggleSeeOnMap = useCallback(
     (featureId: Feature['id']) => {
       const newSelectedFeatures = [...visibleFeatures];
@@ -87,6 +85,16 @@ export const ProjectFeatureList = (): JSX.Element => {
       dispatch(setVisibleFeatures(newSelectedFeatures));
     },
     [dispatch, visibleFeatures]
+  );
+
+  const isShown = useCallback(
+    (id) => {
+      if (!visibleFeatures.includes(id)) {
+        return false;
+      }
+      return true;
+    },
+    [visibleFeatures]
   );
 
   useEffect(() => {
@@ -179,6 +187,8 @@ export const ProjectFeatureList = (): JSX.Element => {
                     projectId={pid}
                     onSelectFeature={handleSelectFeature}
                     isSelected={selectedFeaturesIds.includes(feature.id)}
+                    toggleSeeOnMap={() => toggleSeeOnMap(feature.id)}
+                    isShown={isShown(feature.id)}
                   />
                 </li>
               ))}
