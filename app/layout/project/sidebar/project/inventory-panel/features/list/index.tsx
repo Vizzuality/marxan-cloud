@@ -1,4 +1,4 @@
-import { useCallback, useState, ChangeEvent, useEffect } from 'react';
+import { useCallback, useState, ChangeEvent, useEffect, useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -183,7 +183,7 @@ export const ProjectFeatureList = (): JSX.Element => {
                   <ItemList
                     item={feature}
                     projectId={pid}
-                    onSelectFeature={handleSelectFeature}
+                    onSelect={handleSelectFeature}
                     isSelected={selectedFeaturesIds.includes(feature.id)}
                     id="feature"
                   />

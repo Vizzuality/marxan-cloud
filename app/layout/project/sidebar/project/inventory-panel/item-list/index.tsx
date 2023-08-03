@@ -1,8 +1,8 @@
-import { useCallback, useState, ChangeEvent, useRef, InputHTMLAttributes } from 'react';
+import { useCallback, useState, ChangeEvent, useRef, InputHTMLAttributes, useMemo } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
 
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects/[id]';
 
 import { MoreHorizontal } from 'lucide-react';
@@ -27,18 +27,19 @@ const ItemList = ({
   item,
   projectId,
   isSelected,
-  onSelectFeature,
+  onSelect,
 }: {
   id: string;
+  // !TODO: Add ProtectedArea | Feature | CostSurface types
   item: Feature;
   projectId: Project['id'];
   isSelected: boolean;
-  onSelectFeature: (evt: ChangeEvent<HTMLInputElement>) => void;
+  onSelect: (evt: ChangeEvent<HTMLInputElement>) => void;
 }): JSX.Element => {
   const queryClient = useQueryClient();
   const { addToast } = useToasts();
-  const dispatch = useDispatch();
-  const { selectedFeatures: visibleFeatures } = useSelector((state) => state['/projects/[id]']);
+  const dispatch = useAppDispatch();
+  const { selectedFeatures } = useAppSelector((state) => state['/projects/[id]']);
   const [isEditable, setEditable] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const { mutate: editFeature } = useEditFeature();
@@ -97,7 +98,7 @@ const ItemList = ({
 
   const toggleSeeOnMap = useCallback(
     (featureId: Feature['id']) => {
-      const newSelectedFeatures = [...visibleFeatures];
+      const newSelectedFeatures = [...selectedFeatures];
 
       if (!newSelectedFeatures.includes(featureId)) {
         newSelectedFeatures.push(featureId);
@@ -107,8 +108,12 @@ const ItemList = ({
       }
       dispatch(setVisibleFeatures(newSelectedFeatures));
     },
-    [dispatch, visibleFeatures]
+    [dispatch, selectedFeatures]
   );
+
+  const defaultValue = useMemo(() => {
+    if (id === 'feature') return item.featureClassName;
+  }, [id, item]);
 
   return (
     <>
@@ -117,14 +122,14 @@ const ItemList = ({
           id={`item-${item.id}`}
           theme="light"
           className="block h-4 w-4 checked:bg-blue-400"
-          onChange={onSelectFeature}
+          onChange={onSelect}
           checked={isSelected}
           value={item.id}
         />
         <div className="flex flex-col space-y-2">
           <input
             ref={nameInputRef}
-            defaultValue={item.featureClassName}
+            defaultValue={defaultValue}
             readOnly={!isEditable}
             className={cn({
               'text-ellipsis bg-transparent p-0 text-sm font-medium leading-none': true,
@@ -143,13 +148,15 @@ const ItemList = ({
           )}
         </div>
       </div>
+
       <div className="col-span-2">
-        {item.tag && (
+        {id === 'feature' && item.tag && (
           <Tag className="rounded-2xl bg-yellow-500/10 px-3 py-[2px] font-medium text-yellow-500">
             <span className="text-xs">{item.tag}</span>
           </Tag>
         )}
       </div>
+
       <div className="col-span-1 flex space-x-3">
         <button type="button" onClick={() => toggleSeeOnMap(item.id)}>
           <Icon className="h-4 w-4" icon={true ? SHOW_SVG : HIDE_SVG} />
