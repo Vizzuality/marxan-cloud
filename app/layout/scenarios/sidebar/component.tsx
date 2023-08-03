@@ -16,8 +16,7 @@ export const ScenariosEditSidebar = ({
         'flex w-full flex-grow flex-col overflow-hidden': true,
       })}
     >
-      <Breadcrumbs className="flex-shrink-0" />
-
+      <Breadcrumbs />
       <div className="mt-2.5 flex flex-grow flex-col overflow-hidden">
         <AnimatePresence>{children}</AnimatePresence>
       </div>
