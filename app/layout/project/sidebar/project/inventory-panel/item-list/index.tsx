@@ -14,7 +14,7 @@ import Checkbox from 'components/forms/checkbox';
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tag from 'components/tag';
-import FeatureActions from 'layout/project/sidebar/project/inventory-panel/features/list/item/actions';
+import FeatureActions from 'layout/project/sidebar/project/inventory-panel/features/list/actions';
 import { Feature } from 'types/api/feature';
 import { Project } from 'types/api/project';
 import { cn } from 'utils/cn';
@@ -166,7 +166,7 @@ const ItemList = ({
             sideOffset={5}
             align="start"
           >
-            {id === 'features' && (
+            {id === 'feature' && (
               <FeatureActions
                 feature={item}
                 onEditName={handleRename}
