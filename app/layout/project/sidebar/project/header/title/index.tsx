@@ -158,7 +158,7 @@ const ProjectTitle = (): JSX.Element => {
                               {...input}
                               id="form-title-show-project-input"
                               className={cn({
-                                'h-full w-full overflow-ellipsis border-none bg-transparent font-heading text-4xl font-normal transition-colors focus:bg-primary-300 focus:text-gray-500 focus:outline-none':
+                                'absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent px-1.5 font-heading text-3xl focus:bg-primary-300 focus:text-gray-500 focus:outline-none':
                                   true,
                               })}
                               disabled={!editting}
