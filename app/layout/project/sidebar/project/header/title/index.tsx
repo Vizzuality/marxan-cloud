@@ -138,7 +138,7 @@ const ProjectTitle = (): JSX.Element => {
                   })}
                 >
                   {/* INPUTS */}
-                  <div className="flex items-center justify-items-start space-x-4">
+                  <div className="flex items-center justify-items-start space-x-1">
                     <FieldRFF
                       name="name"
                       validate={composeValidators([{ presence: true }])}
@@ -153,12 +153,12 @@ const ProjectTitle = (): JSX.Element => {
                             'relative h-16': true,
                           })}
                         >
-                          <div className="relative h-full overflow-hidden">
+                          <div className="relative h-full max-w-[260px] overflow-hidden">
                             <input
                               {...input}
                               id="form-title-show-project-input"
                               className={cn({
-                                'absolute left-0 top-0 h-full w-full overflow-ellipsis border-none bg-transparent font-heading text-4xl font-normal transition-colors focus:bg-primary-300 focus:text-gray-500 focus:outline-none':
+                                'h-full w-full overflow-ellipsis border-none bg-transparent font-heading text-4xl font-normal transition-colors focus:bg-primary-300 focus:text-gray-500 focus:outline-none':
                                   true,
                               })}
                               disabled={!editting}
@@ -174,7 +174,7 @@ const ProjectTitle = (): JSX.Element => {
                     </FieldRFF>
 
                     {/* BUTTONS */}
-                    <div className="relative right-0 flex space-x-2">
+                    <div className="relative right-0 flex space-x-0.5">
                       {editable && !editting && (
                         <motion.button
                           key="edit-button"
@@ -208,7 +208,7 @@ const ProjectTitle = (): JSX.Element => {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: -10, opacity: 0 }}
                           className={cn({
-                            'flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-500 px-3 transition-colors hover:border-gray-300 focus:outline-none':
+                            'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-500 px-2 transition-colors hover:border-gray-300 focus:outline-none':
                               true,
                             'bg-white': editting,
                           })}
@@ -230,7 +230,7 @@ const ProjectTitle = (): JSX.Element => {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: -10, opacity: 0 }}
                           className={cn({
-                            'flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-500 px-3 transition-colors hover:border-gray-300 focus:outline-none':
+                            'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-500 px-2 transition-colors hover:border-gray-300 focus:outline-none':
                               true,
                             'bg-white': editting,
                           })}
