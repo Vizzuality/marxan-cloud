@@ -22,9 +22,7 @@ import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 
 import { isLeft } from 'fp-ts/Either';
-import {
-  ImplementsAcl,
-} from '@marxan-api/decorators/acl.decorator';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ProjectProtectedAreasService } from './project-protected-areas.service';
