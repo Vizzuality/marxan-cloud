@@ -222,6 +222,7 @@ export class FeatureAmountUploadService {
         featureClassName: feature.feature_name,
         projectId: projectId,
         creationStatus: JobStatus.done,
+        isLegacy: true,
       };
     });
 
