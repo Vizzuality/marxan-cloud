@@ -71,12 +71,6 @@ export const Contributors = (): JSX.Element => {
                   );
                 })}
 
-              {projectUsers?.length > PROJECT_USERS_SIZE && (
-                <Avatar size="s" className="-ml-3 bg-primary-700 text-sm uppercase text-white">
-                  {`+${projectUsers.length - PROJECT_USERS_SIZE}`}
-                </Avatar>
-              )}
-
               <Popover>
                 <PopoverTrigger asChild>
                   <button
@@ -91,7 +85,7 @@ export const Contributors = (): JSX.Element => {
                     <Avatar
                       size="s"
                       className={cn({
-                        'border-none': true,
+                        '!border-none': true,
                         'bg-gray-500 text-white': !open,
                         'bg-white text-gray-500': open,
                       })}
