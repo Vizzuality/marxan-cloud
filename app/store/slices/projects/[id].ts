@@ -4,7 +4,7 @@ interface ProjectShowStateProps {
   search: string;
   filters: Record<string, unknown> | [];
   sort: string;
-  layerSettings: Record<string, {}>;
+  layerSettings: Record<string, any>;
   selectedFeatures: string[];
   isSidebarOpen: boolean;
 }

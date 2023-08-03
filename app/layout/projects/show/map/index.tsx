@@ -161,7 +161,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const LEGEND = useLegend({
     layers: [
-      ...(tab === 'features' && !!selectedFeaturesData.length ? ['features-preview'] : []),
+      ...(tab === 'features' && !!selectedFeaturesData?.length ? ['features-preview'] : []),
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
 
       ...(!!sid1 && !!sid2 ? ['compare'] : []),
@@ -300,8 +300,6 @@ export const ProjectMap = (): JSX.Element => {
     },
     [dispatch]
   );
-
-  console.log(layerSettings['features-preview']);
 
   const onChangeVisibility = useCallback(
     (lid) => {
