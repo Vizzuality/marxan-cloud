@@ -30,7 +30,7 @@ const FeaturesBulkActionMenu = ({
 
   return (
     <>
-      <div className="grid w-full grid-cols-3 items-center space-x-2 rounded-xl bg-gray-500 p-1">
+      <div className="mt-1 grid w-full grid-cols-3 items-center space-x-2 rounded-xl bg-gray-500 p-1">
         <span className="col-span-1 flex items-center justify-center space-x-2">
           <span className="block w-[20px] rounded-[4px] bg-blue-400/25 px-1 text-center text-xs font-semibold text-blue-400">
             {selectedFeaturesIds.length}

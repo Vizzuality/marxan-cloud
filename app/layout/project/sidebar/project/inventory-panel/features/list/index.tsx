@@ -178,7 +178,7 @@ export const ProjectFeatureList = (): JSX.Element => {
           >
             <ul className="max-h-[calc(100vh-400px)] divide-y divide-gray-400 overflow-y-auto py-3 pl-1 pr-2">
               {allFeaturesQuery.data?.map((feature) => (
-                <li key={feature.id} className="flex items-center justify-between py-2 ">
+                <li key={feature.id} className="flex items-center justify-between py-3">
                   <FeatureItemList
                     feature={feature}
                     projectId={pid}
