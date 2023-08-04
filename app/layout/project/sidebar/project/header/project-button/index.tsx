@@ -168,7 +168,7 @@ const ProjectButton = (): JSX.Element => {
             {!isPublic && (
               <>
                 <button
-                  className="group flex w-full cursor-pointer items-center space-x-2 rounded-t-2xl px-4 py-2 hover:bg-gray-500"
+                  className="group flex w-full cursor-pointer items-center space-x-2 rounded-t-2xl px-4 py-2 hover:bg-gray-500 disabled:pointer-events-none disabled:opacity-50"
                   disabled={!isOwner || !SCENARIOS_RUNNED}
                   onClick={() => setPublishModal(true)}
                 >
@@ -198,7 +198,7 @@ const ProjectButton = (): JSX.Element => {
             {isPublic && (
               <>
                 <button
-                  className="group flex w-full cursor-pointer items-center space-x-2 rounded-t-2xl px-4 py-2 hover:bg-gray-500"
+                  className="group flex w-full cursor-pointer items-center space-x-2 rounded-t-2xl px-4 py-2 hover:bg-gray-500 disabled:pointer-events-none disabled:opacity-50"
                   disabled={!isOwner}
                   onClick={() => setConfirmUnPublish(projectData)}
                 >
