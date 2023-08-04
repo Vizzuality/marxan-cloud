@@ -74,11 +74,16 @@ export interface UseFeaturePreviewLayer {
   id?: string;
 }
 
+interface PreviewFeature extends Feature {
+  splitSelected?: string;
+  splitFeaturesSelected?: string[];
+}
+
 export interface UseFeaturePreviewLayers {
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
-  features?: Feature[];
+  features?: PreviewFeature[];
   options?: {
     featuresRecipe?: Record<string, any>[];
     featureHoverId?: string;

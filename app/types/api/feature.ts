@@ -9,6 +9,4 @@ export interface Feature {
   alias: string;
   scenarioUsageCount: number;
   tag?: string;
-  splitSelected?: string;
-  splitFeaturesSelected?: string[];
 }
