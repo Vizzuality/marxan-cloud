@@ -136,7 +136,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
-    active: tab === 'features',
+    active: selectedFeaturesIds.length > 0,
     bbox,
     options: {
       selectedFeatures: selectedFeaturesIds,
@@ -149,7 +149,7 @@ export const ProjectMap = (): JSX.Element => {
       ?.filter(({ id }) => selectedFeaturesIds.includes(id))
       .map(({ featureClassName, id }) => ({ featureClassName, id }))
       .sort((a, b) => {
-        const aIndex = selectedFeaturesIds.indexOf(a.id as string);
+        const aIndex = selectedFeaturesIds.indexOf(a.id);
         const bIndex = selectedFeaturesIds.indexOf(b.id as string);
         return aIndex - bIndex;
       });
