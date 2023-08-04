@@ -85,7 +85,7 @@ export const Contributors = (): JSX.Element => {
                     <Avatar
                       size="s"
                       className={cn({
-                        '!border-none': true,
+                        'border-none': true,
                         'bg-gray-500 text-white transition-colors hover:bg-white hover:text-gray-500':
                           !open,
                         'bg-white text-gray-500': open,

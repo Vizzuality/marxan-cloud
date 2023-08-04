@@ -1,8 +1,8 @@
 import React, { ButtonHTMLAttributes } from 'react';
 
-import cx from 'classnames';
-
 import chroma from 'chroma-js';
+
+import { cn } from 'utils/cn';
 
 const SIZE = {
   s: 'h-8 w-8',
@@ -29,7 +29,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <div
-      className={cx({
+      className={cn({
         'relative z-0 flex items-center justify-center rounded-full border-2 border-gray-700 bg-transparent bg-cover bg-center bg-no-repeat hover:z-10 focus:outline-none':
           true,
         'text-white': contrast > 2.5,
