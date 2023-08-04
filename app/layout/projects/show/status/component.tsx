@@ -71,7 +71,7 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
         ACTIONS_DONE.default(JOB_DONE_REF);
       }
     }
-  }, [ACTIONS_DONE, JOB_DONE]);
+  }, [/* ACTIONS_DONE, */ JOB_DONE]);
 
   const onCloseFailure = useCallback(() => {
     if (ACTIONS_FAILURE[JOB_FAILURE.kind]) {
