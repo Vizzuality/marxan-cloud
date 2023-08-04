@@ -87,16 +87,6 @@ export const ProjectFeatureList = (): JSX.Element => {
     [dispatch, visibleFeatures]
   );
 
-  const isShown = useCallback(
-    (id) => {
-      if (!visibleFeatures.includes(id)) {
-        return false;
-      }
-      return true;
-    },
-    [visibleFeatures]
-  );
-
   useEffect(() => {
     setSelectedFeaturesIds([]);
   }, [search]);
@@ -194,7 +184,7 @@ export const ProjectFeatureList = (): JSX.Element => {
                     onSelectFeature={handleSelectFeature}
                     isSelected={selectedFeaturesIds.includes(feature.id)}
                     toggleSeeOnMap={() => toggleSeeOnMap(feature.id)}
-                    isShown={isShown(feature.id)}
+                    isShown={visibleFeatures.includes(feature.id)}
                   />
                 </li>
               ))}
