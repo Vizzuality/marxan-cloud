@@ -63,7 +63,7 @@ test(`if tagging info is included in DTO and valid, created feature should be ta
   );
 
   // ASSERT
-  await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
+  await fixtures.ThenGeoFeaturesAreCreated(result, name, description, tag);
   await fixtures.ThenGeoFeatureTagIsCreated(name, tag);
 });
 
@@ -86,7 +86,7 @@ test(`if there is already an existing feature with a tag that has equivalent cap
   );
 
   // ASSERT
-  await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
+  await fixtures.ThenGeoFeaturesAreCreated(result, name, description, equivalentTag);
   await fixtures.ThenGeoFeatureTagIsCreated(name, equivalentTag);
   // TODO Check for update of last_modified_at for all affected tag rows for project when implemented
 });
