@@ -156,7 +156,7 @@ export const ProjectFeatureList = (): JSX.Element => {
           </button>
         </div>
       </div>
-      <div>
+      <div className="relative">
         {allFeaturesQuery.isFetching && (
           <div className="relative min-h-[200px]">
             <Loading
@@ -169,8 +169,8 @@ export const ProjectFeatureList = (): JSX.Element => {
           <div className="flex h-[200px] items-center justify-center">No features found.</div>
         )}
         {!allFeaturesQuery.isFetching && (
-          <div className="relative flex min-h-0 flex-grow flex-col overflow-hidden">
-            <div className="absolute left-0 top-0 z-10 h-6 w-[calc(100%-20px)] bg-gradient-to-b from-gray-700 via-gray-700" />
+          <div className="flex min-h-0 flex-grow flex-col overflow-hidden before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-[calc(100%-20px)] before:bg-gradient-to-b before:from-gray-700 before:content-[''] after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-[calc(100%-20px)] after:bg-gradient-to-t after:from-gray-700 after:content-['']">
+            {/* <div className="absolute left-0 top-0 z-10 h-6 w-[calc(100%-20px)] bg-gradient-to-b from-gray-700 via-gray-700" /> */}
             <ul className="max-h-[calc(100vh-400px)] divide-y divide-gray-400 overflow-y-auto py-3 pl-1 pr-2">
               {allFeaturesQuery.data?.map((feature) => (
                 <li key={feature.id} className="flex items-center justify-between py-2 ">
@@ -183,7 +183,7 @@ export const ProjectFeatureList = (): JSX.Element => {
                 </li>
               ))}
             </ul>
-            <div className="absolute bottom-0 left-0 z-10 h-6 w-[calc(100%-20px)] bg-gradient-to-t from-gray-700 via-gray-700" />
+
             {selectedFeaturesIds.length > 0 && (
               <FeaturesBulkActionMenu selectedFeaturesIds={selectedFeaturesIds} />
             )}

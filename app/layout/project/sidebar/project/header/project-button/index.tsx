@@ -19,8 +19,8 @@ import { cn } from 'utils/cn';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 import DOTS_SVG from 'svgs/ui/dots.svg?sprite';
+import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 import COMMUNITY_SVG from 'svgs/ui/new-layout/community.svg?sprite';
-import DOWNLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 import PublishModal from './publish-modal';
 
@@ -243,7 +243,7 @@ const ProjectButton = (): JSX.Element => {
             >
               <Icon
                 icon={DOWNLOAD_SVG}
-                className="h-5 w-5 rotate-180 stroke-current text-gray-400 group-hover:text-white"
+                className="h-4 w-4 stroke-current text-gray-400 group-hover:text-white"
               />
 
               <p>Download</p>
