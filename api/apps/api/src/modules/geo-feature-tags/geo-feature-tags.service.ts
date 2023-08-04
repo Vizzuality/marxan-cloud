@@ -273,7 +273,7 @@ export class GeoFeatureTagsService {
     }[] = await this.geoFeatureTagsRepo
       .createQueryBuilder()
       .select('feature_id', 'tag')
-      .where('feature_id = :featureId)', { featureId: geoFeature.id })
+      .where('feature_id = :featureId', { featureId: geoFeature.id })
       .execute();
 
     return {
