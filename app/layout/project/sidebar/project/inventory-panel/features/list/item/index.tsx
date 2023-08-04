@@ -135,7 +135,7 @@ const FeatureItemList = ({
         )}
       </div>
       <div className="col-span-1 flex space-x-3">
-        <button type="button" onClick={() => toggleSeeOnMap()}>
+        <button type="button" onClick={toggleSeeOnMap}>
           <Icon
             className={cn({
               'h-4 w-4': true,

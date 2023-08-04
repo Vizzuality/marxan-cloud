@@ -81,7 +81,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const selectedFeaturesData = useMemo(() => {
     return allFeaturesQuery.data?.data.filter((f) => selectedFeaturesIds?.includes(f.id));
-  }, [selectedFeaturesIds]);
+  }, [selectedFeaturesIds, allFeaturesQuery.data?.data]);
 
   const { data: rawScenariosData, isFetched: rawScenariosIsFetched } = useScenarios(pid, {
     filters: {
@@ -161,7 +161,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const LEGEND = useLegend({
     layers: [
-      ...(tab === 'features' && !!selectedFeaturesData?.length ? ['features-preview'] : []),
+      ...(!!selectedFeaturesData?.length ? ['features-preview'] : []),
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
 
       ...(!!sid1 && !!sid2 ? ['compare'] : []),
@@ -303,15 +303,14 @@ export const ProjectMap = (): JSX.Element => {
 
   const onChangeVisibility = useCallback(
     (lid) => {
-      if (layerSettings[lid]) {
-        const { visibility = true } = layerSettings[lid];
-        dispatch(
-          setLayerSettings({
-            id: lid,
-            settings: { visibility: !visibility },
-          })
-        );
-      }
+      console.log('---->', layerSettings[lid], lid);
+      const { visibility = true } = layerSettings[lid];
+      dispatch(
+        setLayerSettings({
+          id: lid,
+          settings: { visibility: !visibility },
+        })
+      );
     },
     [dispatch, layerSettings]
   );
