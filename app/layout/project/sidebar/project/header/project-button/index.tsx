@@ -20,7 +20,7 @@ import { cn } from 'utils/cn';
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 import DOTS_SVG from 'svgs/ui/dots.svg?sprite';
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
-import COMMUNITY_SVG from 'svgs/ui/new-layout/community.svg?sprite';
+import COMMUNITY_SVG from 'svgs/ui/publish.svg?sprite';
 
 import PublishModal from './publish-modal';
 
