@@ -13,7 +13,6 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon/component';
 import Modal from 'components/modal';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
-import Tooltip from 'components/tooltip';
 import DownloadProjectModal from 'layout/projects/common/download-modal';
 import { cn } from 'utils/cn';
 
@@ -168,35 +167,18 @@ const ProjectButton = (): JSX.Element => {
           >
             {!isPublic && (
               <>
-                <Tooltip
-                  disabled={isOwner && SCENARIOS_RUNNED}
-                  arrow
-                  placement="top"
-                  content={
-                    <div
-                      className="rounded bg-white p-4 text-xs text-gray-500"
-                      style={{
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
-                        maxWidth: 200,
-                      }}
-                    >
-                      You need to be the owner and have at least one scenario runned to publish the
-                      project.
-                    </div>
-                  }
+                <button
+                  className="group flex w-full cursor-pointer items-center space-x-2 rounded-t-2xl px-4 py-2 hover:bg-gray-500"
+                  disabled={!isOwner || !SCENARIOS_RUNNED}
+                  onClick={() => setPublishModal(true)}
                 >
-                  <button
-                    className="group flex w-full cursor-pointer items-center space-x-2 rounded-t-2xl px-4 py-2 hover:bg-gray-500"
-                    disabled={!isOwner || !SCENARIOS_RUNNED}
-                    onClick={() => setPublishModal(true)}
-                  >
-                    <Icon
-                      icon={COMMUNITY_SVG}
-                      className="h-5 w-5 text-gray-400 group-hover:text-white"
-                    />
-                    <p>Publish</p>
-                  </button>
-                </Tooltip>
+                  <Icon
+                    icon={COMMUNITY_SVG}
+                    className="h-5 w-5 text-gray-400 group-hover:text-white"
+                  />
+                  <p>Publish</p>
+                </button>
+
                 <Modal
                   id="publish-project-modal"
                   dismissable
