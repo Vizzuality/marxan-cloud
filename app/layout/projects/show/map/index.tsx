@@ -146,8 +146,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const selectedPreviewFeatures = useMemo(() => {
     return selectedFeaturesData
-      ?.filter(({ id }) => selectedFeaturesIds.includes(id))
-      .map(({ featureClassName, id }) => ({ featureClassName, id }))
+      ?.map(({ featureClassName, id }) => ({ featureClassName, id }))
       .sort((a, b) => {
         const aIndex = selectedFeaturesIds.indexOf(a.id);
         const bIndex = selectedFeaturesIds.indexOf(b.id as string);
@@ -303,8 +302,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const onChangeVisibility = useCallback(
     (lid) => {
-      console.log('---->', layerSettings[lid], lid);
-      const { visibility = true } = layerSettings[lid];
+      const { visibility = true } = layerSettings[lid] || {};
       dispatch(
         setLayerSettings({
           id: lid,
