@@ -205,10 +205,14 @@ export const getFixtures = async () => {
       result: request.Response,
       name: string,
       description: string,
+      tag?: string,
     ) => {
-      expect(result.body).toEqual({
-        success: true,
-      });
+      // Check response payload, in JSON:API format
+      expect(result.body?.data?.type).toEqual('geo_features');
+      expect(result.body?.data?.attributes?.isCustom).toEqual(true);
+      expect(result.body?.data?.attributes?.featureClassName).toEqual(name);
+      expect(result.body?.data?.attributes?.tag).toEqual(tag);
+
       const features = await geoFeaturesApiRepo.find({
         where: {
           projectId,
