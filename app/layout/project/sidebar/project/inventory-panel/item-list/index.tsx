@@ -2,9 +2,6 @@ import { useCallback, useState, ChangeEvent, useRef, InputHTMLAttributes, useMem
 
 import { useQueryClient } from 'react-query';
 
-import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects/[id]';
-
 import { MoreHorizontal } from 'lucide-react';
 
 import { useEditFeature } from 'hooks/features';
@@ -56,45 +53,47 @@ const ItemList = ({
         setEditable(false);
         nameInputRef.current?.blur();
 
-        editFeature(
-          {
-            fid: item.id,
-            body: {
-              featureClassName: evt.currentTarget.value,
+        if (id === 'feature') {
+          editFeature(
+            {
+              fid: item.id,
+              body: {
+                featureClassName: evt.currentTarget.value,
+              },
             },
-          },
-          {
-            onSuccess: async () => {
-              await queryClient.invalidateQueries(['all-features', projectId]);
+            {
+              onSuccess: async () => {
+                await queryClient.invalidateQueries(['all-features', projectId]);
 
-              addToast(
-                'edit-project-features',
-                <>
-                  <h2 className="font-medium">Success</h2>
-                  <p className="text-sm">The feature was updated successfully.</p>
-                </>,
-                {
-                  level: 'success',
-                }
-              );
-            },
-            onError: () => {
-              addToast(
-                'edit-project-features',
-                <>
-                  <h2 className="font-medium">Error</h2>
-                  <p className="text-sm">Something went wrong editing the feature.</p>
-                </>,
-                {
-                  level: 'error',
-                }
-              );
-            },
-          }
-        );
+                addToast(
+                  'edit-project-features',
+                  <>
+                    <h2 className="font-medium">Success</h2>
+                    <p className="text-sm">The feature was updated successfully.</p>
+                  </>,
+                  {
+                    level: 'success',
+                  }
+                );
+              },
+              onError: () => {
+                addToast(
+                  'edit-project-features',
+                  <>
+                    <h2 className="font-medium">Error</h2>
+                    <p className="text-sm">Something went wrong editing the feature.</p>
+                  </>,
+                  {
+                    level: 'error',
+                  }
+                );
+              },
+            }
+          );
+        }
       }
     },
-    [nameInputRef, projectId, item.id, editFeature, addToast, queryClient]
+    [nameInputRef, projectId, item.id, editFeature, addToast, queryClient, id]
   );
 
   const defaultValue = useMemo(() => {
