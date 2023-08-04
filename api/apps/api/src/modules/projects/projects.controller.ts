@@ -153,6 +153,7 @@ import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
 import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
 import { outputProjectSummaryResource } from './output-project-summaries/output-project-summary.api.entity';
+import { isNil } from 'lodash';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -757,7 +758,13 @@ export class ProjectsController {
       // @debt Use mapDomainToHttpException() instead
       throw new InternalServerErrorException(newFeatureOrError.left);
     } else {
-      return newFeatureOrError.right;
+      const result = await this.geoFeatureService.getById(newFeatureOrError.right.id);
+      if (isNil(result)) {
+        // @debt Use mapDomainToHttpException() instead
+        throw new NotFoundException();
+      }
+
+      return this.geoFeatureSerializer.serialize(result);
     }
   }
 
