@@ -736,7 +736,7 @@ export class ProjectsController {
     @Param('id') projectId: string,
     @UploadedFile() shapefile: Express.Multer.File,
     @Body() body: UploadShapefileDTO,
-  ): Promise<ShapefileUploadResponse> {
+  ): Promise<GeoFeature> {
     await ensureShapefileHasRequiredFiles(shapefile);
 
     const { data } = await this.shapefileService.transformToGeoJson(shapefile, {
@@ -747,13 +747,18 @@ export class ProjectsController {
       throw new BadRequestException(`Only FeatureCollection is supported.`);
     }
 
-    await this.geoFeatureService.createFeaturesForShapefile(
+    const newFeatureOrError = await this.geoFeatureService.createFeaturesForShapefile(
       projectId,
       body,
       data.features,
     );
 
-    return { success: true };
+    if(isLeft(newFeatureOrError)) {
+      // @debt Use mapDomainToHttpException() instead
+      throw new InternalServerErrorException(newFeatureOrError.left);
+    } else {
+      return newFeatureOrError.right;
+    }
   }
 
   @ImplementsAcl()
