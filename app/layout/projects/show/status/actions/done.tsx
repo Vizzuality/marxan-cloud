@@ -1,45 +1,29 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, MutableRefObject } from 'react';
 
 import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
-// import { ScenarioSidebarTabs } from 'utils/tabs';
-// import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
-
 import { useSaveProject } from 'hooks/projects';
-// import { useScenarios, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
+
+import { Job } from 'types/api/job';
 
 export const useProjectActionsDone = () => {
   const { query } = useRouter();
-  const { pid } = query;
-
+  const { pid } = query as { pid: string };
   const queryClient = useQueryClient();
-
   const { addToast } = useToasts();
 
-  // const { data: scenariosData } = useScenarios(pid, {
-  //   filters: {
-  //     projectId: pid,
-  //   },
-  // });
-
-  // const scenarioMutation = useSaveScenario({
-  //   requestConfig: {
-  //     method: 'PATCH',
-  //   },
-  // });
-
-  const projectMutation = useSaveProject({
+  const { mutate } = useSaveProject({
     requestConfig: {
       method: 'PATCH',
     },
   });
 
   const onDone = useCallback(
-    (JOB_REF) => {
-      projectMutation.mutate(
+    (JOB_REF: MutableRefObject<Job>) => {
+      mutate(
         {
           id: `${pid}`,
           data: {
@@ -66,12 +50,12 @@ export const useProjectActionsDone = () => {
         }
       );
     },
-    [pid, projectMutation, addToast]
+    [pid, mutate, addToast]
   );
 
   const onCloneImportDone = useCallback(
-    (JOB_REF) => {
-      projectMutation.mutate(
+    (JOB_REF: MutableRefObject<Job>) => {
+      mutate(
         {
           id: `${pid}`,
           data: {
@@ -81,10 +65,10 @@ export const useProjectActionsDone = () => {
           },
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
             JOB_REF.current = null;
-            queryClient.invalidateQueries('projects');
-            queryClient.invalidateQueries(['scenarios', pid]);
+            await queryClient.invalidateQueries('projects');
+            await queryClient.invalidateQueries(['scenarios', pid]);
           },
           onError: () => {
             addToast(
@@ -100,12 +84,12 @@ export const useProjectActionsDone = () => {
         }
       );
     },
-    [pid, projectMutation, addToast, queryClient]
+    [pid, mutate, addToast, queryClient]
   );
 
   const onLegacyImportDone = useCallback(
-    (JOB_REF) => {
-      projectMutation.mutate(
+    (JOB_REF: MutableRefObject<Job>) => {
+      mutate(
         {
           id: `${pid}`,
           data: {
@@ -115,10 +99,10 @@ export const useProjectActionsDone = () => {
           },
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
             JOB_REF.current = null;
-            queryClient.invalidateQueries('projects');
-            queryClient.invalidateQueries(['scenarios', pid]);
+            await queryClient.invalidateQueries('projects');
+            await queryClient.invalidateQueries(['scenarios', pid]);
           },
           onError: () => {
             addToast(
@@ -134,21 +118,18 @@ export const useProjectActionsDone = () => {
         }
       );
     },
-    [
-      pid,
-      projectMutation,
-      addToast,
-      queryClient,
-      // scenariosData,
-    ]
+    [pid, mutate, addToast, queryClient]
   );
 
-  return {
-    default: onDone,
-    planningUnits: onDone,
-    export: onDone,
-    import: onCloneImportDone,
-    clone: onCloneImportDone,
-    legacy: onLegacyImportDone,
-  };
+  return useMemo(
+    () => ({
+      default: onDone,
+      planningUnits: onDone,
+      export: onDone,
+      import: onCloneImportDone,
+      clone: onCloneImportDone,
+      legacy: onLegacyImportDone,
+    }),
+    [onDone, onCloneImportDone, onLegacyImportDone]
+  );
 };
