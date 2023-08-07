@@ -1,15 +1,11 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 
 import { AnimatePresence } from 'framer-motion';
 
 import Breadcrumbs from 'layout/project/navigation/breadcrumbs';
 import { cn } from 'utils/cn';
 
-export const ScenariosEditSidebar = ({
-  children,
-}: {
-  children: JSX.Element | JSX.Element[];
-}): JSX.Element => {
+export const ScenariosEditSidebar = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <div
       className={cn({

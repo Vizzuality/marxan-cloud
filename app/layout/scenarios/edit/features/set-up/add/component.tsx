@@ -11,7 +11,6 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add/add-modal';
 import ListFeatures from 'layout/scenarios/edit/features/set-up/add/list';
-import { Tab } from 'types/navigation';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
@@ -21,7 +20,7 @@ import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 
 export const ScenariosSidebarEditFeatures = (): JSX.Element => {
   const { query } = useRouter();
-  const { sid, tab } = query as { sid: string; tab: Tab };
+  const { sid, tab } = query as { sid: string; tab: string };
 
   const { data: scenarioData } = useScenario(sid);
 

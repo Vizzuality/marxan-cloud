@@ -9,13 +9,12 @@ import { useScenario } from 'hooks/scenarios';
 
 import Icon from 'components/icon';
 import TargetFeatures from 'layout/scenarios/edit/features/set-up/targets/list';
-import { Tab } from 'types/navigation';
 
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 
 export const ScenariosSidebarEditFeatures = (): JSX.Element => {
   const { push, query } = useRouter();
-  const { sid, tab } = query as { pid: string; sid: string; tab: Tab };
+  const { sid, tab } = query as { pid: string; sid: string; tab: string };
 
   const { data: scenarioData } = useScenario(sid);
 

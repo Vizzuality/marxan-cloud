@@ -41,18 +41,15 @@ const SECTIONS = [
       'Costs reflect any variety of socioeconomic factors, which if minimized, might help the conservation plan be implemented more effectively and reduce conflicts with other uses.',
   },
 ];
-export interface ScenariosSidebarEditPlanningUnitProps {}
 
-export const ScenariosSidebarEditPlanningUnit: React.FC<
-  ScenariosSidebarEditPlanningUnitProps
-> = () => {
+export const ScenariosSidebarEditPlanningUnit = (): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
-  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const editable = useCanEditScenario(pid, sid);

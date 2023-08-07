@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 
-import Sidebar from 'layout/sidebar';
+import Navigation from 'layout/project/navigation';
 import { cn } from 'utils/cn';
 
 export const ProjectLayout = ({
@@ -8,14 +8,18 @@ export const ProjectLayout = ({
   className,
 }: PropsWithChildren<{ className?: string }>): JSX.Element => {
   return (
-    <div
-      className={cn({
-        flex: true,
-        [className]: !!className,
-      })}
-    >
-      <Sidebar />
-      {children}
+    <div className="flex">
+      <Navigation />
+      {children && (
+        <main
+          className={cn({
+            'flex h-screen w-screen': true,
+            [className]: !!className,
+          })}
+        >
+          {children}
+        </main>
+      )}
     </div>
   );
 };

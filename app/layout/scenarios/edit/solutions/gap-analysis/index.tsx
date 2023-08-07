@@ -47,14 +47,6 @@ export const ScenariosSolutionsGapAnalysis = (): JSX.Element => {
                 </div>
               </div>
             </InfoButton>
-            {/* <Button
-          theme="secondary"
-          size="xs"
-          className="ml-6"
-          onClick={() => console.info('Download - Target Achievement')}
-        >
-          Download
-        </Button> */}
           </header>
 
           <div className="relative mt-1 flex min-h-0 w-full flex-grow flex-col overflow-hidden text-sm">

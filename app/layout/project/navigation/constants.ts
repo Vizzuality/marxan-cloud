@@ -4,7 +4,7 @@ export const NAVIGATION_TREE = {
   user: [],
   inventory: ['protected-areas', 'cost-surface', 'features'],
   gridSetup: [
-    'protected-areas-preview',
+    'protected-areas',
     'protected-areas-threshold',
     'cost-surface',
     'planning-unit-status',
@@ -21,6 +21,7 @@ export const MENU_ITEM_COMMON_CLASSES =
 
 export const MENU_ITEM_ACTIVE_CLASSES =
   'group/active bg-primary-400 border-primary-400 hover:border-primary-400';
+export const MENU_ITEM_DISABLED_CLASSES = 'pointer-events-none opacity-50';
 
 export const ICONS_COMMON_CLASSES =
   'h-5 w-5 text-gray-400 group-hover:text-white group-[.bg-primary-400]:text-gray-500';

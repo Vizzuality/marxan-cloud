@@ -10,6 +10,8 @@ import { withScenario, withScenarioLock, withSolutions } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
+
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
 import Sidebar from 'layout/project/sidebar';
@@ -30,9 +32,6 @@ import ScenarioStatus from 'layout/scenarios/edit/status';
 import NewScenario from 'layout/scenarios/new/name';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
-import { Tab } from 'types/navigation';
-
-import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 export const getServerSideProps = withProtection(
   withUser(withProject(withScenario(withScenarioLock(withSolutions()))))
@@ -40,7 +39,7 @@ export const getServerSideProps = withProtection(
 
 const EditScenarioPage = (): JSX.Element => {
   const { query } = useRouter();
-  const { sid, tab } = query as { sid: string; tab: Tab };
+  const { sid, tab } = query as { sid: string; tab: string };
   const scenarioQuery = useScenario(sid);
   const { metadata } = scenarioQuery.data || {};
   const { scenarioEditingMetadata } = metadata || {};
@@ -90,7 +89,7 @@ const EditScenarioPage = (): JSX.Element => {
           <ScenariosEditSidebar>
             {!tab && <NewScenario />}
 
-            {tab === 'protected-areas-preview' && <ScenariosSidebarWDPACategories />}
+            {tab === 'protected-areas' && <ScenariosSidebarWDPACategories />}
             {tab === 'protected-areas-threshold' && <ScenariosSidebarWDPAThreshold />}
             {tab === 'cost-surface' && <ScenariosCostSurface />}
             {tab === 'planning-unit-status' && <AdjustPanningUnits />}

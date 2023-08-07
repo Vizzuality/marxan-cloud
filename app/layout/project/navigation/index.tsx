@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { TippyProps } from '@tippyjs/react/headless';
 
 import { useRunScenario, useScenarioStatus } from 'hooks/scenarios';
+import { useAllSolutions } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
@@ -28,6 +29,7 @@ import {
   MENU_COMMON_CLASSES,
   MENU_ITEM_COMMON_CLASSES,
   MENU_ITEM_ACTIVE_CLASSES,
+  MENU_ITEM_DISABLED_CLASSES,
   MENU_ITEM_BUTTON_COMMON_CLASSES,
   ICONS_COMMON_CLASSES,
   NAVIGATION_TREE,
@@ -81,6 +83,12 @@ export const Navigation = (): JSX.Element => {
 
   const runScenarioMutation = useRunScenario({});
 
+  const allSolutionsQuery = useAllSolutions(sid, {
+    disablePagination: false,
+    'page[size]': 1,
+    'page[number]': 1,
+  });
+
   const toggleSubmenu = useCallback((submenuKey: NavigationTreeCategories) => {
     if (submenuKey === 'user') {
       return setSubmenuState((prevState) => ({
@@ -99,14 +107,6 @@ export const Navigation = (): JSX.Element => {
       );
     });
   }, []);
-
-  useEffect(() => {
-    if (isProjectRoute && NAVIGATION_TREE.inventory.includes(tab)) toggleSubmenu('inventory');
-    if (isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab)) toggleSubmenu('gridSetup');
-    if (isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab)) toggleSubmenu('solutions');
-    if (isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab))
-      toggleSubmenu('advancedSettings');
-  }, [tab, isProjectRoute, isScenarioRoute, toggleSubmenu]);
 
   const handleRunScenario = useCallback(() => {
     runScenarioMutation.mutate(
@@ -139,6 +139,16 @@ export const Navigation = (): JSX.Element => {
       }
     );
   }, [addToast, runScenarioMutation, sid]);
+
+  const isSolutionTabEnabled = Boolean(allSolutionsQuery.data?.length);
+
+  useEffect(() => {
+    if (isProjectRoute && NAVIGATION_TREE.inventory.includes(tab)) toggleSubmenu('inventory');
+    if (isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab)) toggleSubmenu('gridSetup');
+    if (isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab)) toggleSubmenu('solutions');
+    if (isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab))
+      toggleSubmenu('advancedSettings');
+  }, [tab, isProjectRoute, isScenarioRoute, toggleSubmenu]);
 
   return (
     <nav className="z-20 flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-700 px-2 py-8">
@@ -296,7 +306,10 @@ export const Navigation = (): JSX.Element => {
                 className={cn({
                   [MENU_ITEM_COMMON_CLASSES]: true,
                   [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab),
+                    isScenarioRoute &&
+                    NAVIGATION_TREE.solutions.includes(tab) &&
+                    isSolutionTabEnabled,
+                  [MENU_ITEM_DISABLED_CLASSES]: !isSolutionTabEnabled,
                 })}
               >
                 <Tooltip

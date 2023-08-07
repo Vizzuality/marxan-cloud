@@ -7,7 +7,6 @@ import { dehydrate } from 'react-query/hydration';
 import { NAVIGATION_TREE } from 'layout/project/navigation/constants';
 import { Scenario } from 'types/api/scenario';
 import { Solution } from 'types/api/solution';
-import { Tab } from 'types/navigation';
 
 import ROLES from 'services/roles';
 import SCENARIOS from 'services/scenarios';
@@ -269,10 +268,22 @@ export function withSolutions(getServerSidePropsFunc?: Function) {
 
     const { query } = context;
 
-    const { pid, tab, sid } = query as { pid: string; tab: Tab; sid: string };
+    const { pid, tab, sid } = query as { pid: string; tab: string; sid: string };
 
     const queryClient = new QueryClient();
     const solutions = await fetchScenarioSolutions(session, { sid });
+    queryClient.setQueryData(
+      [
+        'all-solutions',
+        sid,
+        JSON.stringify({
+          disablePagination: false,
+          'page[size]': 1,
+          'page[number]': 1,
+        }),
+      ],
+      solutions
+    );
 
     // ? if the scenarios has no solutions and the user is trying to access the solutions tab,
     // ? it will be redirected to the overview tab as the solutions menu should be disabled.
@@ -280,7 +291,7 @@ export function withSolutions(getServerSidePropsFunc?: Function) {
       return {
         props: {},
         redirect: {
-          destination: `/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-preview`,
+          destination: `/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas`,
           permanent: false,
         },
       };

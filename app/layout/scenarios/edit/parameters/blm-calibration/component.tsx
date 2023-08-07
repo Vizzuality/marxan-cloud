@@ -21,12 +21,11 @@ import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import BlmSettingsChart from 'layout/scenarios/edit/parameters/blm-calibration/results';
-import { Tab } from 'types/navigation';
 
 export const ScenariosBLMCalibration = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const { query } = useRouter();
-  const { pid, sid, tab } = query as { pid: string; sid: string; tab: Tab };
+  const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
   const { addToast } = useToasts();
   const plausible = usePlausible();

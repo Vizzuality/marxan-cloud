@@ -173,7 +173,7 @@ export const WDPAThreshold = (): JSX.Element => {
   );
 
   const handleBack = useCallback(() => {
-    push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-preview`);
+    push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas`);
   }, [push, pid, sid]);
 
   // Loading
