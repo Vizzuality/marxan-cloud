@@ -24,7 +24,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
   const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTab, setSubTab } = scenarioSlice.actions;
+  const { setSubTab } = scenarioSlice.actions;
 
   const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
@@ -57,23 +57,11 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
         </header>
 
         {subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW && (
-          <ScenariosSidebarWDPACategories
-          /*   onSuccess={() => {
-              dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD));
-            }} */
-          />
+          <ScenariosSidebarWDPACategories />
         )}
 
         {subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD && (
-          <ScenariosSidebarWDPAThreshold
-          /* onSuccess={() => {
-              dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));
-              dispatch(setSubTab(null));
-            }} */
-          /*  onBack={() => {
-              dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
-            }} */
-          />
+          <ScenariosSidebarWDPAThreshold />
         )}
       </motion.div>
     </div>

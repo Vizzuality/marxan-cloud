@@ -15,8 +15,6 @@ import ProjectNewMap from 'layout/projects/new/map';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
 
-import Breadcrumbs from 'components/new-layout/breadcrumbs';
-
 export const getServerSideProps = withProtection(withUser());
 
 const NewProjectsPage = (): JSX.Element => {

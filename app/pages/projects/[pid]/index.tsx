@@ -16,15 +16,12 @@ import ProjectMap from 'layout/projects/show/map';
 import ProjectStatus from 'layout/projects/show/status';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
-import { Tab } from 'types/navigation';
-
-import Breadcrumbs from 'components/new-layout/breadcrumbs';
 
 export const getServerSideProps = withProtection(withUser(withProject()));
 
 const ShowProjectsPage = (): JSX.Element => {
   const { query } = useRouter();
-  const { tab } = query as { tab: Tab };
+  const { tab } = query as { tab: string };
 
   return (
     <Protected>

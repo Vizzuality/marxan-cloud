@@ -24,12 +24,6 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import STAR_SVG from 'svgs/ui/star.svg?sprite';
 
 export const SECTIONS = [
-  // {
-  //   id: ScenarioSidebarSubTabs.SCHEDULE_SCENARIO,
-  //   name: 'Schedule scenario',
-  //   description: 'Comming feature...',
-  //   disabled: true,
-  // },
   {
     id: ScenarioSidebarSubTabs.POST_GAP_ANALYSIS,
     name: 'Target Achievement',
@@ -141,7 +135,7 @@ export const ScenariosSidebarShowSolutions = (): JSX.Element => {
                     options={ALL_SOLUTIONS_OPTIONS}
                     selected={selectedSolution?.runId || SOLUTION_DATA?.runId}
                     onChange={(v) => {
-                      const solution = allSolutionsData.find((s) => s.runId === v);
+                      const solution = allSolutionsData.find((s) => s.runId.toString() === v);
                       dispatch(setSelectedSolution(solution));
                     }}
                   />
@@ -178,9 +172,7 @@ export const ScenariosSidebarShowSolutions = (): JSX.Element => {
                   )}
 
                   {subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS && (
-                    <PostGapAnalysis
-                      key="post-gap-analysis" /* onChangeSection={onChangeSection} */
-                    />
+                    <PostGapAnalysis key="post-gap-analysis" />
                   )}
                 </div>
                 <div className="absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
