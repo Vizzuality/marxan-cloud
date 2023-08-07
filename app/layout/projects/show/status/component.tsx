@@ -9,6 +9,7 @@ import { useScenariosStatus } from 'hooks/scenarios';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import { Job } from 'types/api/job';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import PROCESSING_SVG from 'svgs/ui/processing.svg?sprite';
@@ -44,7 +45,7 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
   const TEXT_FAILURE = useProjectTextFailure(JOB_FAILURE);
 
   // Done
-  const JOB_DONE_REF = useRef(null);
+  const JOB_DONE_REF = useRef<Job>(null);
   const JOB_DONE = useProjectJobDone(JOBS, new Date(projectData?.lastModifiedAt).getTime());
   const TEXT_DONE = useProjectTextDone(JOB_DONE, JOB_DONE_REF);
 
