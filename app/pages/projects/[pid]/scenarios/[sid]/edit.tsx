@@ -14,18 +14,18 @@ import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
+import { TABS } from 'layout/project/navigation/constants';
 import Sidebar from 'layout/project/sidebar';
 import AdjustPanningUnits from 'layout/project/sidebar/scenario/grid-setup/planning-unit-status';
 import Protected from 'layout/protected';
+import ScenarioGAPAnalysis from 'layout/scenarios/edit/features/gap-analysis';
 import ScenariosSidebarSetupFeaturesAdd from 'layout/scenarios/edit/features/set-up/add';
-import ScenariosSidebarSetupFeaturesTarget from 'layout/scenarios/edit/features/set-up/targets';
 import ScenarioLock from 'layout/scenarios/edit/lock';
 import ScenarioEditMap from 'layout/scenarios/edit/map';
 import AdvancedSettings from 'layout/scenarios/edit/parameters/advanced-settings';
 import BLMCalibration from 'layout/scenarios/edit/parameters/blm-calibration';
 import ScenariosCostSurface from 'layout/scenarios/edit/planning-unit/cost-surface';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/planning-unit/protected-areas/categories';
-import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/planning-unit/protected-areas/threshold';
 import PostGapAnalysis from 'layout/scenarios/edit/solutions/gap-analysis';
 import SolutionsDetails from 'layout/scenarios/edit/solutions/overview';
 import ScenarioStatus from 'layout/scenarios/edit/status';
@@ -89,18 +89,19 @@ const EditScenarioPage = (): JSX.Element => {
           <ScenariosEditSidebar>
             {!tab && <NewScenario />}
 
-            {tab === 'protected-areas' && <ScenariosSidebarWDPACategories />}
-            {tab === 'protected-areas-threshold' && <ScenariosSidebarWDPAThreshold />}
-            {tab === 'cost-surface' && <ScenariosCostSurface />}
-            {tab === 'planning-unit-status' && <AdjustPanningUnits />}
-            {tab === 'features-add' && <ScenariosSidebarSetupFeaturesAdd />}
-            {tab === 'features-target' && <ScenariosSidebarSetupFeaturesTarget />}
+            {tab === TABS['scenario-protected-areas'] && <ScenariosSidebarWDPACategories />}
+            {tab === TABS['scenario-cost-surface'] && <ScenariosCostSurface />}
+            {tab === TABS['scenario-planning-unit-status'] && <AdjustPanningUnits />}
+            {tab === TABS['scenario-features'] && <ScenariosSidebarSetupFeaturesAdd />}
+            {tab === TABS['scenario-gap-analysis'] && (
+              <ScenarioGAPAnalysis onChangeSection={() => {}} />
+            )}
 
-            {tab === 'advanced-settings' && <AdvancedSettings />}
-            {tab === 'blm-calibration' && <BLMCalibration />}
+            {tab === TABS['scenario-advanced-settings'] && <AdvancedSettings />}
+            {tab === TABS['scenario-blm-calibration'] && <BLMCalibration />}
 
-            {tab === 'solutions' && <SolutionsDetails />}
-            {tab === 'target-achievement' && <PostGapAnalysis />}
+            {tab === TABS['scenario-solutions'] && <SolutionsDetails />}
+            {tab === TABS['scenario-target-achievement'] && <PostGapAnalysis />}
           </ScenariosEditSidebar>
         </Sidebar>
         <ScenarioEditMap />

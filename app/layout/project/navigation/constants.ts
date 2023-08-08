@@ -1,18 +1,36 @@
 import { NavigationTreeCategories } from './types';
 
+export const TABS = {
+  'project-protected-areas': 'protected-areas',
+  'project-cost-surface': 'cost-surface',
+  'project-features': 'features',
+  'scenario-protected-areas': 'protected-areas',
+  'scenario-cost-surface': 'cost-surface',
+  'scenario-planning-unit-status': 'planning-unit-status',
+  'scenario-features': 'features',
+  'scenario-gap-analysis': 'gap-analysis',
+  'scenario-advanced-settings': 'advanced-settings',
+  'scenario-blm-calibration': 'blm-calibration',
+  'scenario-solutions': 'solutions',
+  'scenario-target-achievement': 'target-achievement',
+};
+
 export const NAVIGATION_TREE = {
   user: [],
-  inventory: ['protected-areas', 'cost-surface', 'features'],
-  gridSetup: [
-    'protected-areas',
-    'protected-areas-threshold',
-    'cost-surface',
-    'planning-unit-status',
-    'features-add',
-    'features-target',
+  inventory: [
+    TABS['project-protected-areas'],
+    TABS['project-cost-surface'],
+    TABS['project-features'],
   ],
-  advancedSettings: ['advanced-settings', 'blm-calibration'],
-  solutions: ['solutions', 'target-achievement'],
+  gridSetup: [
+    TABS['scenario-protected-areas'],
+    TABS['scenario-cost-surface'],
+    TABS['scenario-planning-unit-status'],
+    TABS['scenario-features'],
+    TABS['scenario-gap-analysis'],
+  ],
+  advancedSettings: [TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']],
+  solutions: [TABS['scenario-solutions'], TABS['scenario-target-achievement']],
 } satisfies { [key in NavigationTreeCategories]: string[] };
 
 export const MENU_COMMON_CLASSES = 'flex flex-col items-center space-y-2';

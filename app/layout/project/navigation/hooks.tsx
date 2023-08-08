@@ -8,6 +8,7 @@ import PLANNING_UNITS_SVG from 'svgs/navigation/planning-units.svg?sprite';
 import PROTECTED_AREA_SVG from 'svgs/navigation/protected-areas.svg?sprite';
 import TARGET_SVG from 'svgs/navigation/target.svg?sprite';
 
+import { TABS } from './constants';
 import type { SubMenuItem } from './submenu';
 
 const SCENARIO_ROUTE = '/projects/[pid]/scenarios/';
@@ -20,22 +21,22 @@ export const useInventoryItems = (): SubMenuItem[] => {
   return [
     {
       name: 'Protected areas',
-      route: `/projects/${pid}?tab=protected-areas`,
+      route: `/projects/${pid}?tab=${TABS['project-protected-areas']}`,
       icon: PROTECTED_AREA_SVG,
-      selected: isProjectRoute && tab === 'protected-areas',
+      selected: isProjectRoute && tab === TABS['project-protected-areas'],
     },
     {
       name: 'Cost surface',
-      route: `/projects/${pid}?tab=cost-surface`,
+      route: `/projects/${pid}?tab=${TABS['project-cost-surface']}`,
       icon: COST_SURFACE_SVG,
-      selected: isProjectRoute && tab === 'cost-surface',
+      selected: isProjectRoute && tab === TABS['project-cost-surface'],
     },
 
     {
       name: 'Features',
-      route: `/projects/${pid}?tab=features`,
+      route: `/projects/${pid}?tab=${TABS['project-features']}`,
       icon: FEATURES_SVG,
-      selected: isProjectRoute && tab === 'features',
+      selected: isProjectRoute && tab === TABS['project-features'],
     },
   ];
 };
@@ -47,28 +48,34 @@ export const useGridSetupItems = (): SubMenuItem[] => {
 
   return [
     {
-      name: 'Protected areas',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas`,
+      name: 'Protected Areas',
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}}`,
       icon: PROTECTED_AREA_SVG,
-      selected: isScenarioRoute && ['protected-areas', 'protected-areas-threshold'].includes(tab),
+      selected: isScenarioRoute && tab === TABS['scenario-protected-areas'],
     },
     {
       name: 'Cost Surface',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=cost-surface`,
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-cost-surface']}`,
       icon: COST_SURFACE_SVG,
-      selected: isScenarioRoute && tab === 'cost-surface',
+      selected: isScenarioRoute && tab === TABS['scenario-cost-surface'],
     },
     {
-      name: 'Planning unit status',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=planning-unit-status`,
+      name: 'Planning Unit Status',
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-planning-unit-status']}`,
       icon: PLANNING_UNITS_SVG,
-      selected: isScenarioRoute && tab === 'planning-unit-status',
+      selected: isScenarioRoute && tab === TABS['scenario-planning-unit-status'],
     },
     {
       name: 'Features',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=features-add`,
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-features']}`,
       icon: FEATURES_SVG,
-      selected: isScenarioRoute && ['features-add', 'features-target'].includes(tab),
+      selected: isScenarioRoute && TABS['scenario-features'] === tab,
+    },
+    {
+      name: 'GAP Analysis',
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-gap-analysis']}`,
+      icon: FEATURES_SVG,
+      selected: isScenarioRoute && TABS['scenario-gap-analysis'] === tab,
     },
   ];
 };
@@ -81,15 +88,15 @@ export const useSolutionItems = (): SubMenuItem[] => {
   return [
     {
       name: 'Overview',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=solutions`,
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-solutions']}`,
       icon: OVERVIEW_SVG,
-      selected: isScenarioRoute && tab === 'solutions',
+      selected: isScenarioRoute && tab === TABS['scenario-solutions'],
     },
     {
-      name: 'Target achievement',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=target-achievement`,
+      name: 'Target Achievement',
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-target-achievement']}`,
       icon: TARGET_SVG,
-      selected: isScenarioRoute && tab === 'target-achievement',
+      selected: isScenarioRoute && tab === TABS['scenario-target-achievement'],
     },
   ];
 };
@@ -102,15 +109,15 @@ export const useAdvancedSettingsItems = (): SubMenuItem[] => {
   return [
     {
       name: 'Overview',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=advanced-settings`,
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-advanced-settings']}`,
       icon: OVERVIEW_SVG,
-      selected: isScenarioRoute && tab === 'advanced-settings',
+      selected: isScenarioRoute && tab === TABS['scenario-advanced-settings'],
     },
     {
-      name: 'BLM calibration',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=blm-calibration`,
+      name: 'BLM Calibration',
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-blm-calibration']}`,
       icon: BLM_CALIBRATION_SVG,
-      selected: isScenarioRoute && tab === 'blm-calibration',
+      selected: isScenarioRoute && tab === TABS['scenario-blm-calibration'],
     },
   ];
 };

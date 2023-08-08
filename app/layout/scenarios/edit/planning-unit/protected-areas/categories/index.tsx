@@ -22,6 +22,7 @@ import Label from 'components/forms/label';
 import Select from 'components/forms/select';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+import { TABS } from 'layout/project/navigation/constants';
 import ProtectedAreaUploader from 'layout/scenarios/edit/planning-unit/protected-areas/categories/pa-uploader';
 import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
 
@@ -101,7 +102,7 @@ export const WDPACategories = (): JSX.Element => {
                 level: 'success',
               }
             );
-            push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-threshold`);
+            push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`);
           },
           onError: () => {
             setSubmitting(false);
@@ -131,7 +132,7 @@ export const WDPACategories = (): JSX.Element => {
       if (isModified) {
         onCalculateProtectedAreas(values);
       } else {
-        push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-threshold`);
+        push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`);
       }
     },
     [wdpaData, onCalculateProtectedAreas, pid, sid, push]
