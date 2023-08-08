@@ -13,22 +13,13 @@ import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
-import Icon from 'components/icon';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
-
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 import { FIELDS } from './constants';
 import RunField from './field';
 
-export interface ScenariosAdvancedSettingsProps {
-  onChangeSection: (s: string) => void;
-}
-
-export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps> = ({
-  onChangeSection,
-}: ScenariosAdvancedSettingsProps) => {
+export const ScenariosAdvancedSettings = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
 
@@ -122,16 +113,7 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
       exit={{ opacity: 0 }}
     >
       <header className="flex items-center space-x-3 pb-1 pt-5">
-        <button
-          type="button"
-          className="flex w-full items-center space-x-2 text-left focus:outline-none"
-          onClick={() => {
-            onChangeSection(null);
-          }}
-        >
-          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
-          <h4 className="font-heading text-xs uppercase text-primary-500">Advanced Settings</h4>
-        </button>
+        <h4 className="font-heading text-xs uppercase text-primary-500">Advanced Settings</h4>
       </header>
 
       <FormRFF onSubmit={onSubmit} initialValues={INITIAL_VALUES}>

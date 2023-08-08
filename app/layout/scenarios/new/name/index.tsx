@@ -21,9 +21,7 @@ import Loading from 'components/loading';
 import Pill from 'layout/pill';
 import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
-export interface ScenariosSidebarNameProps {}
-
-export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
+export const ScenariosSidebarName = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const { query, push } = useRouter();
   const { pid } = query as { pid: string };
@@ -72,7 +70,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
               }
             );
 
-            push(`/projects/${pid}/scenarios/${s.id}/edit`);
+            push(`/projects/${pid}/scenarios/${s.id}/edit?tab=protected-areas`);
             plausible('New scenario', {
               props: {
                 userId: `${user.id}`,

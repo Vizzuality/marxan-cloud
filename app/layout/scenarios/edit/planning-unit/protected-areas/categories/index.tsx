@@ -25,18 +25,12 @@ import Loading from 'components/loading';
 import ProtectedAreaUploader from 'layout/scenarios/edit/planning-unit/protected-areas/categories/pa-uploader';
 import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
 
-export interface WDPACategoriesProps {
-  onSuccess: () => void;
-}
-
-export const WDPACategories: React.FC<WDPACategoriesProps> = ({
-  onSuccess,
-}: WDPACategoriesProps) => {
+export const WDPACategories = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
   const formRef = useRef(null);
 
-  const { query } = useRouter();
+  const { push, query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
@@ -91,7 +85,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
           id: `${sid}`,
           data: {
             areas: selectedProtectedAreas,
-            threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
+            threshold: scenarioData?.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
           },
         },
         {
@@ -107,6 +101,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                 level: 'success',
               }
             );
+            push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-threshold`);
           },
           onError: () => {
             setSubmitting(false);
@@ -136,10 +131,10 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       if (isModified) {
         onCalculateProtectedAreas(values);
       } else {
-        onSuccess();
+        push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas-threshold`);
       }
     },
-    [wdpaData, onSuccess, onCalculateProtectedAreas]
+    [wdpaData, onCalculateProtectedAreas, pid, sid, push]
   );
 
   // Constants
@@ -173,11 +168,10 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   }, [wdpaData]);
 
   useEffect(() => {
-    const { wdpaThreshold } = scenarioData;
-    if (wdpaThreshold) {
-      dispatch(setWDPAThreshold(wdpaThreshold / 100));
+    if (scenarioData?.wdpaThreshold) {
+      dispatch(setWDPAThreshold(scenarioData.wdpaThreshold / 100));
     }
-  }, [scenarioData.wdpaThreshold]); //eslint-disable-line
+  }, [scenarioData?.wdpaThreshold]); //eslint-disable-line
 
   useEffect(() => {
     dispatch(setWDPACategories(INITIAL_VALUES));
@@ -245,8 +239,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             />
 
             <div className="relative flex flex-grow flex-col overflow-hidden">
-              <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
-
               <div className="relative overflow-y-auto overflow-x-visible px-0.5">
                 <div className="py-6">
                   {/* WDPA */}
@@ -362,7 +354,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                   )}
                 </div>
               </div>
-              <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
             <div className="flex flex-col space-y-4 text-xs text-white">
               <p className="leading-relaxed opacity-50">

@@ -24,18 +24,11 @@ import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protecte
 
 import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
-export interface WDPAThresholdCategories {
-  onSuccess: () => void;
-  onBack: () => void;
-}
-
-export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
-  onBack,
-}: WDPAThresholdCategories) => {
+export const WDPAThreshold = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
 
   const { addToast } = useToasts();
-  const { query } = useRouter();
+  const { push, query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
@@ -105,11 +98,9 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   }, [wdpaData]);
 
   const INITIAL_VALUES = useMemo(() => {
-    const { wdpaThreshold, wdpaIucnCategories } = scenarioData;
-
     return {
-      wdpaThreshold: wdpaThreshold ? wdpaThreshold / 100 : 0.75,
-      wdpaIucnCategories: wdpaIucnCategories || [],
+      wdpaThreshold: scenarioData?.wdpaThreshold ? scenarioData.wdpaThreshold / 100 : 0.75,
+      wdpaIucnCategories: scenarioData?.wdpaIucnCategories || [],
     };
   }, [scenarioData]);
 
@@ -127,8 +118,9 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   const areProjectPAreasSelected = !!projectPAreasSelectedIds.length;
 
   useEffect(() => {
-    const { wdpaThreshold } = scenarioData;
-    dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
+    dispatch(
+      setWDPAThreshold(scenarioData?.wdpaThreshold ? scenarioData.wdpaThreshold / 100 : 0.75)
+    );
   }, [scenarioData]); //eslint-disable-line
 
   const handleSubmit = useCallback(
@@ -158,6 +150,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                 level: 'success',
               }
             );
+            push(`/projects/${pid}/scenarios/${sid}/edit?tab=cost-surface`);
           },
           onError: () => {
             setSubmitting(false);
@@ -180,8 +173,8 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   );
 
   const handleBack = useCallback(() => {
-    onBack();
-  }, [onBack]);
+    push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas`);
+  }, [push, pid, sid]);
 
   // Loading
   if (

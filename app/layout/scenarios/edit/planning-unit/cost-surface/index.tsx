@@ -4,8 +4,6 @@ import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
@@ -25,22 +23,15 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
 import { COST_SURFACE_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
 import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
 
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-export interface ScenariosCostSurfaceProps {
-  // todo: improve typing of "s"
-  onChangeSection: (s: string) => void;
-}
-
-export const ScenariosCostSurface = ({
-  onChangeSection,
-}: ScenariosCostSurfaceProps): JSX.Element => {
+export const ScenariosCostSurface = (): JSX.Element => {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState<{ name: string }>(null);
@@ -111,8 +102,6 @@ export const ScenariosCostSurface = ({
               level: 'success',
             }
           );
-
-          console.info('Cost surface uploaded', g);
 
           plausible('Upload cost surface', {
             props: {
@@ -205,17 +194,8 @@ export const ScenariosCostSurface = ({
       exit={{ opacity: 0 }}
     >
       <header className="flex items-center space-x-3 pb-1 pt-5">
-        <button
-          aria-label="return"
-          type="button"
-          className="flex w-full items-center space-x-2 text-left focus:outline-none"
-          onClick={() => {
-            onChangeSection(null);
-          }}
-        >
-          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
-          <h4 className="font-heading text-xs uppercase text-primary-500">Cost surface</h4>
-        </button>
+        <h4 className="font-heading text-xs uppercase text-primary-500">Cost surface</h4>
+
         <InfoButton>
           <div>
             <h4 className="mb-2.5 font-heading text-lg">What is a Cost Surface?</h4>
@@ -307,7 +287,7 @@ export const ScenariosCostSurface = ({
                                     <div
                                       {...props}
                                       {...getRootProps()}
-                                      className={cx({
+                                      className={cn({
                                         'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
                                           true,
                                         'bg-gray-500': isDragActive,

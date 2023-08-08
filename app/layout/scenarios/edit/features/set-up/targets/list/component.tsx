@@ -3,8 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
@@ -19,21 +17,16 @@ import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Item from 'components/features/target-spf-item';
 import Loading from 'components/loading';
+import { cn } from 'utils/cn';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-export interface ScenariosFeaturesTargetsProps {
-  onBack: () => void;
-}
-
-export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> = ({
-  onBack,
-}: ScenariosFeaturesTargetsProps) => {
+export const ScenariosFeaturesTargets = ({ onBack }: { onBack: () => void }): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [confirmationTarget, setConfirmationTarget] = useState(null);
   const [confirmationFPF, setConfirmationFPF] = useState(null);
 
-  const { query } = useRouter();
+  const { push, query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const dispatch = useDispatch();
@@ -205,6 +198,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
         },
         {
           onSuccess: () => {
+            push(`/projects/${pid}/scenarios/${sid}/edit?tab=overview`);
             saveScenarioMutation.mutate(
               {
                 id: `${sid}`,
@@ -344,7 +338,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                       {values.features.map((item, i) => {
                         return (
                           <div
-                            className={cx({
+                            className={cn({
                               'mt-1.5': i !== 0,
                             })}
                             key={`${item.id}`}

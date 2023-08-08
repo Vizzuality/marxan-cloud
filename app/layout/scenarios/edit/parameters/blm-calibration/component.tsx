@@ -18,23 +18,14 @@ import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
-import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import BlmSettingsChart from 'layout/scenarios/edit/parameters/blm-calibration/results';
 
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
-
-export interface ScenariosBLMCalibrationProps {
-  onChangeSection: (s: string) => void;
-}
-
-export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = ({
-  onChangeSection,
-}: ScenariosBLMCalibrationProps) => {
+export const ScenariosBLMCalibration = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const { query } = useRouter();
-  const { pid, sid } = query as { pid: string; sid: string };
+  const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
   const { addToast } = useToasts();
   const plausible = usePlausible();
@@ -116,16 +107,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
       exit={{ opacity: 0 }}
     >
       <header className="flex items-center space-x-3 pb-1 pt-5">
-        <button
-          type="button"
-          className="flex w-full items-center space-x-2 text-left focus:outline-none"
-          onClick={() => {
-            onChangeSection(null);
-          }}
-        >
-          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
-          <h4 className="font-heading text-xs uppercase text-primary-500">BLM Calibration</h4>
-        </button>
+        <h4 className="font-heading text-xs uppercase text-primary-500">BLM Calibration</h4>
       </header>
 
       <div className="relative mt-1 flex min-h-0 w-full flex-grow flex-col overflow-y-auto overflow-x-hidden">

@@ -41,18 +41,15 @@ const SECTIONS = [
       'Costs reflect any variety of socioeconomic factors, which if minimized, might help the conservation plan be implemented more effectively and reduce conflicts with other uses.',
   },
 ];
-export interface ScenariosSidebarEditPlanningUnitProps {}
 
-export const ScenariosSidebarEditPlanningUnit: React.FC<
-  ScenariosSidebarEditPlanningUnitProps
-> = () => {
+export const ScenariosSidebarEditPlanningUnit = (): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
-  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const editable = useCanEditScenario(pid, sid);
@@ -107,7 +104,8 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<
     );
   }, [sid, scenarioData?.metadata, dispatch, setTab, setSubTab, scenarioMutation]);
 
-  if (!scenarioData || tab !== ScenarioSidebarTabs.PLANNING_UNIT) return null;
+  // if (!scenarioData || tab !== ScenarioSidebarTabs.PLANNING_UNIT) return null;
+  return null;
 
   return (
     <div className="flex h-full w-full flex-grow flex-col overflow-hidden">
@@ -155,7 +153,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<
               <header className="flex flex-shrink-0 justify-between">
                 <div>
                   <div className="flex items-baseline space-x-4">
-                    <h2 className="font-heading text-lg font-medium">Planning Unit</h2>
+                    <h2 className="font-heading text-lg font-medium">Grid Setup</h2>
                   </div>
                 </div>
               </header>
@@ -169,12 +167,10 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<
                 <ProtectedAreas key="protected-areas" />
               )}
 
-              {subtab === ScenarioSidebarSubTabs.COST_SURFACE && (
-                <CostSurface key="cost-surface" onChangeSection={onChangeSection} />
-              )}
+              {subtab === ScenarioSidebarSubTabs.COST_SURFACE && <CostSurface key="cost-surface" />}
 
               {subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS && (
-                <AdjustPanningUnits key="adjust-planning-units" onChangeSection={onChangeSection} />
+                <AdjustPanningUnits key="adjust-planning-units" />
               )}
             </Pill>
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,17 +8,13 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { PUAction } from 'store/slices/scenarios/types';
 
 import { motion } from 'framer-motion';
-import { xor } from 'lodash';
 
 import { useCanEditScenario } from 'hooks/permissions';
 import { useScenarioPU } from 'hooks/scenarios';
 
-import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
 import LOCK_IN_OUT_IMG from 'images/info-buttons/img_lockin_lock_out.png';
-
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 import PlanningUnitMethods from './actions';
 import Tabs from './tabs';
@@ -28,9 +24,7 @@ export interface ScenariosSidebarAnalysisSectionsProps {
   onChangeSection: (s: string) => void;
 }
 
-export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysisSectionsProps> = ({
-  onChangeSection,
-}: ScenariosSidebarAnalysisSectionsProps) => {
+export const ScenariosSidebarAnalysisSections = (): JSX.Element => {
   const dispatch = useDispatch();
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
@@ -67,16 +61,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
       exit={{ opacity: 0 }}
     >
       <header className="flex items-center space-x-3 pb-1 pt-5">
-        <button
-          type="button"
-          className="flex w-full items-center space-x-2 text-left focus:outline-none"
-          onClick={() => {
-            onChangeSection(null);
-          }}
-        >
-          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
-          <h4 className="font-heading text-xs uppercase text-primary-500">Adjust planning units</h4>
-        </button>
+        <h4 className="font-heading text-xs uppercase text-primary-500">Adjust planning units</h4>
 
         <InfoButton>
           <div>

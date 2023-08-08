@@ -8,7 +8,6 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
-// import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProject } from 'hooks/projects';
 import {
   useScenario,
@@ -17,8 +16,6 @@ import {
 } from 'hooks/scenarios';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
-
-// import SolutionFrequency from 'layout/solutions/frequency';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -34,6 +31,7 @@ import SolutionsTableForm from './table/table-form/component';
 export const ScenariosSolutionsOverview = (): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
+
   const [PDFLoader, setPDFLoader] = useState<boolean>(false);
   const [solutionsReportLoader, setSolutionsReportLoader] = useState<boolean>(false);
   const [showTable, setShowTable] = useState<boolean>(false);
@@ -155,7 +153,7 @@ export const ScenariosSolutionsOverview = (): JSX.Element => {
         },
       }
     );
-  }, [sid, scenarioData.name, downloadScenarioReportMutation, SOLUTION_DATA, addToast]);
+  }, [sid, scenarioData?.name, downloadScenarioReportMutation, SOLUTION_DATA, addToast]);
 
   const onChangeVisibility = useCallback(
     (lid) => {

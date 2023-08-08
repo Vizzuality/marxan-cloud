@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useEffect, useState } from 'react';
+import { PropsWithChildren, useCallback, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -6,33 +6,27 @@ import { useRouter } from 'next/router';
 
 import { TippyProps } from '@tippyjs/react/headless';
 
-import { useRunScenario, useScenarioStatus } from 'hooks/scenarios';
-import { useAllSolutions } from 'hooks/solutions';
-import { useToasts } from 'hooks/toast';
-
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tooltip from 'components/tooltip';
-import { useScenarioJobs } from 'layout/scenarios/edit/status/utils';
 import { cn } from 'utils/cn';
 
-import ADVANCED_SETTINGS_SVG from 'svgs/navigation/advanced-settings.svg?sprite';
-import GRID_SETUP_SVG from 'svgs/navigation/grid-setup.svg?sprite';
-import INVENTORY_SVG from 'svgs/navigation/inventory.svg?sprite';
-import WHITE_LOGO_SVG from 'svgs/navigation/logo-white.svg';
-import MENU_SVG from 'svgs/navigation/menu.svg?sprite';
-import RUN_SCENARIO_SVG from 'svgs/navigation/run-scenario.svg?sprite';
-import SCENARIO_LIST_SVG from 'svgs/navigation/scenario-list.svg?sprite';
-import SOLUTIONS_SVG from 'svgs/navigation/solutions.svg?sprite';
+import ADVANCED_SETTINGS_SVG from 'svgs/sidebar/advanced-settings.svg?sprite';
+import GRID_SETUP_SVG from 'svgs/sidebar/grid-setup.svg?sprite';
+import INVENTORY_SVG from 'svgs/sidebar/inventory.svg?sprite';
+import WHITE_LOGO_SVG from 'svgs/sidebar/logo-white.svg';
+import MENU_SVG from 'svgs/sidebar/menu.svg?sprite';
+import RUN_SCENARIO_SVG from 'svgs/sidebar/run-scenario.svg?sprite';
+import SCENARIO_LIST_SVG from 'svgs/sidebar/scenario-list.svg?sprite';
+import SOLUTIONS_SVG from 'svgs/sidebar/solutions.svg?sprite';
 
 import {
   MENU_COMMON_CLASSES,
   MENU_ITEM_COMMON_CLASSES,
   MENU_ITEM_ACTIVE_CLASSES,
-  MENU_ITEM_DISABLED_CLASSES,
   MENU_ITEM_BUTTON_COMMON_CLASSES,
   ICONS_COMMON_CLASSES,
-  NAVIGATION_TREE,
+  SIDEBAR_TREE,
 } from './constants';
 import {
   useInventoryItems,
@@ -41,7 +35,7 @@ import {
   useAdvancedSettingsItems,
 } from './hooks';
 import SubMenu from './submenu';
-import type { NavigationTreeCategories } from './types';
+import type { SidebarTreeCategories } from './types';
 import UserMenu from './user-menu';
 
 export const MenuTooltip = ({ children }: PropsWithChildren): JSX.Element => {
@@ -54,20 +48,19 @@ export const MenuTooltip = ({ children }: PropsWithChildren): JSX.Element => {
 
 export const TOOLTIP_OFFSET: TippyProps['offset'] = [0, 10];
 
-export const Navigation = (): JSX.Element => {
+export const Sidebar = (): JSX.Element => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
   const isProjectRoute = route === '/projects/[pid]';
-  const isScenarioRoute = route.startsWith('/projects/[pid]/scenarios/');
-  const { addToast } = useToasts();
+  const isScenarioRoute = route === '/projects/[pid]/scenarios/[sid]/edit';
 
-  const [submenuState, setSubmenuState] = useState<{ [key in NavigationTreeCategories]: boolean }>({
+  const [submenuState, setSubmenuState] = useState<{ [key in SidebarTreeCategories]: boolean }>({
     user: false,
-    inventory: NAVIGATION_TREE.inventory.includes(tab),
-    gridSetup: isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab),
-    solutions: isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab),
-    advancedSettings: isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab),
+    inventory: isProjectRoute && SIDEBAR_TREE.inventory.includes(tab),
+    gridSetup: isScenarioRoute && SIDEBAR_TREE.gridSetup.includes(tab),
+    solutions: isScenarioRoute && SIDEBAR_TREE.solutions.includes(tab),
+    advancedSettings: isScenarioRoute && SIDEBAR_TREE.advancedSettings.includes(tab),
   });
 
   const inventoryItems = useInventoryItems();
@@ -75,21 +68,7 @@ export const Navigation = (): JSX.Element => {
   const solutionsItems = useSolutionItems();
   const advancedSettingsItems = useAdvancedSettingsItems();
 
-  const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
-  const { jobs = [] } = scenarioStatusData || {};
-  const JOBS = useScenarioJobs(jobs);
-
-  const scenarioIsRunning = JOBS.find((j) => j.kind === 'run')?.status === 'running';
-
-  const runScenarioMutation = useRunScenario({});
-
-  const allSolutionsQuery = useAllSolutions(sid, {
-    disablePagination: false,
-    'page[size]': 1,
-    'page[number]': 1,
-  });
-
-  const toggleSubmenu = useCallback((submenuKey: NavigationTreeCategories) => {
+  const toggleSubmenu = useCallback((submenuKey: SidebarTreeCategories) => {
     if (submenuKey === 'user') {
       return setSubmenuState((prevState) => ({
         ...prevState,
@@ -101,7 +80,7 @@ export const Navigation = (): JSX.Element => {
       return Object.keys(prevState).reduce<typeof submenuState>(
         (acc, key) => ({
           ...acc,
-          [key]: key === submenuKey ? true : false,
+          [key]: key === submenuKey ? !prevState[key] : false,
         }),
         prevState
       );
@@ -109,54 +88,17 @@ export const Navigation = (): JSX.Element => {
   }, []);
 
   const handleRunScenario = useCallback(() => {
-    runScenarioMutation.mutate(
-      { id: sid },
-      {
-        onSuccess: () => {
-          addToast(
-            'run-start',
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Run started</p>
-            </>,
-            {
-              level: 'success',
-            }
-          );
-        },
-        onError: () => {
-          addToast(
-            'error-run-start',
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">Scenario run failed</p>
-            </>,
-            {
-              level: 'error',
-            }
-          );
-        },
-      }
-    );
-  }, [addToast, runScenarioMutation, sid]);
-
-  const isSolutionTabEnabled = Boolean(allSolutionsQuery.data?.length);
-
-  useEffect(() => {
-    if (isProjectRoute && NAVIGATION_TREE.inventory.includes(tab)) toggleSubmenu('inventory');
-    if (isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab)) toggleSubmenu('gridSetup');
-    if (isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab)) toggleSubmenu('solutions');
-    if (isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab))
-      toggleSubmenu('advancedSettings');
-  }, [tab, isProjectRoute, isScenarioRoute, toggleSubmenu]);
+    // todo: define run scenario button behaviour
+    console.log('handleRunScenario', sid);
+  }, [sid]);
 
   return (
-    <nav className="z-20 flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-700 px-2 py-8">
+    <nav className="flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-700 px-2 py-8">
       <div className="flex flex-col">
         <Link href="/">
           <Image alt="Marxan logo" width={55} height={7} src={WHITE_LOGO_SVG} />
         </Link>
-        <div className="space-y-2 divide-y divide-gray-600">
+        <div className="space-y-2 divide-y divide-gray-400">
           {/* // ? Common menu */}
           <div className="flex flex-col items-center">
             <ul className={MENU_COMMON_CLASSES}>
@@ -184,7 +126,7 @@ export const Navigation = (): JSX.Element => {
                     <PopoverContent
                       side="right"
                       sideOffset={20}
-                      className="min-w-[410px] rounded-b-4xl rounded-tl-xl rounded-tr-4xl bg-white p-4"
+                      className="w-80 rounded-b-4xl rounded-tl-xl rounded-tr-4xl bg-white p-4"
                       collisionPadding={48}
                       onInteractOutside={() => toggleSubmenu('user')}
                     >
@@ -254,7 +196,7 @@ export const Navigation = (): JSX.Element => {
                 className={cn({
                   [MENU_ITEM_COMMON_CLASSES]: true,
                   [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab),
+                    isScenarioRoute && SIDEBAR_TREE.gridSetup.includes(tab),
                 })}
               >
                 <Tooltip
@@ -280,7 +222,7 @@ export const Navigation = (): JSX.Element => {
                 className={cn({
                   [MENU_ITEM_COMMON_CLASSES]: true,
                   [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab),
+                    isScenarioRoute && SIDEBAR_TREE.advancedSettings.includes(tab),
                 })}
               >
                 <Tooltip
@@ -306,10 +248,7 @@ export const Navigation = (): JSX.Element => {
                 className={cn({
                   [MENU_ITEM_COMMON_CLASSES]: true,
                   [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute &&
-                    NAVIGATION_TREE.solutions.includes(tab) &&
-                    isSolutionTabEnabled,
-                  [MENU_ITEM_DISABLED_CLASSES]: !isSolutionTabEnabled,
+                    isScenarioRoute && SIDEBAR_TREE.solutions.includes(tab),
                 })}
               >
                 <Tooltip
@@ -335,7 +274,7 @@ export const Navigation = (): JSX.Element => {
           )}
         </div>
       </div>
-      {sid && !scenarioIsRunning && (
+      {sid && (
         <div className="group flex flex-col-reverse items-center">
           <button
             type="button"
@@ -353,4 +292,4 @@ export const Navigation = (): JSX.Element => {
   );
 };
 
-export default Navigation;
+export default Sidebar;

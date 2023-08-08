@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import { withProtection, withUser } from 'hoc/auth';
 import { withProject } from 'hoc/projects';
 
-import Breadcrumb from 'components/breadcrumb';
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
+import Breadcrumbs from 'layout/project/navigation/breadcrumbs';
 import Sidebar from 'layout/project/sidebar';
 import InventoryProjectHeader from 'layout/project/sidebar/project/header';
 import InventoryPanelCostSurface from 'layout/project/sidebar/project/inventory-panel/cost-surface';
@@ -20,8 +20,8 @@ import ProjectTitle from 'layout/title/project-title';
 export const getServerSideProps = withProtection(withUser(withProject()));
 
 const ShowProjectsPage = (): JSX.Element => {
-  const { push, query } = useRouter();
-  const { tab } = query as { tab: 'features' | 'protected-areas' | 'cost-surface' };
+  const { query } = useRouter();
+  const { tab } = query as { tab: string };
 
   return (
     <Protected>
@@ -29,13 +29,7 @@ const ShowProjectsPage = (): JSX.Element => {
       <MetaIcons />
       <ProjectLayout className="relative z-10">
         <Sidebar className="flex-col">
-          <Breadcrumb
-            onClick={() => {
-              push('/projects');
-            }}
-          >
-            Dashboard
-          </Breadcrumb>
+          <Breadcrumbs />
 
           <InventoryProjectHeader />
 

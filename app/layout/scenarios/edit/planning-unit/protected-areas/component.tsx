@@ -14,7 +14,6 @@ import Icon from 'components/icon';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/planning-unit/protected-areas/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/planning-unit/protected-areas/threshold';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
-// import Steps from 'components/steps';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -25,7 +24,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
   const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTab, setSubTab } = scenarioSlice.actions;
+  const { setSubTab } = scenarioSlice.actions;
 
   const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
@@ -58,23 +57,11 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
         </header>
 
         {subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW && (
-          <ScenariosSidebarWDPACategories
-            onSuccess={() => {
-              dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD));
-            }}
-          />
+          <ScenariosSidebarWDPACategories />
         )}
 
         {subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD && (
-          <ScenariosSidebarWDPAThreshold
-            onSuccess={() => {
-              dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));
-              dispatch(setSubTab(null));
-            }}
-            onBack={() => {
-              dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
-            }}
-          />
+          <ScenariosSidebarWDPAThreshold />
         )}
       </motion.div>
     </div>
