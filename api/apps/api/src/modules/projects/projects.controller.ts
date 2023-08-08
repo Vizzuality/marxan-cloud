@@ -24,6 +24,7 @@ import {
 import { projectResource, ProjectResultSingular } from './project.api.entity';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
@@ -729,8 +730,12 @@ export class ProjectsController {
   @ApiOperation({
     description: `Upload shapefiles of species or bioregional features.`,
   })
-  @ApiOkResponse({ type: ShapefileUploadResponse })
+  @ApiOkResponse({ type: GeoFeature })
   @ApiTags(inlineJobTag)
+  @ApiBody({
+    description: 'Shapefile to upload',
+    type: UploadShapefileDTO,
+  })
   @Post(`:id/features/shapefile`)
   @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
   async uploadFeatures(
