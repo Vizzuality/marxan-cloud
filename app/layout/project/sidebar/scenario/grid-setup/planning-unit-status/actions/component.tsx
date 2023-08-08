@@ -11,7 +11,7 @@ import { useSaveScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Select from 'components/forms/select';
-import ActionsSummary from 'layout/scenarios/edit/planning-unit/adjust-planning-units/actions-summary';
+import ActionsSummary from 'layout/project/sidebar/scenario/grid-setup/planning-unit-status/actions-summary';
 
 import DrawPUMethod from './draw';
 import SelectPUMethod from './select';
