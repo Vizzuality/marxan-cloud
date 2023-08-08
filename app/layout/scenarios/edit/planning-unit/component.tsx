@@ -14,7 +14,7 @@ import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import Button from 'components/button';
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import AdjustPanningUnits from 'layout/scenarios/edit/planning-unit/adjust-planning-units';
+import AdjustPanningUnits from 'layout/project/sidebar/scenario/grid-setup/planning-unit-status';
 import CostSurface from 'layout/scenarios/edit/planning-unit/cost-surface';
 import ProtectedAreas from 'layout/scenarios/edit/planning-unit/protected-areas';
 import Sections from 'layout/sections';
