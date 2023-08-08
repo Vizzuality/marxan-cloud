@@ -16,11 +16,18 @@ export class UploadShapefileDTO {
   @IsString()
   description?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsOptional()
   @Validate(IsValidTagNameValidator)
   @MaxLength(tagMaxlength, {
     message: tagMaxLengthErrorMessage,
   })
   tagName?: string;
+
+  /**
+   * `file` data is extracted via the @UploadedFile decorator in the controller;
+   *  the DTO includes this property to document the request body.
+   */
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: any;
 }
