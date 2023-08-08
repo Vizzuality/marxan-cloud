@@ -1,5 +1,5 @@
 export enum ScenarioSidebarTabs {
-  PLANNING_UNIT = 'planning-unit',
+  PLANNING_UNIT = 'planning-unit-status',
   FEATURES = 'features',
   PARAMETERS = 'parameters',
   SOLUTIONS = 'solutions',

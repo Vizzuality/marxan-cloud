@@ -9,6 +9,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
+import { TABS } from 'layout/project/navigation/constants';
 import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add/add-modal';
 import ListFeatures from 'layout/scenarios/edit/features/set-up/add/list';
 
@@ -26,7 +27,7 @@ export const ScenariosSidebarEditFeatures = (): JSX.Element => {
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
 
-  if (!scenarioData || tab !== 'features-add') return null;
+  if (!scenarioData || tab !== TABS['scenario-features']) return null;
 
   return (
     <div className="flex h-full w-full flex-grow flex-col overflow-hidden">
