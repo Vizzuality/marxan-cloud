@@ -12,7 +12,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
-    "node": "~18.16"
+    "node": "~18.17"
   },
   "author": "Vizzuality",
   "license": "MIT",
@@ -38,9 +38,9 @@
     "tsconfig-paths": "4.1.1"
   },
   "resolutions": {
-    "@types/node": "18.16.14"
+    "@types/node": "18.17.3"
   },
   "volta": {
-    "node": "18.16.0"
+    "node": "18.17.0"
   }
 }
