@@ -8,9 +8,8 @@ import ProjectLayout from 'layout/project';
 import Breadcrumbs from 'layout/project/navigation/breadcrumbs';
 import Sidebar from 'layout/project/sidebar';
 import InventoryProjectHeader from 'layout/project/sidebar/project/header';
-import InventoryPanelCostSurface from 'layout/project/sidebar/project/inventory-panel/cost-surface';
+import InventoryPanel from 'layout/project/sidebar/project/inventory-panel';
 import InventoryPanelFeatures from 'layout/project/sidebar/project/inventory-panel/features';
-import InventoryPanelProtectedAreas from 'layout/project/sidebar/project/inventory-panel/protected-areas';
 import ScenariosList from 'layout/project/sidebar/project/scenarios-list';
 import ProjectMap from 'layout/projects/show/map';
 import ProjectStatus from 'layout/projects/show/status';
@@ -30,12 +29,10 @@ const ShowProjectsPage = (): JSX.Element => {
       <ProjectLayout className="relative z-10">
         <Sidebar className="flex-col">
           <Breadcrumbs />
-
           <InventoryProjectHeader />
-
-          {tab === 'features' && <InventoryPanelFeatures />}
-          {tab === 'protected-areas' && <InventoryPanelProtectedAreas />}
-          {tab === 'cost-surface' && <InventoryPanelCostSurface />}
+          {/* TODO Simao: Remove. Development purposes */}
+          {tab && <InventoryPanel />}
+          {tab === 'features2' && <InventoryPanelFeatures />}
           {!tab && <ScenariosList />}
         </Sidebar>
         <ProjectStatus />

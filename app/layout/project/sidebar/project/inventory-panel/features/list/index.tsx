@@ -42,6 +42,7 @@ export const ProjectFeatureList = (): JSX.Element => {
       placeholderData: { data: [] },
     }
   );
+
   const featureIds = allFeaturesQuery.data?.map((feature) => feature.id);
 
   const handleSelectAll = useCallback(

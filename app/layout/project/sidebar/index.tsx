@@ -27,7 +27,7 @@ export const Sidebar = ({
         [className]: !!className,
       })}
     >
-      <div className="w-full overflow-hidden px-8 py-6">{children}</div>
+      <div className="w-full overflow-scroll px-8 py-6">{children}</div>
       <button
         type="button"
         onClick={handleSidebar}
