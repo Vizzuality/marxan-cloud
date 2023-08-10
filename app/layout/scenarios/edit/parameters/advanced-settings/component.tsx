@@ -13,6 +13,7 @@ import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
+import Section from 'layout/section';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
@@ -112,52 +113,57 @@ export const ScenariosAdvancedSettings = (): JSX.Element => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header className="flex items-center space-x-3 pb-1 pt-5">
-        <h4 className="font-heading text-xs uppercase text-primary-500">Advanced Settings</h4>
-      </header>
+      <Section className="w-full">
+        <div className="space-y-1">
+          <span className="text-xs font-semibold text-blue-400">Advanced Settings</span>
+          <div className="flex items-center space-x-2">
+            <h3 className="text-lg font-medium">Overview</h3>
+          </div>
+        </div>
 
-      <FormRFF onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
-        {({ handleSubmit }) => (
-          <form
-            className={cx({
-              'flex w-full flex-grow flex-col overflow-hidden text-gray-500': true,
-            })}
-            autoComplete="off"
-            noValidate
-            onSubmit={handleSubmit}
-          >
-            <div className="flex w-full overflow-hidden" style={{ height: 475 }}>
-              <div className="flex flex-shrink-0 flex-grow flex-col space-y-6 overflow-hidden pt-5">
-                <div className="relative flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
-                  <div className="mr-12 space-y-10">
-                    {FIELDS.map((f) => (
-                      <RunField key={f.id} {...f} />
-                    ))}
+        <FormRFF onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
+          {({ handleSubmit }) => (
+            <form
+              className={cx({
+                'flex w-full flex-grow flex-col overflow-hidden text-gray-500': true,
+              })}
+              autoComplete="off"
+              noValidate
+              onSubmit={handleSubmit}
+            >
+              <div className="flex max-h-[calc(100vh-400px)] w-full overflow-y-auto">
+                <div className="flex w-full flex-shrink-0 flex-grow flex-col space-y-6 overflow-hidden pt-5">
+                  <div className="relative flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
+                    <div className="mr-12 space-y-10">
+                      {FIELDS.map((f) => (
+                        <RunField key={f.id} {...f} />
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                {editable && (
-                  <div className="flex-shrink-0 px-10">
-                    <Button
-                      type="submit"
-                      theme="primary"
-                      size="base"
-                      className="w-full"
-                      disabled={submitting}
-                    >
-                      <div className="flex items-center space-x-5">
-                        <div className="text-left">
-                          <div className="text-lg">Save</div>
+                  {editable && (
+                    <div className="flex-shrink-0 px-10">
+                      <Button
+                        type="submit"
+                        theme="primary"
+                        size="base"
+                        className="w-full"
+                        disabled={submitting}
+                      >
+                        <div className="flex items-center space-x-5">
+                          <div className="text-left">
+                            <div className="text-lg">Save</div>
+                          </div>
                         </div>
-                      </div>
-                    </Button>
-                  </div>
-                )}
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </form>
-        )}
-      </FormRFF>
+            </form>
+          )}
+        </FormRFF>
+      </Section>
     </motion.div>
   );
 };

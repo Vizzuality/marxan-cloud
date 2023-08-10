@@ -25,8 +25,9 @@ import Loading from 'components/loading';
 import { TABS } from 'layout/project/navigation/constants';
 import ProtectedAreaUploader from 'layout/scenarios/edit/planning-unit/protected-areas/categories/pa-uploader';
 import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
+import Section from 'layout/section';
 
-export const WDPACategories = (): JSX.Element => {
+export const WDPACategories = ({ onContinue }): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
   const formRef = useRef(null);
@@ -102,7 +103,8 @@ export const WDPACategories = (): JSX.Element => {
                 level: 'success',
               }
             );
-            push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`);
+            // push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`);
+            onContinue();
           },
           onError: () => {
             setSubmitting(false);
@@ -121,7 +123,7 @@ export const WDPACategories = (): JSX.Element => {
         }
       );
     },
-    [saveScenarioProtectedAreasMutation, sid, wdpaData, scenarioData, addToast]
+    [saveScenarioProtectedAreasMutation, sid, wdpaData, scenarioData, addToast, onContinue]
   );
 
   const onSubmit = useCallback(
@@ -132,10 +134,11 @@ export const WDPACategories = (): JSX.Element => {
       if (isModified) {
         onCalculateProtectedAreas(values);
       } else {
-        push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`);
+        // push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`);
+        onContinue();
       }
     },
-    [wdpaData, onCalculateProtectedAreas, pid, sid, push]
+    [wdpaData, onCalculateProtectedAreas, pid, sid, push, onContinue]
   );
 
   // Constants
@@ -194,195 +197,203 @@ export const WDPACategories = (): JSX.Element => {
   }
 
   return (
-    <FormRFF
-      onSubmit={onSubmit}
-      key="protected-areas-categories"
-      mutators={{
-        removeWDPAFilter: (args, state, utils) => {
-          const [id, arr] = args;
-          const newArr = [...arr];
-          const i = newArr.indexOf(id);
+    <Section>
+      <div className="space-y-1">
+        <span className="text-xs font-semibold text-blue-400">Grid Setup</span>
+        <h3 className="flex items-center space-x-2">
+          <span className="text-lg font-medium">Protected Areas</span>
+        </h3>
+      </div>
+      <FormRFF
+        onSubmit={onSubmit}
+        key="protected-areas-categories"
+        mutators={{
+          removeWDPAFilter: (args, state, utils) => {
+            const [id, arr] = args;
+            const newArr = [...arr];
+            const i = newArr.indexOf(id);
 
-          if (i > -1) {
-            newArr.splice(i, 1);
-          }
-          utils.changeValue(state, 'wdpaIucnCategories', () => newArr);
-        },
-      }}
-      initialValues={INITIAL_VALUES}
-    >
-      {({ form, values, handleSubmit }) => {
-        formRef.current = form;
+            if (i > -1) {
+              newArr.splice(i, 1);
+            }
+            utils.changeValue(state, 'wdpaIucnCategories', () => newArr);
+          },
+        }}
+        initialValues={INITIAL_VALUES}
+      >
+        {({ form, values, handleSubmit }) => {
+          formRef.current = form;
 
-        const { values: stateValues } = formRef?.current?.getState();
+          const { values: stateValues } = formRef?.current?.getState();
 
-        dispatch(setWDPACategories(stateValues));
+          dispatch(setWDPACategories(stateValues));
 
-        const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
-        const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
+          const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
+          const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
 
-        const areWDPAreasSelected =
-          intersection(plainWDPAOptions, values.wdpaIucnCategories).length > 0;
+          const areWDPAreasSelected =
+            intersection(plainWDPAOptions, values.wdpaIucnCategories).length > 0;
 
-        const areProjectPAreasSelected =
-          intersection(plainProjectPAOptions, values.wdpaIucnCategories).length > 0;
+          const areProjectPAreasSelected =
+            intersection(plainProjectPAOptions, values.wdpaIucnCategories).length > 0;
 
-        return (
-          <form
-            onSubmit={handleSubmit}
-            autoComplete="off"
-            className="relative flex w-full flex-grow flex-col overflow-hidden"
-          >
-            <Loading
-              visible={submitting}
-              className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
-              iconClassName="w-10 h-10 text-white"
-            />
+          return (
+            <form
+              onSubmit={handleSubmit}
+              autoComplete="off"
+              className="relative flex w-full flex-grow flex-col overflow-hidden"
+            >
+              <Loading
+                visible={submitting}
+                className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
+                iconClassName="w-10 h-10 text-white"
+              />
 
-            <div className="relative flex flex-grow flex-col overflow-hidden">
-              <div className="relative overflow-y-auto overflow-x-visible px-0.5">
-                <div className="py-6">
-                  {/* WDPA */}
+              <div className="relative flex flex-grow flex-col overflow-hidden">
+                <div className="relative overflow-y-auto overflow-x-visible px-0.5">
+                  <div className="py-6">
+                    {/* WDPA */}
 
-                  <div>
-                    <FieldRFF name="wdpaIucnCategories">
-                      {(fprops) => (
-                        <Field id="wdpaIucnCategories" {...fprops}>
-                          <div className="mb-3 flex items-center">
-                            <Label theme="dark" className="mr-3 uppercase">
-                              Choose one or more protected areas categories
-                            </Label>
-                            <InfoButton>
-                              <span>
-                                <h4 className="mb-2.5 font-heading text-lg">IUCN categories</h4>
-                                <div className="space-y-2">
-                                  <p>
-                                    You can select to include protected areas from any or all of the
-                                    IUCN categories that exist in your planning area:
-                                  </p>
+                    <div>
+                      <FieldRFF name="wdpaIucnCategories">
+                        {(fprops) => (
+                          <Field id="wdpaIucnCategories" {...fprops}>
+                            <div className="mb-3 flex items-center">
+                              <Label theme="dark" className="mr-3 uppercase">
+                                Choose one or more protected areas categories
+                              </Label>
+                              <InfoButton>
+                                <span>
+                                  <h4 className="mb-2.5 font-heading text-lg">IUCN categories</h4>
+                                  <div className="space-y-2">
+                                    <p>
+                                      You can select to include protected areas from any or all of
+                                      the IUCN categories that exist in your planning area:
+                                    </p>
 
-                                  <ul className="list-disc space-y-1 pl-6">
-                                    <li>Ia: Strict Nature Reserve.</li>
-                                    <li>Ib: Wilderness Area.</li>
-                                    <li>II: National Park.</li>
-                                    <li>III: Natural Monument or Feature.</li>
-                                    <li>IV: Habitat/Species Management Area.</li>
-                                    <li>V: Protected Landscape/Seascape.</li>
+                                    <ul className="list-disc space-y-1 pl-6">
+                                      <li>Ia: Strict Nature Reserve.</li>
+                                      <li>Ib: Wilderness Area.</li>
+                                      <li>II: National Park.</li>
+                                      <li>III: Natural Monument or Feature.</li>
+                                      <li>IV: Habitat/Species Management Area.</li>
+                                      <li>V: Protected Landscape/Seascape.</li>
                                     <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
-                                  </ul>
-                                </div>
-                              </span>
-                            </InfoButton>
-                          </div>
-
-                          {WDPA_CATEGORIES_OPTIONS.length < 1 && (
-                            <div className="py-6 text-sm">
-                              This planning area doesn&apos;t have any protected areas categories
-                              associated with it. You can upload a new one using the button below.
+                                    </ul>
+                                  </div>
+                                </span>
+                              </InfoButton>
                             </div>
-                          )}
 
-                          {WDPA_CATEGORIES_OPTIONS.length === 1 && (
-                            <Select
-                              theme="dark"
-                              size="base"
-                              placeholder="Select..."
-                              clearSelectionActive
-                              disabled={!editable}
-                              selected={
-                                values.wdpaIucnCategories.length
-                                  ? values.wdpaIucnCategories[0]
-                                  : null
-                              }
-                              options={ORDERED_WDPA_CATEGORIES_OPTIONS}
-                              onChange={(v) => {
-                                if (v) {
-                                  fprops.input.onChange([v]);
-                                } else {
-                                  fprops.input.onChange([]);
+                            {WDPA_CATEGORIES_OPTIONS.length < 1 && (
+                              <div className="py-6 text-sm">
+                                This planning area doesn&apos;t have any protected areas categories
+                                associated with it. You can upload a new one using the button below.
+                              </div>
+                            )}
+
+                            {WDPA_CATEGORIES_OPTIONS.length === 1 && (
+                              <Select
+                                theme="dark"
+                                size="base"
+                                placeholder="Select..."
+                                clearSelectionActive
+                                disabled={!editable}
+                                selected={
+                                  values.wdpaIucnCategories.length
+                                    ? values.wdpaIucnCategories[0]
+                                    : null
                                 }
-                              }}
-                            />
-                          )}
+                                options={ORDERED_WDPA_CATEGORIES_OPTIONS}
+                                onChange={(v) => {
+                                  if (v) {
+                                    fprops.input.onChange([v]);
+                                  } else {
+                                    fprops.input.onChange([]);
+                                  }
+                                }}
+                              />
+                            )}
 
-                          {WDPA_CATEGORIES_OPTIONS.length > 1 && (
-                            <Select
-                              theme="dark"
-                              size="base"
-                              multiple
-                              placeholder="Select..."
-                              clearSelectionActive
-                              clearSelectionLabel="Clear selection"
-                              batchSelectionActive
-                              batchSelectionLabel="All protected areas"
-                              disabled={!editable}
-                              selected={values.wdpaIucnCategories}
-                              options={ORDERED_WDPA_CATEGORIES_OPTIONS}
-                              onChange={fprops.input.onChange}
-                            />
-                          )}
-                        </Field>
-                      )}
+                            {WDPA_CATEGORIES_OPTIONS.length > 1 && (
+                              <Select
+                                theme="dark"
+                                size="base"
+                                multiple
+                                placeholder="Select..."
+                                clearSelectionActive
+                                clearSelectionLabel="Clear selection"
+                                batchSelectionActive
+                                batchSelectionLabel="All protected areas"
+                                disabled={!editable}
+                                selected={values.wdpaIucnCategories}
+                                options={ORDERED_WDPA_CATEGORIES_OPTIONS}
+                                onChange={fprops.input.onChange}
+                              />
+                            )}
+                          </Field>
+                        )}
+                      </FieldRFF>
+                    </div>
+
+                    {WDPA_CATEGORIES_OPTIONS.length > 1 && (
+                      <p className="py-4 text-center text-sm">or</p>
+                    )}
+
+                    <FieldRFF name="uploadedProtectedArea">
+                      {(flprops) => {
+                        return <ProtectedAreaUploader {...flprops} />;
+                      }}
                     </FieldRFF>
+
+                    {areWDPAreasSelected && (
+                      <ProtectedAreasSelected
+                        form={form}
+                        options={WDPA_OPTIONS}
+                        title="Selected protected areas:"
+                        wdpaIucnCategories={values.wdpaIucnCategories}
+                      />
+                    )}
+
+                    {areProjectPAreasSelected && (
+                      <ProtectedAreasSelected
+                        form={form}
+                        options={PROJECT_PA_OPTIONS}
+                        title="Uploaded protected areas:"
+                        wdpaIucnCategories={values.wdpaIucnCategories}
+                      />
+                    )}
                   </div>
-
-                  {WDPA_CATEGORIES_OPTIONS.length > 1 && (
-                    <p className="py-4 text-center text-sm">or</p>
-                  )}
-
-                  <FieldRFF name="uploadedProtectedArea">
-                    {(flprops) => {
-                      return <ProtectedAreaUploader {...flprops} />;
-                    }}
-                  </FieldRFF>
-
-                  {areWDPAreasSelected && (
-                    <ProtectedAreasSelected
-                      form={form}
-                      options={WDPA_OPTIONS}
-                      title="Selected protected areas:"
-                      wdpaIucnCategories={values.wdpaIucnCategories}
-                    />
-                  )}
-
-                  {areProjectPAreasSelected && (
-                    <ProtectedAreasSelected
-                      form={form}
-                      options={PROJECT_PA_OPTIONS}
-                      title="Uploaded protected areas:"
-                      wdpaIucnCategories={values.wdpaIucnCategories}
-                    />
-                  )}
                 </div>
               </div>
-            </div>
-            <div className="flex flex-col space-y-4 text-xs text-white">
-              <p className="leading-relaxed opacity-50">
-                UNEP-WCMC and IUCN (2022), Protected Planet: The World Database on Protected Areas
-                (WDPA) [On-line], [05/2022], Cambridge, UK: UNEP-WCMC and IUCN.
-              </p>
-              <p>
-                Available at:{' '}
-                <a
-                  className="text-primary-500"
-                  href="www.protectedplanet.net"
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  www.protectedplanet.net.
-                </a>
-              </p>
-            </div>
+              <div className="flex flex-col space-y-4 text-xs text-white">
+                <p className="leading-relaxed opacity-50">
+                  UNEP-WCMC and IUCN (2022), Protected Planet: The World Database on Protected Areas
+                  (WDPA) [On-line], [05/2022], Cambridge, UK: UNEP-WCMC and IUCN.
+                </p>
+                <p>
+                  Available at:{' '}
+                  <a
+                    className="text-primary-500"
+                    href="www.protectedplanet.net"
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    www.protectedplanet.net.
+                  </a>
+                </p>
+              </div>
 
-            <div className="mt-5 flex justify-center space-x-2">
-              <Button theme="secondary-alt" size="lg" type="submit" className="relative px-20">
-                Continue
-              </Button>
-            </div>
-          </form>
-        );
-      }}
-    </FormRFF>
+              <div className="mt-5 flex justify-center space-x-2">
+                <Button theme="secondary-alt" size="lg" type="submit" className="relative px-20">
+                  Continue
+                </Button>
+              </div>
+            </form>
+          );
+        }}
+      </FormRFF>
+    </Section>
   );
 };
 

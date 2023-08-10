@@ -156,7 +156,7 @@ export const ScenariosSidebarFeatures = (): JSX.Element => {
               )}
 
               {subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS && (
-                <GapAnalysis key="gap-analysis" onChangeSection={onChangeSection} />
+                <GapAnalysis key="gap-analysis" />
               )}
             </Pill>
 

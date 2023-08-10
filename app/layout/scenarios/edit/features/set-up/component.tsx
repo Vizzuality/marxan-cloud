@@ -26,36 +26,38 @@ export const ScenariosSidebarSetUp = (): JSX.Element => {
 
   const dispatch = useDispatch();
 
-  return (
-    <div className="flex h-full w-full flex-grow flex-col overflow-hidden">
-      <motion.div
-        key="set-up-features"
-        className="flex min-h-0 flex-col overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
-        <header className="flex items-center space-x-3 py-5">
-          <button
-            aria-label="return"
-            type="button"
-            className="flex w-full items-center space-x-2 text-left focus:outline-none"
-            onClick={() => {
-              dispatch(setSubTab(null));
-            }}
-          >
-            <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
-            <h4 className="font-heading text-xs uppercase text-primary-500">Set Up features</h4>
-          </button>
-        </header>
+  return null;
 
-        {subtab === ScenarioSidebarSubTabs.FEATURES_ADD && <ScenariosSidebarSetupFeaturesAdd />}
+  // return (
+  //   <div className="flex h-full w-full flex-grow flex-col overflow-hidden">
+  //     <motion.div
+  //       key="set-up-features"
+  //       className="flex min-h-0 flex-col overflow-hidden"
+  //       initial={{ opacity: 0 }}
+  //       animate={{ opacity: 1 }}
+  //     >
+  //       <header className="flex items-center space-x-3 py-5">
+  //         <button
+  //           aria-label="return"
+  //           type="button"
+  //           className="flex w-full items-center space-x-2 text-left focus:outline-none"
+  //           onClick={() => {
+  //             dispatch(setSubTab(null));
+  //           }}
+  //         >
+  //           <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
+  //           <h4 className="font-heading text-xs uppercase text-primary-500">Set Up features</h4>
+  //         </button>
+  //       </header>
 
-        {subtab === ScenarioSidebarSubTabs.FEATURES_TARGET && (
-          <ScenariosSidebarSetupFeaturesTarget />
-        )}
-      </motion.div>
-    </div>
-  );
+  //       {subtab === ScenarioSidebarSubTabs.FEATURES_ADD && <ScenariosSidebarSetupFeaturesAdd />}
+
+  //       {subtab === ScenarioSidebarSubTabs.FEATURES_TARGET && (
+  //         <ScenariosSidebarSetupFeaturesTarget />
+  //       )}
+  //     </motion.div>
+  //   </div>
+  // );
 };
 
 export default ScenariosSidebarSetUp;

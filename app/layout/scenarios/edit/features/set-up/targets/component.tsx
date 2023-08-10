@@ -12,15 +12,13 @@ import TargetFeatures from 'layout/scenarios/edit/features/set-up/targets/list';
 
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 
-export const ScenariosSidebarEditFeatures = (): JSX.Element => {
+export const ScenariosSidebarEditFeatures = ({ onGoBack }): JSX.Element => {
   const { push, query } = useRouter();
   const { sid, tab } = query as { pid: string; sid: string; tab: string };
 
   const { data: scenarioData } = useScenario(sid);
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
-
-  if (!scenarioData || tab !== 'features-target') return null;
 
   return (
     <div className="flex h-full max-h-[90vh] w-full flex-grow flex-col overflow-hidden">
@@ -71,11 +69,7 @@ export const ScenariosSidebarEditFeatures = (): JSX.Element => {
           </div>
         </header>
 
-        <TargetFeatures
-          onBack={() =>
-            push(`/projects/${scenarioData.projectId}/scenarios/${sid}/edit?tab=features-add`)
-          }
-        />
+        <TargetFeatures onGoBack={onGoBack} />
       </motion.div>
     </div>
   );

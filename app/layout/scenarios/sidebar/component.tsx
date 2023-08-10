@@ -13,7 +13,7 @@ export const ScenariosEditSidebar = ({ children }: PropsWithChildren): JSX.Eleme
       })}
     >
       <Breadcrumbs />
-      <div className="mt-2.5 flex flex-grow flex-col overflow-hidden">
+      <div className="mt-2.5 flex flex-grow flex-col">
         <AnimatePresence>{children}</AnimatePresence>
       </div>
     </div>

@@ -1,5 +1,7 @@
+import Section from 'layout/section';
+
 const InventoryPanelCostSurface = (): JSX.Element => {
-  return <div>InventoryPanelCostSurface</div>;
+  return <Section>InventoryPanelCostSurface</Section>;
 };
 
 export default InventoryPanelCostSurface;

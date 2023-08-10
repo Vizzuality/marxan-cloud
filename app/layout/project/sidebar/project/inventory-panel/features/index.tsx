@@ -7,6 +7,7 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Search, { SearchProps } from 'components/search';
+import Section from 'layout/section';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
@@ -37,7 +38,7 @@ const InventoryPanelFeatures = (): JSX.Element => {
   }, []);
 
   return (
-    <section className="relative space-y-2 rounded-[20px] bg-gray-700 p-6">
+    <Section className="relative">
       <header className="flex items-center justify-between">
         <div className="space-y-1">
           <span className="text-xs font-semibold text-blue-400">Inventory Panel</span>
@@ -80,7 +81,7 @@ const InventoryPanelFeatures = (): JSX.Element => {
       />
       <ProjectFeatureList />
       <FeatureUploadModal isOpen={isOpenFeatureUploader} onDismiss={closeFeatureUploadModal} />
-    </section>
+    </Section>
   );
 };
 

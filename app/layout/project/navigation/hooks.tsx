@@ -49,7 +49,7 @@ export const useGridSetupItems = (): SubMenuItem[] => {
   return [
     {
       name: 'Protected Areas',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}}`,
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`,
       icon: PROTECTED_AREA_SVG,
       selected: isScenarioRoute && tab === TABS['scenario-protected-areas'],
     },
