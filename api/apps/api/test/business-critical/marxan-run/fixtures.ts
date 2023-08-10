@@ -42,7 +42,7 @@ export const getFixtures = async () => {
     },
     GivenCostSurfaceTemplateFilled: async () => {
       await request(app.getHttpServer())
-        .get(`/api/v1/scenarios/${scenario}/cost-surface/shapefile-template`)
+        .get(`/api/v1/projects/${scenario}/cost-surface/shapefile-template`)
         .set('Authorization', `Bearer ${authToken}`);
     },
     WhenMarxanExecutionIsRequested: async () => {
