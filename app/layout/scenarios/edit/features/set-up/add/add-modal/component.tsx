@@ -158,8 +158,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
 
   return (
     <>
-      {/* // ! revert to "editable" later */}
-      {true && (
+      {editable && (
         <Button theme="primary" size="base" onClick={() => setOpen(true)}>
           <span className="mr-3">Add features</span>
           <Icon icon={PLUS_SVG} className="h-4 w-4" />

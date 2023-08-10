@@ -13,6 +13,7 @@ import useBottomScrollListener from 'hooks/scroll';
 
 import Item from 'components/gap-analysis/item';
 import Loading from 'components/loading';
+import { cn } from 'utils/cn';
 
 export interface ScenariosPreGapAnalysisListProps {
   search?: string;
@@ -76,14 +77,13 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
   }, []);
 
   return (
-    <div className="relative flex flex-grow flex-col overflow-hidden" style={{ minHeight: 200 }}>
+    <div className="relative flex flex-grow flex-col">
       <div className="absolute -top-1 left-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
 
       <div
         ref={scrollRef}
-        className={cx({
-          'divide-y divide-dashed divide-black divide-opacity-20 overflow-y-auto overflow-x-hidden bg-gray-700':
-            true,
+        className={cn({
+          'divide-y divide-dashed divide-black divide-opacity-20 bg-gray-700': true,
         })}
       >
         {allFeaturesIsFetching && !allFeaturesIsFetched && (
@@ -97,7 +97,7 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
           </div>
         )}
 
-        <div className="py-6">
+        <ul className="py-6">
           {!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length) && (
             <div className="flex h-40 w-full items-center justify-center text-sm uppercase">
               No results found
@@ -107,9 +107,9 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
           {allFeaturesData &&
             allFeaturesData.map((item, i) => {
               return (
-                <div
+                <li
                   key={`${item.id}`}
-                  className={cx({
+                  className={cn({
                     'border-t border-dashed': i !== 0,
                   })}
                 >
@@ -119,10 +119,10 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
                     highlighted={isHighlighted(item.id)}
                     onHighlight={() => toggleHighlight(item.id)}
                   />
-                </div>
+                </li>
               );
             })}
-        </div>
+        </ul>
       </div>
 
       <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />

@@ -176,7 +176,6 @@ export const ScenariosEditMap: React.FC = () => {
   });
 
   const protectedAreas = protectedAreasData?.filter((a) => a.selected).map((a) => a.name);
-  console.log({ protectedAreas });
 
   const { data: bestSolutionData } = useBestSolution(sid, {
     enabled: scenarioData?.ranAtLeastOnce,
@@ -336,8 +335,6 @@ export const ScenariosEditMap: React.FC = () => {
     },
   });
 
-  console.log({ selectedFeaturesData, selectedFeatures });
-
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
     cache,
@@ -363,8 +360,6 @@ export const ScenariosEditMap: React.FC = () => {
       ...layerSettings['features-preview'],
     },
   });
-
-  console.log({ include });
 
   const PUGridLayer = usePUGridLayer({
     cache,
@@ -614,8 +609,6 @@ export const ScenariosEditMap: React.FC = () => {
     },
     [setLayerSettings, dispatch, layerSettings]
   );
-
-  console.log(LAYERS);
 
   return (
     <div className="relative h-full w-full overflow-hidden">

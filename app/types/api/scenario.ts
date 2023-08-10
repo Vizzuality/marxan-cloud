@@ -38,10 +38,13 @@ export interface Scenario {
   projectScenarioId?: number;
   protectedAreaFilterByIds?: number[];
   ranAtLeastOnce: boolean;
+  // ! looks like this property does not come from the API but is added to the scenario at some point
   runStatus: Job['status'];
   solutionsAreLocked: boolean;
   wdpaIucnCategories: string[];
   wdpaThreshold: number;
+  lastModifiedAt: string;
+  status: Job['status'];
 }
 
 export interface ScenarioFeature {

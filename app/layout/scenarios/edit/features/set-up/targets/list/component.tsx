@@ -21,7 +21,7 @@ import { cn } from 'utils/cn';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-export const ScenariosFeaturesTargets = ({ onBack }: { onBack: () => void }): JSX.Element => {
+export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void }): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [confirmationTarget, setConfirmationTarget] = useState(null);
   const [confirmationFPF, setConfirmationFPF] = useState(null);
@@ -198,7 +198,8 @@ export const ScenariosFeaturesTargets = ({ onBack }: { onBack: () => void }): JS
         },
         {
           onSuccess: () => {
-            push(`/projects/${pid}/scenarios/${sid}/edit?tab=overview`);
+            // push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-features']}`);
+            onGoBack();
             saveScenarioMutation.mutate(
               {
                 id: `${sid}`,
@@ -225,7 +226,7 @@ export const ScenariosFeaturesTargets = ({ onBack }: { onBack: () => void }): JS
         }
       );
     },
-    [sid, metadata, selectedFeaturesData, selectedFeaturesMutation, saveScenarioMutation]
+    [sid, metadata, selectedFeaturesData, selectedFeaturesMutation, saveScenarioMutation, onGoBack]
   );
 
   const toggleSeeOnMap = useCallback(
@@ -371,7 +372,13 @@ export const ScenariosFeaturesTargets = ({ onBack }: { onBack: () => void }): JS
 
           {!!targetedFeaturesData && !!targetedFeaturesData.length && (
             <div className="flex flex-shrink-0 justify-center space-x-3">
-              <Button className="w-full" type="button" theme="secondary" size="lg" onClick={onBack}>
+              <Button
+                className="w-full"
+                type="button"
+                theme="secondary"
+                size="lg"
+                onClick={onGoBack}
+              >
                 {editable ? 'Set features' : 'Back to features'}
               </Button>
 

@@ -25,7 +25,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 
-export const ScenariosFeaturesList = (): JSX.Element => {
+export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [intersecting, setIntersecting] = useState(null);
   const [deleteFeature, setDeleteFeature] = useState(null);
@@ -232,7 +232,7 @@ export const ScenariosFeaturesList = (): JSX.Element => {
         },
         {
           onSuccess: () => {
-            dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
+            // dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
             saveScenarioMutation.mutate({
               id: `${sid}`,
               data: {
@@ -242,7 +242,7 @@ export const ScenariosFeaturesList = (): JSX.Element => {
                 }),
               },
             });
-            push(`/projects/${pid}/scenarios/${sid}/edit?tab=features-target`);
+            onContinue();
           },
           onError: () => {
             setSubmitting(false);
@@ -250,22 +250,15 @@ export const ScenariosFeaturesList = (): JSX.Element => {
         }
       );
     },
-    [
-      sid,
-      selectedFeaturesMutation,
-      getFeaturesRecipe,
-      dispatch,
-      setSubTab,
-      metadata,
-      saveScenarioMutation,
-    ]
+    [sid, selectedFeaturesMutation, getFeaturesRecipe, metadata, saveScenarioMutation, onContinue]
   );
 
-  const onContinue = useCallback(() => {
+  const handleContinue = useCallback(() => {
     setSubmitting(true);
-    dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
-    push(`/projects/${pid}/scenarios/${sid}/edit?tab=features-target`);
-  }, [dispatch, setSubTab, push, pid, sid]);
+    // dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
+    // push(`/projects/${pid}/scenarios/${sid}/edit?tab=features-target`);
+    onContinue();
+  }, [onContinue]);
 
   const toggleSeeOnMap = useCallback(
     (id) => {
@@ -338,15 +331,10 @@ export const ScenariosFeaturesList = (): JSX.Element => {
               <div className="relative overflow-y-auto overflow-x-visible px-0.5">
                 <FieldRFF name="features">
                   {({ input }) => (
-                    <div className="py-6">
+                    <ul className="max-h-[calc(100vh-400px)] space-y-1.5 overflow-y-auto py-6">
                       {values.features.map((item, i) => {
                         return (
-                          <div
-                            className={cx({
-                              'mt-1.5': i !== 0,
-                            })}
-                            key={`${item.id}`}
-                          >
+                          <li key={`${item.id}`}>
                             <Item
                               {...item}
                               editable={editable}
@@ -373,10 +361,10 @@ export const ScenariosFeaturesList = (): JSX.Element => {
                               onRefuse={() => setDeleteFeature(null)}
                               onDismiss={() => setDeleteFeature(null)}
                             />
-                          </div>
+                          </li>
                         );
                       })}
-                    </div>
+                    </ul>
                   )}
                 </FieldRFF>
               </div>
@@ -396,7 +384,7 @@ export const ScenariosFeaturesList = (): JSX.Element => {
               theme="secondary-alt"
               size="lg"
               className="flex-shrink-0"
-              onClick={onContinue}
+              onClick={handleContinue}
             >
               Continue
             </Button>
