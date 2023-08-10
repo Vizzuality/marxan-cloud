@@ -152,24 +152,24 @@ export const getFixtures = async () => {
     WhenGettingMarxanDataAsOwner: async () =>
       (
         await request(app.getHttpServer())
-          .get(`/api/v1/scenarios/${scenarioId}/marxan/dat/pu.dat`)
+          .get(`/api/v1/projects/${scenarioId}/marxan/dat/pu.dat`)
           .set('Authorization', `Bearer ${ownerToken}`)
       ).text,
     WhenGettingMarxanDataAsContributor: async () =>
       (
         await request(app.getHttpServer())
-          .get(`/api/v1/scenarios/${scenarioId}/marxan/dat/pu.dat`)
+          .get(`/api/v1/projects/${scenarioId}/marxan/dat/pu.dat`)
           .set('Authorization', `Bearer ${contributorToken}`)
       ).text,
     WhenGettingMarxanDataAsViewer: async () =>
       (
         await request(app.getHttpServer())
-          .get(`/api/v1/scenarios/${scenarioId}/marxan/dat/pu.dat`)
+          .get(`/api/v1/projects/${scenarioId}/marxan/dat/pu.dat`)
           .set('Authorization', `Bearer ${viewerToken}`)
       ).text,
     WhenGettingMarxanDataAsUserNotInScenario: async () =>
       await request(app.getHttpServer())
-        .get(`/api/v1/scenarios/${scenarioId}/marxan/dat/pu.dat`)
+        .get(`/api/v1/projects/${scenarioId}/marxan/dat/pu.dat`)
         .set('Authorization', `Bearer ${userNotInScenarioToken}`),
     WhenGettingPuInclusionStateAsOwner: async () =>
       (

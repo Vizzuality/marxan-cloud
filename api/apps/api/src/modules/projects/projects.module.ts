@@ -47,6 +47,7 @@ import { ProjectsProxyController } from '@marxan-api/modules/projects/projects-p
 import { WebshotModule } from '@marxan/webshot';
 import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.module';
 import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.module';
+import { ProjectCostSurfaceController } from './project-cost-surface.controller';
 
 @Module({
   imports: [
@@ -107,6 +108,7 @@ import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/outpu
     ProjectDetailsController,
     ProjectsController,
     ProjectsProxyController,
+    ProjectCostSurfaceController,
   ],
   // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
   exports: [ProjectsCrudService, TypeOrmModule, ProjectsService],
