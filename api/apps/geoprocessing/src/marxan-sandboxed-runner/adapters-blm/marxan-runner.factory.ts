@@ -8,6 +8,7 @@ import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handl
 import { Workspace } from '../ports/workspace';
 import { WorkspaceBuilder } from '../ports/workspace-builder';
 import { BlmPartialResultsRepository } from './blm-partial-results.repository';
+import {EntityManager} from "typeorm";
 
 @Injectable()
 export class MarxanRunnerFactory {
@@ -21,6 +22,7 @@ export class MarxanRunnerFactory {
     projectId: string,
     blmValue: number,
     workspace: Workspace,
+    entityManager: EntityManager
   ): SandboxRunner<JobData, ExecutionResult> {
     const workspaceBuilder: WorkspaceBuilder = {
       get: async () => workspace,
@@ -56,6 +58,7 @@ export class MarxanRunnerFactory {
       workspaceBuilder,
       inputFilesHandler,
       outputFilesHandler,
+      entityManager
     );
   }
 }
