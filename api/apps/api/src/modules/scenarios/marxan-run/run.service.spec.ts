@@ -44,7 +44,7 @@ test(`scheduling job`, async () => {
   await runService.run({ id: 'scenario-1' });
 
   // then
-  fixtures.ThenShouldNotUpdateScenario()
+  fixtures.ThenShouldNotUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
   fixtures.ThenShouldUseDefaultBlm();
@@ -59,7 +59,7 @@ test(`scheduling job with overriding blm`, async () => {
   await runService.run({ id: 'scenario-1', boundaryLengthModifier: 78 }, -123);
 
   // then
-  fixtures.ThenShouldNotUpdateScenario()
+  fixtures.ThenShouldNotUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
   fixtures.ThenShouldUseBlm(-123);
@@ -74,7 +74,7 @@ test(`scheduling job with scenario that has blm`, async () => {
   await runService.run({ id: 'scenario-1', boundaryLengthModifier: 78 });
 
   // then
-  fixtures.ThenShouldNotUpdateScenario()
+  fixtures.ThenShouldNotUpdateScenario();
   fixtures.ThenShouldEmitSubmittedEvent(`1234`);
   fixtures.ThenShouldAddJob();
   fixtures.ThenShouldUseBlm(78);

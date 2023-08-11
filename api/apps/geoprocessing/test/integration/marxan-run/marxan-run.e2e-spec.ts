@@ -36,6 +36,9 @@ describe(`given input data is delayed`, () => {
     fixtures.GivenInputFilesAreAvailable(500000);
     await fixtures.GivenScenarioExistsInApiDb();
   });
+  afterEach(async () => {
+    await fixtures.apiDbCleanup();
+  }, TEST_TIMEOUT_MULTIPLIER * 2);
 
   test(
     `cancelling marxan run during fetching assets shouldn't finish Marxan run.`,
@@ -64,6 +67,9 @@ describe(`given input data is available`, () => {
     await fixtures.GivenScenarioPuDataExists();
     await fixtures.GivenScenarioExistsInApiDb();
   }, TEST_TIMEOUT_MULTIPLIER * 4);
+  afterEach(async () => {
+    await fixtures.apiDbCleanup();
+  }, TEST_TIMEOUT_MULTIPLIER * 2);
   test(
     `marxan run during binary execution`,
     async () => {
@@ -163,6 +169,18 @@ const getFixtures = async () => {
       });
       // featuresOutputRepo removes on cascade
 
+      await apiEntityManager.query(`DELETE FROM scenarios WHERE id=$1`, [
+        scenarioId,
+      ]);
+      await apiEntityManager.query(`DELETE FROM projects WHERE id=$1`, [
+        projectId,
+      ]);
+      await apiEntityManager.query(`DELETE FROM organizations`);
+      nockScope.done();
+      nock.enableNetConnect();
+    },
+
+    apiDbCleanup: async () => {
       await apiEntityManager.query(`DELETE FROM scenarios WHERE id=$1`, [
         scenarioId,
       ]);
