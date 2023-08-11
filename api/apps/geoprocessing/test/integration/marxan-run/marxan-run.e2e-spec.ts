@@ -38,7 +38,7 @@ describe(`given input data is delayed`, () => {
   });
   afterEach(async () => {
     await fixtures.apiDbCleanup();
-  }, TEST_TIMEOUT_MULTIPLIER * 2);
+  });
 
   test(
     `cancelling marxan run during fetching assets shouldn't finish Marxan run.`,
@@ -69,7 +69,7 @@ describe(`given input data is available`, () => {
   }, TEST_TIMEOUT_MULTIPLIER * 4);
   afterEach(async () => {
     await fixtures.apiDbCleanup();
-  }, TEST_TIMEOUT_MULTIPLIER * 2);
+  });
   test(
     `marxan run during binary execution`,
     async () => {
@@ -112,6 +112,7 @@ const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
   const featureId = v4();
+  const organizationId = v4();
   const outputsIds: string[] = [];
   const scenarioFeatures: string[] = [];
 
@@ -168,26 +169,20 @@ const getFixtures = async () => {
         id: In(projectPus.map((pu) => pu.geomId)),
       });
       // featuresOutputRepo removes on cascade
-
-      await apiEntityManager.query(`DELETE FROM scenarios WHERE id=$1`, [
-        scenarioId,
-      ]);
-      await apiEntityManager.query(`DELETE FROM projects WHERE id=$1`, [
-        projectId,
-      ]);
-      await apiEntityManager.query(`DELETE FROM organizations`);
       nockScope.done();
       nock.enableNetConnect();
     },
 
     apiDbCleanup: async () => {
-      await apiEntityManager.query(`DELETE FROM scenarios WHERE id=$1`, [
+      await apiEntityManager.query(`DELETE FROM scenarios WHERE id = $1`, [
         scenarioId,
       ]);
-      await apiEntityManager.query(`DELETE FROM projects WHERE id=$1`, [
+      await apiEntityManager.query(`DELETE FROM projects WHERE id = $1`, [
         projectId,
       ]);
-      await apiEntityManager.query(`DELETE FROM organizations`);
+      await apiEntityManager.query(`DELETE FROM organizations WHERE id = $1`, [
+        organizationId,
+      ]);
       nockScope.done();
       nock.enableNetConnect();
     },
@@ -217,7 +212,6 @@ const getFixtures = async () => {
           });
       }),
     GivenScenarioExistsInApiDb: async () => {
-      const organizationId = v4();
       await apiEntityManager.query(
         `INSERT INTO organizations (id, name) VALUES ($1, $2)`,
         [organizationId, 'test_organization'],
