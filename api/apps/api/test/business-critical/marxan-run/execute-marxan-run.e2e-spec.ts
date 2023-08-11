@@ -12,7 +12,6 @@ describe.skip(`Marxan run`, () => {
     await fixtures.GivenUserIsLoggedIn();
     await fixtures.GivenProjectOrganizationExists();
     await fixtures.GivenScenarioExists(`Mouse`);
-    await fixtures.GivenCostSurfaceTemplateFilled();
     await fixtures.WhenMarxanExecutionIsRequested();
     await fixtures.WhenMarxanExecutionIsCompleted();
     await fixtures.ThenResultsAreAvailable();
