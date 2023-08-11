@@ -4,6 +4,7 @@ import {
   Get,
   Header,
   Inject,
+  NotImplementedException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -22,11 +23,6 @@ import {
 } from '@marxan-api/decorators/file-interceptors.decorator';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import {
-  AsyncJobDto,
-  JsonApiAsyncJobMeta,
-} from '@marxan-api/dto/async-job.dto';
-import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { isLeft } from 'fp-ts/Either';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { scenarioResource } from '@marxan-api/modules/scenarios/scenario.api.entity';
@@ -48,31 +44,21 @@ export class ProjectCostSurfaceController {
 
   @ImplementsAcl()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'To be implemented' })
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
   @ApiTags(asyncJobTag)
-  @Post(`:scenarioId/cost-surface/shapefile`)
+  @Post(`:projectId/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
-    @Param('scenarioId') scenarioId: string,
+    @Param(':projectId') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<JsonApiAsyncJobMeta> {
-    await ensureShapefileHasRequiredFiles(file);
-
-    const result = await this.scenarioService.processCostSurfaceShapefile(
-      scenarioId,
-      req.user.id,
-      file,
-    );
-
-    if (isLeft(result)) {
-      throw mapAclDomainToHttpError(result.left, {
-        scenarioId,
-        userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
-      });
-    }
-    return AsyncJobDto.forScenario().asJsonApiMetadata();
+  ): Promise<NotImplementedException> {
+    /**
+     * @todo: We will have to move ScenarioService.processCostSurfaceShapefile logic to another project-scoped
+     *        service and fire it from here.
+     */
+    throw new NotImplementedException();
   }
 
   @ImplementsAcl()
