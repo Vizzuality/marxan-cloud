@@ -391,6 +391,38 @@ export class ScenariosController {
     return await this.geoFeatureSetSerializer.serialize(result.right);
   }
 
+  @ApiOperation({
+    deprecated: true,
+    description:
+      'To be removed soon to POST /projects/:projectId/cost-surface/shapefile',
+  })
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
+  @ApiTags(asyncJobTag)
+  @Post(`:scenarioId/cost-surface/shapefile`)
+  async processCostSurfaceShapefile(
+    @Param(':scenarioId') scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<JsonApiAsyncJobMeta> {
+    await ensureShapefileHasRequiredFiles(file);
+
+    const result = await this.service.processCostSurfaceShapefile(
+      scenarioId,
+      req.user.id,
+      file,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
+  }
+
   @ApiConsumesShapefile()
   @ApiTags(inlineJobTag)
   @Post(':id/planning-unit-shapefile')
