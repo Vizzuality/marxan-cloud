@@ -22,7 +22,7 @@ import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
 import { GivenScenarioAndProjectPuData } from '../../steps/given-scenario-pu-data-exists';
 import { bootstrapApplication } from '../../utils';
-
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 const TEST_TIMEOUT_MULTIPLIER = 35000;
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
@@ -32,19 +32,21 @@ beforeEach(async () => {
 });
 
 describe(`given input data is delayed`, () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     fixtures.GivenInputFilesAreAvailable(500000);
+    await fixtures.GivenScenarioExistsInApiDb();
   });
 
   test(
     `cancelling marxan run during fetching assets shouldn't finish Marxan run.`,
     async () => {
-      expect.assertions(1);
+      expect.assertions(2);
       setTimeout(fixtures.WhenKillingMarxanRun, 1000);
       try {
         await fixtures.GivenBLMCalibrationIsRunning();
         fail();
       } catch (e) {
+        await fixtures.ThenRanAtLeastOncePropertyForScenarioIsFalse();
         expect(e).toHaveProperty('signal', 'SIGTERM');
       }
     },
@@ -60,6 +62,7 @@ describe(`given input data is available`, () => {
     fixtures.GivenInputFilesAreAvailable(500);
     await fixtures.GivenScenarioDataExists();
     await fixtures.GivenScenarioPuDataExists();
+    await fixtures.GivenScenarioExistsInApiDb();
   }, TEST_TIMEOUT_MULTIPLIER * 4);
   test(
     `marxan run during binary execution`,
@@ -68,6 +71,7 @@ describe(`given input data is available`, () => {
       fixtures.ThenHasValidOutput(output);
       await fixtures.ThenOutputScenarioPuDataWasPersisted();
       fixtures.ThenProgressWasReported();
+      await fixtures.ThenRanAtLeastOncePropertyForScenarioIsTrue();
     },
     TEST_TIMEOUT_MULTIPLIER * 30,
   );
@@ -109,6 +113,9 @@ const getFixtures = async () => {
 
   const app = await bootstrapApplication();
   const entityManager = app.get<EntityManager>(getEntityManagerToken());
+  const apiEntityManager: EntityManager = app.get(
+    getEntityManagerToken(geoprocessingConnections.apiDB),
+  );
   const featuresData: Repository<GeoFeatureGeometry> = app.get(
     getRepositoryToken(GeoFeatureGeometry),
   );
@@ -155,6 +162,14 @@ const getFixtures = async () => {
         id: In(projectPus.map((pu) => pu.geomId)),
       });
       // featuresOutputRepo removes on cascade
+
+      await apiEntityManager.query(`DELETE FROM scenarios WHERE id=$1`, [
+        scenarioId,
+      ]);
+      await apiEntityManager.query(`DELETE FROM projects WHERE id=$1`, [
+        projectId,
+      ]);
+      await apiEntityManager.query(`DELETE FROM organizations`);
       nockScope.done();
       nock.enableNetConnect();
     },
@@ -183,6 +198,21 @@ const getFixtures = async () => {
             'content-type': 'plain/text',
           });
       }),
+    GivenScenarioExistsInApiDb: async () => {
+      const organizationId = v4();
+      await apiEntityManager.query(
+        `INSERT INTO organizations (id, name) VALUES ($1, $2)`,
+        [organizationId, 'test_organization'],
+      );
+      await apiEntityManager.query(
+        `INSERT INTO projects (id, name, organization_id, sources) VALUES ($1, $2, $3, $4)`,
+        [projectId, 'test_project', organizationId, 'legacy_import'],
+      );
+      await apiEntityManager.query(
+        `INSERT INTO scenarios (id, name, project_id) VALUES ($1, $2, $3)`,
+        [scenarioId, 'test_scenario', projectId],
+      );
+    },
     GivenScenarioPuDataExists: async () => {
       outputsIds.push(
         ...(
@@ -262,6 +292,22 @@ const getFixtures = async () => {
       // checking only the last call, otherwise the test is flaky as it depends on chunking the buffer
       const { calls } = this.progressMock.mock;
       expect(last(calls)).toEqual([1]);
+    },
+
+    ThenRanAtLeastOncePropertyForScenarioIsFalse: async () => {
+      const scenario = await apiEntityManager.query(
+        `SELECT * FROM scenarios WHERE id = $1;`,
+        [scenarioId],
+      );
+      expect(scenario[0].ran_at_least_once).toBe(false);
+    },
+
+    ThenRanAtLeastOncePropertyForScenarioIsTrue: async () => {
+      const scenario = await apiEntityManager.query(
+        `SELECT * FROM scenarios WHERE id = $1;`,
+        [scenarioId],
+      );
+      expect(scenario[0].ran_at_least_once).toBe(true);
     },
   };
 };

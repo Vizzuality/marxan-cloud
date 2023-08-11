@@ -11,7 +11,7 @@ import { Cancellable } from '../ports/cancellable';
 import { SandboxRunnerInputFiles } from '../ports/sandbox-runner-input-files';
 import { SandboxRunner } from '../ports/sandbox-runner';
 import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handler';
-import { EntityManager} from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
@@ -25,7 +25,7 @@ export class MarxanSandboxRunnerService
     private readonly inputFilesHandler: SandboxRunnerInputFiles,
     private readonly outputFilesHandler: SandboxRunnerOutputHandler<ExecutionResult>,
     @InjectEntityManager(geoprocessingConnections.apiDB)
-    private readonly apiEntityManager: EntityManager
+    private readonly apiEntityManager: EntityManager,
   ) {}
 
   kill(ofScenarioId: string): void {
