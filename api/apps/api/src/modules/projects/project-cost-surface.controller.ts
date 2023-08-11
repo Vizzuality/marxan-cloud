@@ -82,37 +82,4 @@ export class ProjectCostSurfaceController {
     }
     return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
   }
-
-  @ImplementsAcl()
-  @UseGuards(JwtAuthGuard)
-  @ApiTags(marxanRunFiles)
-  @Header('Content-Type', 'text/csv')
-  @ApiOkResponse({
-    schema: {
-      type: 'string',
-    },
-  })
-  @ApiOperation({
-    description: `Uploaded cost surface data`,
-  })
-  @Get(`:scenarioId/marxan/dat/pu.dat`)
-  async getScenarioCostSurface(
-    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
-    @Req() req: RequestWithAuthenticatedUser,
-    @Res() res: Response,
-  ): Promise<void> {
-    const result = await this.scenarioService.getCostSurfaceCsv(
-      scenarioId,
-      req.user.id,
-      res,
-    );
-
-    if (isLeft(result)) {
-      throw mapAclDomainToHttpError(result.left, {
-        scenarioId,
-        userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
-      });
-    }
-  }
 }
