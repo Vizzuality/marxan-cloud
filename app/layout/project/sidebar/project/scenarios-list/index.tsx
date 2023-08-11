@@ -218,46 +218,44 @@ export const ScenariosList: React.FC = () => {
             {hasScenarios && (
               <div
                 ref={scrollRef}
-                className="relative z-0 flex h-full flex-grow flex-col overflow-y-auto overflow-x-hidden py-6"
+                className="relative z-0 flex h-full max-h-[calc(100vh-400px)] flex-grow flex-col overflow-y-auto overflow-x-hidden py-6"
               >
-                {scenariosData.map((s, i) => {
-                  const TAG = i === 0 ? HelpBeacon : Fragment;
+                <ul className="space-y-3">
+                  {scenariosData.map((s, i) => {
+                    const TAG = i === 0 ? HelpBeacon : Fragment;
 
-                  return (
-                    <TAG
-                      key={`${s.id}`}
-                      {...(i === 0 && {
-                        id: `project-scenario-${s.id}`,
-                        title: 'Scenario list',
-                        subtitle: 'List and detail overview',
-                        content: (
-                          <div>
-                            This is the list of all the scenarios you create under a project. You
-                            can access, edit and view scenarios. Updates on scenario edits and
-                            analysis are provided. Warnings will be issued if the scenario is
-                            currently being edited by another contributor.
-                          </div>
-                        ),
-                      })}
-                    >
-                      <div
-                        className={cn({
-                          'mt-3': i !== 0,
+                    return (
+                      <TAG
+                        key={`${s.id}`}
+                        {...(i === 0 && {
+                          id: `project-scenario-${s.id}`,
+                          title: 'Scenario list',
+                          subtitle: 'List and detail overview',
+                          content: (
+                            <div>
+                              This is the list of all the scenarios you create under a project. You
+                              can access, edit and view scenarios. Updates on scenario edits and
+                              analysis are provided. Warnings will be issued if the scenario is
+                              currently being edited by another contributor.
+                            </div>
+                          ),
                         })}
                       >
-                        <ScenarioItem
-                          {...s}
-                          id={s.id}
-                          onDelete={() => {
-                            setDelete(s);
-                          }}
-                          onDuplicate={() => onDuplicate(s.id, s.name)}
-                          onCancelRun={() => onCancelRun(s.id, s.name)}
-                        />
-                      </div>
-                    </TAG>
-                  );
-                })}
+                        <li>
+                          <ScenarioItem
+                            {...s}
+                            id={s.id}
+                            onDelete={() => {
+                              setDelete(s);
+                            }}
+                            onDuplicate={() => onDuplicate(s.id, s.name)}
+                            onCancelRun={() => onCancelRun(s.id, s.name)}
+                          />
+                        </li>
+                      </TAG>
+                    );
+                  })}
+                </ul>
               </div>
             )}
 

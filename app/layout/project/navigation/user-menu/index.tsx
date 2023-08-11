@@ -139,6 +139,7 @@ export const UserMenu = (): JSX.Element => {
               <Switch
                 onCheckedChange={onToggleHelpGuide}
                 className="bg-gray-500 data-[state=checked]:bg-blue-500"
+                checked={active}
               />
             </div>
           </li>

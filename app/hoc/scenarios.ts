@@ -282,7 +282,7 @@ export function withSolutions(getServerSidePropsFunc?: Function) {
           'page[number]': 1,
         }),
       ],
-      solutions
+      { data: solutions }
     );
 
     // ? if the scenarios has no solutions and the user is trying to access the solutions tab,

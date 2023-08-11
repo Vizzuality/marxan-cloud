@@ -23,7 +23,7 @@ import {
   useTargetedPreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useCostSurfaceRange, useScenario, useScenarioPU } from 'hooks/scenarios';
+import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 import { useWDPACategories } from 'hooks/wdpa';
 
@@ -40,8 +40,8 @@ import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
+import { TABS } from 'layout/project/navigation/constants';
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 export const ScenariosEditMap: React.FC = () => {
   const [open, setOpen] = useState(true);
@@ -52,7 +52,7 @@ export const ScenariosEditMap: React.FC = () => {
 
   const { query } = useRouter();
 
-  const { pid, sid } = query as { pid: string; sid: string };
+  const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
@@ -68,8 +68,6 @@ export const ScenariosEditMap: React.FC = () => {
   const dispatch = useDispatch();
 
   const {
-    tab,
-    subtab,
     cache,
 
     // WDPA
@@ -108,28 +106,33 @@ export const ScenariosEditMap: React.FC = () => {
   });
 
   const { data: scenarioData } = useScenario(sid);
-  const {
-    data: { excluded, included, available },
-  } = useScenarioPU(sid);
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
 
   const { data: targetedFeaturesData } = useTargetedFeatures(sid, {});
 
   const previewFeatureIsSelected = useMemo(() => {
-    if (subtab === ScenarioSidebarSubTabs.FEATURES_ADD) {
-      return selectedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
-    }
+    // if (tab === TABS['scenario-features-add']) {
+    //   return selectedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
+    // }
 
-    if (subtab === ScenarioSidebarSubTabs.FEATURES_TARGET) {
-      return targetedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
+    // if (tab === TABS['scenario-features-target']) {
+    //   return targetedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
+    // }
+
+    if (tab === TABS['scenario-features']) {
+      return (
+        [...selectedFeaturesData, ...targetedFeaturesData].filter(({ id }) =>
+          selectedFeatures.includes(id)
+        ).length > 0
+      );
     }
 
     return [];
-  }, [subtab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
+  }, [tab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
 
   const selectedPreviewFeatures = useMemo(() => {
-    if (subtab === ScenarioSidebarSubTabs.FEATURES_ADD) {
+    if (tab === TABS['scenario-features-add']) {
       return selectedFeaturesData
         .filter(({ id }) => selectedFeatures.includes(id))
         .map(({ name, id }) => ({ name, id }))
@@ -140,7 +143,7 @@ export const ScenariosEditMap: React.FC = () => {
         });
     }
 
-    if (subtab === ScenarioSidebarSubTabs.FEATURES_TARGET) {
+    if (tab === TABS['scenario-features-target']) {
       return targetedFeaturesData
         .filter(({ id }) => selectedFeatures.includes(id))
         .map(({ name, id }) => ({ name, id }))
@@ -152,7 +155,7 @@ export const ScenariosEditMap: React.FC = () => {
     }
 
     return [];
-  }, [subtab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
+  }, [tab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
 
   const { data: costSurfaceRangeData } = useCostSurfaceRange(sid);
 
@@ -185,163 +188,123 @@ export const ScenariosEditMap: React.FC = () => {
   const [bounds, setBounds] = useState(null);
 
   const include = useMemo(() => {
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null)
-      return 'lock-status,protection';
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
-    )
+    if (tab === TABS['scenario-protected-areas']) {
       return 'protection';
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE)
+    }
+
+    if (tab === TABS['scenario-cost-surface']) {
       return 'cost';
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
-    )
-      return 'lock-status,protection';
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
-    )
-      return 'lock-status,protection';
+    }
 
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS)
+    if (tab === TABS['scenario-gap-analysis']) {
       return 'features';
+    }
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return 'protection,features';
+    if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
+      return 'protection,features';
+    }
 
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
+    if (tab === TABS['scenario-solutions']) {
       return 'results';
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
+    }
+
+    if (tab === TABS['scenario-target-achievement']) {
       return 'results,features';
+    }
 
     return 'protection';
-  }, [tab, subtab]);
+  }, [tab]);
 
   const sublayers = useMemo(() => {
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return ['wdpa-percentage'];
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
-    )
+    if (tab === TABS['scenario-protected-areas']) {
       return ['wdpa-percentage'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE)
+    }
+
+    if (tab === TABS['scenario-cost-surface']) {
       return ['cost'];
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
-    )
+    }
+
+    if (tab === TABS['scenario-planning-unit-status']) {
       return ['wdpa-percentage', 'lock-available', 'lock-in', 'lock-out'];
+    }
 
-    if (
-      tab === ScenarioSidebarTabs.FEATURES &&
-      subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS &&
-      subtab !== null
-    )
-      return ['wdpa-percentage', 'features-preview'];
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS)
+    if (tab === TABS['scenario-features']) {
+      return ['wdpa-percentage', 'features', 'features-preview'];
+    }
+
+    if (tab === TABS['scenario-gap-analysis']) {
       return ['features'];
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === null) return ['wdpa-percentage'];
+    }
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
+    if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
+      return ['wdpa-percentage', 'features'];
+    }
 
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
+    if ([TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab)) {
       return ['frequency', 'solution'];
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
-      return ['features'];
+    }
 
     return [];
-  }, [tab, subtab]);
+  }, [tab]);
 
   const layers = useMemo(() => {
     const protectedCategories = protectedAreas || [];
 
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) {
-      return [...(protectedCategories.length ? ['wdpa-percentage'] : []), 'pugrid'];
-    }
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE)
+    if (tab === TABS['scenario-cost-surface']) {
       return ['cost', 'pugrid'];
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
-    )
-      return ['wdpa-percentage', 'lock-available', 'lock-in', 'lock-out', 'pugrid'];
-
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW &&
-      !!protectedCategories.length
-    )
-      return ['wdpa-preview', 'pugrid'];
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD &&
-      !!protectedCategories.length
-    )
-      return ['wdpa-percentage', 'pugrid'];
-
-    if (
-      tab === ScenarioSidebarTabs.FEATURES &&
-      subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS
-    ) {
+    }
+    if (tab === TABS['scenario-planning-unit-status']) {
       return [
         ...(protectedCategories.length ? ['wdpa-percentage'] : []),
+        'lock-available',
+        'lock-in',
+        'lock-out',
+        'pugrid',
+      ];
+    }
+
+    if (tab === TABS['scenario-protected-areas'] && !!protectedCategories.length) {
+      return ['wdpa-percentage', 'wdpa-preview', 'pugrid'];
+    }
+
+    if (tab === TABS['scenario-features']) {
+      return [
+        ...(protectedCategories.length ? ['wdpa-percentage'] : []),
+        ...(preHighlightFeatures.length ? ['features-highlight'] : []),
         !!previewFeatureIsSelected && 'features-preview',
         'pugrid',
       ];
     }
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === null) {
-      return [...(protectedCategories.length ? ['wdpa-percentage'] : []), 'pugrid'];
-    }
-    if (
-      tab === ScenarioSidebarTabs.FEATURES &&
-      subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS &&
-      !preHighlightFeatures.length
-    )
+
+    if (tab === TABS['scenario-gap-analysis']) {
       return ['features', 'pugrid'];
-    if (
-      tab === ScenarioSidebarTabs.FEATURES &&
-      subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS &&
-      !!preHighlightFeatures.length
-    )
-      return ['features', 'features-highlight', 'pugrid'];
+    }
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
+    if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
+      return ['wdpa-percentage', 'features'];
+    }
 
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
+    if ([TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab)) {
       return ['frequency', 'solution', 'pugrid'];
+    }
+
     if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS &&
+      [TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab) &&
       !postHighlightFeatures.length
-    )
+    ) {
       return ['features'];
+    }
+
     if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS &&
+      [TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab) &&
       !!postHighlightFeatures.length
-    )
+    ) {
       return ['features', 'features-highlight'];
+    }
 
     return ['pugrid'];
   }, [
     tab,
-    subtab,
     protectedAreas,
     previewFeatureIsSelected,
     preHighlightFeatures.length,
@@ -365,9 +328,7 @@ export const ScenariosEditMap: React.FC = () => {
     ...wdpaCategories,
     pid: `${pid}`,
     cache,
-    active:
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
+    active: tab === TABS['scenario-protected-areas'],
     bbox,
     options: {
       ...layerSettings['wdpa-preview'],
@@ -377,7 +338,7 @@ export const ScenariosEditMap: React.FC = () => {
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
     cache,
-    active: tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.FEATURES_ADD,
+    active: tab === TABS['scenario-features'],
     bbox,
     options: {
       featuresRecipe,
@@ -390,8 +351,7 @@ export const ScenariosEditMap: React.FC = () => {
   const TargetedPreviewLayers = useTargetedPreviewLayers({
     features: targetedFeaturesData,
     cache,
-    active:
-      tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.FEATURES_TARGET,
+    active: tab === TABS['scenario-features'],
     bbox,
     options: {
       featuresRecipe,
@@ -410,8 +370,7 @@ export const ScenariosEditMap: React.FC = () => {
     options: {
       wdpaIucnCategories: protectedAreas,
       wdpaThreshold:
-        tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-        subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
+        tab === TABS['scenario-protected-areas']
           ? wdpaThreshold * 100
           : scenarioData?.wdpaThreshold,
       puAction,
@@ -452,10 +411,7 @@ export const ScenariosEditMap: React.FC = () => {
     options: {
       wdpaIucnCategories: protectedAreas,
       wdpaThreshold:
-        tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-        subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
-          ? wdpaThreshold
-          : scenarioData?.wdpaThreshold,
+        tab === TABS['scenario-protected-areas'] ? wdpaThreshold : scenarioData?.wdpaThreshold,
       cost: costSurfaceRangeData,
       items: selectedPreviewFeatures,
       puAction,
