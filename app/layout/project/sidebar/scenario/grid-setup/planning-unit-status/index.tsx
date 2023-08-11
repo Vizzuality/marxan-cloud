@@ -25,7 +25,7 @@ export interface ScenariosSidebarAnalysisSectionsProps {
   onChangeSection: (s: string) => void;
 }
 
-export const ScenariosSidebarAnalysisSections = (): JSX.Element => {
+export const GridSetupPlanningUnits = (): JSX.Element => {
   const dispatch = useDispatch();
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
@@ -124,4 +124,4 @@ export const ScenariosSidebarAnalysisSections = (): JSX.Element => {
   );
 };
 
-export default ScenariosSidebarAnalysisSections;
+export default GridSetupPlanningUnits;

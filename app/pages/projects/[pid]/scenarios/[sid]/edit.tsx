@@ -16,24 +16,21 @@ import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
 import { TABS } from 'layout/project/navigation/constants';
 import Sidebar from 'layout/project/sidebar';
-import AdjustPanningUnits from 'layout/project/sidebar/scenario/grid-setup/planning-unit-status';
+import AdvancedSettingsBLMCalibration from 'layout/project/sidebar/scenario/advanced-settings/blm-calibration';
+import AdvancedSettingsOverview from 'layout/project/sidebar/scenario/advanced-settings/overview';
+import GridSetupCostSurface from 'layout/project/sidebar/scenario/grid-setup/cost-surface';
+import GridSetupFeatures from 'layout/project/sidebar/scenario/grid-setup/features';
+import GridSetupGAPAnalysis from 'layout/project/sidebar/scenario/grid-setup/gap-analysis';
+import GridSetupPlanningUnits from 'layout/project/sidebar/scenario/grid-setup/planning-unit-status';
+import GridSetupProtectedAreas from 'layout/project/sidebar/scenario/grid-setup/protected-areas';
+import SolutionsTargetAchievements from 'layout/project/sidebar/scenario/solutions/gap-analysis';
+import SolutionsOverview from 'layout/project/sidebar/scenario/solutions/overview';
 import Protected from 'layout/protected';
-import ScenarioGAPAnalysis from 'layout/scenarios/edit/features/gap-analysis';
-import ScenariosSidebarSetupFeaturesAdd from 'layout/scenarios/edit/features/set-up/add';
-import ScenariosSidebarSetupFeaturesTargets from 'layout/scenarios/edit/features/set-up/targets';
 import ScenarioLock from 'layout/scenarios/edit/lock';
 import ScenarioEditMap from 'layout/scenarios/edit/map';
-import AdvancedSettings from 'layout/scenarios/edit/parameters/advanced-settings';
-import BLMCalibration from 'layout/scenarios/edit/parameters/blm-calibration';
-import ScenariosCostSurface from 'layout/scenarios/edit/planning-unit/cost-surface';
-import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/planning-unit/protected-areas/categories';
-import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/planning-unit/protected-areas/threshold';
-import PostGapAnalysis from 'layout/scenarios/edit/solutions/gap-analysis';
-import SolutionsDetails from 'layout/scenarios/edit/solutions/overview';
 import ScenarioStatus from 'layout/scenarios/edit/status';
 import NewScenario from 'layout/scenarios/new/name';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
-import StepManager from 'layout/step-manager';
 import Title from 'layout/title/scenario-title';
 
 export const getServerSideProps = withProtection(
@@ -92,43 +89,20 @@ const EditScenarioPage = (): JSX.Element => {
           <ScenariosEditSidebar>
             {!tab && <NewScenario />}
 
-            {tab === TABS['scenario-protected-areas'] && (
-              <StepManager>
-                {({ currentStep, onChangeStep }) => (
-                  <>
-                    {currentStep === 0 && (
-                      <ScenariosSidebarWDPACategories onContinue={() => onChangeStep(1)} />
-                    )}
-                    {currentStep === 1 && (
-                      <ScenariosSidebarWDPAThreshold onGoBack={() => onChangeStep(0)} />
-                    )}
-                  </>
-                )}
-              </StepManager>
-            )}
-            {tab === TABS['scenario-cost-surface'] && <ScenariosCostSurface />}
-            {tab === TABS['scenario-planning-unit-status'] && <AdjustPanningUnits />}
-            {tab === TABS['scenario-features'] && (
-              <StepManager>
-                {({ currentStep, onChangeStep }) => (
-                  <>
-                    {currentStep === 0 && (
-                      <ScenariosSidebarSetupFeaturesAdd onContinue={() => onChangeStep(1)} />
-                    )}
-                    {currentStep === 1 && (
-                      <ScenariosSidebarSetupFeaturesTargets onGoBack={() => onChangeStep(0)} />
-                    )}
-                  </>
-                )}
-              </StepManager>
-            )}
-            {tab === TABS['scenario-gap-analysis'] && <ScenarioGAPAnalysis />}
+            {/* // ? grid setup */}
+            {tab === TABS['scenario-protected-areas'] && <GridSetupProtectedAreas />}
+            {tab === TABS['scenario-cost-surface'] && <GridSetupCostSurface />}
+            {tab === TABS['scenario-planning-unit-status'] && <GridSetupPlanningUnits />}
+            {tab === TABS['scenario-features'] && <GridSetupFeatures />}
+            {tab === TABS['scenario-gap-analysis'] && <GridSetupGAPAnalysis />}
 
-            {tab === TABS['scenario-advanced-settings'] && <AdvancedSettings />}
-            {tab === TABS['scenario-blm-calibration'] && <BLMCalibration />}
+            {/* // ? advanced settings */}
+            {tab === TABS['scenario-advanced-settings'] && <AdvancedSettingsOverview />}
+            {tab === TABS['scenario-blm-calibration'] && <AdvancedSettingsBLMCalibration />}
 
-            {tab === TABS['scenario-solutions'] && <SolutionsDetails />}
-            {tab === TABS['scenario-target-achievement'] && <PostGapAnalysis />}
+            {/* // ? solutions */}
+            {tab === TABS['scenario-solutions'] && <SolutionsOverview />}
+            {tab === TABS['scenario-target-achievement'] && <SolutionsTargetAchievements />}
           </ScenariosEditSidebar>
         </Sidebar>
         <ScenarioEditMap />
