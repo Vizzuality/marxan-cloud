@@ -612,7 +612,7 @@ export class ScenariosService {
     return right(geoJson);
   }
 
-  async getCostSurfaceCsv(
+  async getPuDatCsv(
     scenarioId: string,
     userId: string,
     stream: stream.Writable,
