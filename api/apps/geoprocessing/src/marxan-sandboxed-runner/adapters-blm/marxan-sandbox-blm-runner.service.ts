@@ -93,7 +93,7 @@ export class MarxanSandboxBlmRunnerService
             projectId,
             blmValue,
             workspace,
-            this.apiEntityManager
+            this.apiEntityManager,
           );
 
           const abortEventListener = () => {
