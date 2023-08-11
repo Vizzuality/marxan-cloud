@@ -36,6 +36,13 @@ resource "azurerm_role_assignment" "key_vault_reader" {
   skip_service_principal_aad_check = true
 }
 
+resource "azurerm_role_assignment" "network_contributor" {
+  scope                            = var.resource_group.id
+  role_definition_name             = "Network Contributor"
+  principal_id                     = azurerm_user_assigned_identity.aks_identity.principal_id
+  skip_service_principal_aad_check = true
+}
+
 resource "azurerm_role_assignment" "attach_acr" {
   scope                = var.acr_id
   role_definition_name = "AcrPull"
