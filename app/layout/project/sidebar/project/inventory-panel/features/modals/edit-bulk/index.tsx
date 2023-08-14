@@ -177,7 +177,10 @@ const EditBulkModal = ({
                             className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                             placeholder="Type to pick or create tag..."
                             value={fprops.input.value}
-                            onFocus={() => setTagsMenuOpen(true)}
+                            onFocus={() => {
+                              setTagsMenuOpen(true);
+                              form.change('tag', '');
+                            }}
                             onBlur={() => setTagIsDone(true)}
                             onKeyDown={handleKeyPress}
                           />
