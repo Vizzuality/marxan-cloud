@@ -27,6 +27,8 @@ import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
+import UploadFeatureTabs from './upload-tabs';
+
 export type FormValues = {
   name: string;
   file: File;
@@ -43,6 +45,7 @@ export const FeatureUploadModal = ({
 
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState<{ name: FormValues['name'] }>(null);
+  const [uploadMode, saveUploadMode] = useState<'shapefile' | 'csv'>('shapefile');
 
   const { query } = useRouter();
   const { pid } = query as { pid: string };
@@ -174,6 +177,11 @@ export const FeatureUploadModal = ({
     onDropRejected,
   });
 
+  const onChangeTab = useCallback((mode) => {
+    saveUploadMode(mode);
+    // dispatch(setPUAction(t));
+  }, []);
+
   return (
     <Modal id="features-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
       <FormRFF<FormValues>
@@ -186,11 +194,13 @@ export const FeatureUploadModal = ({
             <form onSubmit={handleSubmit}>
               <div className="space-y-5 p-9">
                 <div className="mb-5 flex items-center space-x-3">
-                  <h4 className="font-heading text-lg text-black">Upload shapefile</h4>
+                  <h4 className="font-heading text-lg text-black">Upload feature</h4>
                   <InfoButton size="base" theme="primary">
                     <UploadFeaturesInfoButtonContent />
                   </InfoButton>
                 </div>
+
+                <UploadFeatureTabs mode={uploadMode} onChange={onChangeTab} />
 
                 <div>
                   <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
