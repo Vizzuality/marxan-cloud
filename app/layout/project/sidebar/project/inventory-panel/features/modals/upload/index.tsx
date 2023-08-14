@@ -1,4 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  ElementRef,
+  InputHTMLAttributes,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
@@ -10,6 +17,7 @@ import { motion } from 'framer-motion';
 
 import { useUploadFeaturesCSV, useUploadFeaturesShapefile } from 'hooks/features';
 import { useDownloadShapefileTemplate } from 'hooks/projects';
+import { useProjectTags } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -27,6 +35,7 @@ import {
   FEATURES_UPLOADER_CSV_MAX_SIZE,
 } from 'constants/file-uploader-size-limits';
 import UploadFeaturesInfoButtonContent from 'constants/info-button-content/upload-features';
+import { Feature } from 'types/api/feature';
 import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
@@ -35,6 +44,7 @@ import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 export type FormValues = {
   name: string;
   file: File;
+  tag: Feature['tag'];
 };
 
 export const FeatureUploadModal = ({
@@ -45,15 +55,20 @@ export const FeatureUploadModal = ({
   onDismiss: () => void;
 }): JSX.Element => {
   const formRef = useRef<FormProps<FormValues>['form']>(null);
+  const tagsSectionRef = useRef<ElementRef<'div'>>(null);
 
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState<{ name: FormValues['name'] }>(null);
   const [uploadMode, saveUploadMode] = useState<'shapefile' | 'csv'>('shapefile');
+  const [tagsMenuOpen, setTagsMenuOpen] = useState(false);
+  const [tagIsDone, setTagIsDone] = useState(false);
 
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
+
+  const tagsQuery = useProjectTags(pid);
 
   const uploadFeaturesShapefileMutation = useUploadFeaturesShapefile({
     requestConfig: {
@@ -69,6 +84,18 @@ export const FeatureUploadModal = ({
     uploadMode === 'shapefile'
       ? FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE
       : FEATURES_UPLOADER_CSV_MAX_SIZE;
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tagsSectionRef.current && !tagsSectionRef.current.contains(event.target)) {
+        setTagsMenuOpen(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -121,12 +148,13 @@ export const FeatureUploadModal = ({
   const onUploadSubmit = useCallback(
     (values: FormValues) => {
       setLoading(true);
-      const { file, name } = values;
+      const { file, name, tag } = values;
 
       const data = new FormData();
 
       data.append('file', file);
       data.append('name', name);
+      data.append('tagName', tag);
 
       const mutationResponse = {
         onSuccess: () => {
@@ -194,6 +222,17 @@ export const FeatureUploadModal = ({
     ]
   );
 
+  const handleKeyPress = useCallback(
+    (event: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
+      if (event.key === 'Enter') {
+        setTagIsDone(true);
+        formRef.current.change('tag', event.currentTarget.value);
+        setTagsMenuOpen(false);
+      }
+    },
+    [formRef]
+  );
+
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
     maxSize: UPLOADER_MAX_SIZE,
@@ -224,9 +263,12 @@ export const FeatureUploadModal = ({
   return (
     <Modal id="features-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
       <FormRFF<FormValues>
+        initialValues={{
+          tag: '',
+        }}
         ref={formRef}
         onSubmit={onUploadSubmit}
-        render={({ form, handleSubmit }) => {
+        render={({ form, handleSubmit, values }) => {
           formRef.current = form;
 
           return (
@@ -267,6 +309,75 @@ export const FeatureUploadModal = ({
                     </FieldRFF>
                   </div>
                 )}
+
+                <div ref={tagsSectionRef}>
+                  <FieldRFF name="tag">
+                    {(fprops) => (
+                      <Field id="tag" {...fprops} className="relative">
+                        <Label
+                          theme="light"
+                          className="mb-3 font-heading text-xs font-semibold uppercase"
+                        >
+                          Add type
+                        </Label>
+
+                        {(!values.tag || !tagIsDone) && (
+                          <div className="space-y-2">
+                            <input
+                              {...fprops.input}
+                              className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              placeholder="Type to pick or create tag..."
+                              value={fprops.input.value}
+                              onFocus={() => setTagsMenuOpen(true)}
+                              onBlur={() => setTagIsDone(true)}
+                              onKeyDown={handleKeyPress}
+                            />
+
+                            {tagsMenuOpen && (
+                              <div className="w-full space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
+                                <div className="text-sm text-gray-800">Recent:</div>
+                                <div className="flex flex-wrap gap-2.5">
+                                  {tagsQuery.data?.map((tag) => (
+                                    <button
+                                      key={tag}
+                                      className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
+                                      onClick={() => {
+                                        form.change('tag', tag);
+                                        setTagIsDone(true);
+                                      }}
+                                    >
+                                      <p className="text-sm capitalize text-gray-800">{tag}</p>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {values.tag && tagIsDone && (
+                          <div className="flex items-center space-x-1">
+                            <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5 hover:bg-yellow-600">
+                              <p className="text-sm capitalize text-gray-800">{values.tag}</p>
+                            </div>
+                            <button
+                              className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 hover:bg-gray-500"
+                              onClick={() => {
+                                form.change('tag', null);
+                                setTagIsDone(false);
+                              }}
+                            >
+                              <Icon
+                                icon={CLOSE_SVG}
+                                className="h-2 w-2 text-gray-400  group-hover:text-white"
+                              />
+                            </button>
+                          </div>
+                        )}
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
 
                 {!successFile && (
                   <div>
