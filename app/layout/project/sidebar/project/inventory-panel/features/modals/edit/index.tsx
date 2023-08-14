@@ -170,7 +170,7 @@ const EditModal = ({
                 >
                   {(fprops) => (
                     <Field id="featureClassName" {...fprops}>
-                      <Label theme="light" className="mb-3 uppercase">
+                      <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
                         Name
                       </Label>
 
