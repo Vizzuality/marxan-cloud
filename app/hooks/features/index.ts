@@ -21,6 +21,7 @@ import { ItemProps as SelectedItemProps } from 'components/features/selected-ite
 import { Feature } from 'types/api/feature';
 import { Project } from 'types/api/project';
 
+import DOWNLOADS from 'services/downloads';
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
@@ -715,4 +716,37 @@ export function useProjectFeatures(
       select: (data) => data?.data.filter((f) => featureIds.includes(f.id)),
     }
   );
+}
+
+export function useDownloadFeatureTemplate() {
+  const { data: session } = useSession();
+
+  const downloadFeatureTemplate = ({ pid }: { pid: Project['id'] }) => {
+    return DOWNLOADS.get<ArrayBuffer>(`/projects/${pid}/project-grid/shapefile-template`, {
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+    });
+  };
+
+  return useMutation(downloadFeatureTemplate, {
+    onSuccess: (data, variables, context) => {
+      const { data: blob } = data;
+      const { pid } = variables;
+
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `feature-template-${pid}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      console.info('Success', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
 }

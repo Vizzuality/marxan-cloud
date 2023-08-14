@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import { AxiosError, isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 
-import { useUploadFeaturesShapefile } from 'hooks/features';
+import { useDownloadFeatureTemplate, useUploadFeaturesShapefile } from 'hooks/features';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -57,6 +57,8 @@ export const FeatureUploadModal = ({
       method: 'POST',
     },
   });
+
+  const downloadFeatureTemplateMutation = useDownloadFeatureTemplate();
 
   useEffect(() => {
     return () => {
@@ -177,10 +179,26 @@ export const FeatureUploadModal = ({
     onDropRejected,
   });
 
-  const onChangeTab = useCallback((mode) => {
-    saveUploadMode(mode);
-    // dispatch(setPUAction(t));
-  }, []);
+  const onDownloadTemplate = useCallback(() => {
+    downloadFeatureTemplateMutation.mutate(
+      { pid },
+      {
+        onSuccess: () => {},
+        onError: () => {
+          addToast(
+            'download-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">Template not downloaded</ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
+  }, [pid, downloadFeatureTemplateMutation, addToast]);
 
   return (
     <Modal id="features-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
@@ -200,7 +218,19 @@ export const FeatureUploadModal = ({
                   </InfoButton>
                 </div>
 
-                <UploadFeatureTabs mode={uploadMode} onChange={onChangeTab} />
+                <UploadFeatureTabs mode={uploadMode} onChange={(mode) => saveUploadMode(mode)} />
+                {uploadMode === 'csv' && (
+                  <p className="!mt-4 text-sm text-gray-400">
+                    Please download and fill in the{' '}
+                    <button
+                      className="text-primary-500 underline hover:no-underline"
+                      onClick={onDownloadTemplate}
+                    >
+                      CSV template
+                    </button>{' '}
+                    before upload.
+                  </p>
+                )}
 
                 <div>
                   <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
