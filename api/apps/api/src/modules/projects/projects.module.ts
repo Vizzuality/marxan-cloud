@@ -51,6 +51,7 @@ import { ProjectProtectedAreasController } from './project-protected-areas.contr
 import { ProjectProtectedAreasService } from './project-protected-areas.service';
 import { ProjectAclModule } from '../access-control/projects-acl/project-acl.module';
 import { ProtectedAreasCrudModule } from '../protected-areas/protected-areas-crud.module';
+import {ProtectedAreaModule} from "@marxan-api/modules/scenarios/protected-area";
 import { ProjectCostSurfaceController } from './project-cost-surface.controller';
 import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 
@@ -96,6 +97,7 @@ import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface
     OutputProjectSummariesModule,
     ProtectedAreasCrudModule,
     CostSurfaceModule,
+    ProtectedAreaModule
   ],
   providers: [
     ProjectProtectedAreasService,

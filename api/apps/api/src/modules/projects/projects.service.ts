@@ -110,11 +110,15 @@ import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
 import stream from 'stream';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
-import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
+import {ScenariosService, SubmitProtectedAreaError} from '@marxan-api/modules/scenarios/scenarios.service';
 import {
   OutputProjectSummariesService,
   outputProjectSummaryNotFound,
 } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
+import {AppInfoDTO} from "@marxan-api/dto/info.dto";
+import {UploadShapefileDto} from "@marxan-api/modules/scenarios/dto/upload.shapefile.dto";
+import {lockedByAnotherUser, noLockInPlace} from "@marxan-api/modules/access-control/scenarios-acl/locks/lock.service";
+import {ProtectedAreaService} from "@marxan-api/modules/scenarios/protected-area";
 
 export { validationFailed } from '../planning-areas';
 
@@ -153,6 +157,7 @@ export class ProjectsService {
     @Inject(forwardRef(() => ScenariosService))
     private readonly scenariosService: ScenariosService,
     private readonly outputProjectSummariesService: OutputProjectSummariesService,
+    private readonly protectedArea: ProtectedAreaService,
   ) {}
 
   async findAllGeoFeatures(
@@ -868,5 +873,42 @@ export class ProjectsService {
       const key = idx === 0 ? 'countryId' : `adminAreaLevel${idx}Id`;
       return { ...acc, [key]: curr };
     }, {});
+  }
+
+  async addProtectedAreaFor(
+    projectId: string,
+    file: Express.Multer.File,
+    info: AppInfoDTO,
+    dto: UploadShapefileDto,
+  ): Promise<
+    Either<
+      | GetScenarioFailure
+      | SubmitProtectedAreaError
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser,
+      true
+    >
+  > {
+
+    const projectResponse = await this.queryBus.execute(
+      new GetProjectQuery(projectId, info.authenticatedUser?.id),
+    );
+    if (isLeft(projectResponse)) {
+      return projectResponse;
+    }
+
+    const submission = await this.protectedArea.addShapeFor(
+      projectResponse.right.id,
+      projectId,
+      file,
+      dto.name,
+    );
+
+    if (isLeft(submission)) {
+      return submission;
+    }
+
+    return right(true);
   }
 }
