@@ -154,6 +154,9 @@ import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-
 import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
 import { outputProjectSummaryResource } from './output-project-summaries/output-project-summary.api.entity';
 import { isNil } from 'lodash';
+import {UploadShapefileDto} from "@marxan-api/modules/scenarios/dto/upload.shapefile.dto";
+import {AsyncJobDto, JsonApiAsyncJobMeta} from "@marxan-api/dto/async-job.dto";
+import {scenarioResource} from "@marxan-api/modules/scenarios/scenario.api.entity";
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -1395,5 +1398,54 @@ export class ProjectsController {
       importId: idsOrError.right.importId,
       projectId: idsOrError.right.projectId,
     };
+  }
+
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    description:
+      'Upload shapefile with protected areas for project',
+  })
+  @GeometryFileInterceptor(GeometryKind.Complex)
+  @ApiTags(asyncJobTag)
+  @Post(':id/protected-areas/shapefile')
+  async shapefileForProtectedArea(
+    @Param('id') projectId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: UploadShapefileDto,
+  ): Promise<JsonApiAsyncJobMeta> {
+
+    const project = await this.projectsService.findOne(projectId, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(project)) {
+      switch (project.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case projectNotFound:
+          throw new NotFoundException(`Project ${projectId} could not be found`);
+        default:
+          const _exhaustiveCheck: never = project.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    await ensureShapefileHasRequiredFiles(file);
+
+    const outcome = await this.projectsService.addProtectedAreaFor(
+      projectId,
+      file,
+      { authenticatedUser: req.user },
+      dto,
+    );
+    if (isLeft(outcome)) {
+      throw mapAclDomainToHttpError(outcome.left, {
+        projectId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    return AsyncJobDto.forProject().asJsonApiMetadata();
   }
 }
