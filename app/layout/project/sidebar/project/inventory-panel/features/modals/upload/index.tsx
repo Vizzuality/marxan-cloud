@@ -325,7 +325,7 @@ export const FeatureUploadModal = ({
                           <div className="space-y-2">
                             <input
                               {...fprops.input}
-                              className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              className="h-10 w-full rounded-md border border-gray-500 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                               placeholder="Type to pick or create tag..."
                               value={fprops.input.value}
                               onFocus={() => setTagsMenuOpen(true)}
@@ -381,7 +381,7 @@ export const FeatureUploadModal = ({
 
                 {!successFile && (
                   <div>
-                    <Label theme="light" className="mb-3 uppercase">
+                    <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
                       File
                     </Label>
                     <FieldRFF name="file" validate={composeValidators([{ presence: true }])}>
@@ -391,7 +391,7 @@ export const FeatureUploadModal = ({
                             {...props}
                             {...getRootProps()}
                             className={cn({
-                              'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                              'relative w-full cursor-pointer rounded-lg border-[1.5px] border-dashed border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
                                 true,
                               'bg-gray-500': isDragActive,
                               'border-green-800': isDragAccept,
