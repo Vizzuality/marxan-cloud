@@ -1,8 +1,8 @@
 import { INestApplication } from '@nestjs/common';
 import { PromiseType } from 'utility-types';
 
-import { TypeormCostSurface } from '../../../../src/modules/surface-cost/adapters/typeorm-cost-surface';
-import { CostSurfacePersistencePort } from '../../../../src/modules/surface-cost/ports/persistence/cost-surface-persistence.port';
+import { TypeormCostSurface } from '@marxan-geoprocessing/modules/cost-surface/adapters/typeorm-cost-surface';
+import { CostSurfacePersistencePort } from '@marxan-geoprocessing/modules/cost-surface/ports/persistence/cost-surface-persistence.port';
 
 import { bootstrapApplication } from '../../../utils';
 import { getFixtures } from '../planning-unit-fixtures';

@@ -68,7 +68,6 @@ import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
-import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
 import { ShapefileService } from '@marxan/shapefile-converter';

@@ -2,14 +2,11 @@ import {
   Controller,
   forwardRef,
   Get,
-  Header,
   Inject,
   NotImplementedException,
   Param,
-  ParseUUIDPipe,
   Post,
   Req,
-  Res,
   UploadedFile,
   UseGuards,
 } from '@nestjs/common';
@@ -29,8 +26,6 @@ import { scenarioResource } from '@marxan-api/modules/scenarios/scenario.api.ent
 import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 import { CostRangeDto } from '@marxan-api/modules/scenarios/dto/cost-range.dto';
 import { plainToClass } from 'class-transformer';
-import { Response } from 'express';
-import { marxanRunFiles } from '@marxan-api/modules/scenarios/scenarios.controller';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
@@ -46,7 +41,7 @@ export class ProjectCostSurfaceController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ description: 'To be implemented' })
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
+  @GeometryFileInterceptor(GeometryKind.Complex)
   @ApiTags(asyncJobTag)
   @Post(`:projectId/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
@@ -63,7 +58,7 @@ export class ProjectCostSurfaceController {
 
   @ImplementsAcl()
   @UseGuards(JwtAuthGuard)
-  @Get(`:scenarioId/cost-surface`)
+  @Get(`:projectId/cost-surface/:costSurfaceId/cost-range`)
   @ApiOkResponse({ type: CostRangeDto })
   async getCostRange(
     @Param('scenarioId') scenarioId: string,
