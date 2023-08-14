@@ -59,7 +59,7 @@ export const ProjectMap = (): JSX.Element => {
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const { query } = useRouter();
-  // !TODO: Type tab correctly
+
   const { pid, tab } = query as { pid: string; tab: string };
   const { data = {} } = useProject(pid);
 
@@ -449,7 +449,7 @@ export const ProjectMap = (): JSX.Element => {
             </Legend>
           </div>
 
-          {!!SCENARIOS_RUNNED.sid1Options.length && (
+          {!!SCENARIOS_RUNNED.sid1Options.length && !tab && (
             <div
               className={cn({
                 'absolute right-24 top-5 flex space-x-5': true,
