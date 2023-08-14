@@ -10,7 +10,7 @@ import { PlanningUnitsModule } from '@marxan-geoprocessing/modules/planning-unit
 import { TileModule } from '@marxan-geoprocessing/modules/tile/tile.module';
 import { FeaturesModule } from '@marxan-geoprocessing/modules/features/features.module';
 import { ApiEventsModule } from '@marxan-geoprocessing/modules/api-events/api-events.module';
-import { SurfaceCostModule } from '@marxan-geoprocessing/modules/surface-cost/surface-cost.module';
+import { CostSurfaceModule } from '@marxan-geoprocessing/modules/cost-surface/cost-surface.module';
 import { ScenarioPlanningUnitsInclusionModule } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/scenario-planning-units-inclusion.module';
 import { FileTemplateModule } from '@marxan-geoprocessing/modules/scenarios';
 import { PlanningAreaModule } from '@marxan-geoprocessing/modules/planning-area/planning-area.module';
@@ -42,7 +42,7 @@ import { CleanupTasksModule } from './modules/cleanup-tasks/cleanup-tasks.module
     ProtectedAreasModule,
     FeaturesModule,
     ApiEventsModule,
-    SurfaceCostModule,
+    CostSurfaceModule,
     ScenarioPlanningUnitsInclusionModule,
     ScenarioProtectedAreaCalculationModule,
     PlanningAreaModule,

@@ -1,4 +1,4 @@
-import { SurfaceCostProcessor } from '@marxan-geoprocessing/modules/surface-cost/application/surface-cost-processor';
+import { SurfaceCostProcessor } from '@marxan-geoprocessing/modules/cost-surface/application/surface-cost-processor';
 import { INestApplication } from '@nestjs/common';
 import { PromiseType } from 'utility-types';
 import { bootstrapApplication, delay } from '../../../utils';

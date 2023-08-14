@@ -18,13 +18,18 @@ import { ShapefileConverter } from './adapters/shapefile-converter';
 import { PuCostExtractor } from './adapters/pu-cost-extractor';
 import { AvailablePlanningUnitsRepository } from './adapters/available-planning-units-repository';
 import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
+import { CostSurfacePuDataGeoEntity } from '@marxan/cost-surfaces';
 
 @Module({
   imports: [
     WorkerModule,
     ShapefilesModule,
     CqrsModule,
-    TypeOrmModule.forFeature([ScenariosPuCostDataGeo, ScenariosPuPaDataGeo]),
+    TypeOrmModule.forFeature([
+      ScenariosPuCostDataGeo,
+      ScenariosPuPaDataGeo,
+      CostSurfacePuDataGeoEntity,
+    ]),
   ],
   providers: [
     SurfaceCostWorker,
@@ -47,4 +52,4 @@ import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
     },
   ],
 })
-export class SurfaceCostModule {}
+export class CostSurfaceModule {}
