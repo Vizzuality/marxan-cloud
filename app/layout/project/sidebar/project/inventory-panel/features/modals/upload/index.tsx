@@ -20,7 +20,10 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
-import { FEATURES_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import {
+  FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE,
+  FEATURES_UPLOADER_CSV_MAX_SIZE,
+} from 'constants/file-uploader-size-limits';
 import UploadFeaturesInfoButtonContent from 'constants/info-button-content/upload-features';
 import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
@@ -60,6 +63,11 @@ export const FeatureUploadModal = ({
 
   const downloadFeatureTemplateMutation = useDownloadFeatureTemplate();
 
+  const UPLOADER_MAX_SIZE =
+    uploadMode === 'shapefile'
+      ? FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE
+      : FEATURES_UPLOADER_CSV_MAX_SIZE;
+
   useEffect(() => {
     return () => {
       setSuccessFile(null);
@@ -87,7 +95,7 @@ export const FeatureUploadModal = ({
       return error.code === 'file-too-large'
         ? {
             ...error,
-            message: `File is larger than ${bytesToMegabytes(FEATURES_UPLOADER_MAX_SIZE)} MB`,
+            message: `File is larger than ${bytesToMegabytes(UPLOADER_MAX_SIZE)} MB`,
           }
         : error;
     });
@@ -174,7 +182,7 @@ export const FeatureUploadModal = ({
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
-    maxSize: FEATURES_UPLOADER_MAX_SIZE,
+    maxSize: UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
@@ -232,18 +240,20 @@ export const FeatureUploadModal = ({
                   </p>
                 )}
 
-                <div>
-                  <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
-                    {(fprops) => (
-                      <Field id="form-name" {...fprops}>
-                        <Label theme="light" className="mb-3 uppercase">
-                          Name
-                        </Label>
-                        <Input theme="light" />
-                      </Field>
-                    )}
-                  </FieldRFF>
-                </div>
+                {uploadMode === 'shapefile' && (
+                  <div>
+                    <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
+                      {(fprops) => (
+                        <Field id="form-name" {...fprops}>
+                          <Label theme="light" className="mb-3 uppercase">
+                            Name
+                          </Label>
+                          <Input theme="light" />
+                        </Field>
+                      )}
+                    </FieldRFF>
+                  </div>
+                )}
 
                 {!successFile && (
                   <div>
@@ -268,13 +278,14 @@ export const FeatureUploadModal = ({
                             <input {...getInputProps()} />
 
                             <p className="text-center text-sm text-gray-500">
-                              Drag and drop your polygon data file
+                              Drag and drop your{' '}
+                              {uploadMode === 'shapefile' ? 'polygon data file' : 'feature file'}
                               <br />
                               or <b>click here</b> to upload
                             </p>
 
                             <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
-                              FEATURES_UPLOADER_MAX_SIZE
+                              UPLOADER_MAX_SIZE
                             )} MB`}</p>
 
                             <Loading
