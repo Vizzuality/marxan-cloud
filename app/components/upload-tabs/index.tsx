@@ -17,7 +17,7 @@ export const UploadFeatureTabs = ({
   onChange: (mode: UploadFeatureMode) => void;
 }): JSX.Element => {
   return (
-    <div className="flex w-full space-x-4 text-xs font-medium text-black">
+    <div className="flex w-full space-x-4 border-b border-gray-300 text-xs font-medium text-black">
       <button
         type="button"
         className={cn({

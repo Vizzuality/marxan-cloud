@@ -21,6 +21,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
+import UploadTabs from 'components/upload-tabs';
 import {
   FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE,
   FEATURES_UPLOADER_CSV_MAX_SIZE,
@@ -30,8 +31,6 @@ import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
-
-import UploadFeatureTabs from './upload-tabs';
 
 export type FormValues = {
   name: string;
@@ -282,7 +281,7 @@ export const FeatureUploadModal = ({
                   </InfoButton>
                 </div>
 
-                <UploadFeatureTabs mode={uploadMode} onChange={(mode) => saveUploadMode(mode)} />
+                <UploadTabs mode={uploadMode} onChange={(mode) => saveUploadMode(mode)} />
                 {uploadMode === 'csv' && (
                   <p className="!mt-4 text-sm text-gray-400">
                     Please download and fill in the{' '}
