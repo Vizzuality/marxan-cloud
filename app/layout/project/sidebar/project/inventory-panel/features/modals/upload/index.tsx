@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import { AxiosError, isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 
-import { useUploadFeaturesShapefile } from 'hooks/features';
+import { useUploadFeaturesCSV, useUploadFeaturesShapefile } from 'hooks/features';
 import { useDownloadShapefileTemplate } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -61,6 +61,8 @@ export const FeatureUploadModal = ({
       method: 'POST',
     },
   });
+
+  const uploadFeaturesCSVMutation = useUploadFeaturesCSV({});
 
   const downloadShapefileTemplateMutation = useDownloadShapefileTemplate();
 
@@ -123,60 +125,113 @@ export const FeatureUploadModal = ({
       const { file, name } = values;
 
       const data = new FormData();
+
       data.append('file', file);
       data.append('name', name);
 
-      uploadFeaturesShapefileMutation.mutate(
-        { data, id: `${pid}` },
-        {
-          onSuccess: () => {
-            setSuccessFile({ ...successFile });
-            onClose();
-            addToast(
-              'success-upload-feature-shapefile',
-              <>
-                <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Shapefile uploaded</p>
-              </>,
-              {
-                level: 'success',
+      if (uploadMode === 'shapefile') {
+        uploadFeaturesShapefileMutation.mutate(
+          { data, id: `${pid}` },
+          {
+            onSuccess: () => {
+              setSuccessFile({ ...successFile });
+              onClose();
+              addToast(
+                'success-upload-feature-shapefile',
+                <>
+                  <h2 className="font-medium">Success!</h2>
+                  <p className="text-sm">Shapefile uploaded</p>
+                </>,
+                {
+                  level: 'success',
+                }
+              );
+            },
+            onError: (error: AxiosError | Error) => {
+              let errors: { status: number; title: string }[] = [];
+
+              if (isAxiosError(error)) {
+                errors = [...error.response.data.errors];
+              } else {
+                // ? in case of unknown error (not request error), display generic error message
+                errors = [{ status: 500, title: 'Something went wrong' }];
               }
-            );
 
-            console.info('Feature shapefile uploaded');
-          },
-          onError: (error: AxiosError | Error) => {
-            let errors: { status: number; title: string }[] = [];
+              setSuccessFile(null);
 
-            if (isAxiosError(error)) {
-              errors = [...error.response.data.errors];
-            } else {
-              // ? in case of unknown error (not request error), display generic error message
-              errors = [{ status: 500, title: 'Something went wrong' }];
-            }
+              addToast(
+                'error-upload-feature-shapefile',
+                <>
+                  <h2 className="font-medium">Error</h2>
+                  <ul className="text-sm">
+                    {errors.map((e) => (
+                      <li key={`${e.status}`}>{e.title}</li>
+                    ))}
+                  </ul>
+                </>,
+                {
+                  level: 'error',
+                }
+              );
+            },
+            onSettled: () => {
+              setLoading(false);
+            },
+          }
+        );
+      }
 
-            setSuccessFile(null);
+      if (uploadMode === 'csv') {
+        uploadFeaturesCSVMutation.mutate(
+          { data, id: `${pid}` },
+          {
+            onSuccess: () => {
+              setSuccessFile({ ...successFile });
+              onClose();
+              addToast(
+                'success-upload-feature-csv',
+                <>
+                  <h2 className="font-medium">Success!</h2>
+                  <p className="text-sm">CSV uploaded</p>
+                </>,
+                {
+                  level: 'success',
+                }
+              );
+            },
+            onError: (error: AxiosError | Error) => {
+              let errors: { status: number; title: string }[] = [];
 
-            addToast(
-              'error-upload-feature-shapefile',
-              <>
-                <h2 className="font-medium">Error</h2>
-                <ul className="text-sm">
-                  {errors.map((e) => (
-                    <li key={`${e.status}`}>{e.title}</li>
-                  ))}
-                </ul>
-              </>,
-              {
-                level: 'error',
+              if (isAxiosError(error)) {
+                errors = [...error.response.data.errors];
+              } else {
+                // ? in case of unknown error (not request error), display generic error message
+                errors = [{ status: 500, title: 'Something went wrong' }];
               }
-            );
-          },
-          onSettled: () => {
-            setLoading(false);
-          },
-        }
-      );
+
+              setSuccessFile(null);
+
+              addToast(
+                'error-upload-feature-csv',
+                <>
+                  <h2 className="font-medium">Error</h2>
+                  <ul className="text-sm">
+                    {errors.map((e) => (
+                      <li key={`${e.status}`}>{e.title}</li>
+                    ))}
+                  </ul>
+                </>,
+                {
+                  level: 'error',
+                }
+              );
+            },
+            onSettled: () => {
+              setLoading(false);
+            },
+          }
+        );
+      }
     },
     [pid, addToast, onClose, uploadFeaturesShapefileMutation, successFile]
   );

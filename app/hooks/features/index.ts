@@ -609,6 +609,36 @@ export function useUploadFeaturesShapefile({
   });
 }
 
+export function useUploadFeaturesCSV({
+  requestConfig = {
+    method: 'POST',
+  },
+}: {
+  requestConfig?: AxiosRequestConfig<FormData>;
+}) {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const uploadFeatureCSV = ({ id, data }: { id: Project['id']; data: FormData }) => {
+    return UPLOADS.request<{ success: true }>({
+      url: `/projects/${id}/features/csv`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    } as typeof requestConfig);
+  };
+
+  return useMutation(uploadFeatureCSV, {
+    onSuccess: async (data, variables) => {
+      const { id: projectId } = variables;
+      await queryClient.invalidateQueries(['all-features', projectId]);
+    },
+  });
+}
+
 export function useEditFeature() {
   const { data: session } = useSession();
 
