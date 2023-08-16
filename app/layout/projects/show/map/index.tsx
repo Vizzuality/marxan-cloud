@@ -24,6 +24,7 @@ import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
 import Select from 'components/forms/select';
+import Icon from 'components/icon/component';
 import Loading from 'components/loading';
 import Map from 'components/map';
 import Controls from 'components/map/controls';
@@ -38,6 +39,8 @@ import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import HelpBeacon from 'layout/help/beacon';
 import { cn } from 'utils/cn';
+
+import PRINT_SVG from 'svgs/ui/print.svg?sprite';
 
 export const ProjectMap = (): JSX.Element => {
   const [open, setOpen] = useState(true);
@@ -59,7 +62,6 @@ export const ProjectMap = (): JSX.Element => {
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const { query } = useRouter();
-
   const { pid, tab } = query as { pid: string; tab: string };
   const { data } = useProject(pid);
 
@@ -313,6 +315,8 @@ export const ProjectMap = (): JSX.Element => {
     [dispatch, layerSettings]
   );
 
+  const onPrint = () => console.info('webshot');
+
   return (
     <AnimatePresence>
       {id && (
@@ -403,7 +407,15 @@ export const ProjectMap = (): JSX.Element => {
             />
             <LoadingControl loading={!mapTilesLoaded} />
           </Controls>
-
+          {/* Print */}
+          {!tab && sid1 && sid2 && (
+            <button
+              className="absolute bottom-32 right-5 flex h-14 w-14 items-center justify-center rounded-full bg-black"
+              onClick={onPrint}
+            >
+              <Icon icon={PRINT_SVG} className="h-5 w-5 text-white" />
+            </button>
+          )}
           {/* Legend */}
           <div className="absolute bottom-16 right-5 w-full max-w-xs">
             <Legend
