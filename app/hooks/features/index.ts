@@ -21,7 +21,6 @@ import { ItemProps as SelectedItemProps } from 'components/features/selected-ite
 import { Feature } from 'types/api/feature';
 import { Project } from 'types/api/project';
 
-import DOWNLOADS from 'services/downloads';
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
