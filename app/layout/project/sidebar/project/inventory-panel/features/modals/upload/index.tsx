@@ -8,7 +8,8 @@ import { useRouter } from 'next/router';
 import { AxiosError, isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 
-import { useDownloadFeatureTemplate, useUploadFeaturesShapefile } from 'hooks/features';
+import { useUploadFeaturesShapefile } from 'hooks/features';
+import { useDownloadShapefileTemplate } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -61,7 +62,7 @@ export const FeatureUploadModal = ({
     },
   });
 
-  const downloadFeatureTemplateMutation = useDownloadFeatureTemplate();
+  const downloadShapefileTemplateMutation = useDownloadShapefileTemplate();
 
   const UPLOADER_MAX_SIZE =
     uploadMode === 'shapefile'
@@ -188,7 +189,7 @@ export const FeatureUploadModal = ({
   });
 
   const onDownloadTemplate = useCallback(() => {
-    downloadFeatureTemplateMutation.mutate(
+    downloadShapefileTemplateMutation.mutate(
       { pid },
       {
         onSuccess: () => {},
@@ -206,7 +207,7 @@ export const FeatureUploadModal = ({
         },
       }
     );
-  }, [pid, downloadFeatureTemplateMutation, addToast]);
+  }, [pid, downloadShapefileTemplateMutation, addToast]);
 
   return (
     <Modal id="features-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
@@ -234,7 +235,7 @@ export const FeatureUploadModal = ({
                       className="text-primary-500 underline hover:no-underline"
                       onClick={onDownloadTemplate}
                     >
-                      CSV template
+                      shapefile template
                     </button>{' '}
                     before upload.
                   </p>
