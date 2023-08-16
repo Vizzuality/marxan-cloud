@@ -882,11 +882,7 @@ export class ProjectsService {
     dto: UploadShapefileDto,
   ): Promise<
     Either<
-      | GetScenarioFailure
-      | SubmitProtectedAreaError
-      | typeof forbiddenError
-      | typeof noLockInPlace
-      | typeof lockedByAnotherUser,
+      SubmitProtectedAreaError,
       true
     >
   > {

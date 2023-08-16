@@ -10,5 +10,5 @@ export class AddProtectedAreaOutput {
   projectId!: string;
 
   @IsUUID()
-  scenarioId!: string;
+  scenarioId?: string;
 }

@@ -25,7 +25,7 @@ export class ProtectedAreaProcessor
     if (isLeft(result)) {
       throw new Error(
         `Couldn't convert ${job.data.shapefile.path} for ${
-          job.data.scenarioId
+          job.data.projectId
         }: ${String(result.left)}`,
       );
     }
@@ -64,7 +64,6 @@ export class ProtectedAreaProcessor
       return plainToClass<JobOutput, JobOutput>(JobOutput, {
         protectedAreaId: entities.map((entity) => entity.id),
         projectId: job.data.projectId,
-        scenarioId: job.data.scenarioId,
       });
     });
   }
