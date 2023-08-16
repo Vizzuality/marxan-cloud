@@ -1443,7 +1443,7 @@ export class ProjectsController {
       throw mapAclDomainToHttpError(outcome.left, {
         projectId,
         userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
+        resourceType: projectResource.name.plural,
       });
     }
     return AsyncJobDto.forProject().asJsonApiMetadata();
