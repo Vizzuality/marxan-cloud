@@ -128,111 +128,70 @@ export const FeatureUploadModal = ({
       data.append('file', file);
       data.append('name', name);
 
-      if (uploadMode === 'shapefile') {
-        uploadFeaturesShapefileMutation.mutate(
-          { data, id: `${pid}` },
-          {
-            onSuccess: () => {
-              setSuccessFile({ ...successFile });
-              onClose();
-              addToast(
-                'success-upload-feature-shapefile',
-                <>
-                  <h2 className="font-medium">Success!</h2>
-                  <p className="text-sm">Shapefile uploaded</p>
-                </>,
-                {
-                  level: 'success',
-                }
-              );
-            },
-            onError: (error: AxiosError | Error) => {
-              let errors: { status: number; title: string }[] = [];
+      const mutationResponse = {
+        onSuccess: () => {
+          setSuccessFile({ ...successFile });
+          onClose();
+          addToast(
+            'success-upload-feature-file',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">File uploaded</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+        },
+        onError: (error: AxiosError | Error) => {
+          let errors: { status: number; title: string }[] = [];
 
-              if (isAxiosError(error)) {
-                errors = [...error.response.data.errors];
-              } else {
-                // ? in case of unknown error (not request error), display generic error message
-                errors = [{ status: 500, title: 'Something went wrong' }];
-              }
-
-              setSuccessFile(null);
-
-              addToast(
-                'error-upload-feature-shapefile',
-                <>
-                  <h2 className="font-medium">Error</h2>
-                  <ul className="text-sm">
-                    {errors.map((e) => (
-                      <li key={`${e.status}`}>{e.title}</li>
-                    ))}
-                  </ul>
-                </>,
-                {
-                  level: 'error',
-                }
-              );
-            },
-            onSettled: () => {
-              setLoading(false);
-            },
+          if (isAxiosError(error)) {
+            errors = [...error.response.data.errors];
+          } else {
+            // ? in case of unknown error (not request error), display generic error message
+            errors = [{ status: 500, title: 'Something went wrong' }];
           }
-        );
+
+          setSuccessFile(null);
+
+          addToast(
+            'error-upload-feature-csv',
+            <>
+              <h2 className="font-medium">Error</h2>
+              <ul className="text-sm">
+                {errors.map((e) => (
+                  <li key={`${e.status}`}>{e.title}</li>
+                ))}
+              </ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+        onSettled: () => {
+          setLoading(false);
+        },
+      };
+
+      if (uploadMode === 'shapefile') {
+        uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, mutationResponse);
       }
 
       if (uploadMode === 'csv') {
-        uploadFeaturesCSVMutation.mutate(
-          { data, id: `${pid}` },
-          {
-            onSuccess: () => {
-              setSuccessFile({ ...successFile });
-              onClose();
-              addToast(
-                'success-upload-feature-csv',
-                <>
-                  <h2 className="font-medium">Success!</h2>
-                  <p className="text-sm">CSV uploaded</p>
-                </>,
-                {
-                  level: 'success',
-                }
-              );
-            },
-            onError: (error: AxiosError | Error) => {
-              let errors: { status: number; title: string }[] = [];
-
-              if (isAxiosError(error)) {
-                errors = [...error.response.data.errors];
-              } else {
-                // ? in case of unknown error (not request error), display generic error message
-                errors = [{ status: 500, title: 'Something went wrong' }];
-              }
-
-              setSuccessFile(null);
-
-              addToast(
-                'error-upload-feature-csv',
-                <>
-                  <h2 className="font-medium">Error</h2>
-                  <ul className="text-sm">
-                    {errors.map((e) => (
-                      <li key={`${e.status}`}>{e.title}</li>
-                    ))}
-                  </ul>
-                </>,
-                {
-                  level: 'error',
-                }
-              );
-            },
-            onSettled: () => {
-              setLoading(false);
-            },
-          }
-        );
+        uploadFeaturesCSVMutation.mutate({ data, id: `${pid}` }, mutationResponse);
       }
     },
-    [pid, addToast, onClose, uploadFeaturesShapefileMutation, successFile]
+    [
+      pid,
+      addToast,
+      onClose,
+      uploadMode,
+      uploadFeaturesShapefileMutation,
+      uploadFeaturesCSVMutation,
+      successFile,
+    ]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
@@ -246,7 +205,6 @@ export const FeatureUploadModal = ({
     downloadShapefileTemplateMutation.mutate(
       { pid },
       {
-        onSuccess: () => {},
         onError: () => {
           addToast(
             'download-error',
