@@ -13,7 +13,8 @@ import { usePlausible } from 'next-plausible';
 
 import { useMe } from 'hooks/me';
 import { useCanEditScenario } from 'hooks/permissions';
-import { useDownloadCostSurface, useUploadCostSurface } from 'hooks/scenarios';
+import { useDownloadShapefileTemplate } from 'hooks/projects';
+import { useUploadCostSurface } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -48,7 +49,7 @@ export const GridSetupCostSurface = (): JSX.Element => {
 
   const { user } = useMe();
   const editable = useCanEditScenario(pid, sid);
-  const downloadMutation = useDownloadCostSurface();
+  const downloadShapefileTemplateMutation = useDownloadShapefileTemplate();
   const uploadMutation = useUploadCostSurface({
     requestConfig: {
       method: 'POST',
@@ -56,7 +57,7 @@ export const GridSetupCostSurface = (): JSX.Element => {
   });
 
   const onDownload = useCallback(() => {
-    downloadMutation.mutate(
+    downloadShapefileTemplateMutation.mutate(
       { pid },
       {
         onSuccess: () => {},
@@ -74,7 +75,7 @@ export const GridSetupCostSurface = (): JSX.Element => {
         },
       }
     );
-  }, [pid, downloadMutation, addToast]);
+  }, [pid, downloadShapefileTemplateMutation, addToast]);
 
   const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     setLoading(true);
