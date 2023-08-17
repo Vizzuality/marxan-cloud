@@ -1054,7 +1054,6 @@ export function useDownloadScenarioReport({
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });

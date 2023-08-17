@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import SCENARIOS from 'services/scenarios';
+import DOWNLOADS from 'services/downloads';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const baseUrl = req.headers.origin;
@@ -10,22 +10,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     sid2: string;
   };
 
-  console.log('sid1', sid1, 'sid2', sid2);
+  //!TODO: Call the API to get the PDF
 
-  await SCENARIOS.request({
-    method: 'GET',
-    url: `/${sid1}`,
+  const { data: pdf } = await DOWNLOADS.request<ArrayBuffer>({
+    method: 'POST',
+    // url: `/scenarios/${sid}/solutions/report`,
+    responseType: 'arraybuffer',
     headers: {
       ...(req?.headers?.authorization && { Authorization: req.headers.authorization }),
       'Content-Type': 'application/json',
       Cookie: req?.headers?.cookie,
     },
     data: {
-      config: {
-        baseUrl,
+      baseUrl,
+      pdfOptions: {
+        landscape: true,
       },
     },
   });
 
-  res.status(200).send({});
+  res.status(200).send(Buffer.from(pdf));
 }
