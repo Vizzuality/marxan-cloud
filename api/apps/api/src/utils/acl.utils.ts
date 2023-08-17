@@ -44,7 +44,7 @@ import {
   metadataNotFound,
   outputZipNotYetAvailable,
 } from '@marxan-api/modules/scenarios/output-files/output-files.service';
-import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
+import { submissionFailed } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
 import { invalidProtectedAreaId } from '@marxan-api/modules/scenarios/protected-area/selection/selection-update.service';
 import {
   bestSolutionNotFound,

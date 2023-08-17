@@ -8,7 +8,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 
 import { projectProtectedAreaQueueToken } from './queue.providers';
-import {JobInput} from "@marxan/protected-areas/add-protected-area-to-project-input";
+import { JobInput } from '@marxan/protected-areas/add-protected-area-to-project-input';
 
 export const submissionFailed = Symbol(
   `System could not submit the async job.`,
@@ -55,6 +55,4 @@ export class AddProtectedAreaService {
 
     return right(true);
   }
-
-
 }

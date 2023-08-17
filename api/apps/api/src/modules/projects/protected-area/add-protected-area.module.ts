@@ -12,15 +12,8 @@ import {
 import { AddProtectedAreaHandler } from './add-protected-area.handler';
 import { AddProtectedAreaService } from './add-protected-area.service';
 
-
-
-
 @Module({
-  imports: [
-    QueueApiEventsModule,
-    ApiEventsModule,
-    CqrsModule,
-  ],
+  imports: [QueueApiEventsModule, ApiEventsModule, CqrsModule],
   providers: [
     AddProtectedAreaHandler,
     AddProtectedAreaService,

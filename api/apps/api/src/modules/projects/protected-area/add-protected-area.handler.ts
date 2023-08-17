@@ -11,13 +11,10 @@ import {
 } from '@marxan-api/modules/queue-api-events';
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
 
-import {
-  JobInput,
-  JobOutput,
-} from '@marxan/protected-areas';
+import { JobInput, JobOutput } from '@marxan/protected-areas';
 
 import { projectProtectedAreaEventsFactoryToken } from './queue.providers';
-import {ProtectedAreaForProjectCreatedEvent} from "@marxan/protected-areas/protected-area-created.event";
+import { ProtectedAreaForProjectCreatedEvent } from '@marxan/protected-areas/protected-area-created.event';
 
 @Injectable()
 export class AddProtectedAreaHandler
