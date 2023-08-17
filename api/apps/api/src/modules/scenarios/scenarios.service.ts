@@ -1219,6 +1219,8 @@ export class ScenariosService {
     return right(true);
   }
 
+
+  // get a list of protected areas in use /selected in a scenario
   async getProtectedAreasFor(
     scenarioId: string,
     info: AppInfoDTO,
@@ -1257,6 +1259,7 @@ export class ScenariosService {
     return right(areas);
   }
 
+  // select protected areas and set them in use for a scenario
   async updateProtectedAreasFor(
     scenarioId: string,
     dto: ProtectedAreasChangeDto,
