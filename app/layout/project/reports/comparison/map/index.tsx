@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setMaps } from 'store/slices/reports/frequency';
+import { setMaps } from 'store/slices/reports/comparison';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -15,7 +15,7 @@ import { useScenarios } from 'hooks/scenarios';
 
 import Map from 'components/map';
 
-export const ScreenshotBLMMap = ({ id }: { id: string }): JSX.Element => {
+export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element => {
   const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
@@ -157,4 +157,4 @@ export const ScreenshotBLMMap = ({ id }: { id: string }): JSX.Element => {
   );
 };
 
-export default ScreenshotBLMMap;
+export default ScreenshotComparisionMap;
