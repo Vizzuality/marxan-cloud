@@ -834,11 +834,11 @@ export function useDownloadScenarioComparisonReport({
 }) {
   const { data: session } = useSession();
 
-  const downloadScenarioReport = ({ sid1, sid2 }) => {
+  const downloadScenarioComparisonReport = ({ sid1, sid2 }) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
     return axios.request({
-      url: `${baseUrl}/api/reports/project/${projectId}/comparison/${sid1}${sid2}`,
+      url: `${baseUrl}/api/reports/project/${projectId}/comparison?scenario1Id=${sid1}scenario2Id=${sid2}`,
       responseType: 'arraybuffer',
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
@@ -848,7 +848,7 @@ export function useDownloadScenarioComparisonReport({
     });
   };
 
-  return useMutation(downloadScenarioReport, {
+  return useMutation(downloadScenarioComparisonReport, {
     onSuccess: (data: any) => {
       const { data: blob } = data;
       const url = window.URL.createObjectURL(new Blob([blob]));
