@@ -51,7 +51,6 @@ import {
   ChangeProtectedAreasError,
   ProtectedAreaService,
   ScenarioProtectedArea,
-  submissionFailed,
 } from './protected-area';
 import { ProtectedAreasChangeDto } from './dto/protected-area-change.dto';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
@@ -122,6 +121,7 @@ import {
 import { LegacyProjectImportChecker } from '../legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.service';
 import { lastValueFrom } from 'rxjs';
 import { AdjustPlanningUnitsInput } from '@marxan-api/modules/analysis/entry-points/adjust-planning-units-input';
+import {submissionFailed} from "@marxan-api/modules/projects/protected-area/add-protected-area.service";
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
