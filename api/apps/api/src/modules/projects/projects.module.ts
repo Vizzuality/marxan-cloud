@@ -47,6 +47,7 @@ import { ProjectsProxyController } from '@marxan-api/modules/projects/projects-p
 import { WebshotModule } from '@marxan/webshot';
 import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.module';
 import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.module';
+import { AddProtectedAreaModule } from '@marxan-api/modules/projects/protected-area/add-protected-area.module';
 import { ProjectProtectedAreasController } from './project-protected-areas.controller';
 import { ProjectProtectedAreasService } from './project-protected-areas.service';
 import { ProjectAclModule } from '../access-control/projects-acl/project-acl.module';

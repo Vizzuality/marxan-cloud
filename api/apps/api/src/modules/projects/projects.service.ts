@@ -894,7 +894,7 @@ export class ProjectsService {
     const project = await this.assertProject(projectId, info.authenticatedUser);
     if (isLeft(project)) return left(projectNotFound);
 
-    assertDefined(info.authenticatedUser)
+    assertDefined(info.authenticatedUser);
 
     if (
       !(await this.projectAclService.canEditProject(
