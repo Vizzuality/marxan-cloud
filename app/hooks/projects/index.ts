@@ -830,6 +830,7 @@ export function useDownloadScenarioComparisonReport({
   requestConfig = {
     method: 'POST',
   },
+  projectId,
 }) {
   const { data: session } = useSession();
 
@@ -837,7 +838,7 @@ export function useDownloadScenarioComparisonReport({
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
     return axios.request({
-      url: `${baseUrl}/api/reports/project/comparison/${sid1}${sid2}`,
+      url: `${baseUrl}/api/reports/project/${projectId}/comparison/${sid1}${sid2}`,
       responseType: 'arraybuffer',
       headers: {
         Authorization: `Bearer ${session.accessToken}`,

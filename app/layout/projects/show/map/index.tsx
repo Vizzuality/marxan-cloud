@@ -320,7 +320,9 @@ export const ProjectMap = (): JSX.Element => {
     [dispatch, layerSettings]
   );
 
-  const downloadScenarioComparisonReportMutation = useDownloadScenarioComparisonReport({});
+  const downloadScenarioComparisonReportMutation = useDownloadScenarioComparisonReport({
+    projectId: pid,
+  });
 
   const onDownloadReport = useCallback(() => {
     setPDFLoader(true);
