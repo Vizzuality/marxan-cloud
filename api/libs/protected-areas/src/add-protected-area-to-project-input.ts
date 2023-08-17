@@ -11,7 +11,6 @@ export class Shapefile {
 }
 
 export class JobInput {
-
   @IsUUID()
   projectId!: string;
 

@@ -16,10 +16,7 @@ import {
 } from './selection/selection-update.service';
 import { SelectionGetService } from './getter/selection-get.service';
 import { ScenarioProtectedArea } from '@marxan-api/modules/scenarios/protected-area/scenario-protected-area';
-
-export const submissionFailed = Symbol(
-  `System could not submit the async job.`,
-);
+import { submissionFailed } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
 
 @Injectable()
 export class ProtectedAreaService {

@@ -1219,7 +1219,6 @@ export class ScenariosService {
     return right(true);
   }
 
-
   // get a list of protected areas in use /selected in a scenario
   async getProtectedAreasFor(
     scenarioId: string,
