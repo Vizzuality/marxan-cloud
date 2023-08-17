@@ -1404,6 +1404,7 @@ export class ProjectsController {
     };
   }
 
+  @ImplementsAcl()
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description: 'Upload shapefile with protected areas for project',

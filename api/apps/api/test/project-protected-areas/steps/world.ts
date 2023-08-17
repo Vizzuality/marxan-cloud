@@ -3,14 +3,14 @@ import { INestApplication } from '@nestjs/common';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../../steps/given-project';
 
-import { SubmitsProjectsPaShapefile } from './submits-projects-pa-shapefile';
+import {SubmitsProjectsPaShapefile, SubmitsScenariosPaShapefile} from './submits-projects-pa-shapefile';
 import { FakeQueue } from '../../utils/queues';
 
 import { addProtectedAreaQueueName } from '@marxan/protected-areas';
 import { GivenScenarioExists } from '../../steps/given-scenario-exists';
 
 export const createWorld = async (app: INestApplication) => {
-  const jwtToken = await GivenUserIsLoggedIn(app);
+  const jwtToken = await GivenUserIsLoggedIn(app, 'aa');
   const queue = FakeQueue.getByName(addProtectedAreaQueueName);
   const { projectId, organizationId } = await GivenProjectExists(
     app,
@@ -30,8 +30,10 @@ export const createWorld = async (app: INestApplication) => {
     scenarioId: scenario.id,
     projectId,
     organizationId,
-    WhenSubmittingShapefileFor: (scenarioId: string) =>
-      SubmitsProjectsPaShapefile(app, jwtToken, scenarioId, shapeFilePath),
+    WhenSubmittingProtectedAreaShapefileForScenario: (scenarioId: string) =>
+      SubmitsScenariosPaShapefile(app, jwtToken, scenarioId, shapeFilePath),
     GetSubmittedJobs: () => Object.values(queue.jobs),
+      WhenSubmittingProtectedAreaShapefileForProject: (projectId: string) =>
+          SubmitsProjectsPaShapefile(app, jwtToken, projectId, shapeFilePath),
   };
 };
