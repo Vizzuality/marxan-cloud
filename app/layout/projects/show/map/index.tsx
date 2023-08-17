@@ -336,7 +336,7 @@ export const ProjectMap = (): JSX.Element => {
     );
 
     downloadScenarioComparisonReportMutation.mutate(
-      { sid1: `${sid1}`, sid2: `${sid2}` },
+      { sid1, sid2 },
       {
         onSuccess: () => {
           setPDFLoader(false);
@@ -368,7 +368,7 @@ export const ProjectMap = (): JSX.Element => {
         },
       }
     );
-  }, [sid, addToast]);
+  }, [pid, sid1, sid2, projectName, downloadScenarioComparisonReportMutation, addToast]);
 
   return (
     <AnimatePresence>
