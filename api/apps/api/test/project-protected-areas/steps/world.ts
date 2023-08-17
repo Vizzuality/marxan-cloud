@@ -3,7 +3,10 @@ import { INestApplication } from '@nestjs/common';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../../steps/given-project';
 
-import {SubmitsProjectsPaShapefile, SubmitsScenariosPaShapefile} from './submits-projects-pa-shapefile';
+import {
+  SubmitsProjectsPaShapefile,
+  SubmitsScenariosPaShapefile,
+} from './submits-projects-pa-shapefile';
 import { FakeQueue } from '../../utils/queues';
 
 import { addProtectedAreaQueueName } from '@marxan/protected-areas';
@@ -33,7 +36,7 @@ export const createWorld = async (app: INestApplication) => {
     WhenSubmittingProtectedAreaShapefileForScenario: (scenarioId: string) =>
       SubmitsScenariosPaShapefile(app, jwtToken, scenarioId, shapeFilePath),
     GetSubmittedJobs: () => Object.values(queue.jobs),
-      WhenSubmittingProtectedAreaShapefileForProject: (projectId: string) =>
-          SubmitsProjectsPaShapefile(app, jwtToken, projectId, shapeFilePath),
+    WhenSubmittingProtectedAreaShapefileForProject: (projectId: string) =>
+      SubmitsProjectsPaShapefile(app, jwtToken, projectId, shapeFilePath),
   };
 };

@@ -15,14 +15,18 @@ describe('Project protected areas - Upload shapefile for scenario (e2e)', () => 
 
   describe(`when scenario is not available`, () => {
     it(`should fail`, async () => {
-      const result = await world.WhenSubmittingProtectedAreaShapefileForScenario(v4());
+      const result = await world.WhenSubmittingProtectedAreaShapefileForScenario(
+        v4(),
+      );
       expect(result.status).toEqual(404);
     });
   });
 
   describe(`when project is available`, () => {
     it(`submits shapefile to the system`, async () => {
-      const result = await world.WhenSubmittingProtectedAreaShapefileForScenario(world.scenarioId);
+      const result = await world.WhenSubmittingProtectedAreaShapefileForScenario(
+        world.scenarioId,
+      );
 
       expect(result.status).toEqual(201);
       expect(result.body.meta.started).toBeTruthy();
