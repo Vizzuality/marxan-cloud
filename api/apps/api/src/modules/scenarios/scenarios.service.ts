@@ -121,7 +121,7 @@ import {
 import { LegacyProjectImportChecker } from '../legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.service';
 import { lastValueFrom } from 'rxjs';
 import { AdjustPlanningUnitsInput } from '@marxan-api/modules/analysis/entry-points/adjust-planning-units-input';
-import {submissionFailed} from "@marxan-api/modules/projects/protected-area/add-protected-area.service";
+import { submissionFailed } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
