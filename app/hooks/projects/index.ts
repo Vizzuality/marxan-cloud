@@ -792,6 +792,7 @@ export function useProjectTags(pid: Project['id']) {
   });
 }
 
+<<<<<<< HEAD
 export function useDownloadShapefileTemplate() {
   const { data: session } = useSession();
 
@@ -818,6 +819,44 @@ export function useDownloadShapefileTemplate() {
       link.click();
       link.remove();
       console.info('Success', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDownloadScenarioComparisonReport({
+  requestConfig = {
+    method: 'POST',
+  },
+}) {
+  const { data: session } = useSession();
+
+  const downloadScenarioReport = ({ sid1, sid2 }) => {
+    const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
+
+    return axios.request({
+      url: `${baseUrl}/api/reports/project/comparison/${sid1}${sid2}`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(downloadScenarioReport, {
+    onSuccess: (data: any) => {
+      const { data: blob } = data;
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `scenario-comparison.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);

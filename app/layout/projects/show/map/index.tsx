@@ -20,8 +20,9 @@ import {
   useBBOX,
   useFeaturePreviewLayers,
 } from 'hooks/map';
-import { useProject } from 'hooks/projects';
+import { useDownloadScenarioComparisonReport, useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
 import Select from 'components/forms/select';
 import Icon from 'components/icon/component';
@@ -60,14 +61,18 @@ export const ProjectMap = (): JSX.Element => {
   const [bounds, setBounds] = useState(null);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+  const [PDFLoader, setPDFLoader] = useState<boolean>(false);
 
   const { query } = useRouter();
   const { pid, tab } = query as { pid: string; tab: string };
   const { data } = useProject(pid);
 
+  const { addToast } = useToasts();
+
   const {
     id,
     bbox,
+    name: projectName,
     // countryId,
     // adminAreaLevel1Id,
     // adminAreaLevel2Id,
@@ -315,7 +320,55 @@ export const ProjectMap = (): JSX.Element => {
     [dispatch, layerSettings]
   );
 
-  const onPrint = () => console.info('webshot');
+  const downloadScenarioComparisonReportMutation = useDownloadScenarioComparisonReport({});
+
+  const onDownloadReport = useCallback(() => {
+    setPDFLoader(true);
+    addToast(
+      `info-generating-report-${pid}`,
+      <>
+        <h2 className="font-medium">Info</h2>
+        <p className="text-sm">{`Generating "${projectName}" scenario comparison PDF report`}</p>
+      </>,
+      {
+        level: 'info',
+      }
+    );
+
+    downloadScenarioComparisonReportMutation.mutate(
+      { sid1: `${sid1}`, sid2: `${sid2}` },
+      {
+        onSuccess: () => {
+          setPDFLoader(false);
+
+          addToast(
+            `success-generating-report-${pid}`,
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">{`"${projectName}" scenario comparison PDF report generated`}</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+        },
+        onError: () => {
+          setPDFLoader(false);
+
+          addToast(
+            `error-generating-report-${pid}`,
+            <>
+              <h2 className="font-medium">Error</h2>
+              <p className="text-sm">{`"${projectName}" scenario comparison PDF report not generated`}</p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
+  }, [sid, addToast]);
 
   return (
     <AnimatePresence>
@@ -411,7 +464,7 @@ export const ProjectMap = (): JSX.Element => {
           {!tab && sid1 && sid2 && (
             <button
               className="absolute bottom-32 right-5 flex h-14 w-14 items-center justify-center rounded-full bg-black"
-              onClick={onPrint}
+              onClick={onDownloadReport}
             >
               <Icon icon={PRINT_SVG} className="h-5 w-5 text-white" />
             </button>
