@@ -145,12 +145,6 @@ const eventToJobStatusMapping: Record<
     ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__featuresWithPuIntersection__finished__v1__alpha1]:
     ApiEventJobStatus.done,
-  [API_EVENT_KINDS.scenario__protectedAreas__submitted__v1__alpha]:
-    ApiEventJobStatus.running,
-  [API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha]:
-    ApiEventJobStatus.failure,
-  [API_EVENT_KINDS.scenario__protectedAreas__finished__v1__alpha]:
-    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1]:
     ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1]:
