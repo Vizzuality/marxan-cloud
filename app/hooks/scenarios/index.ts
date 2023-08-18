@@ -1016,7 +1016,7 @@ export function useSaveScenarioCalibrationRange({
 
 export function useDownloadScenarioReport({
   requestConfig = {
-    method: 'POST',
+    method: 'GET',
   },
   projectName,
   scenarioName,

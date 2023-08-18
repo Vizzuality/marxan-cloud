@@ -841,8 +841,6 @@ export function useDownloadScenarioComparisonReport({
   const downloadScenarioComparisonReport = ({ sid1, sid2 }: { sid1: string; sid2: string }) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
-    console.log({ baseUrl, sid1, sid2 });
-
     return axios.request({
       url: `${baseUrl}/api/reports/project/${projectId}/comparison?sid1=${sid1}&sid2=${sid2}`,
       responseType: 'arraybuffer',
@@ -866,7 +864,7 @@ export function useDownloadScenarioComparisonReport({
       link.remove();
     },
     onError: (error, variables, context) => {
-      console.info('Error', error, variables, context);
+      console.info('Error ----------->', error, variables, context);
     },
   });
 }
