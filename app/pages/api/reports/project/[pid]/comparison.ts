@@ -10,11 +10,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     sid2: string;
   };
 
-  //!TODO: Call the API to get the PDF
-
   const { data: pdf } = await DOWNLOADS.request<ArrayBuffer>({
-    method: 'POST',
-    // url: `/scenarios/${sid}/solutions/report`,
+    method: 'GET',
+    url: `/projects/comparison-map/${sid1}/compare/${sid2}`,
     responseType: 'arraybuffer',
     headers: {
       ...(req?.headers?.authorization && { Authorization: req.headers.authorization }),
