@@ -12,9 +12,6 @@ export class Shapefile {
 
 export class JobInput {
   @IsUUID()
-  scenarioId!: string;
-
-  @IsUUID()
   projectId!: string;
 
   @ValidateNested()

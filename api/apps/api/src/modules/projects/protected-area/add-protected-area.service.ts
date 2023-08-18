@@ -2,13 +2,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { Either, left, right } from 'fp-ts/Either';
 
-import { JobOutput } from '@marxan/protected-areas';
+import { JobInput, JobOutput } from '@marxan/protected-areas';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 
 import { projectProtectedAreaQueueToken } from './queue.providers';
-import { JobInput } from '@marxan/protected-areas/add-protected-area-to-project-input';
 
 export const submissionFailed = Symbol(
   `System could not submit the async job.`,

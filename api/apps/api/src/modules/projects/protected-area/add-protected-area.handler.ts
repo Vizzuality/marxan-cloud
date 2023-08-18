@@ -35,6 +35,7 @@ export class AddProtectedAreaHandler
   async createCompletedEvent(
     eventData: EventData<JobInput>,
   ): Promise<CreateApiEventDTO> {
+    console.log('test test test', eventData);
     const data = await eventData.data;
     const kind = API_EVENT_KINDS.project__protectedAreas__finished__v1__alpha;
     return {
