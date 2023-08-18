@@ -3,13 +3,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
-
-import {
-  scenarioProtectedAreaEventsFactoryProvider,
-  scenarioProtectedAreaQueueEventsProvider,
-  scenarioProtectedAreaQueueProvider,
-} from './queue.providers';
-import { AddProtectedAreaHandler } from './add-protected-area.handler';
 import { ProtectedAreaService } from './protected-area.service';
 
 import { SelectionChangeModule } from './selection/selection-change.module';
@@ -25,13 +18,7 @@ import { CleanupModule } from './cleanup';
     SelectionGetterModule,
     CleanupModule,
   ],
-  providers: [
-    AddProtectedAreaHandler,
-    ProtectedAreaService,
-    scenarioProtectedAreaQueueProvider,
-    scenarioProtectedAreaQueueEventsProvider,
-    scenarioProtectedAreaEventsFactoryProvider,
-  ],
+  providers: [ProtectedAreaService],
   exports: [ProtectedAreaService],
 })
 export class ProtectedAreaModule {}

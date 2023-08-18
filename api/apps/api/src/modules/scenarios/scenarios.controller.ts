@@ -1120,38 +1120,6 @@ export class ScenariosController {
     return await this.getProtectedAreasForScenario(scenarioId, req);
   }
 
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @ApiOperation({
-    description:
-      'Upload shapefile for with protected areas for project&scenario',
-  })
-  @GeometryFileInterceptor(GeometryKind.Complex)
-  @ApiTags(asyncJobTag)
-  @Post(':id/protected-areas/shapefile')
-  async shapefileForProtectedArea(
-    @Param('id') scenarioId: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: RequestWithAuthenticatedUser,
-    @Body() dto: UploadShapefileDto,
-  ): Promise<JsonApiAsyncJobMeta> {
-    await ensureShapefileHasRequiredFiles(file);
-
-    const outcome = await this.service.addProtectedAreaFor(
-      scenarioId,
-      file,
-      { authenticatedUser: req.user },
-      dto,
-    );
-    if (isLeft(outcome)) {
-      throw mapAclDomainToHttpError(outcome.left, {
-        scenarioId,
-        userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
-      });
-    }
-    return AsyncJobDto.forScenario().asJsonApiMetadata();
-  }
-
   @ApiOperation({
     description: `Start BLM calibration process for a scenario.`,
     summary: `Start BLM calibration process for a scenario.`,
