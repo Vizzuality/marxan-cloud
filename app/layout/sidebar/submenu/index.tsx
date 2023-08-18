@@ -11,6 +11,7 @@ export interface SubMenuItem {
   icon: IconProps['icon'];
   route: string;
   selected: boolean;
+  disabled?: boolean;
 }
 
 export const SubMenu = ({ items }: { items: SubMenuItem[] }): JSX.Element => {
