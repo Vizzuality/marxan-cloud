@@ -4,6 +4,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-q
 
 import { useRouter } from 'next/router';
 
+import { AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import { formatDistance } from 'date-fns';
 import flatten from 'lodash/flatten';
@@ -828,13 +829,16 @@ export function useDownloadShapefileTemplate() {
 
 export function useDownloadScenarioComparisonReport({
   requestConfig = {
-    method: 'GET',
+    method: 'POST',
   },
   projectId,
+}: {
+  requestConfig?: AxiosRequestConfig;
+  projectId: string;
 }) {
   const { data: session } = useSession();
 
-  const downloadScenarioComparisonReport = ({ sid1, sid2 }) => {
+  const downloadScenarioComparisonReport = ({ sid1, sid2 }: { sid1: string; sid2: string }) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
     return axios.request({

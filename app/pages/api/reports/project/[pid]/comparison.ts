@@ -13,6 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { data: pdf } = await DOWNLOADS.request<ArrayBuffer>({
     method: 'GET',
     url: `/projects/comparison-map/${sid1}/compare/${sid2}`,
+
     responseType: 'arraybuffer',
     headers: {
       ...(req?.headers?.authorization && { Authorization: req.headers.authorization }),
