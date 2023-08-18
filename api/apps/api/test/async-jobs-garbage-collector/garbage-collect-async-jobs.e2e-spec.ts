@@ -95,6 +95,7 @@ const getFixtures = async () => {
     API_EVENT_KINDS.project__clone__submitted__v1__alpha,
     API_EVENT_KINDS.project__export__submitted__v1__alpha,
     API_EVENT_KINDS.project__import__submitted__v1__alpha,
+    API_EVENT_KINDS.project__protectedAreas__submitted__v1__alpha,
   ];
 
   const scenarioSubmittedApiEvents = [
@@ -103,7 +104,6 @@ const getFixtures = async () => {
     API_EVENT_KINDS.scenario__featuresWithPuIntersection__submitted__v1__alpha1,
     API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__submitted__v1__alpha1,
     API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1,
-    API_EVENT_KINDS.scenario__protectedAreas__submitted__v1__alpha,
     API_EVENT_KINDS.scenario__run__submitted__v1__alpha1,
     API_EVENT_KINDS.scenario__clone__submitted__v1__alpha,
     API_EVENT_KINDS.scenario__export__submitted__v1__alpha,
@@ -117,6 +117,7 @@ const getFixtures = async () => {
     API_EVENT_KINDS.project__clone__failed__v1__alpha,
     API_EVENT_KINDS.project__export__failed__v1__alpha,
     API_EVENT_KINDS.project__import__failed__v1__alpha,
+    API_EVENT_KINDS.project__protectedAreas__failed__v1__alpha,
   ];
 
   const scenarioFailedApiEvents = [
@@ -125,7 +126,6 @@ const getFixtures = async () => {
     API_EVENT_KINDS.scenario__featuresWithPuIntersection__failed__v1__alpha1,
     API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__failed__v1__alpha1,
     API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1,
-    API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha,
     API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
     API_EVENT_KINDS.scenario__clone__failed__v1__alpha,
     API_EVENT_KINDS.scenario__export__failed__v1__alpha,
