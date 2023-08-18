@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
 
+import { useScenario } from 'hooks/scenarios';
+
 import BLM_CALIBRATION_SVG from 'svgs/navigation/blm-calibration.svg?sprite';
 import COST_SURFACE_SVG from 'svgs/navigation/cost-surface.svg?sprite';
 import FEATURES_SVG from 'svgs/navigation/features.svg?sprite';
@@ -85,6 +87,7 @@ export const useSolutionItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
   const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
+  const scenarioQuery = useScenario(sid);
 
   return [
     {
@@ -92,12 +95,14 @@ export const useSolutionItems = (): SubMenuItem[] => {
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-solutions']}`,
       icon: OVERVIEW_SVG,
       selected: isScenarioRoute && tab === TABS['scenario-solutions'],
+      disabled: !scenarioQuery.data?.ranAtLeastOnce,
     },
     {
       name: 'Target Achievement',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-target-achievement']}`,
       icon: TARGET_SVG,
       selected: isScenarioRoute && tab === TABS['scenario-target-achievement'],
+      disabled: !scenarioQuery.data?.ranAtLeastOnce,
     },
   ];
 };
