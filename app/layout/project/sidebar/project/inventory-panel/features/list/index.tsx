@@ -164,6 +164,7 @@ export const ProjectFeatureList = (): JSX.Element => {
             />
           </div>
         )}
+
         {!allFeaturesQuery.data?.length && allFeaturesQuery.isFetching === false && (
           <div className="flex h-[200px] items-center justify-center">No features found.</div>
         )}

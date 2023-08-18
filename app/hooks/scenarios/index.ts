@@ -656,40 +656,6 @@ export function useCostSurfaceRange(id) {
   }, [query, data]);
 }
 
-export function useDownloadCostSurface() {
-  const { data: session } = useSession();
-
-  const downloadScenarioCostSurface = ({ pid }: { pid: Project['id'] }) => {
-    return DOWNLOADS.get<ArrayBuffer>(`/projects/${pid}/project-grid/shapefile-template`, {
-      responseType: 'arraybuffer',
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'application/zip',
-      },
-    });
-  };
-
-  return useMutation(downloadScenarioCostSurface, {
-    onSuccess: (data, variables, context) => {
-      const { data: blob } = data;
-      const { pid } = variables;
-
-      const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `cost-surface-${pid}.zip`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
-    },
-  });
-}
-
 export function useUploadCostSurface({
   requestConfig = {
     method: 'GET',

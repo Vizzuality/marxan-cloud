@@ -8,7 +8,8 @@ import { useRouter } from 'next/router';
 import { AxiosError, isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 
-import { useUploadFeaturesShapefile } from 'hooks/features';
+import { useUploadFeaturesCSV, useUploadFeaturesShapefile } from 'hooks/features';
+import { useDownloadShapefileTemplate } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -20,7 +21,11 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
-import { FEATURES_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import UploadTabs from 'components/upload-tabs';
+import {
+  FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE,
+  FEATURES_UPLOADER_CSV_MAX_SIZE,
+} from 'constants/file-uploader-size-limits';
 import UploadFeaturesInfoButtonContent from 'constants/info-button-content/upload-features';
 import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
@@ -43,6 +48,7 @@ export const FeatureUploadModal = ({
 
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState<{ name: FormValues['name'] }>(null);
+  const [uploadMode, saveUploadMode] = useState<'shapefile' | 'csv'>('shapefile');
 
   const { query } = useRouter();
   const { pid } = query as { pid: string };
@@ -54,6 +60,15 @@ export const FeatureUploadModal = ({
       method: 'POST',
     },
   });
+
+  const uploadFeaturesCSVMutation = useUploadFeaturesCSV({});
+
+  const downloadShapefileTemplateMutation = useDownloadShapefileTemplate();
+
+  const UPLOADER_MAX_SIZE =
+    uploadMode === 'shapefile'
+      ? FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE
+      : FEATURES_UPLOADER_CSV_MAX_SIZE;
 
   useEffect(() => {
     return () => {
@@ -82,7 +97,7 @@ export const FeatureUploadModal = ({
       return error.code === 'file-too-large'
         ? {
             ...error,
-            message: `File is larger than ${bytesToMegabytes(FEATURES_UPLOADER_MAX_SIZE)} MB`,
+            message: `File is larger than ${bytesToMegabytes(UPLOADER_MAX_SIZE)} MB`,
           }
         : error;
     });
@@ -109,70 +124,102 @@ export const FeatureUploadModal = ({
       const { file, name } = values;
 
       const data = new FormData();
+
       data.append('file', file);
       data.append('name', name);
 
-      uploadFeaturesShapefileMutation.mutate(
-        { data, id: `${pid}` },
-        {
-          onSuccess: () => {
-            setSuccessFile({ ...successFile });
-            onClose();
-            addToast(
-              'success-upload-feature-shapefile',
-              <>
-                <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Shapefile uploaded</p>
-              </>,
-              {
-                level: 'success',
-              }
-            );
-
-            console.info('Feature shapefile uploaded');
-          },
-          onError: (error: AxiosError | Error) => {
-            let errors: { status: number; title: string }[] = [];
-
-            if (isAxiosError(error)) {
-              errors = [...error.response.data.errors];
-            } else {
-              // ? in case of unknown error (not request error), display generic error message
-              errors = [{ status: 500, title: 'Something went wrong' }];
+      const mutationResponse = {
+        onSuccess: () => {
+          setSuccessFile({ ...successFile });
+          onClose();
+          addToast(
+            'success-upload-feature-file',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">File uploaded</p>
+            </>,
+            {
+              level: 'success',
             }
+          );
+        },
+        onError: (error: AxiosError | Error) => {
+          let errors: { status: number; title: string }[] = [];
 
-            setSuccessFile(null);
+          if (isAxiosError(error)) {
+            errors = [...error.response.data.errors];
+          } else {
+            // ? in case of unknown error (not request error), display generic error message
+            errors = [{ status: 500, title: 'Something went wrong' }];
+          }
 
-            addToast(
-              'error-upload-feature-shapefile',
-              <>
-                <h2 className="font-medium">Error</h2>
-                <ul className="text-sm">
-                  {errors.map((e) => (
-                    <li key={`${e.status}`}>{e.title}</li>
-                  ))}
-                </ul>
-              </>,
-              {
-                level: 'error',
-              }
-            );
-          },
-          onSettled: () => {
-            setLoading(false);
-          },
-        }
-      );
+          setSuccessFile(null);
+
+          addToast(
+            'error-upload-feature-csv',
+            <>
+              <h2 className="font-medium">Error</h2>
+              <ul className="text-sm">
+                {errors.map((e) => (
+                  <li key={`${e.status}`}>{e.title}</li>
+                ))}
+              </ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+        onSettled: () => {
+          setLoading(false);
+        },
+      };
+
+      if (uploadMode === 'shapefile') {
+        uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, mutationResponse);
+      }
+
+      if (uploadMode === 'csv') {
+        uploadFeaturesCSVMutation.mutate({ data, id: `${pid}` }, mutationResponse);
+      }
     },
-    [pid, addToast, onClose, uploadFeaturesShapefileMutation, successFile]
+    [
+      pid,
+      addToast,
+      onClose,
+      uploadMode,
+      uploadFeaturesShapefileMutation,
+      uploadFeaturesCSVMutation,
+      successFile,
+    ]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
-    maxSize: FEATURES_UPLOADER_MAX_SIZE,
+    maxSize: UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
+
+  const onDownloadTemplate = useCallback(() => {
+    downloadShapefileTemplateMutation.mutate(
+      { pid },
+      {
+        onError: () => {
+          addToast(
+            'download-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">Template not downloaded</ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
+  }, [pid, downloadShapefileTemplateMutation, addToast]);
 
   return (
     <Modal id="features-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
@@ -186,24 +233,40 @@ export const FeatureUploadModal = ({
             <form onSubmit={handleSubmit}>
               <div className="space-y-5 p-9">
                 <div className="mb-5 flex items-center space-x-3">
-                  <h4 className="font-heading text-lg text-black">Upload shapefile</h4>
+                  <h4 className="font-heading text-lg text-black">Upload feature</h4>
                   <InfoButton size="base" theme="primary">
                     <UploadFeaturesInfoButtonContent />
                   </InfoButton>
                 </div>
 
-                <div>
-                  <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
-                    {(fprops) => (
-                      <Field id="form-name" {...fprops}>
-                        <Label theme="light" className="mb-3 uppercase">
-                          Name
-                        </Label>
-                        <Input theme="light" />
-                      </Field>
-                    )}
-                  </FieldRFF>
-                </div>
+                <UploadTabs mode={uploadMode} onChange={(mode) => saveUploadMode(mode)} />
+                {uploadMode === 'csv' && (
+                  <p className="!mt-4 text-sm text-gray-400">
+                    Please download and fill in the{' '}
+                    <button
+                      className="text-primary-500 underline hover:no-underline"
+                      onClick={onDownloadTemplate}
+                    >
+                      shapefile template
+                    </button>{' '}
+                    before upload.
+                  </p>
+                )}
+
+                {uploadMode === 'shapefile' && (
+                  <div>
+                    <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
+                      {(fprops) => (
+                        <Field id="form-name" {...fprops}>
+                          <Label theme="light" className="mb-3 uppercase">
+                            Name
+                          </Label>
+                          <Input theme="light" />
+                        </Field>
+                      )}
+                    </FieldRFF>
+                  </div>
+                )}
 
                 {!successFile && (
                   <div>
@@ -228,13 +291,14 @@ export const FeatureUploadModal = ({
                             <input {...getInputProps()} />
 
                             <p className="text-center text-sm text-gray-500">
-                              Drag and drop your polygon data file
+                              Drag and drop your{' '}
+                              {uploadMode === 'shapefile' ? 'polygon data file' : 'feature file'}
                               <br />
                               or <b>click here</b> to upload
                             </p>
 
                             <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
-                              FEATURES_UPLOADER_MAX_SIZE
+                              UPLOADER_MAX_SIZE
                             )} MB`}</p>
 
                             <Loading

@@ -21,7 +21,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
-import { FEATURES_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import UploadFeaturesInfoButtonContent from 'constants/info-button-content/upload-features';
 import { bytesToMegabytes } from 'utils/units';
 
@@ -78,7 +78,9 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
       return error.code === 'file-too-large'
         ? {
             ...error,
-            message: `File is larger than ${bytesToMegabytes(FEATURES_UPLOADER_MAX_SIZE)} MB`,
+            message: `File is larger than ${bytesToMegabytes(
+              FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE
+            )} MB`,
           }
         : error;
     });
@@ -157,7 +159,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
-    maxSize: FEATURES_UPLOADER_MAX_SIZE,
+    maxSize: FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
@@ -228,7 +230,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
                             </p>
 
                             <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
-                              FEATURES_UPLOADER_MAX_SIZE
+                              FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE
                             )} MB`}</p>
 
                             <Loading
