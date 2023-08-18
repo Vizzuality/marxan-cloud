@@ -829,7 +829,7 @@ export function useDownloadShapefileTemplate() {
 
 export function useDownloadScenarioComparisonReport({
   requestConfig = {
-    method: 'POST',
+    method: 'GET',
   },
   projectId,
 }: {
@@ -841,8 +841,10 @@ export function useDownloadScenarioComparisonReport({
   const downloadScenarioComparisonReport = ({ sid1, sid2 }: { sid1: string; sid2: string }) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
+    console.log({ baseUrl, sid1, sid2 });
+
     return axios.request({
-      url: `${baseUrl}/api/reports/project/${projectId}/comparison?sid1=${sid1}?sid2=${sid2}`,
+      url: `${baseUrl}/api/reports/project/${projectId}/comparison?sid1=${sid1}&sid2=${sid2}`,
       responseType: 'arraybuffer',
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
