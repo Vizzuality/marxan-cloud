@@ -18,8 +18,6 @@ import { ScenarioProtectedArea } from '@marxan-api/modules/scenarios/protected-a
 @Injectable()
 export class ProtectedAreaService {
   constructor(
-    private readonly queue: Queue<JobInput, JobOutput>,
-    private readonly apiEvents: ApiEventsService,
     private readonly selectionUpdateService: SelectionUpdateService,
     private readonly selectionGetService: SelectionGetService,
   ) {}
