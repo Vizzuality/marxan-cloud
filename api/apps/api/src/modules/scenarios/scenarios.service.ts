@@ -1172,53 +1172,6 @@ export class ScenariosService {
     return right(void 0);
   }
 
-  async addProtectedAreaFor(
-    scenarioId: string,
-    file: Express.Multer.File,
-    info: AppInfoDTO,
-    dto: UploadShapefileDto,
-  ): Promise<
-    Either<
-      | GetScenarioFailure
-      | SubmitProtectedAreaError
-      | typeof forbiddenError
-      | typeof noLockInPlace
-      | typeof lockedByAnotherUser,
-      true
-    >
-  > {
-    const scenario = await this.getById(scenarioId, info);
-    if (isLeft(scenario)) return scenario;
-
-    assertDefined(info.authenticatedUser);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      info.authenticatedUser.id,
-      scenarioId,
-    );
-    if (isLeft(userCanEditScenario)) {
-      return userCanEditScenario;
-    }
-    const projectResponse = await this.queryBus.execute(
-      new GetProjectQuery(scenario.right.projectId, info.authenticatedUser?.id),
-    );
-    if (isLeft(projectResponse)) {
-      return projectResponse;
-    }
-
-    const submission = await this.protectedArea.addShapeFor(
-      projectResponse.right.id,
-      scenarioId,
-      file,
-      dto.name,
-    );
-
-    if (isLeft(submission)) {
-      return submission;
-    }
-
-    return right(true);
-  }
-
   // get a list of protected areas in use /selected in a scenario
   async getProtectedAreasFor(
     scenarioId: string,
