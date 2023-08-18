@@ -52,7 +52,7 @@ const FeatureActions = ({
           onClick={() => handleModal('edit', true)}
           className={cn({
             [BUTTON_CLASSES]: true,
-            'last:rounded-b-2xl': true,
+            'last:rounded-b-2xl': !isDeletable,
           })}
         >
           <Tag className={ICON_CLASSES} size={20} />

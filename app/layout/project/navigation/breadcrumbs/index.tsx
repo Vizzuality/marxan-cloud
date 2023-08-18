@@ -25,7 +25,13 @@ export const Breadcrumbs = ({ className }: { className?: string }): JSX.Element 
     >
       <ol className="flex items-center space-x-2 text-xs text-white">
         <li className="flex items-center">
-          <Link href="/projects" className="hover:text-primary-500">
+          <Link
+            href="/projects"
+            className={cn({
+              'hover:text-primary-500': true,
+              'font-semibold text-primary-500': !pid,
+            })}
+          >
             Dashboard
           </Link>
         </li>
