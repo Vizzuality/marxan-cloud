@@ -693,6 +693,7 @@ export function useEditFeatureTag() {
     onSuccess: async (data, variables) => {
       const { featureId, projectId } = variables;
       await queryClient.invalidateQueries(['feature', featureId]);
+      await queryClient.invalidateQueries(['project-tags', projectId]);
       await queryClient.invalidateQueries(['all-features', projectId]);
     },
     onError: (error, variables, context) => {
