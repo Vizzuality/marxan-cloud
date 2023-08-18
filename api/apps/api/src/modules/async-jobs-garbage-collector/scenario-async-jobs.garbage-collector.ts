@@ -46,9 +46,6 @@ export class ScenarioAsyncJobsGarbageCollector
     await this.planningUnitsInclusionAsyncJob.sendFailedApiEventForStuckAsyncJob(
       scenarioId,
     );
-    await this.protectedAreasAsyncJob.sendFailedApiEventForStuckAsyncJob(
-      scenarioId,
-    );
     await this.runAsyncJob.sendFailedApiEventForStuckAsyncJob(scenarioId);
     await this.scenarioCloneAsyncJob.sendFailedApiEventForStuckAsyncJob(
       scenarioId,
