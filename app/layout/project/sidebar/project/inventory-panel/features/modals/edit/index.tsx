@@ -170,7 +170,7 @@ const EditModal = ({
                 >
                   {(fprops) => (
                     <Field id="featureClassName" {...fprops}>
-                      <Label theme="light" className="mb-3 uppercase">
+                      <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
                         Name
                       </Label>
 
@@ -223,7 +223,7 @@ const EditModal = ({
                                       setTagIsDone(true);
                                     }}
                                   >
-                                    <p className="text-sm capitalize text-gray-800">{tag}</p>
+                                    <p className="text-sm text-gray-800">{tag}</p>
                                   </button>
                                 ))}
                               </div>
@@ -235,7 +235,7 @@ const EditModal = ({
                       {values.tag && tagIsDone && (
                         <div className="flex items-center space-x-1">
                           <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5 hover:bg-yellow-600">
-                            <p className="text-sm capitalize text-gray-800">{values.tag}</p>
+                            <p className="text-sm text-gray-800">{values.tag}</p>
                           </div>
                           <button
                             className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 hover:bg-gray-500"
