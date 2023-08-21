@@ -853,18 +853,19 @@ export function useDownloadScenarioComparisonReport({
   };
 
   return useMutation(downloadScenarioComparisonReport, {
-    onSuccess: (data: any) => {
+    onSuccess: (data: any, variables, context) => {
       const { data: blob } = data;
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `scenario-comparison.pdf`);
+      link.setAttribute('download', 'scenario-comparison.pdf');
       document.body.appendChild(link);
       link.click();
       link.remove();
+      console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
-      console.info('Error ----------->', error, variables, context);
+      console.info('Error', error, variables, context);
     },
   });
 }

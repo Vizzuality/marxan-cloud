@@ -23,14 +23,16 @@ export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element =>
 
   const { query } = useRouter();
 
-  const { pid, sid } = query as { pid: string; sid: string };
+  const { pid, sid, sid1, sid2 } = query as {
+    pid: string;
+    sid: string;
+    sid1: string;
+    sid2: string;
+  };
 
   const dispatch = useAppDispatch();
 
   const { layerSettings } = useAppSelector((state) => state['/projects/[id]']);
-
-  const { compare } = layerSettings;
-  const { scenario1: sid1, scenario2: sid2 } = compare;
 
   const { data = {} } = useProject(pid);
   const { bbox } = data;
