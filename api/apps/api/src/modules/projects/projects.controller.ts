@@ -1418,8 +1418,6 @@ export class ProjectsController {
     @Req() req: RequestWithAuthenticatedUser,
     @Body() dto: UploadShapefileDto,
   ): Promise<JsonApiAsyncJobMeta> {
-    await ensureShapefileHasRequiredFiles(file);
-
     const outcome = await this.projectsService.addProtectedAreaFor(
       projectId,
       file,
