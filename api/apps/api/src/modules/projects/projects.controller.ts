@@ -759,11 +759,13 @@ export class ProjectsController {
       data.features,
     );
 
-    if(isLeft(newFeatureOrError)) {
+    if (isLeft(newFeatureOrError)) {
       // @debt Use mapDomainToHttpException() instead
       throw new InternalServerErrorException(newFeatureOrError.left);
     } else {
-      const result = await this.geoFeatureService.getById(newFeatureOrError.right.id);
+      const result = await this.geoFeatureService.getById(
+        newFeatureOrError.right.id,
+      );
       if (isNil(result)) {
         // @debt Use mapDomainToHttpException() instead
         throw new NotFoundException();
