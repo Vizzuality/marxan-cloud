@@ -57,7 +57,7 @@ export const getFixtures = async () => {
       scenarioIdB: string,
     ) =>
       await request(app.getHttpServer())
-        .get(
+        .post(
           `/api/v1/projects/comparison-map/${scenarioIdA}/compare/${scenarioIdB}`,
         )
         .set('Authorization', `Bearer ${randomUserToken}`)

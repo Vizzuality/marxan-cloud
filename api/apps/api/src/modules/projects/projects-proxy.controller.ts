@@ -1,11 +1,10 @@
 import {
   Body,
   Controller,
-  Get,
   Header,
-  InternalServerErrorException,
   Param,
   ParseUUIDPipe,
+  Post,
   Req,
   Res,
   UseGuards,
@@ -56,8 +55,7 @@ export class ProjectsProxyController {
     description: 'Get comparison map for two scenarios in PDF format',
   })
   @Header('content-type', 'application/pdf')
-  //@Get('comparison-map/:scenarioIdA/compare/:scenarioIdB')
-  @Get('comparison-map/:scenarioIdA/compare/:scenarioIdB')
+  @Post('comparison-map/:scenarioIdA/compare/:scenarioIdB')
   async scenarioFrequencyComparisonMap(
     @Body() config: WebshotBasicPdfConfig,
     @Param('scenarioIdA', ParseUUIDPipe) scenarioIdA: string,
