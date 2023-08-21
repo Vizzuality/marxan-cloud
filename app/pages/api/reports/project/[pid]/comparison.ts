@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     data: {
       baseUrl,
       pdfOptions: {
-        landscape: true,
+        landscape: false,
       },
     },
   });

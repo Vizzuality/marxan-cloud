@@ -481,6 +481,7 @@ export const ProjectMap = (): JSX.Element => {
             >
               {LEGEND.map((i) => {
                 const { type, items, intersections } = i;
+                console.log({ intersections, items });
 
                 return (
                   <LegendItem
