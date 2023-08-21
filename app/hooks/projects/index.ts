@@ -829,7 +829,7 @@ export function useDownloadShapefileTemplate() {
 
 export function useDownloadScenarioComparisonReport({
   requestConfig = {
-    method: 'GET',
+    method: 'POST',
   },
   projectId,
 }: {
