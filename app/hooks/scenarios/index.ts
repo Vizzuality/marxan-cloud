@@ -815,6 +815,7 @@ export function useRunScenario({
   },
 }: UseRunScenarioProps) {
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
 
   const duplicateScenario = ({ id }: RunScenarioProps) => {
     // Pending endpoint
@@ -828,11 +829,11 @@ export function useRunScenario({
   };
 
   return useMutation(duplicateScenario, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Success', data, variables, context);
+    onSuccess: (data: any, variables) => {
+      const { id } = variables;
+      queryClient.invalidateQueries(['scenario', id]);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });
