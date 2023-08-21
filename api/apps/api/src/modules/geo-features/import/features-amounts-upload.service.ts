@@ -56,12 +56,15 @@ export class FeatureAmountUploadService {
       );
       await this.events.createEvent(data);
       // saving feature data to temporary table
-      const featuresRegistry = await this.saveCsvToRegistry(
+      const featuresRegistry: Left<any> | Right<FeatureAmountUploadRegistry> = await this.saveCsvToRegistry(
         data,
         apiQueryRunner,
       );
 
       if (isLeft(featuresRegistry)) {
+        // Some validations done while parsing csv in stream return nested Left object when being rejected as left
+        // Todo: make validations during csv parse more unified
+        if (featuresRegistry.left.left) { return featuresRegistry.left; }
         return featuresRegistry;
       }
       // Saving new features to apiDB 'features' table
