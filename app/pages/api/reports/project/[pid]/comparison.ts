@@ -9,6 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     sid1: string;
     sid2: string;
   };
+  console.log('------->', baseUrl, sid1, sid2);
 
   const { data: pdf } = await DOWNLOADS.request<ArrayBuffer>({
     method: 'POST',

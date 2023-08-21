@@ -21,7 +21,7 @@ export const WebShotStatus: React.FC = () => {
   }, [maps]);
 
   const { data: projectData, isFetched: projectDataIsFetched } = useProject(pid);
-
+  // !TODO: Wiat both scenarios to be fetched
   const reportDataIsFetched = projectData && projectDataIsFetched && mapsLoaded;
 
   useEffect(() => {
