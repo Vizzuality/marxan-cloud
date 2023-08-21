@@ -124,6 +124,7 @@ import {
   AddProtectedAreaService,
   submissionFailed,
 } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
+import {ensureShapefileHasRequiredFiles} from "@marxan-api/utils/file-uploads.utils";
 
 export { validationFailed } from '../planning-areas';
 
@@ -891,6 +892,8 @@ export class ProjectsService {
       true
     >
   > {
+    await ensureShapefileHasRequiredFiles(file);
+
     const project = await this.assertProject(projectId, info.authenticatedUser);
     if (isLeft(project)) return left(projectNotFound);
 
