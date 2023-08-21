@@ -63,7 +63,7 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${randomUserToken}`)
         .send({ baseUrl: 'webshorUrl' }),
     ThenCorrectPdfBufferIsReceived: (response: request.Response) => {
-      expect(response.status).toEqual(200);
+      expect(response.status).toEqual(201);
       expect(response.body).toBeInstanceOf(Buffer);
       expect(Object.keys(response.body).length).toBe(1214);
     },
