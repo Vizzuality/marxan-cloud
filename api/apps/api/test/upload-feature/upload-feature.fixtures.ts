@@ -137,7 +137,49 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${token}`)
         .attach(
           `file`,
-          __dirname + `/import-files/missing_puid_feature_amount_upload.csv`,
+          __dirname + `/import-files/missing_puids_upload.csv`,
+        )
+        .field({
+          name: customFeatureName,
+          description: customFeatureDesc,
+        });
+    },
+    WhenUploadingCsvWithNoFeatures: async () => {
+      await GivenProjectsPuExists(geoEntityManager, projectId);
+      return request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/features/csv`)
+        .set('Authorization', `Bearer ${token}`)
+        .attach(
+          `file`,
+          __dirname + `/import-files/no_features_upload.csv`,
+        )
+        .field({
+          name: customFeatureName,
+          description: customFeatureDesc,
+        });
+    },
+    WhenUploadingCsvWithDuplicatedPUIDs: async () => {
+      await GivenProjectsPuExists(geoEntityManager, projectId);
+      return request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/features/csv`)
+        .set('Authorization', `Bearer ${token}`)
+        .attach(
+          `file`,
+          __dirname + `/import-files/duplicate_puids_upload.csv`,
+        )
+        .field({
+          name: customFeatureName,
+          description: customFeatureDesc,
+        });
+    },
+    WhenUploadingCsvWhenProjectNotFound: async (falseProjectId: string) => {
+      await GivenProjectsPuExists(geoEntityManager, projectId);
+      return request(app.getHttpServer())
+        .post(`/api/v1/projects/${falseProjectId}/features/csv`)
+        .set('Authorization', `Bearer ${token}`)
+        .attach(
+          `file`,
+          __dirname + `/import-files/missing_puids_upload.csv`,
         )
         .field({
           name: customFeatureName,
@@ -151,7 +193,22 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${token}`)
         .attach(
           `file`,
-          __dirname + `/import-files/duplicate_features_feature_upload.csv`,
+          __dirname + `/import-files/duplicate_features_upload.csv`,
+        )
+        .field({
+          name: customFeatureName,
+          description: customFeatureDesc,
+        });
+    },
+
+    WhenUploadingCsvWithPuidsNotPresentITheProject: async () => {
+      await GivenProjectsPuExists(geoEntityManager, projectId);
+      return request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/features/csv`)
+        .set('Authorization', `Bearer ${token}`)
+        .attach(
+          `file`,
+          __dirname + `/import-files/feature_amount_upload_incorrect_puids.csv`,
         )
         .field({
           name: customFeatureName,
@@ -301,10 +358,27 @@ export const getFixtures = async () => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
       expect(result.body.errors[0].title).toEqual('Missing PUID column');
     },
+    ThenNoFeaturesInCsvFileErrorIsReturned: async (result: request.Response) => {
+      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
+    },
+    ThenDuplicatedPUIDErrorIsReturned: async (result: request.Response) => {
+      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
+      expect(result.body.errors[0].title).toEqual('Duplicate PUIDs in feature amount CSV upload');
+    },
+    ThenProjectNotFoundErrorIsReturned: async (result: request.Response, falseProjectId: string) => {
+      expect(result.body.errors[0].status).toEqual(HttpStatus.NOT_FOUND);
+      expect(result.body.errors[0].title).toEqual(`Project with id ${falseProjectId} not found`);
+    },
     ThenDuplicatedHeaderErrorIsReturned: async (result: request.Response) => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
       expect(result.body.errors[0].title).toEqual(
         'Duplicate headers found ["feat_1d666bd"]',
+      );
+    },
+    ThenPuidsNotPresentErrorIsReturned: async (result: request.Response) => {
+      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
+      expect(result.body.errors[0].title).toEqual(
+        'Unknown PUIDs',
       );
     },
     AndNoFeatureUploadIsRegistered: async () => {

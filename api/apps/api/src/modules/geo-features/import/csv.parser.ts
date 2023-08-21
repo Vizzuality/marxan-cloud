@@ -41,7 +41,7 @@ export async function featureAmountCsvParser(
       .on('data', (data) => {
         const puid: number = parseInt(data.puid);
         if (seenPuids.has(puid)) {
-          reject(duplicatePuidsInFeatureAmountCsvUpload);
+          reject(left(duplicatePuidsInFeatureAmountCsvUpload));
         }
         seenPuids.add(puid);
         for (const key in data) {
