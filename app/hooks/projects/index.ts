@@ -852,16 +852,9 @@ export function useDownloadScenarioComparisonReport({
   };
 
   return useMutation(downloadScenarioComparisonReport, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data) => {
       const { data: blob } = data;
-      const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'scenario-comparison.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      console.info('Succces', data, variables, context);
+      createDownloadLink(blob, 'scenario-comparison.pdf');
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
