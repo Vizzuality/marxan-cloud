@@ -1,5 +1,3 @@
-import { ChangeEvent } from 'react';
-
 import { MoreHorizontal } from 'lucide-react';
 
 import Checkbox from 'components/forms/checkbox';
@@ -10,12 +8,7 @@ import { cn } from 'utils/cn';
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 
-type RowItem = {
-  id: string;
-  name: string;
-  scenarios: number;
-  tag: string;
-};
+import { RowItem } from './types';
 
 const RowItem = ({
   item,
@@ -24,14 +17,7 @@ const RowItem = ({
   onSelectRow,
   onToggleSeeOnMap,
   ActionsComponent,
-}: {
-  item: RowItem;
-  visibleFeatures: string[];
-  selectedIds: string[];
-  onSelectRow: (evt: ChangeEvent<HTMLInputElement>) => void;
-  onToggleSeeOnMap: (id: string) => void;
-  ActionsComponent: ({ item }) => JSX.Element;
-}) => {
+}: RowItem) => {
   const { id, name, scenarios, tag } = item;
   const visibleOnMap = visibleFeatures.includes(id);
 

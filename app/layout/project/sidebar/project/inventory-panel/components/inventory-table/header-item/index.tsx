@@ -2,23 +2,9 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 
 import { cn } from 'utils/cn';
 
-const HeaderItem = ({
-  className,
-  text,
-  name,
-  columns,
-  sorting,
-  onClick,
-}: {
-  className?: string;
-  text: string;
-  name: string;
-  columns: {
-    [key: string]: string;
-  };
-  sorting: string;
-  onClick?: (field: string) => void;
-}) => {
+import { HeaderItem } from './types';
+
+const HeaderItem = ({ className, text, name, columns, sorting, onClick }: HeaderItem) => {
   const sortingMatches = /^(-?)(.+)$/.exec(sorting);
   const sortField = sortingMatches[2];
   const sortOrder = sortingMatches[1] === '-' ? 'desc' : 'asc';

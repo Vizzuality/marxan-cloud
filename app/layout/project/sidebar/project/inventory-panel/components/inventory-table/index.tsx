@@ -1,10 +1,9 @@
-import { ChangeEvent } from 'react';
-
 import Checkbox from 'components/forms/checkbox';
 import Loading from 'components/loading';
 
 import HeaderItem from './header-item';
 import RowItem from './row-item';
+import { InventoryTable } from './types';
 
 const InventoryTable = ({
   loading,
@@ -19,27 +18,7 @@ const InventoryTable = ({
   onSelectRow,
   onSelectAll,
   ActionsComponent,
-}: {
-  loading: boolean;
-  data: {
-    id: string;
-    name: string;
-    scenarios: number;
-    tag: string;
-  }[];
-  noDataMessage: string;
-  columns: {
-    [key: string]: string;
-  };
-  sorting: string;
-  selectedIds: string[];
-  visibleFeatures: string[];
-  onSortChange: (field: string) => void;
-  onToggleSeeOnMap: (id: string) => void;
-  onSelectRow: (evt: ChangeEvent<HTMLInputElement>) => void;
-  onSelectAll: (evt: ChangeEvent<HTMLInputElement>) => void;
-  ActionsComponent: ({ item }) => JSX.Element;
-}): JSX.Element => {
+}: InventoryTable): JSX.Element => {
   const noData = !loading && data?.length === 0;
 
   return (

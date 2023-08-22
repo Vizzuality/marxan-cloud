@@ -7,7 +7,7 @@ import FeaturesInfo from './features/info';
 import FeatureUploadModal from './features/modals/upload';
 import ProtectedAreasTable from './protected-areas';
 import ProtectedAreasFooter from './protected-areas/footer';
-import { Panel } from './types';
+import { InventoryPanel } from './types';
 
 export const INVENTORY_TABS = {
   'protected-areas': {
@@ -33,5 +33,5 @@ export const INVENTORY_TABS = {
     TableComponent: FeaturesTable,
   },
 } satisfies {
-  [key in NavigationInventoryTabs]: Panel;
+  [key in NavigationInventoryTabs]: InventoryPanel;
 };
