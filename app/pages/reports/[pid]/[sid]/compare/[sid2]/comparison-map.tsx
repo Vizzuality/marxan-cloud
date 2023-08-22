@@ -68,7 +68,7 @@ const ComparisonScreenshot = (): JSX.Element => {
     <>
       <Head title="Comparison screenshot" />
       <MetaIcons />
-      <div style={styles.page} className="flex h-full flex-col space-y-6 bg-white text-black">
+      <div style={styles.page} className="flex h-full flex-col space-y-3 bg-white text-black">
         <header className="flex w-full items-start justify-between pb-6">
           <div className="mx-auto w-11/12">
             <div className="flex flex-col space-y-8">
