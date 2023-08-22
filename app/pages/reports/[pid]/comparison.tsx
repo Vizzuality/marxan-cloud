@@ -9,6 +9,7 @@ import { useAppSelector } from 'store/hooks';
 import { format } from 'date-fns';
 
 import { useLegend } from 'hooks/map';
+import { COLORS } from 'hooks/map/constants';
 import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
@@ -50,8 +51,8 @@ const ComparisonScreenshot = (): JSX.Element => {
     scenario2Query.isFetched;
 
   const items = [
-    { value: scenario1Query.data?.name, color: '#DE3397' },
-    { value: scenario2Query.data?.name, color: '#1C9BD0' },
+    { value: scenario1Query.data?.name, color: COLORS['compare-legend'][0] },
+    { value: scenario2Query.data?.name, color: COLORS['compare-legend'][1] },
   ];
 
   const legend = useLegend({
@@ -62,6 +63,7 @@ const ComparisonScreenshot = (): JSX.Element => {
   });
 
   const compareIntersections = legend?.find((l) => l.id === 'compare')?.intersections;
+  console.log({ compareIntersections });
 
   return (
     <>
