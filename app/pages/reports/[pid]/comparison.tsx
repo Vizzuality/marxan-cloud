@@ -63,7 +63,6 @@ const ComparisonScreenshot = (): JSX.Element => {
   });
 
   const compareIntersections = legend?.find((l) => l.id === 'compare')?.intersections;
-  console.log({ compareIntersections });
 
   return (
     <>
