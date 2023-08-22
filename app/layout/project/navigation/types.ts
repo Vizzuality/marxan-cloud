@@ -4,3 +4,5 @@ export type NavigationTreeCategories =
   | 'gridSetup'
   | 'solutions'
   | 'advancedSettings';
+
+export type NavigationInventoryTabs = 'protected-areas' | 'cost-surface' | 'features';
