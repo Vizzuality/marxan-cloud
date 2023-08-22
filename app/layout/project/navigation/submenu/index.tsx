@@ -31,7 +31,6 @@ export const SubMenu = ({ items }: { items: SubMenuItem[] }): JSX.Element => {
                 'flex px-[10px]': true,
                 'relative overflow-hidden before:absolute before:-left-[1px] before:block before:h-full before:w-[3px] before:rounded-sm before:bg-blue-400 before:drop-shadow-blue after:absolute after:-right-[1px] after:block after:h-full after:w-[3px] after:rounded-sm after:bg-blue-400 after:drop-shadow-blue':
                   item.selected,
-                'pointer-events-none opacity-50': item.disabled,
               })}
             >
               <Icon

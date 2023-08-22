@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useEffect, useState } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -6,8 +6,7 @@ import { useRouter } from 'next/router';
 
 import { TippyProps } from '@tippyjs/react/headless';
 
-import { useRunScenario, useScenarioStatus } from 'hooks/scenarios';
-import { useAllSolutions } from 'hooks/solutions';
+import { useRunScenario, useScenario, useScenarioStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
@@ -79,15 +78,11 @@ export const Navigation = (): JSX.Element => {
   const { jobs = [] } = scenarioStatusData || {};
   const JOBS = useScenarioJobs(jobs);
 
+  const scenarioQuery = useScenario(sid);
+
   const scenarioIsRunning = JOBS.find((j) => j.kind === 'run')?.status === 'running';
 
   const runScenarioMutation = useRunScenario({});
-
-  const allSolutionsQuery = useAllSolutions(sid, {
-    disablePagination: false,
-    'page[size]': 1,
-    'page[number]': 1,
-  });
 
   const toggleSubmenu = useCallback((submenuKey: NavigationTreeCategories) => {
     if (submenuKey === 'user') {
@@ -140,7 +135,10 @@ export const Navigation = (): JSX.Element => {
     );
   }, [addToast, runScenarioMutation, sid]);
 
-  const isSolutionTabEnabled = Boolean(allSolutionsQuery.data?.length);
+  const isSolutionsSectionEnabled = useMemo(() => {
+    if (sid) return scenarioQuery.data?.ranAtLeastOnce;
+    return false;
+  }, [sid, scenarioQuery.data?.ranAtLeastOnce]);
 
   useEffect(() => {
     if (isProjectRoute && NAVIGATION_TREE.inventory.includes(tab)) toggleSubmenu('inventory');
@@ -308,8 +306,8 @@ export const Navigation = (): JSX.Element => {
                   [MENU_ITEM_ACTIVE_CLASSES]:
                     isScenarioRoute &&
                     NAVIGATION_TREE.solutions.includes(tab) &&
-                    isSolutionTabEnabled,
-                  [MENU_ITEM_DISABLED_CLASSES]: !isSolutionTabEnabled,
+                    isSolutionsSectionEnabled,
+                  [MENU_ITEM_DISABLED_CLASSES]: !isSolutionsSectionEnabled,
                 })}
               >
                 <Tooltip

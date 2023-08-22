@@ -829,7 +829,7 @@ export function useRunScenario({
   };
 
   return useMutation(duplicateScenario, {
-    onSuccess: (data: any, variables) => {
+    onSuccess: (data, variables) => {
       const { id } = variables;
       queryClient.invalidateQueries(['scenario', id]);
     },
