@@ -14,14 +14,14 @@ import { NavigationInventoryTabs } from 'layout/project/navigation/types';
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 import { INVENTORY_TABS } from './constants';
-import { Panel } from './types';
+import { InventoryPanel } from './types';
 
 const InventoryPanel = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const { query } = useRouter();
   const { tab } = query as { tab: NavigationInventoryTabs };
 
-  const panel: Panel = INVENTORY_TABS[tab];
+  const panel = INVENTORY_TABS[tab] as InventoryPanel;
 
   const [isOpenUploader, setOpenUploader] = useState(false);
 
