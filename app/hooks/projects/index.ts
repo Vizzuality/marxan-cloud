@@ -793,7 +793,6 @@ export function useProjectTags(pid: Project['id']) {
   });
 }
 
-<<<<<<< HEAD
 export function useDownloadShapefileTemplate() {
   const { data: session } = useSession();
 

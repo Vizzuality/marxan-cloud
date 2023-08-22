@@ -36,21 +36,22 @@ const ComparisonScreenshot = (): JSX.Element => {
 
   const { layerSettings } = useAppSelector((state) => state['/projects/[id]']);
 
-  const { data: projectData, isFetched: projectDataIsFetched } = useProject(pid);
-  const { data: projectUsers, isFetched: projectUsersAreFetched } = useProjectUsers(pid);
-  const projectOwner = projectUsers?.find((u) => u.roleName === 'project_owner')?.user || {};
-  const { data: scenarioData1, isFetched: scenarioData1IsFetched } = useScenario(sid1);
-  const { data: scenarioData2, isFetched: scenarioDatarIsFetched } = useScenario(sid2);
+  const projectQuery = useProject(pid);
+  const projectUsersQuery = useProjectUsers(pid);
+  const projectOwner =
+    projectUsersQuery.data?.find((u) => u.roleName === 'project_owner')?.user || {};
+  const scenario1Query = useScenario(sid1);
+  const scenario2Query = useScenario(sid2);
 
   const reportDataIsFetched =
-    projectDataIsFetched &&
-    projectUsersAreFetched &&
-    scenarioData1IsFetched &&
-    scenarioDatarIsFetched;
+    projectQuery.isFetched &&
+    projectUsersQuery.isFetched &&
+    scenario1Query.isFetched &&
+    scenario2Query.isFetched;
 
   const items = [
-    { value: scenarioData1.name, color: '#DE3397' },
-    { value: scenarioData2.name, color: '#1C9BD0' },
+    { value: scenario1Query.data?.name, color: '#DE3397' },
+    { value: scenario2Query.data?.name, color: '#1C9BD0' },
   ];
 
   const legend = useLegend({
@@ -60,7 +61,7 @@ const ComparisonScreenshot = (): JSX.Element => {
     },
   });
 
-  const compareIntersections = legend?.find((l) => l.id === 'compare').intersections;
+  const compareIntersections = legend?.find((l) => l.id === 'compare')?.intersections;
 
   return (
     <>
@@ -71,12 +72,12 @@ const ComparisonScreenshot = (): JSX.Element => {
           <div className="mx-auto w-11/12">
             <div className="flex flex-col space-y-8">
               <div>
-                <h1 className="text-xl font-medium">{projectData?.name}</h1>
+                <h1 className="text-xl font-medium">{projectQuery.data?.name}</h1>
 
                 <div className="flex items-center space-x-6 text-lg">
-                  <h2>{scenarioData1?.name}</h2>
+                  <h2>{scenario1Query.data?.name}</h2>
                   <div className="h-5 w-[3px] bg-gray-100" />
-                  <h2>{scenarioData2?.name}</h2>
+                  <h2>{scenario2Query.data?.name}</h2>
                 </div>
               </div>
 
