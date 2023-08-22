@@ -39,14 +39,15 @@ import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import HelpBeacon from 'layout/help/beacon';
+import { Scenario } from 'types/api/scenario';
 import { cn } from 'utils/cn';
 
 import PRINT_SVG from 'svgs/ui/print.svg?sprite';
 
 export const ProjectMap = (): JSX.Element => {
-  const [open, setOpen] = useState(true);
-  const [sid1, setSid1] = useState(null);
-  const [sid2, setSid2] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [sid1, setSid1] = useState<Scenario['id']>(null);
+  const [sid2, setSid2] = useState<Scenario['id']>(null);
   const {
     isSidebarOpen,
     layerSettings,
@@ -134,7 +135,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const PUCompareLayer = usePUCompareLayer({
     active: !!sid1 && !!sid2,
-    sid1,
+    sid: sid1,
     sid2,
     options: {
       ...layerSettings.compare,

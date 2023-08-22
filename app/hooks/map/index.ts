@@ -929,7 +929,7 @@ export function usePUGridLayer({
   }, [cache, active, sid, options, include, sublayers]);
 }
 
-export function usePUCompareLayer({ active, sid1, sid2, cache = 0, options }: UsePUCompareLayer) {
+export function usePUCompareLayer({ active, sid, sid2, cache = 0, options }: UsePUCompareLayer) {
   const COLOR_NUMBER = 10;
 
   const COLOR_RAMP = useMemo(() => {
@@ -1075,14 +1075,14 @@ export function usePUCompareLayer({ active, sid1, sid2, cache = 0, options }: Us
     const { opacity = 1, visibility = true } = options || {};
 
     return {
-      id: `pu-grid-layer-${sid1}-${sid2}-${cache}`,
+      id: `pu-grid-layer-${sid}-${sid2}-${cache}`,
       type: 'vector',
       opacity,
       visibility,
       source: {
         type: 'vector',
         tiles: [
-          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid1}/compare/${sid2}/tiles/{z}/{x}/{y}.mvt`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/compare/${sid2}/tiles/{z}/{x}/{y}.mvt`,
         ],
       },
       render: {
@@ -1115,7 +1115,7 @@ export function usePUCompareLayer({ active, sid1, sid2, cache = 0, options }: Us
         ],
       },
     };
-  }, [active, sid1, sid2, cache, options, COLOR_RAMP]);
+  }, [active, sid, sid2, cache, options, COLOR_RAMP]);
 }
 
 export function useScenarioBlmLayer({ active, sId, blm, cache = 0 }: UseScenarioBLMLayer) {

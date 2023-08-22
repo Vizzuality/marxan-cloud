@@ -2,6 +2,7 @@ import { PUAction } from 'store/slices/scenarios/types';
 
 import { TargetSPFItemProps } from 'components/features/target-spf-item/types';
 import { Feature } from 'types/api/feature';
+import { Scenario } from 'types/api/scenario';
 
 export interface UseGeoJSONLayer {
   cache?: number;
@@ -176,8 +177,8 @@ export interface UsePUGridLayer {
 export interface UsePUCompareLayer {
   cache?: number;
   active?: boolean;
-  sid1?: string;
-  sid2?: string;
+  sid: Scenario['id'];
+  sid2: Scenario['id'];
   options?: Record<string, unknown>;
 }
 

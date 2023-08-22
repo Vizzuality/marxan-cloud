@@ -23,10 +23,9 @@ export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element =>
 
   const { query } = useRouter();
 
-  const { pid, sid, sid1, sid2 } = query as {
+  const { pid, sid, sid2 } = query as {
     pid: string;
     sid: string;
-    sid1: string;
     sid2: string;
   };
 
@@ -57,7 +56,7 @@ export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element =>
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
     sid: sid ? `${sid}` : null,
     include: 'results',
-    sublayers: [...(sid1 && !sid2 ? ['frequency'] : [])],
+    sublayers: [...(sid && !sid2 ? ['frequency'] : [])],
     options: {
       settings: {
         pugrid: layerSettings.pugrid,
@@ -75,8 +74,8 @@ export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element =>
 
   const PUCompareLayer = usePUCompareLayer({
     cache,
-    active: !!sid1 && !!sid2,
-    sid1,
+    active: !!sid && !!sid2,
+    sid,
     sid2,
     options: {
       ...layerSettings.compare,

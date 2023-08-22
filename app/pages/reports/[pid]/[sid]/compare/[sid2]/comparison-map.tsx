@@ -33,7 +33,7 @@ const styles = {
 
 const ComparisonScreenshot = (): JSX.Element => {
   const { query } = useRouter();
-  const { pid, sid1, sid2 } = query as { pid: string; sid1: string; sid2: string };
+  const { pid, sid, sid2 } = query as { pid: string; sid: string; sid2: string };
 
   const { layerSettings } = useAppSelector((state) => state['/projects/[id]']);
 
@@ -41,7 +41,7 @@ const ComparisonScreenshot = (): JSX.Element => {
   const projectUsersQuery = useProjectUsers(pid);
   const projectOwner =
     projectUsersQuery.data?.find((u) => u.roleName === 'project_owner')?.user || {};
-  const scenario1Query = useScenario(sid1);
+  const scenario1Query = useScenario(sid);
   const scenario2Query = useScenario(sid2);
 
   const reportDataIsFetched =
@@ -56,7 +56,7 @@ const ComparisonScreenshot = (): JSX.Element => {
   ];
 
   const legend = useLegend({
-    layers: [...(!!sid1 && !!sid2 ? ['compare'] : [])],
+    layers: [...(!!sid && !!sid2 ? ['compare'] : [])],
     options: {
       layerSettings,
     },
