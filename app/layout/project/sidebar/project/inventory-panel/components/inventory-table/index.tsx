@@ -55,7 +55,7 @@ const InventoryTable = ({
       {noData && <div className="flex h-[200px] items-center justify-center">{noDataMessage}</div>}
       {!loading && !noData && (
         <table className="w-full table-auto">
-          <thead className="text-left text-xs font-semibold uppercase">
+          <thead className="mr-26 block text-left text-xs font-semibold uppercase">
             <tr>
               <th className="pb-2 pt-5">
                 <Checkbox
@@ -65,7 +65,7 @@ const InventoryTable = ({
                   onChange={onSelectAll}
                 />
               </th>
-              <th className="w-full">
+              <th className="w-full pl-2">
                 <HeaderItem
                   text={'Name'}
                   name={'name'}
@@ -74,7 +74,7 @@ const InventoryTable = ({
                   onClick={onSortChange}
                 />
               </th>
-              <th className="pb-2 pt-5 text-center">
+              <th className="pb-2 pt-2 text-center">
                 <HeaderItem
                   className="justify-center"
                   text={'Type'}
@@ -87,7 +87,7 @@ const InventoryTable = ({
               <th className="pb-2 pt-5"></th>
             </tr>
           </thead>
-          <tbody className="align-baseline text-sm">
+          <tbody className="block max-h-[calc(100vh-430px)] divide-y divide-gray-400 overflow-y-scroll pb-3 pl-1 pr-2 align-baseline text-sm">
             {data?.map((item) => (
               <RowItem
                 key={item.id}
