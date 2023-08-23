@@ -104,14 +104,14 @@ const ComparisonScreenshot = (): JSX.Element => {
           <ScreenshotMap id="comparison-map-1" />
         </div>
         {reportDataIsFetched && (
-          <div className="flex items-start justify-between space-x-14 bg-gray-50 px-16 py-8">
+          <div className="flex items-start justify-between space-x-14 bg-gray-50 px-16 py-7">
             <div className="flex flex-col space-y-8 text-sm text-black">
               <p className="font-semibold"> Solutions Distribution:</p>
               <ul className="flex w-full flex-col space-y-2">
                 {items.map(({ value, color }) => (
-                  <li key={`${value}`} className="flex items-center space-x-2 font-heading text-sm">
+                  <li key={`${value}`} className="flex items-center space-x-2 font-heading text-xs">
                     <div
-                      className="h-4 w-4 flex-shrink-0 rounded-sm"
+                      className="h-3 w-3 flex-shrink-0 rounded-sm"
                       style={{
                         backgroundColor: color,
                       }}
@@ -122,7 +122,7 @@ const ComparisonScreenshot = (): JSX.Element => {
               </ul>
             </div>
 
-            <div className="relative ml-10 w-16 flex-shrink-0 py-12">
+            <div className="relative ml-10 w-16 flex-shrink-0 py-11">
               <p className="absolute left-1/2 top-1 -translate-x-1/2 transform font-heading text-xxs font-medium text-black">
                 Always
               </p>

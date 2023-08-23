@@ -120,7 +120,7 @@ export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element =>
 
   return (
     <>
-      <div className="relative w-full overflow-hidden" style={{ height: '160mm' }}>
+      <div className="relative w-full overflow-hidden" style={{ height: '155mm' }}>
         <Map
           key={accessToken}
           className="map-report"
@@ -131,7 +131,7 @@ export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element =>
           touchRotate={false}
           bounds={bounds}
           width={'100%'}
-          height={600}
+          height={550}
           minZoom={minZoom}
           maxZoom={maxZoom}
           viewport={viewport}
