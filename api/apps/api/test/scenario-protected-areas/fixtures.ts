@@ -57,6 +57,7 @@ export const getFixtures = async () => {
   });
 
   return {
+    GivenProjectExists: () => projectId,
     GivenScenarioInsideNAM41WasCreated: async () => {
       const { id } = await GivenScenarioExists(app, projectId, ownerToken);
       scenarioId = id;
@@ -93,6 +94,11 @@ export const getFixtures = async () => {
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/protected-areas`)
         .set('Authorization', `Bearer ${userWithNoRoleToken}`),
+    WhenGettingProtectedAreasListForProject: async (projectId: string) =>
+      request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/protected-areas`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .then((response) => response.body),
     ThenItContainsRelevantWdpa: async (response: any) => {
       expect(response).toEqual([
         {
@@ -102,6 +108,13 @@ export const getFixtures = async () => {
           selected: false,
         },
       ]);
+    },
+    ThenItContainsListOfCustomProtectedAreas: async (response: any) => {
+      expect(response.data).toHaveLength(1);
+      expect(response.data[0].attributes.fullName).toBe(
+        'custom protected area',
+      );
+      expect(response.data[0].attributes.scenarioUsageCount).toBe(1);
     },
     GivenCustomProtectedAreaWasAddedToProject: async () => {
       const ids: { id: string }[] = await wdpa.query(
