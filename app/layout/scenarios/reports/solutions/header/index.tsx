@@ -8,13 +8,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import LOGO_BLACK from 'images/logo-black.png';
 
-export interface ScenariosReportHeaderProps {
-  title: string;
-}
-
-export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
-  title,
-}: ScenariosReportHeaderProps) => {
+export const ScenariosReportHeader = ({ title }: { title: string }): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 

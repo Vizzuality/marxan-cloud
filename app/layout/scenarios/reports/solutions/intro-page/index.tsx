@@ -10,9 +10,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import LOGO_BLACK from 'svgs/logo-black.svg';
 
-export interface IntroPageProps {}
-
-export const IntroPage: React.FC<IntroPageProps> = () => {
+export const IntroPage = (): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 

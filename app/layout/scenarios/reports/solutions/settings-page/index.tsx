@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useRouter } from 'next/router';
 
 import { useSelectedFeatures } from 'hooks/features';
@@ -9,9 +7,7 @@ import { useWDPACategories } from 'hooks/wdpa';
 
 import { SCENARIO_PARAMETERS, Types } from './constants';
 
-export interface SettingsPageProps {}
-
-export const SettingsPage: React.FC<SettingsPageProps> = () => {
+export const SettingsPage = (): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 

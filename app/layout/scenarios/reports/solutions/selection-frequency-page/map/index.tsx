@@ -16,13 +16,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import Map from 'components/map';
 
-export interface ScenariosReportMapProps {
-  id: string;
-}
-
-export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
-  id,
-}: ScenariosReportMapProps) => {
+export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
   const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 

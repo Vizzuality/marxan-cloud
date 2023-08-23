@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useDispatch } from 'react-redux';
 
@@ -17,13 +17,7 @@ import { useBestSolution, useSolution } from 'hooks/solutions';
 
 import Map from 'components/map';
 
-export interface ScenariosReportMapProps {
-  id: string;
-}
-
-export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
-  id,
-}: ScenariosReportMapProps) => {
+export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
   const accessToken = useAccessToken();
   const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);

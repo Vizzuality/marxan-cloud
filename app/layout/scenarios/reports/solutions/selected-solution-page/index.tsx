@@ -9,9 +9,7 @@ import { useBestSolution, useSolution } from 'hooks/solutions';
 import LegendItem from 'components/map/legend/item/component';
 import ScenarioReportsMap from 'layout/scenarios/reports/solutions/selected-solution-page/map';
 
-export interface SelectedSolutionPageProps {}
-
-export const SelectedSolutionPage: React.FC<SelectedSolutionPageProps> = () => {
+export const SelectedSolutionPage = (): JSX.Element => {
   const { query } = useRouter();
   const { sid, solutionId } = query as { sid: string; solutionId: string };
 

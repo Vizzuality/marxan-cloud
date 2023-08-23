@@ -12,9 +12,7 @@ import LegendItem from 'components/map/legend/item/component';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import ScenarioReportsMap from 'layout/scenarios/reports/solutions/selection-frequency-page/map';
 
-export interface SelectionFrequencyPageProps {}
-
-export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () => {
+export const SelectionFrequencyPage = (): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
