@@ -88,10 +88,6 @@ export interface UseRunScenarioProps {
   requestConfig?: AxiosRequestConfig;
 }
 
-export interface RunScenarioProps {
-  id: string | string[];
-}
-
 export interface UseCancelRunScenarioProps {
   requestConfig?: AxiosRequestConfig;
 }

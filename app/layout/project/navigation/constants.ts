@@ -35,13 +35,14 @@ export const NAVIGATION_TREE = {
 
 export const MENU_COMMON_CLASSES = 'flex flex-col items-center space-y-2';
 export const MENU_ITEM_COMMON_CLASSES =
-  'flex group rounded-xl cursor-pointer bg-transparent transition-colors first:mt-2';
+  'group flex cursor-pointer rounded-xl bg-transparent transition-colors first:mt-2';
 
 export const MENU_ITEM_ACTIVE_CLASSES =
-  'group/active bg-primary-400 border-primary-400 hover:border-primary-400';
-export const MENU_ITEM_DISABLED_CLASSES = 'pointer-events-none opacity-50';
-
-export const ICONS_COMMON_CLASSES =
-  'h-5 w-5 text-gray-400 group-hover:text-white group-[.bg-primary-400]:text-gray-500';
+  'group/active border-primary-400 bg-primary-400 hover:border-primary-400';
 
 export const MENU_ITEM_BUTTON_COMMON_CLASSES = 'flex p-[10px]';
+export const MENU_ITEM_BUTTON_DISABLED_CLASSES = 'cursor-default opacity-50';
+
+export const ICON_COMMON_CLASSES =
+  'h-5 w-5 text-gray-400 group-hover:text-white group-[.bg-primary-400]:text-gray-500';
+export const ICON_DISABLED_CLASSES = 'group-hover:text-gray-400';

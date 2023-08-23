@@ -1,12 +1,11 @@
 import { QueryClient } from 'react-query';
 
+import { NAVIGATION_TREE } from 'layout/project/navigation/constants';
 import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import { dehydrate } from 'react-query/hydration';
-
-import { NAVIGATION_TREE } from 'layout/project/navigation/constants';
+import { Project } from 'types/api/project';
 import { Scenario } from 'types/api/scenario';
-import { Solution } from 'types/api/solution';
 
 import ROLES from 'services/roles';
 import SCENARIOS from 'services/scenarios';
@@ -14,7 +13,7 @@ import USERS from 'services/users';
 
 import { mergeDehydratedState } from './utils';
 
-const fetchUser = (session: Session, queryClient) => {
+const fetchUser = (session: Session, queryClient: QueryClient) => {
   return queryClient.prefetchQuery('me', () =>
     USERS.request({
       method: 'GET',
@@ -31,7 +30,11 @@ const fetchUser = (session: Session, queryClient) => {
   );
 };
 
-const fetchProjectUsers = (session: Session, queryClient, { pid }) => {
+const fetchProjectUsers = (
+  session: Session,
+  queryClient: QueryClient,
+  { pid }: { pid: Project['id'] }
+) => {
   return queryClient.prefetchQuery(['roles', pid], () =>
     ROLES.request({
       method: 'GET',
@@ -47,9 +50,13 @@ const fetchProjectUsers = (session: Session, queryClient, { pid }) => {
   );
 };
 
-const fetchScenario = (session: Session, queryClient, { sid }) => {
-  return queryClient.prefetchQuery(['scenarios', sid], () =>
-    SCENARIOS.request({
+const fetchScenario = (
+  session: Session,
+  queryClient: QueryClient,
+  { sid }: { sid: Scenario['id'] }
+) => {
+  return queryClient.prefetchQuery(['scenario', sid], () =>
+    SCENARIOS.request<{ data: Scenario }>({
       method: 'GET',
       url: `/${sid}`,
       headers: {
@@ -61,23 +68,11 @@ const fetchScenario = (session: Session, queryClient, { sid }) => {
   );
 };
 
-const fetchScenarioSolutions = (session: Session, { sid }: { sid: Scenario['id'] }) => {
-  return SCENARIOS.request<{ data: Solution[] }>({
-    method: 'GET',
-    url: `/${sid}/marxan/solutions`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[size]': 1,
-      'page[number]': 1,
-    },
-  }).then((response) => {
-    return response.data?.data;
-  });
-};
-
-const fetchScenarioLock = (session, queryClient, { sid }) => {
+const fetchScenarioLock = (
+  session: Session,
+  queryClient: QueryClient,
+  { sid }: { sid: Scenario['id'] }
+) => {
   return queryClient.prefetchQuery(['scenario-lock', sid], () =>
     SCENARIOS.request({
       method: 'GET',
@@ -117,7 +112,7 @@ export function withScenario(getServerSidePropsFunc?: Function) {
     const queryClient = new QueryClient();
 
     await fetchScenario(session, queryClient, { sid });
-    const scenario = queryClient.getQueryData<{ data: Scenario }>(['scenarios', sid]);
+    const scenario = queryClient.getQueryData<{ data: Scenario }>(['scenario', sid])?.data;
 
     if (!scenario) {
       return {
@@ -271,23 +266,13 @@ export function withSolutions(getServerSidePropsFunc?: Function) {
     const { pid, tab, sid } = query as { pid: string; tab: string; sid: string };
 
     const queryClient = new QueryClient();
-    const solutions = await fetchScenarioSolutions(session, { sid });
-    queryClient.setQueryData(
-      [
-        'all-solutions',
-        sid,
-        JSON.stringify({
-          disablePagination: false,
-          'page[size]': 1,
-          'page[number]': 1,
-        }),
-      ],
-      { data: solutions }
-    );
 
-    // ? if the scenarios has no solutions and the user is trying to access the solutions tab,
+    await fetchScenario(session, queryClient, { sid });
+    const scenario = queryClient.getQueryData<{ data: Scenario }>(['scenario', sid])?.data;
+
+    // ? if the scenario has not been ran at least once and the user tries to access the solutions tab,
     // ? it will be redirected to the overview tab as the solutions menu should be disabled.
-    if (NAVIGATION_TREE.solutions.includes(tab) && !solutions.length) {
+    if (NAVIGATION_TREE.solutions.includes(tab) && !scenario.ranAtLeastOnce) {
       return {
         props: {},
         redirect: {
