@@ -69,7 +69,7 @@ const ComparisonScreenshot = (): JSX.Element => {
       <Head title="Comparison screenshot" />
       <MetaIcons />
       <div style={styles.page} className="flex h-full flex-col space-y-3 bg-white text-black">
-        <header className="flex w-full items-start justify-between pb-6">
+        <header className="flex w-full items-start justify-between pb-4">
           <div className="mx-auto w-11/12">
             <div className="flex flex-col space-y-8">
               <div>
@@ -105,17 +105,14 @@ const ComparisonScreenshot = (): JSX.Element => {
           <ScreenshotMap id="comparison-map-1" />
         </div>
         {reportDataIsFetched && (
-          <div className="flex items-start justify-between space-x-14 bg-gray-50 px-16 py-12">
-            <div className="flex flex-col space-y-8 text-base text-black">
+          <div className="flex items-start justify-between space-x-14 bg-gray-50 px-16 py-8">
+            <div className="flex flex-col space-y-8 text-sm text-black">
               <p className="font-semibold"> Solutions Distribution:</p>
               <ul className="flex w-full flex-col space-y-2">
                 {items.map(({ value, color }) => (
-                  <li
-                    key={`${value}`}
-                    className="flex items-center space-x-2 font-heading text-base"
-                  >
+                  <li key={`${value}`} className="flex items-center space-x-2 font-heading text-sm">
                     <div
-                      className="h-5 w-5 flex-shrink-0 rounded-sm"
+                      className="h-4 w-4 flex-shrink-0 rounded-sm"
                       style={{
                         backgroundColor: color,
                       }}
