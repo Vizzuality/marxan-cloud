@@ -27,6 +27,7 @@ import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ProjectProtectedAreasService } from './project-protected-areas.service';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
+import { assertDefined } from '@marxan/utils';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -43,6 +44,7 @@ export class ProjectProtectedAreasController {
   })
   @ApiOkResponse({
     type: ProtectedArea,
+    isArray: true,
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
@@ -51,9 +53,11 @@ export class ProjectProtectedAreasController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProtectedArea[]> {
+    assertDefined(req.user);
+
     const result = await this.projectProtectedAreasService.listForProject(
       projectId,
-      req.user?.id,
+      req.user.id,
     );
 
     if (isLeft(result)) {

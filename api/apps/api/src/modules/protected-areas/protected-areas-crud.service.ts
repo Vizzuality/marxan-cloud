@@ -152,7 +152,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
         'countryId',
         'status',
         'designation',
-        'scenarioUsageCount'
+        'scenarioUsageCount',
       ],
       keyForAttribute: 'camelCase',
     };
