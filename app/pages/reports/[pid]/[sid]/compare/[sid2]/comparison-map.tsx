@@ -27,7 +27,7 @@ const styles = {
     margin: 'auto',
     padding: '8.73mm 13.49mm',
     width: '200mm',
-    'page-break-after': 'auto',
+    'page-break-after': 'avoid',
   },
 };
 
@@ -104,7 +104,7 @@ const ComparisonScreenshot = (): JSX.Element => {
         <div className="mx-auto w-11/12">
           <ScreenshotMap id="comparison-map-1" />
         </div>
-        {/* {reportDataIsFetched && (
+        {reportDataIsFetched && (
           <div className="flex items-start justify-between space-x-14 bg-gray-50 px-16 py-7">
             <div className="flex flex-col space-y-8 text-sm text-black">
               <p className="font-semibold"> Solutions Distribution:</p>
@@ -209,7 +209,7 @@ const ComparisonScreenshot = (): JSX.Element => {
               </div>
             </div>
           </div>
-        )} */}
+        )}
       </div>
 
       <WebShotStatus />
