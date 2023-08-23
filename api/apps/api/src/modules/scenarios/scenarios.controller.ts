@@ -399,7 +399,7 @@ export class ScenariosController {
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
   @ApiTags(asyncJobTag)
-  @Post(`:scenarioId/cost-surface/shapefile`)
+  @Get(`:scenarioId/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
     @Param(':scenarioId') scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
