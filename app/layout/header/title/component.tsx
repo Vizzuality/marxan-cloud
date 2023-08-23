@@ -111,7 +111,7 @@ export const Title: React.FC<TitleProps> = () => {
           },
         },
         {
-          onSuccess: ({ data: { data: s } }) => {
+          onSuccess: ({ data }) => {
             addToast(
               'save-scenario-name',
               <>
@@ -122,7 +122,7 @@ export const Title: React.FC<TitleProps> = () => {
                 level: 'success',
               }
             );
-            console.info('Scenario name saved succesfully', s);
+            console.info('Scenario name saved succesfully', data);
           },
           onError: () => {
             addToast(

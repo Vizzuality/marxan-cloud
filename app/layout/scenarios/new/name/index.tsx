@@ -5,7 +5,9 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
+import Pill from 'layout/pill';
 import { usePlausible } from 'next-plausible';
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
@@ -18,8 +20,6 @@ import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Loading from 'components/loading';
-import Pill from 'layout/pill';
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 export const ScenariosSidebarName = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
@@ -58,19 +58,19 @@ export const ScenariosSidebarName = (): JSX.Element => {
           },
         },
         {
-          onSuccess: ({ data: { data: s } }) => {
+          onSuccess: ({ data }) => {
             addToast(
               'success-scenario-create',
               <>
                 <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">{`Scenario "${s.name}" created`}</p>
+                <p className="text-sm">{`Scenario "${data.name}" created`}</p>
               </>,
               {
                 level: 'success',
               }
             );
 
-            push(`/projects/${pid}/scenarios/${s.id}/edit?tab=protected-areas`);
+            push(`/projects/${pid}/scenarios/${data.id}/edit?tab=protected-areas`);
             plausible('New scenario', {
               props: {
                 userId: `${user.id}`,

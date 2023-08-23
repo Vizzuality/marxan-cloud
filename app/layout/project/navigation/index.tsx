@@ -1,5 +1,7 @@
 import { PropsWithChildren, useCallback, useEffect, useState, MouseEvent } from 'react';
 
+import { useQueryClient } from 'react-query';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -55,6 +57,7 @@ export const MenuTooltip = ({ children }: PropsWithChildren): JSX.Element => {
 export const TOOLTIP_OFFSET: TippyProps['offset'] = [0, 10];
 
 export const Navigation = (): JSX.Element => {
+  const queryClient = useQueryClient();
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
@@ -97,7 +100,7 @@ export const Navigation = (): JSX.Element => {
       return Object.keys(prevState).reduce<typeof submenuState>(
         (acc, key) => ({
           ...acc,
-          [key]: key === submenuKey ? true : false,
+          [key]: key === submenuKey,
         }),
         prevState
       );
@@ -145,6 +148,19 @@ export const Navigation = (): JSX.Element => {
     if (isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab))
       toggleSubmenu('advancedSettings');
   }, [tab, isProjectRoute, isScenarioRoute, toggleSubmenu]);
+
+  const runJob = JOBS.find(({ kind }) => kind === 'run');
+
+  useEffect(() => {
+    const checkRunJob = async () => {
+      if ((['done', 'failure'] as (typeof runJob)['status'][]).includes(runJob?.status)) {
+        await queryClient.invalidateQueries(['scenario', sid]);
+      }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    checkRunJob();
+  }, [runJob, queryClient, sid]);
 
   return (
     <nav className="z-20 flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-700 px-2 py-8">

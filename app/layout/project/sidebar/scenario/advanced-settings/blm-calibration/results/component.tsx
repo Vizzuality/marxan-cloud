@@ -6,6 +6,10 @@ import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
+import { blmFormat } from 'utils/units';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario, useScenarioCalibrationResults } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -17,9 +21,6 @@ import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
-import { blmFormat } from 'utils/units';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import BlmChart from '../../blm-calibration/chart';
 
@@ -101,7 +102,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
           },
         },
         {
-          onSuccess: ({ data: { data: s } }) => {
+          onSuccess: ({ data }) => {
             setSubmitting(false);
             addToast(
               'success-save-blm-value',
@@ -114,7 +115,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
               }
             );
 
-            console.info('Scenario blm calibration saved', s);
+            console.info('Scenario blm calibration saved', data);
           },
           onError: () => {
             setSubmitting(false);
