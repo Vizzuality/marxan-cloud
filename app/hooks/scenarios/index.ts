@@ -11,7 +11,7 @@ import {
 
 import { useRouter } from 'next/router';
 
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
@@ -32,8 +32,6 @@ import UPLOADS from 'services/uploads';
 
 import {
   UseScenariosOptionsProps,
-  UseSaveScenarioProps,
-  SaveScenarioProps,
   UseDeleteScenarioProps,
   DeleteScenarioProps,
   UseUploadScenarioCostSurfaceProps,
@@ -46,8 +44,6 @@ import {
   UseUploadPAProps,
   UseDuplicateScenarioProps,
   DuplicateScenarioProps,
-  UseRunScenarioProps,
-  RunScenarioProps,
   UseCancelRunScenarioProps,
   CancelRunScenarioProps,
   UseSaveScenarioCalibrationRangeProps,
@@ -481,6 +477,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
 export function useScenario(id: Scenario['id']) {
   const { data: session } = useSession();
+
   return useQuery({
     queryKey: ['scenario', id],
     queryFn: async () =>
@@ -504,28 +501,30 @@ export function useSaveScenario({
   requestConfig = {
     method: 'POST',
   },
-}: UseSaveScenarioProps) {
+}: {
+  requestConfig?: AxiosRequestConfig<{ data: Scenario }>;
+}) {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
 
-  const saveScenario = ({ id, data }: SaveScenarioProps) => {
-    return SCENARIOS.request({
+  const saveScenario = ({ id, data }: { id?: Scenario['id']; data: Record<string, unknown> }) => {
+    return SCENARIOS.request<{ data: Scenario }>({
       url: id ? `/${id}` : '/',
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
-    });
+    }).then((response) => response.data);
   };
 
   return useMutation(saveScenario, {
-    onSuccess: async (data: any) => {
-      const { id, projectId } = data?.data?.data;
+    onSuccess: async ({ data }) => {
+      const { id, projectId } = data;
 
       await queryClient.invalidateQueries(['scenarios', projectId]);
       await queryClient.invalidateQueries(['scenario', id]);
-      queryClient.setQueryData(['scenario', id], data?.data?.data);
+      queryClient.setQueryData(['scenario', id], data);
     },
   });
 }
@@ -813,11 +812,13 @@ export function useRunScenario({
   requestConfig = {
     method: 'POST',
   },
-}: UseRunScenarioProps) {
+}: {
+  requestConfig?: AxiosRequestConfig;
+}) {
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
 
-  const duplicateScenario = ({ id }: RunScenarioProps) => {
-    // Pending endpoint
+  const runScenario = ({ id }: { id: Scenario['id'] }) => {
     return SCENARIOS.request({
       url: `/${id}/marxan`,
       headers: {
@@ -827,12 +828,12 @@ export function useRunScenario({
     });
   };
 
-  return useMutation(duplicateScenario, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Success', data, variables, context);
+  return useMutation(runScenario, {
+    onSuccess: async (data, variables) => {
+      const { id } = variables;
+      await queryClient.invalidateQueries(['scenario', id]);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });

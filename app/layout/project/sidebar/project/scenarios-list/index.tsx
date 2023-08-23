@@ -7,7 +7,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import HelpBeacon from 'layout/help/beacon';
+import ScenarioToolbar from 'layout/project/sidebar/project/scenarios-list/toolbar';
 import { flatten } from 'lodash';
+import { cn } from 'utils/cn';
 
 import { useCanEditProject } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
@@ -25,9 +28,6 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
-import HelpBeacon from 'layout/help/beacon';
-import ScenarioToolbar from 'layout/project/sidebar/project/scenarios-list/toolbar';
-import { cn } from 'utils/cn';
 
 import bgScenariosDashboard from 'images/new-layout/bg-scenarios-dashboard.png';
 
@@ -86,10 +86,10 @@ export const ScenariosList: React.FC = () => {
       {
         onSuccess: () => {
           addToast(
-            `success-project-delete-${deleteScenario.id}`,
+            `success-scenario-delete-${deleteScenario.id}`,
             <>
               <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">{`Project "${deleteScenario.name}" deleted`}</p>
+              <p className="text-sm">{`Scenario "${deleteScenario.name}" deleted`}</p>
             </>,
             {
               level: 'success',

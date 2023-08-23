@@ -1,20 +1,21 @@
-import { PropsWithChildren, useCallback, useEffect, useState } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useState, MouseEvent } from 'react';
+
+import { useQueryClient } from 'react-query';
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { TippyProps } from '@tippyjs/react/headless';
+import { useScenarioJobs } from 'layout/scenarios/edit/status/utils';
+import { cn } from 'utils/cn';
 
-import { useRunScenario, useScenarioStatus } from 'hooks/scenarios';
-import { useAllSolutions } from 'hooks/solutions';
+import { useRunScenario, useScenario, useScenarioStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tooltip from 'components/tooltip';
-import { useScenarioJobs } from 'layout/scenarios/edit/status/utils';
-import { cn } from 'utils/cn';
 
 import ADVANCED_SETTINGS_SVG from 'svgs/navigation/advanced-settings.svg?sprite';
 import GRID_SETUP_SVG from 'svgs/navigation/grid-setup.svg?sprite';
@@ -29,9 +30,10 @@ import {
   MENU_COMMON_CLASSES,
   MENU_ITEM_COMMON_CLASSES,
   MENU_ITEM_ACTIVE_CLASSES,
-  MENU_ITEM_DISABLED_CLASSES,
   MENU_ITEM_BUTTON_COMMON_CLASSES,
-  ICONS_COMMON_CLASSES,
+  MENU_ITEM_BUTTON_DISABLED_CLASSES,
+  ICON_COMMON_CLASSES,
+  ICON_DISABLED_CLASSES,
   NAVIGATION_TREE,
 } from './constants';
 import {
@@ -55,6 +57,7 @@ export const MenuTooltip = ({ children }: PropsWithChildren): JSX.Element => {
 export const TOOLTIP_OFFSET: TippyProps['offset'] = [0, 10];
 
 export const Navigation = (): JSX.Element => {
+  const queryClient = useQueryClient();
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
@@ -79,15 +82,11 @@ export const Navigation = (): JSX.Element => {
   const { jobs = [] } = scenarioStatusData || {};
   const JOBS = useScenarioJobs(jobs);
 
+  const scenarioQuery = useScenario(sid);
+
   const scenarioIsRunning = JOBS.find((j) => j.kind === 'run')?.status === 'running';
 
   const runScenarioMutation = useRunScenario({});
-
-  const allSolutionsQuery = useAllSolutions(sid, {
-    disablePagination: false,
-    'page[size]': 1,
-    'page[number]': 1,
-  });
 
   const toggleSubmenu = useCallback((submenuKey: NavigationTreeCategories) => {
     if (submenuKey === 'user') {
@@ -101,7 +100,7 @@ export const Navigation = (): JSX.Element => {
       return Object.keys(prevState).reduce<typeof submenuState>(
         (acc, key) => ({
           ...acc,
-          [key]: key === submenuKey ? true : false,
+          [key]: key === submenuKey,
         }),
         prevState
       );
@@ -140,7 +139,7 @@ export const Navigation = (): JSX.Element => {
     );
   }, [addToast, runScenarioMutation, sid]);
 
-  const isSolutionTabEnabled = Boolean(allSolutionsQuery.data?.length);
+  const isSolutionsSectionEnabled = scenarioQuery.data?.ranAtLeastOnce ?? false;
 
   useEffect(() => {
     if (isProjectRoute && NAVIGATION_TREE.inventory.includes(tab)) toggleSubmenu('inventory');
@@ -149,6 +148,19 @@ export const Navigation = (): JSX.Element => {
     if (isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab))
       toggleSubmenu('advancedSettings');
   }, [tab, isProjectRoute, isScenarioRoute, toggleSubmenu]);
+
+  const runJob = JOBS.find(({ kind }) => kind === 'run');
+
+  useEffect(() => {
+    const checkRunJob = async () => {
+      if ((['done', 'failure'] as (typeof runJob)['status'][]).includes(runJob?.status)) {
+        await queryClient.invalidateQueries(['scenario', sid]);
+      }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    checkRunJob();
+  }, [runJob, queryClient, sid]);
 
   return (
     <nav className="z-20 flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-700 px-2 py-8">
@@ -178,7 +190,7 @@ export const Navigation = (): JSX.Element => {
                         className={MENU_ITEM_BUTTON_COMMON_CLASSES}
                         onClick={() => toggleSubmenu('user')}
                       >
-                        <Icon className={ICONS_COMMON_CLASSES} icon={MENU_SVG} />
+                        <Icon className={ICON_COMMON_CLASSES} icon={MENU_SVG} />
                       </button>
                     </PopoverTrigger>
                     <PopoverContent
@@ -216,7 +228,7 @@ export const Navigation = (): JSX.Element => {
                   >
                     <Icon
                       className={cn({
-                        [ICONS_COMMON_CLASSES]: true,
+                        [ICON_COMMON_CLASSES]: true,
                         'pointer-events-none': true,
                       })}
                       icon={INVENTORY_SVG}
@@ -241,7 +253,7 @@ export const Navigation = (): JSX.Element => {
                   content={<MenuTooltip>Scenario</MenuTooltip>}
                 >
                   <Link href={`/projects/${pid}`} className={MENU_ITEM_BUTTON_COMMON_CLASSES}>
-                    <Icon className={ICONS_COMMON_CLASSES} icon={SCENARIO_LIST_SVG} />
+                    <Icon className={ICON_COMMON_CLASSES} icon={SCENARIO_LIST_SVG} />
                   </Link>
                 </Tooltip>
               </li>
@@ -267,7 +279,7 @@ export const Navigation = (): JSX.Element => {
                     className={MENU_ITEM_BUTTON_COMMON_CLASSES}
                     onClick={() => toggleSubmenu('gridSetup')}
                   >
-                    <Icon className={ICONS_COMMON_CLASSES} icon={GRID_SETUP_SVG} />
+                    <Icon className={ICON_COMMON_CLASSES} icon={GRID_SETUP_SVG} />
                   </button>
                 </Tooltip>
               </li>
@@ -293,7 +305,7 @@ export const Navigation = (): JSX.Element => {
                     className={MENU_ITEM_BUTTON_COMMON_CLASSES}
                     onClick={() => toggleSubmenu('advancedSettings')}
                   >
-                    <Icon className={ICONS_COMMON_CLASSES} icon={ADVANCED_SETTINGS_SVG} />
+                    <Icon className={ICON_COMMON_CLASSES} icon={ADVANCED_SETTINGS_SVG} />
                   </button>
                 </Tooltip>
               </li>
@@ -308,8 +320,7 @@ export const Navigation = (): JSX.Element => {
                   [MENU_ITEM_ACTIVE_CLASSES]:
                     isScenarioRoute &&
                     NAVIGATION_TREE.solutions.includes(tab) &&
-                    isSolutionTabEnabled,
-                  [MENU_ITEM_DISABLED_CLASSES]: !isSolutionTabEnabled,
+                    isSolutionsSectionEnabled,
                 })}
               >
                 <Tooltip
@@ -319,10 +330,23 @@ export const Navigation = (): JSX.Element => {
                 >
                   <button
                     type="button"
-                    className={MENU_ITEM_BUTTON_COMMON_CLASSES}
-                    onClick={() => toggleSubmenu('solutions')}
+                    className={cn({
+                      [MENU_ITEM_BUTTON_COMMON_CLASSES]: true,
+                      [MENU_ITEM_BUTTON_DISABLED_CLASSES]: !isSolutionsSectionEnabled,
+                    })}
+                    onClick={(evt: MouseEvent<HTMLButtonElement>) => {
+                      return !isSolutionsSectionEnabled
+                        ? evt.preventDefault()
+                        : toggleSubmenu('solutions');
+                    }}
                   >
-                    <Icon className={ICONS_COMMON_CLASSES} icon={SOLUTIONS_SVG} />
+                    <Icon
+                      className={cn({
+                        [ICON_COMMON_CLASSES]: true,
+                        [ICON_DISABLED_CLASSES]: !isSolutionsSectionEnabled,
+                      })}
+                      icon={SOLUTIONS_SVG}
+                    />
                   </button>
                 </Tooltip>
               </li>

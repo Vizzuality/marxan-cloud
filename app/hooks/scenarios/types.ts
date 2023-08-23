@@ -6,15 +6,6 @@ export interface UseScenariosOptionsProps {
   filters?: Record<string, unknown>;
 }
 
-export interface UseSaveScenarioProps {
-  requestConfig?: AxiosRequestConfig;
-}
-
-export interface SaveScenarioProps {
-  id?: string;
-  data: any;
-}
-
 export interface UseDeleteScenarioProps {
   requestConfig?: AxiosRequestConfig;
 }
@@ -82,14 +73,6 @@ export interface UseDuplicateScenarioProps {
 
 export interface DuplicateScenarioProps {
   sid: string | string[];
-}
-
-export interface UseRunScenarioProps {
-  requestConfig?: AxiosRequestConfig;
-}
-
-export interface RunScenarioProps {
-  id: string | string[];
 }
 
 export interface UseCancelRunScenarioProps {

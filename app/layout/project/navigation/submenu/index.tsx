@@ -1,8 +1,9 @@
 import Link from 'next/link';
 
+import { cn } from 'utils/cn';
+
 import Icon, { IconProps } from 'components/icon';
 import Tooltip from 'components/tooltip';
-import { cn } from 'utils/cn';
 
 import { MenuTooltip, TOOLTIP_OFFSET } from '../';
 
