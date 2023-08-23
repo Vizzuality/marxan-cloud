@@ -15,15 +15,15 @@ import axios, { AxiosError } from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
+import { Job } from 'types/api/job';
+import { Project } from 'types/api/project';
+import { Scenario } from 'types/api/scenario';
+import { createDownloadLink } from 'utils/download';
 
 import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
-import { Job } from 'types/api/job';
-import { Project } from 'types/api/project';
-import { Scenario } from 'types/api/scenario';
-import { createDownloadLink } from 'utils/download';
 
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
@@ -47,7 +47,6 @@ import {
   UseDuplicateScenarioProps,
   DuplicateScenarioProps,
   UseRunScenarioProps,
-  RunScenarioProps,
   UseCancelRunScenarioProps,
   CancelRunScenarioProps,
   UseSaveScenarioCalibrationRangeProps,
@@ -520,7 +519,7 @@ export function useSaveScenario({
   };
 
   return useMutation(saveScenario, {
-    onSuccess: async (data: any) => {
+    onSuccess: async (data) => {
       const { id, projectId } = data?.data?.data;
 
       await queryClient.invalidateQueries(['scenarios', projectId]);
@@ -817,8 +816,7 @@ export function useRunScenario({
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
-  const duplicateScenario = ({ id }: RunScenarioProps) => {
-    // Pending endpoint
+  const duplicateScenario = ({ id }: { id: Scenario['id'] }) => {
     return SCENARIOS.request({
       url: `/${id}/marxan`,
       headers: {
@@ -829,9 +827,9 @@ export function useRunScenario({
   };
 
   return useMutation(duplicateScenario, {
-    onSuccess: (data, variables) => {
+    onSuccess: async (data, variables) => {
       const { id } = variables;
-      queryClient.invalidateQueries(['scenario', id]);
+      await queryClient.invalidateQueries(['scenario', id]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
