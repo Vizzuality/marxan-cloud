@@ -62,7 +62,6 @@ export const ProjectMap = (): JSX.Element => {
   const [bounds, setBounds] = useState(null);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
-  const [PDFLoader, setPDFLoader] = useState<boolean>(false);
 
   const { query } = useRouter();
   const { pid, tab } = query as { pid: string; tab: string };
@@ -70,16 +69,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const { addToast } = useToasts();
 
-  const {
-    id,
-    bbox,
-    name: projectName,
-    // countryId,
-    // adminAreaLevel1Id,
-    // adminAreaLevel2Id,
-    // planningUnitGridShape,
-    // planningUnitAreakm2,
-  } = data;
+  const { id, bbox, name: projectName } = data;
 
   const BBOX = useBBOX({
     bbox,
@@ -326,7 +316,6 @@ export const ProjectMap = (): JSX.Element => {
   });
 
   const onDownloadReport = useCallback(() => {
-    setPDFLoader(true);
     addToast(
       `info-generating-report-${pid}`,
       <>
@@ -339,11 +328,9 @@ export const ProjectMap = (): JSX.Element => {
     );
 
     downloadScenarioComparisonReportMutation.mutate(
-      { sid1, sid2 },
+      { sid1, sid2, projectName },
       {
         onSuccess: () => {
-          setPDFLoader(false);
-
           addToast(
             `success-generating-report-${pid}`,
             <>
@@ -356,8 +343,6 @@ export const ProjectMap = (): JSX.Element => {
           );
         },
         onError: () => {
-          setPDFLoader(false);
-
           addToast(
             `error-generating-report-${pid}`,
             <>

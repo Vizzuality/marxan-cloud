@@ -837,7 +837,15 @@ export function useDownloadScenarioComparisonReport({
 }) {
   const { data: session } = useSession();
 
-  const downloadScenarioComparisonReport = ({ sid1, sid2 }: { sid1: string; sid2: string }) => {
+  const downloadScenarioComparisonReport = ({
+    sid1,
+    sid2,
+    projectName,
+  }: {
+    sid1: string;
+    sid2: string;
+    projectName: string;
+  }) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
     return axios.request({
@@ -852,9 +860,10 @@ export function useDownloadScenarioComparisonReport({
   };
 
   return useMutation(downloadScenarioComparisonReport, {
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
+      const { projectName } = variables;
       const { data: blob } = data;
-      createDownloadLink(blob, 'scenario-comparison.pdf');
+      createDownloadLink(blob, `${projectName}-scenario-comparison.pdf`);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
