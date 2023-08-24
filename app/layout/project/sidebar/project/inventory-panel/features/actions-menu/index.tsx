@@ -1,20 +1,21 @@
-import { useCallback, useState, ButtonHTMLAttributes } from 'react';
+import { useCallback, useState } from 'react';
 
-import { FileEdit, Trash2, Tag } from 'lucide-react';
-
+import Icon from 'components/icon';
 import Modal from 'components/modal/component';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete';
 import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
 import { cn } from 'utils/cn';
 
+import EDIT_SVG from 'svgs/project/edit.svg?sprite';
+import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
+
 const BUTTON_CLASSES =
   'flex items-center px-4 py-2 w-full text-sm cursor-pointer bg-gray-700 hover:bg-gray-500 transition transition-colors space-x-2 group';
 
-const ICON_CLASSES = 'text-gray-400 group-hover:text-white';
+const ICON_CLASSES = 'h-5 w-5 text-gray-400 group-hover:text-white';
 
 const ActionsMenu = ({
   item,
-  onEditName,
 }: {
   item: {
     id: string;
@@ -23,7 +24,6 @@ const ActionsMenu = ({
     tag: string;
     custom: boolean;
   };
-  onEditName: (evt: Parameters<ButtonHTMLAttributes<HTMLButtonElement>['onClick']>[0]) => void;
 }): JSX.Element => {
   const isDeletable = !item.custom && !item.scenarios;
 
@@ -42,26 +42,14 @@ const ActionsMenu = ({
       <li>
         <button
           type="button"
-          onClick={onEditName}
-          className={cn({
-            [BUTTON_CLASSES]: true,
-            'rounded-t-2xl': true,
-          })}
-        >
-          <FileEdit className={ICON_CLASSES} size={20} />
-          <span>Rename</span>
-        </button>
-      </li>
-      <li>
-        <button
-          type="button"
           onClick={() => handleModal('edit', true)}
           className={cn({
             [BUTTON_CLASSES]: true,
+            'rounded-t-2xl': true,
             'last:rounded-b-2xl': !isDeletable,
           })}
         >
-          <Tag className={ICON_CLASSES} size={20} />
+          <Icon icon={EDIT_SVG} className={ICON_CLASSES} />
           <span>Edit</span>
         </button>
         <Modal
@@ -86,7 +74,7 @@ const ActionsMenu = ({
               'rounded-b-2xl': true,
             })}
           >
-            <Trash2 className={ICON_CLASSES} size={20} />
+            <Icon icon={DELETE_SVG} className={ICON_CLASSES} />
             <span>Delete</span>
           </button>
           <Modal

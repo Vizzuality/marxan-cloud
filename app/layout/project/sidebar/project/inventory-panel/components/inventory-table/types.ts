@@ -5,6 +5,7 @@ export type DataItem = {
   name: string;
   scenarios: number;
   tag: string;
+  isVisibleOnMap: boolean;
 };
 
 export type InventoryTable = {
@@ -16,7 +17,6 @@ export type InventoryTable = {
   };
   sorting: string;
   selectedIds: string[];
-  visibleFeatures: string[];
   onSortChange: (field: string) => void;
   onToggleSeeOnMap: (id: string) => void;
   onSelectRow: (evt: ChangeEvent<HTMLInputElement>) => void;

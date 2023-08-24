@@ -12,31 +12,29 @@ import { RowItem } from './types';
 
 const RowItem = ({
   item,
-  visibleFeatures,
   selectedIds,
   onSelectRow,
   onToggleSeeOnMap,
   ActionsComponent,
 }: RowItem) => {
-  const { id, name, scenarios, tag } = item;
-  const visibleOnMap = visibleFeatures.includes(id);
+  const { id, name, scenarios, tag, isVisibleOnMap } = item;
 
   return (
-    <tr key={id} className="border-b border-gray-400">
+    <tr key={id} className="align-top">
       <td className="pb-2 pr-1 pt-5">
         <Checkbox
           id={`select-${id}`}
           theme="light"
-          className="-mb-0.5 block h-4 w-4 checked:bg-blue-400"
+          className="block h-4 w-4 checked:bg-blue-400"
           onChange={onSelectRow}
           value={id}
           checked={selectedIds.includes(id)}
         />
       </td>
       <td className="px-1 pb-2 pt-5">
-        <div>{name}</div>
+        <span className="inline-flex">{name}</span>
         <div className="mt-1.5 text-xs text-gray-300">
-          Currently in use in {/* TODO Simao: Replace with <Tag /> component */}
+          Currently in use in
           <span className="rounded bg-blue-500 bg-opacity-10 px-1 text-blue-500">
             {scenarios}
           </span>{' '}
@@ -46,22 +44,21 @@ const RowItem = ({
       <td className="px-6 pb-2 pt-5 text-xs">
         {tag && (
           <div className="flex justify-center">
-            <span className="whitespace-nowrap rounded-full bg-yellow-600 bg-opacity-10 px-2 pb-1 pt-0.5 text-yellow-600">
+            <span className="whitespace-nowrap rounded-full bg-yellow-600 bg-opacity-10 px-2 py-1 text-yellow-600">
               {tag}
             </span>
           </div>
         )}
       </td>
-      <td className="pb-2 pl-1 pt-5">
+      <td className="pb-2 pl-1 pr-2 pt-5">
         <div className="flex gap-6">
           <button type="button" onClick={() => onToggleSeeOnMap(id)}>
             <Icon
               className={cn({
-                'h-5 w-5': true,
-                'text-gray-400': !visibleOnMap,
-                'text-blue-400': visibleOnMap,
+                'h-5 w-5 text-gray-400': true,
+                'text-blue-400': isVisibleOnMap,
               })}
-              icon={visibleOnMap ? SHOW_SVG : HIDE_SVG}
+              icon={isVisibleOnMap ? SHOW_SVG : HIDE_SVG}
             />
           </button>
           <Popover>

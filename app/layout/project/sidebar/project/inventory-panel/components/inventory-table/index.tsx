@@ -12,7 +12,6 @@ const InventoryTable = ({
   columns,
   sorting,
   selectedIds,
-  visibleFeatures,
   onSortChange,
   onToggleSeeOnMap,
   onSelectRow,
@@ -23,7 +22,7 @@ const InventoryTable = ({
 
   return (
     <>
-      {loading && (
+      {loading && !data.length && (
         <div className="relative min-h-[200px]">
           <Loading
             visible={true}
@@ -32,11 +31,11 @@ const InventoryTable = ({
         </div>
       )}
       {noData && <div className="flex h-[200px] items-center justify-center">{noDataMessage}</div>}
-      {!loading && !noData && (
-        <table className="w-full table-auto">
-          <thead className="mr-26 block text-left text-xs font-semibold uppercase">
-            <tr>
-              <th className="pb-2 pt-5">
+      {!!data?.length && (
+        <table className="w-full table-auto space-y-2">
+          <thead className="text-left text-xs font-semibold uppercase">
+            <tr className="flex w-full items-center pl-1">
+              <th>
                 <Checkbox
                   id="select-all"
                   theme="light"
@@ -44,7 +43,7 @@ const InventoryTable = ({
                   onChange={onSelectAll}
                 />
               </th>
-              <th className="w-full pl-2">
+              <th className="flex-1 pl-2">
                 <HeaderItem
                   text={'Name'}
                   name={'name'}
@@ -53,7 +52,7 @@ const InventoryTable = ({
                   onClick={onSortChange}
                 />
               </th>
-              <th className="pb-2 pt-2 text-center">
+              <th className="flex flex-1 justify-start py-2 pl-14">
                 <HeaderItem
                   className="justify-center"
                   text={'Type'}
@@ -63,15 +62,13 @@ const InventoryTable = ({
                   onClick={onSortChange}
                 />
               </th>
-              <th className="pb-2 pt-5"></th>
             </tr>
           </thead>
-          <tbody className="block max-h-[calc(100vh-430px)] divide-y divide-gray-400 overflow-y-scroll pb-3 pl-1 pr-2 align-baseline text-sm">
-            {data?.map((item) => (
+          <tbody className="block max-h-[calc(100vh-430px)] divide-y divide-gray-400 overflow-y-auto overflow-x-hidden pl-1 align-baseline text-sm">
+            {data.map((item) => (
               <RowItem
                 key={item.id}
                 item={item}
-                visibleFeatures={visibleFeatures}
                 selectedIds={selectedIds}
                 onSelectRow={onSelectRow}
                 onToggleSeeOnMap={onToggleSeeOnMap}
@@ -84,5 +81,7 @@ const InventoryTable = ({
     </>
   );
 };
+
+export { type DataItem } from './types';
 
 export default InventoryTable;

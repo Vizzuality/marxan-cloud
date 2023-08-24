@@ -1,4 +1,4 @@
-import { useCallback, useState, ChangeEvent, useEffect, useMemo } from 'react';
+import { useCallback, useState, ChangeEvent, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -9,10 +9,15 @@ import { useAllFeatures } from 'hooks/features';
 
 import { Feature } from 'types/api/feature';
 
-import InventoryTable from '../components/inventory-table';
+import InventoryTable, { type DataItem } from '../components/inventory-table';
 
 import ActionsMenu from './actions-menu';
 import FeaturesBulkActionMenu from './bulk-action-menu';
+
+const FEATURES_TABLE_COLUMNS = {
+  name: 'featureClassName',
+  tag: 'tag',
+};
 
 const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -28,15 +33,23 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
-  const allFeaturesQuery = useAllFeatures<Feature[]>(
+  const allFeaturesQuery = useAllFeatures(
     pid,
     {
       ...filters,
       search,
     },
     {
-      select: ({ data }) => data,
+      select: ({ data }) =>
+        data?.map((feature) => ({
+          id: feature.id,
+          name: feature.featureClassName,
+          scenarios: feature.scenarioUsageCount,
+          tag: feature.tag,
+          isCustom: feature.isCustom,
+        })),
       placeholderData: { data: [] },
+      keepPreviousData: true,
     }
   );
 
@@ -91,36 +104,20 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
 
   const displayBulkActions = selectedFeaturesIds.length > 0;
 
-  const tableColumns = useMemo(
-    () => ({
-      name: 'featureClassName',
-      tag: 'tag',
-    }),
-    []
-  );
-
-  const tableData = useMemo(
-    () =>
-      allFeaturesQuery?.data?.map((entry) => ({
-        id: entry.id,
-        name: entry.featureClassName,
-        scenarios: entry.scenarioUsageCount,
-        tag: entry.tag,
-        isCustom: entry.isCustom,
-      })),
-    [allFeaturesQuery?.data]
-  );
+  const data: DataItem[] = allFeaturesQuery.data?.map((feature) => ({
+    ...feature,
+    isVisibleOnMap: visibleFeatures.includes(feature.id),
+  }));
 
   return (
-    <>
+    <div className="space-y-6">
       <InventoryTable
         loading={allFeaturesQuery.isFetching}
-        data={tableData}
+        data={data}
         noDataMessage={noDataMessage}
-        columns={tableColumns}
-        sorting={filters?.sort}
+        columns={FEATURES_TABLE_COLUMNS}
+        sorting={filters.sort}
         selectedIds={selectedFeaturesIds}
-        visibleFeatures={visibleFeatures}
         onSortChange={handleSort}
         onSelectAll={handleSelectAll}
         onSelectRow={handleSelectFeature}
@@ -128,7 +125,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
         ActionsComponent={ActionsMenu}
       />
       {displayBulkActions && <FeaturesBulkActionMenu selectedFeaturesIds={selectedFeaturesIds} />}
-    </>
+    </div>
   );
 };
 
