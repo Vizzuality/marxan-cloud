@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -11,15 +11,14 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useAccessToken } from 'hooks/auth';
 import { useBBOX, usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
+import { useBestSolution } from 'hooks/solutions';
 
 import Map from 'components/map';
 
 export const ReportMap = ({ id }: { id: string }): JSX.Element => {
+  const accessToken = useAccessToken();
   const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
-
-  const accessToken = useAccessToken();
 
   const { query } = useRouter();
 
@@ -27,27 +26,26 @@ export const ReportMap = ({ id }: { id: string }): JSX.Element => {
 
   const dispatch = useAppDispatch();
 
-  const { data } = useProject(pid);
+  const { data = {} } = useProject(pid);
   const { bbox } = data;
   const BBOX = useBBOX({
     bbox,
   });
-
-  const { data: scenarioData } = useScenario(sid);
 
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
 
+  const bestSolutionQuery = useBestSolution(sid, {});
   const PUGridLayer = usePUGridLayer({
     cache,
     active: true,
     sid: sid ? `${sid}` : null,
     include: 'results',
-    sublayers: ['frequency'],
+    sublayers: ['solution'],
     options: {
-      wdpaThreshold: scenarioData?.wdpaThreshold,
+      runId: bestSolutionQuery.data?.runId,
     },
   });
 

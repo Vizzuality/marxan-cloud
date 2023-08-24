@@ -15,8 +15,6 @@ export const FrequencyPage = (): JSX.Element => {
 
   const scenarioQuery = useScenario(sid);
 
-  console.log(scenarioQuery.data);
-
   const LEGEND = useMemo(() => {
     return {
       ...LEGEND_LAYERS.frequency({

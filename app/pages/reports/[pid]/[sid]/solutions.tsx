@@ -4,10 +4,10 @@ import { withProtection, withUser } from 'hoc/auth';
 
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
+import BestSolutionPage from 'layout/scenarios/reports/solutions/best-solution-page';
 import FrequencyPage from 'layout/scenarios/reports/solutions/frequency-page';
 import GridPage from 'layout/scenarios/reports/solutions/grid-page';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
-import SelectedSolutionPage from 'layout/scenarios/reports/solutions/selected-solution-page';
 import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
 import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 
@@ -41,7 +41,7 @@ const MainReport: React.FC = () => {
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader />
-        <SelectedSolutionPage />
+        <BestSolutionPage />
       </div>
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
