@@ -5,6 +5,7 @@ import { withProtection, withUser } from 'hoc/auth';
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
 import BestSolutionPage from 'layout/scenarios/reports/solutions/best-solution-page';
+import DifferentSolutionsPage from 'layout/scenarios/reports/solutions/different-solutions-page';
 import FeaturesPage from 'layout/scenarios/reports/solutions/features-page';
 import FrequencyPage from 'layout/scenarios/reports/solutions/frequency-page';
 import GridPage from 'layout/scenarios/reports/solutions/grid-page';
@@ -57,6 +58,15 @@ const MainReport: React.FC = () => {
         <ReportHeader />
         <FeaturesPage />
       </div>
+      {/* PAGE 7 */}
+      {/* PAGE 8 */}
+      {/* PAGE 9 & 10 */}
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
+        <ReportHeader />
+        <DifferentSolutionsPage />
+      </div>
+      {/* PAGE 11 */}
+      {/* PAGE 12 */}
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader />
