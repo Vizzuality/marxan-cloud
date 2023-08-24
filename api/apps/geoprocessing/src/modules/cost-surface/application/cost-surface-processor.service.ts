@@ -13,7 +13,7 @@ import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
 import { ShapefileConverterPort } from '../ports/shapefile-converter/shapefile-converter.port';
 
 @Injectable()
-export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
+export class CostSurfaceProcessor implements WorkerProcessor<JobInput, true> {
   constructor(
     private readonly repo: CostSurfacePersistencePort,
     private readonly puExtractor: PuExtractorPort,
@@ -25,14 +25,14 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
     job: Job<FromShapefileJobInput, true>,
   ): Promise<true> {
     const geoJson = await this.shapefileConverter.convert(job.data.shapefile);
-    const surfaceCosts = this.puExtractor.extract(geoJson);
+    const costSurfaces = this.puExtractor.extract(geoJson);
     const scenarioPlanningUnits = await this.availablePlanningUnits.get(
       job.data.scenarioId,
     );
     const puids = scenarioPlanningUnits.map((spu) => spu.puid);
 
     const { errors } = canPlanningUnitsBeLocked(
-      surfaceCosts.map((cost) => cost.puid),
+      costSurfaces.map((cost) => cost.puid),
       puids,
     );
     if (errors.length > 0) {
@@ -45,7 +45,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
     });
 
     await this.repo.save(
-      surfaceCosts.map((record) => ({
+      costSurfaces.map((record) => ({
         cost: record.cost,
         id: scenarioPlanningUnitIdByPuid[record.puid],
       })),

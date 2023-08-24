@@ -12,7 +12,7 @@ import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { AnalysisModule } from '../analysis/analysis.module';
-import { CostSurfaceModule } from './cost-surface/cost-surface.module';
+import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';

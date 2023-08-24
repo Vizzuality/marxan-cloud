@@ -3,8 +3,8 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { fakeQueryBuilder } from '../../../../utils/__mocks__/fake-query-builder';
-import { LatestApiEventByTopicAndKind } from '../../../api-events/api-event.topic+kind.api.entity';
+import { fakeQueryBuilder } from '../../../utils/__mocks__/fake-query-builder';
+import { LatestApiEventByTopicAndKind } from '../../api-events/api-event.topic+kind.api.entity';
 import { CostSurfaceState } from '../ports/cost-surface-events.port';
 import { CostSurfaceApiEvents } from './cost-surface-api-events';
 

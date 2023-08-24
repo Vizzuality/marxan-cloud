@@ -10,12 +10,12 @@ import { FromShapefileJobInput, JobInput } from '@marxan/artifact-cache';
 import { Inject, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { DeleteScenario } from './delete-scenario.command';
-import { surfaceCostEventsFactoryToken } from './surface-cost-queue.provider';
+import { CostSurfaceFactoryToken } from './cost-surface-queue.provider';
 
 type EventKind = { event: API_EVENT_KINDS };
 
 @Injectable()
-export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
+export class CostSurfaceEventsHandler implements EventFactory<JobInput, true> {
   private queueEvents: QueueEventsAdapter<JobInput, true>;
 
   private failEventsMapper: EventKind = {
@@ -27,7 +27,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
   };
 
   constructor(
-    @Inject(surfaceCostEventsFactoryToken)
+    @Inject(CostSurfaceFactoryToken)
     queueEventsFactory: CreateWithEventFactory<JobInput, true>,
     private readonly commandBus: CommandBus,
   ) {

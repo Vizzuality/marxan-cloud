@@ -1,41 +1,39 @@
 import {
-  InitialCostJobInput,
+  FromShapefileJobInput,
   jobSubmissionFailed,
 } from '@marxan/artifact-cache';
 import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { Either, left, right } from 'fp-ts/lib/Either';
-import { surfaceCostQueueToken } from '../infra/surface-cost-queue.provider';
+import { costSurfaceQueueToken } from '../infra/cost-surface-queue.provider';
 import {
   CostSurfaceEventsPort,
   CostSurfaceState,
 } from '../ports/cost-surface-events.port';
-import {
-  SetInitialCostSurface,
-  SetInitialCostSurfaceError,
-} from './set-initial-cost-surface.command';
+import { UpdateCostSurface } from './update-cost-surface.command';
 
-@CommandHandler(SetInitialCostSurface)
-export class SetInitialCostSurfaceHandler
-  implements IInferredCommandHandler<SetInitialCostSurface> {
-  private readonly logger: Logger = new Logger(
-    SetInitialCostSurfaceHandler.name,
-  );
+@CommandHandler(UpdateCostSurface)
+export class UpdateCostSurfaceHandler
+  implements IInferredCommandHandler<UpdateCostSurface> {
+  private readonly logger: Logger = new Logger(UpdateCostSurfaceHandler.name);
 
   constructor(
-    @Inject(surfaceCostQueueToken)
-    private readonly queue: Queue<InitialCostJobInput>,
+    @Inject(costSurfaceQueueToken)
+    private readonly queue: Queue<FromShapefileJobInput>,
     private readonly events: CostSurfaceEventsPort,
   ) {}
 
   async execute({
     scenarioId,
-  }: SetInitialCostSurface): Promise<Either<SetInitialCostSurfaceError, true>> {
+    shapefile,
+  }: UpdateCostSurface): Promise<Either<typeof jobSubmissionFailed, true>> {
     try {
-      await this.queue.add(`set-initial-cost-surface`, {
+      await this.queue.add(`cost-surface-for-${scenarioId}`, {
         scenarioId,
+        shapefile,
       });
+
       await this.events.event(scenarioId, CostSurfaceState.Submitted);
     } catch (error) {
       await this.markAsFailedSubmission(scenarioId, error);
@@ -50,7 +48,7 @@ export class SetInitialCostSurfaceHandler
     error: unknown,
   ) => {
     this.logger.error(
-      `Failed submitting set-initial-cost-surface job for scenario with ID ${scenarioId}`,
+      `Failed submitting cost-surface-for-${scenarioId} job`,
       String(error),
     );
     await this.events.event(scenarioId, CostSurfaceState.Submitted);

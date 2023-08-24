@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { Queue } from 'bullmq';
 import { Either, Left, Right } from 'fp-ts/lib/Either';
 import { jobSubmissionFailed } from '@marxan/artifact-cache';
-import { surfaceCostQueueToken } from '../infra/surface-cost-queue.provider';
+import { costSurfaceQueueToken } from '../infra/cost-surface-queue.provider';
 import { CostSurfaceEventsPort } from '../ports/cost-surface-events.port';
 import { UpdateCostSurface } from './update-cost-surface.command';
 import { UpdateCostSurfaceHandler } from './update-cost-surface.handler';
@@ -25,7 +25,7 @@ beforeEach(async () => {
     providers: [
       UpdateCostSurfaceHandler,
       {
-        provide: surfaceCostQueueToken,
+        provide: costSurfaceQueueToken,
         useValue: ({
           add: addJobMock,
         } as unknown) as Queue,

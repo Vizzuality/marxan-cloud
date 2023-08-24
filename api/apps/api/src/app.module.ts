@@ -36,7 +36,7 @@ import { ExportCleanupModule } from './modules/export-cleanup/export-cleanup.mod
 import { ScheduleModule } from '@nestjs/schedule';
 import { GeoFeatureTagsModule } from './modules/geo-feature-tags/geo-feature-tags.module';
 import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.module';
-import { CostSurfaceModuleFirstClass } from '@marxan-api/modules/cost-surface/cost-surface-module-first.class';
+import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 
 @Module({
   imports: [
@@ -78,7 +78,7 @@ import { CostSurfaceModuleFirstClass } from '@marxan-api/modules/cost-surface/co
     ExportCleanupModule,
     ScheduleModule.forRoot(),
     OutputProjectSummariesModule,
-    CostSurfaceModuleFirstClass,
+    CostSurfaceModule,
   ],
   controllers: [AppController, PingController],
   providers: [

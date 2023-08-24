@@ -4,7 +4,7 @@ import {
   CostSurfaceEventsPort,
   CostSurfaceState,
 } from '../ports/cost-surface-events.port';
-import { ApiEventsService } from '../../../api-events/api-events.service';
+import { ApiEventsService } from '../../api-events/api-events.service';
 
 @Injectable()
 export class CostSurfaceApiEvents
