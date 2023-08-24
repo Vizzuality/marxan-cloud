@@ -7,7 +7,7 @@ import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features
 import EditBulkModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit-bulk';
 import { Feature } from 'types/api/feature';
 
-import EDIT_SVG from 'svgs/project/edit.svg?sprite';
+import EDIT_SVG from 'svgs/ui/edit.svg?sprite';
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
 
 const BUTTON_CLASSES =
@@ -30,7 +30,7 @@ const FeaturesBulkActionMenu = ({
 
   return (
     <>
-      <div className="mt-1 grid w-full grid-cols-3 items-center space-x-2 rounded-xl bg-gray-500 p-1">
+      <div className="grid w-full grid-cols-3 items-center space-x-2 rounded-xl bg-gray-500 p-1">
         <span className="col-span-1 flex items-center justify-center space-x-2">
           <span className="block w-[20px] rounded-[4px] bg-blue-400/25 px-1 text-center text-xs font-semibold text-blue-400">
             {selectedFeaturesIds.length}

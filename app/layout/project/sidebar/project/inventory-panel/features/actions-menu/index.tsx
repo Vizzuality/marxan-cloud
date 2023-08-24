@@ -1,27 +1,33 @@
-import { useCallback, useState, ButtonHTMLAttributes } from 'react';
+import { useCallback, useState } from 'react';
 
-import { FileEdit, Trash2, Tag } from 'lucide-react';
-
+import Icon from 'components/icon';
 import Modal from 'components/modal/component';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete';
 import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
-import { Feature } from 'types/api/feature';
 import { cn } from 'utils/cn';
+
+import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
+import TAG_SVG from 'svgs/ui/tag.svg?sprite';
 
 const BUTTON_CLASSES =
   'flex items-center px-4 py-2 w-full text-sm cursor-pointer bg-gray-700 hover:bg-gray-500 transition transition-colors space-x-2 group';
 
-const ICON_CLASSES = 'text-gray-400 group-hover:text-white';
+const ICON_CLASSES = 'h-5 w-5 text-gray-400 group-hover:text-white';
 
-const FeatureActions = ({
-  feature,
-  onEditName,
-  isDeletable,
+const ActionsMenu = ({
+  item,
 }: {
-  feature: Feature;
-  isDeletable: boolean;
-  onEditName: (evt: Parameters<ButtonHTMLAttributes<HTMLButtonElement>['onClick']>[0]) => void;
+  item: {
+    id: string;
+    name: string;
+    scenarios: number;
+    tag: string;
+    custom: boolean;
+  };
 }): JSX.Element => {
+  const isDeletable = !item.custom && !item.scenarios;
+
+  // item.isCustom && !item.scenarioUsageCount
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
     edit: false,
     delete: false,
@@ -36,36 +42,24 @@ const FeatureActions = ({
       <li>
         <button
           type="button"
-          onClick={onEditName}
-          className={cn({
-            [BUTTON_CLASSES]: true,
-            'rounded-t-2xl': true,
-          })}
-        >
-          <FileEdit className={ICON_CLASSES} size={20} />
-          <span>Rename</span>
-        </button>
-      </li>
-      <li>
-        <button
-          type="button"
           onClick={() => handleModal('edit', true)}
           className={cn({
             [BUTTON_CLASSES]: true,
+            'rounded-t-2xl': true,
             'last:rounded-b-2xl': !isDeletable,
           })}
         >
-          <Tag className={ICON_CLASSES} size={20} />
+          <Icon icon={TAG_SVG} className={ICON_CLASSES} />
           <span>Edit</span>
         </button>
         <Modal
-          id="edit-feaure-modal"
+          id="edit-feature-modal"
           title="All features"
           open={modalState.edit}
           size="narrow"
           onDismiss={() => handleModal('edit', false)}
         >
-          <EditModal featureId={feature.id} handleModal={handleModal} />
+          <EditModal featureId={item.id} handleModal={handleModal} />
         </Modal>
       </li>
       {isDeletable && (
@@ -80,7 +74,7 @@ const FeatureActions = ({
               'rounded-b-2xl': true,
             })}
           >
-            <Trash2 className={ICON_CLASSES} size={20} />
+            <Icon icon={DELETE_SVG} className={ICON_CLASSES} />
             <span>Delete</span>
           </button>
           <Modal
@@ -92,7 +86,7 @@ const FeatureActions = ({
               handleModal('delete', false);
             }}
           >
-            <DeleteModal selectedFeaturesIds={[feature.id]} />
+            <DeleteModal selectedFeaturesIds={[item.id]} />
           </Modal>
         </li>
       )}
@@ -100,4 +94,4 @@ const FeatureActions = ({
   );
 };
 
-export default FeatureActions;
+export default ActionsMenu;

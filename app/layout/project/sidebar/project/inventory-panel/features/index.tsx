@@ -1,87 +1,131 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, ChangeEvent, useEffect } from 'react';
 
-import { useAppDispatch } from 'store/hooks';
-import { setSearch } from 'store/slices/projects/[id]';
+import { useRouter } from 'next/router';
 
-import Button from 'components/button';
-import Icon from 'components/icon';
-import InfoButton from 'components/info-button';
-import Search, { SearchProps } from 'components/search';
-import Section from 'layout/section';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects/[id]';
 
-import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
-import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
-import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
+import { useAllFeatures } from 'hooks/features';
 
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
+import { Feature } from 'types/api/feature';
 
-import ProjectFeatureList from './list';
-import FeatureUploadModal from './modals/upload';
+import InventoryTable, { type DataItem } from '../components/inventory-table';
 
-const InventoryPanelFeatures = (): JSX.Element => {
+import ActionsMenu from './actions-menu';
+import FeaturesBulkActionMenu from './bulk-action-menu';
+
+const FEATURES_TABLE_COLUMNS = {
+  name: 'featureClassName',
+  tag: 'tag',
+};
+
+const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
 
-  const handleSearch = useCallback(
-    (value: Parameters<SearchProps['onChange']>[0]) => {
-      dispatch(setSearch(value));
-    },
-    [dispatch]
+  const { selectedFeatures: visibleFeatures, search } = useAppSelector(
+    (state) => state['/projects/[id]']
   );
-  const [isOpenFeatureUploader, setOpenFeatureUploader] = useState(false);
 
-  const handleFeatureUploader = useCallback(() => {
-    setOpenFeatureUploader(true);
+  const [filters, setFilters] = useState<Parameters<typeof useAllFeatures>[1]>({
+    sort: 'featureClassName',
+  });
+  const [selectedFeaturesIds, setSelectedFeaturesIds] = useState<Feature['id'][]>([]);
+  const { query } = useRouter();
+  const { pid } = query as { pid: string };
+
+  const allFeaturesQuery = useAllFeatures(
+    pid,
+    {
+      ...filters,
+      search,
+    },
+    {
+      select: ({ data }) =>
+        data?.map((feature) => ({
+          id: feature.id,
+          name: feature.featureClassName,
+          scenarios: feature.scenarioUsageCount,
+          tag: feature.tag,
+          isCustom: feature.isCustom,
+        })),
+      placeholderData: { data: [] },
+      keepPreviousData: true,
+    }
+  );
+
+  const featureIds = allFeaturesQuery.data?.map((feature) => feature.id);
+
+  const handleSelectAll = useCallback(
+    (evt: ChangeEvent<HTMLInputElement>) => {
+      setSelectedFeaturesIds(evt.target.checked ? featureIds : []);
+    },
+    [featureIds]
+  );
+
+  const handleSelectFeature = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
+    if (evt.target.checked) {
+      setSelectedFeaturesIds((prevSelectedFeatures) => [...prevSelectedFeatures, evt.target.value]);
+    } else {
+      setSelectedFeaturesIds((prevSelectedFeatures) =>
+        prevSelectedFeatures.filter((featureId) => featureId !== evt.target.value)
+      );
+    }
   }, []);
 
-  const closeFeatureUploadModal = useCallback(() => {
-    setOpenFeatureUploader(false);
-  }, []);
+  const handleSort = useCallback(
+    (_sortType: (typeof filters)['sort']) => {
+      const sort = filters.sort === _sortType ? `-${_sortType}` : _sortType;
+
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        sort,
+      }));
+    },
+    [filters.sort]
+  );
+
+  useEffect(() => {
+    setSelectedFeaturesIds([]);
+  }, [search]);
+
+  const toggleSeeOnMap = useCallback(
+    (featureId: Feature['id']) => {
+      const newSelectedFeatures = [...visibleFeatures];
+      if (!newSelectedFeatures.includes(featureId)) {
+        newSelectedFeatures.push(featureId);
+      } else {
+        const i = newSelectedFeatures.indexOf(featureId);
+        newSelectedFeatures.splice(i, 1);
+      }
+      dispatch(setVisibleFeatures(newSelectedFeatures));
+    },
+    [dispatch, visibleFeatures]
+  );
+
+  const displayBulkActions = selectedFeaturesIds.length > 0;
+
+  const data: DataItem[] = allFeaturesQuery.data?.map((feature) => ({
+    ...feature,
+    isVisibleOnMap: visibleFeatures.includes(feature.id),
+  }));
 
   return (
-    <Section className="relative">
-      <header className="flex items-center justify-between">
-        <div className="space-y-1">
-          <span className="text-xs font-semibold text-blue-400">Inventory Panel</span>
-          <h3 className="flex items-center space-x-2">
-            <span className="text-lg font-medium">Features</span>
-            <InfoButton theme="tertiary">
-              <>
-                <h4 className="mb-2.5 font-heading text-lg">What are features?</h4>
-                <div className="space-y-2">
-                  <p>
-                    Features are the important habitats, species, processes, activities, and
-                    discrete areas that you want to consider in your planning process. Common
-                    feature data formats are range maps, polygons, abundances, and continuous scale
-                    or probability of occurrence maps (e.g. 0-1). Features can include more than
-                    just ecological data but also be cultural and socio-economic areas like
-                    community fishing grounds or traditional-use areas, and other human activities
-                    and industries. Every feature must have a minimum target amount set. Some
-                    examples include:
-                  </p>
-                  <img src={FEATURE_SPECIES_IMG} alt="Feature-Range" />
-                  <img src={FEATURE_ABUND_IMG} alt="Feature-Abundance" />
-                  <img src={FEATURE_SOCIAL_IMG} alt="Feature-Social" />
-                </div>
-              </>
-            </InfoButton>
-          </h3>
-        </div>
-        <Button theme="primary" size="base" onClick={handleFeatureUploader} className="space-x-3">
-          <span>Upload</span>
-          <Icon icon={UPLOAD_SVG} className="h-5 w-5 stroke-current" />
-        </Button>
-      </header>
-      <Search
-        id="feature-search"
-        size="sm"
-        placeholder="Search features"
-        aria-label="Search features"
-        onChange={handleSearch}
-        theme="dark"
+    <div className="space-y-6">
+      <InventoryTable
+        loading={allFeaturesQuery.isFetching}
+        data={data}
+        noDataMessage={noDataMessage}
+        columns={FEATURES_TABLE_COLUMNS}
+        sorting={filters.sort}
+        selectedIds={selectedFeaturesIds}
+        onSortChange={handleSort}
+        onSelectAll={handleSelectAll}
+        onSelectRow={handleSelectFeature}
+        onToggleSeeOnMap={toggleSeeOnMap}
+        ActionsComponent={ActionsMenu}
       />
-      <ProjectFeatureList />
-      <FeatureUploadModal isOpen={isOpenFeatureUploader} onDismiss={closeFeatureUploadModal} />
-    </Section>
+      {displayBulkActions && <FeaturesBulkActionMenu selectedFeaturesIds={selectedFeaturesIds} />}
+    </div>
   );
 };
 
