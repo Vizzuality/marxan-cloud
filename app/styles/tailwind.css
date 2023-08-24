@@ -124,7 +124,12 @@
 
 /* PRINT */
 @media print {
-body {-webkit-print-color-adjust: exact;}
+  body {
+    -webkit-print-color-adjust: exact;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 /* FLICKING */

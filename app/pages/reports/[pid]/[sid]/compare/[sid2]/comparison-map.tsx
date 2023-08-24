@@ -28,6 +28,7 @@ const styles = {
     padding: '8.73mm 13.49mm',
     width: '200mm',
     'page-break-after': 'avoid',
+    'margin-bottom': '-2px',
   },
 };
 
