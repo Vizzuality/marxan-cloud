@@ -35,6 +35,7 @@ services:
       - postgresql-api
       - postgresql-geo-api
       - redis
+    restart: unless-stopped
 
   app:
     build:
@@ -88,6 +89,7 @@ services:
       - postgresql-api
       - api
       - redis
+    restart: unless-stopped
 
   webshot:
     build:
@@ -142,7 +144,7 @@ services:
       dockerfile: Dockerfile
     hostname: redis
     container_name: marxan-redis
-    command: ["redis-server"]
+    command: [ "redis-server" ]
     ports:
       - "${REDIS_API_SERVICE_PORT:-3050}:6379"
     restart: on-failure
