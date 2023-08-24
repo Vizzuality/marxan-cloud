@@ -1,18 +1,13 @@
 import React from 'react';
 
-import { useRouter } from 'next/router';
-
 import { withProtection, withUser } from 'hoc/auth';
-
-import { useScenario } from 'hooks/scenarios';
-import { useBestSolution, useSolution } from 'hooks/solutions';
 
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
+import FrequencyPage from 'layout/scenarios/reports/solutions/frequency-page';
 import GridPage from 'layout/scenarios/reports/solutions/grid-page';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
 import SelectedSolutionPage from 'layout/scenarios/reports/solutions/selected-solution-page';
-import SelectionFrequencyPage from 'layout/scenarios/reports/solutions/selection-frequency-page';
 import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
 import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 
@@ -28,20 +23,7 @@ const styles = {
   },
 };
 
-const SolutionsReport: React.FC = () => {
-  const { query } = useRouter();
-  const { sid, solutionId } = query as { sid: string; solutionId: string };
-
-  const { data: scenarioData } = useScenario(sid);
-
-  const { data: selectedSolutionData } = useSolution(sid, solutionId);
-
-  const { data: bestSolutionData } = useBestSolution(sid, {
-    enabled: scenarioData?.ranAtLeastOnce,
-  });
-
-  const { runId: solutionNumber } = selectedSolutionData || bestSolutionData;
-
+const MainReport: React.FC = () => {
   return (
     <>
       <Head title="Solutions Report" />
@@ -54,7 +36,7 @@ const SolutionsReport: React.FC = () => {
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader />
-        <SelectionFrequencyPage />
+        <FrequencyPage />
       </div>
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
@@ -72,4 +54,4 @@ const SolutionsReport: React.FC = () => {
   );
 };
 
-export default SolutionsReport;
+export default MainReport;

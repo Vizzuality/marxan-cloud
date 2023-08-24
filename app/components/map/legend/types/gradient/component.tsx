@@ -1,8 +1,8 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import { useNumberFormatter } from '@react-aria/i18n';
+
+import { cn } from 'utils/cn';
 
 export interface LegendTypeGradientProps {
   className?: {
@@ -26,12 +26,12 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
 
   return (
     <div
-      className={cx({
+      className={cn({
         [className?.box]: !!className?.box,
       })}
     >
       <div
-        className={cx({
+        className={cn({
           'flex h-2 w-full': true,
           [className?.bar]: className?.bar,
         })}
@@ -46,7 +46,7 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
           .map(({ value }) => (
             <li
               key={`${value}`}
-              className={cx({
+              className={cn({
                 'flex-shrink-0 text-xs': true,
                 [className.labels]: className.labels,
               })}

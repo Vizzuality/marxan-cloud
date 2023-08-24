@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useDispatch } from 'react-redux';
-
 import { useRouter } from 'next/router';
 
+import { useAppDispatch } from 'store/hooks';
 import { setMaps } from 'store/slices/reports/solutions';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
@@ -16,7 +15,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import Map from 'components/map';
 
-export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
+export const ReportMap = ({ id }: { id: string }): JSX.Element => {
   const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
@@ -26,7 +25,7 @@ export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
 
   const { pid, sid } = query as { pid: string; sid: string };
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { data } = useProject(pid);
   const { bbox } = data;
@@ -92,7 +91,7 @@ export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
 
   return (
     <>
-      <div className="relative h-full w-2/3 overflow-hidden" style={{ height: '146.05mm' }}>
+      <div className="relative h-full w-full overflow-hidden" style={{ height: '230mm' }}>
         <Map
           key={accessToken}
           className="map-report"
@@ -128,4 +127,4 @@ export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
   );
 };
 
-export default ScenariosReportMap;
+export default ReportMap;

@@ -14,7 +14,7 @@ import { useProject } from 'hooks/projects';
 
 import Map from 'components/map';
 
-export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
+export const ReportMap = ({ id }: { id: string }): JSX.Element => {
   const accessToken = useAccessToken();
   const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
@@ -83,7 +83,7 @@ export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
 
   return (
     <>
-      <div className="relative h-full w-full overflow-hidden" style={{ height: '180mm' }}>
+      <div className="relative h-full w-full overflow-hidden" style={{ height: '230mm' }}>
         <Map
           key={accessToken}
           className="map-report"
@@ -119,4 +119,4 @@ export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
   );
 };
 
-export default ScenariosReportMap;
+export default ReportMap;
