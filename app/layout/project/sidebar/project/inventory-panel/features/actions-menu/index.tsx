@@ -6,8 +6,8 @@ import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features
 import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
 import { cn } from 'utils/cn';
 
-import EDIT_SVG from 'svgs/project/edit.svg?sprite';
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
+import TAG_SVG from 'svgs/ui/tag.svg?sprite';
 
 const BUTTON_CLASSES =
   'flex items-center px-4 py-2 w-full text-sm cursor-pointer bg-gray-700 hover:bg-gray-500 transition transition-colors space-x-2 group';
@@ -49,7 +49,7 @@ const ActionsMenu = ({
             'last:rounded-b-2xl': !isDeletable,
           })}
         >
-          <Icon icon={EDIT_SVG} className={ICON_CLASSES} />
+          <Icon icon={TAG_SVG} className={ICON_CLASSES} />
           <span>Edit</span>
         </button>
         <Modal
