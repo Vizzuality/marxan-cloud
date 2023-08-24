@@ -4,7 +4,6 @@ import { DataItem } from '../types';
 
 export type RowItem = {
   item: DataItem;
-  visibleFeatures: string[];
   selectedIds: string[];
   onSelectRow: (evt: ChangeEvent<HTMLInputElement>) => void;
   onToggleSeeOnMap: (id: string) => void;
