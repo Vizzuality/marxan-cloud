@@ -8,11 +8,11 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
-import { CreateApiEventDTO } from '../../../api-events/dto/create.api-event.dto';
-import { EventData, EventFactory } from '../../../queue-api-events';
+import { CreateApiEventDTO } from '../../api-events/dto/create.api-event.dto';
+import { EventData, EventFactory } from '../../queue-api-events';
 import { DeleteScenario } from './delete-scenario.command';
-import { surfaceCostEventsFactoryToken } from './surface-cost-queue.provider';
-import { SurfaceCostEventsHandler } from './surface-cost.events-handler';
+import { CostSurfaceFactoryToken } from './cost-surface-queue.provider';
+import { CostSurfaceEventsHandler } from './cost-surface-events-handler.service';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -73,9 +73,9 @@ const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
     providers: [
-      SurfaceCostEventsHandler,
+      CostSurfaceEventsHandler,
       {
-        provide: surfaceCostEventsFactoryToken,
+        provide: CostSurfaceFactoryToken,
         useValue: (eventFactory: EventFactory<JobInput, true>) => {
           fakeQueueEvents = new FakeQueueEvents(eventFactory);
           return fakeQueueEvents;

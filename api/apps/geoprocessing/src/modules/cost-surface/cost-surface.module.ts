@@ -5,8 +5,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
 import { ShapefilesModule } from '@marxan/shapefile-converter';
 
-import { SurfaceCostProcessor } from './application/surface-cost-processor';
-import { SurfaceCostWorker } from './application/surface-cost-worker';
+import { CostSurfaceProcessor } from './application/cost-surface-processor.service';
+import { CostSurfaceWorker } from './application/cost-surface-worker.service';
 
 import { CostSurfacePersistencePort } from './ports/persistence/cost-surface-persistence.port';
 import { PuExtractorPort } from './ports/pu-extractor/pu-extractor.port';
@@ -32,8 +32,8 @@ import { CostSurfacePuDataGeoEntity } from '@marxan/cost-surfaces';
     ]),
   ],
   providers: [
-    SurfaceCostWorker,
-    SurfaceCostProcessor,
+    CostSurfaceWorker,
+    CostSurfaceProcessor,
     {
       provide: CostSurfacePersistencePort,
       useClass: TypeormCostSurface,

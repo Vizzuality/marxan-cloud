@@ -8,9 +8,7 @@ import {
 } from 'typeorm';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { PlanningUnitsGeom } from './planning-units.geo.entity';
-import { CostSurfacePuDataGeoEntity } from '../../cost-surfaces/src';
-
-//import { CostSurfacePuDataGeoEntity } from '@marxan-geoprocessing/modules/cost-surface/cost-surface-pu-data.geo.entity';
+import { CostSurfacePuDataGeoEntity } from '@marxan/cost-surfaces';
 
 @Entity('projects_pu')
 export class ProjectsPuEntity {

@@ -4,7 +4,7 @@ import { GetAvailablePlanningUnits } from '../ports/available-planning-units/get
 import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
 import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
 import { ShapefileConverterPort } from '../ports/shapefile-converter/shapefile-converter.port';
-import { SurfaceCostProcessor } from './surface-cost-processor';
+import { CostSurfaceProcessor } from './cost-surface-processor.service';
 import {
   getAreaByPlanningUnit,
   getCostByAreaOfPlanningUnit,
@@ -17,7 +17,7 @@ import { getFromShapeFileJob, getInitialCostJob } from './__mocks__/job.data';
 import { PuExtractorFake } from './__mocks__/pu-extractor.fake';
 import { ShapefileConverterFake } from './__mocks__/shapefile-converter.fake';
 
-let sut: SurfaceCostProcessor;
+let sut: CostSurfaceProcessor;
 
 let fileConverter: ShapefileConverterFake;
 let puExtractor: PuExtractorFake;
@@ -31,7 +31,7 @@ const missingPlanningUnitPuids = [1, 4];
 beforeEach(async () => {
   const sandbox = await Test.createTestingModule({
     providers: [
-      SurfaceCostProcessor,
+      CostSurfaceProcessor,
       {
         provide: CostSurfacePersistencePort,
         useClass: CostSurfaceRepoFake,
@@ -51,7 +51,7 @@ beforeEach(async () => {
     ],
   }).compile();
 
-  sut = sandbox.get(SurfaceCostProcessor);
+  sut = sandbox.get(CostSurfaceProcessor);
   fileConverter = sandbox.get(ShapefileConverterPort);
   puExtractor = sandbox.get(PuExtractorPort);
   puRepo = sandbox.get(GetAvailablePlanningUnits);

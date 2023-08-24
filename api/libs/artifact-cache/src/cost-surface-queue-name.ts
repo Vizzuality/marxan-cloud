@@ -1,3 +1,3 @@
 // The variable is here for historical reasons and not related to Artefact Cache
 
-export const surfaceCostQueueName = 'cost-surface';
+export const costSurfaceQueueName = 'cost-surface';
