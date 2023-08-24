@@ -8,6 +8,7 @@ import BestSolutionPage from 'layout/scenarios/reports/solutions/best-solution-p
 import FrequencyPage from 'layout/scenarios/reports/solutions/frequency-page';
 import GridPage from 'layout/scenarios/reports/solutions/grid-page';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
+import ResumePage from 'layout/scenarios/reports/solutions/resume-page';
 import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
 import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 
@@ -42,6 +43,11 @@ const MainReport: React.FC = () => {
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader />
         <BestSolutionPage />
+      </div>
+
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
+        <ReportHeader />
+        <ResumePage />
       </div>
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
