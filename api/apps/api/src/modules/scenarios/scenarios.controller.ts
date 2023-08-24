@@ -108,6 +108,8 @@ import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { WebshotPdfReportConfig } from '@marxan/webshot/webshot.dto';
 import { ClearLockStatusParams } from '@marxan-api/modules/scenarios/dto/clear-lock-status-param.dto';
+import { CostRangeDto } from "@marxan-api/modules/scenarios/dto/cost-range.dto";
+import { plainToClass } from "class-transformer";
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -399,7 +401,7 @@ export class ScenariosController {
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
   @ApiTags(asyncJobTag)
-  @Get(`:scenarioId/cost-surface/shapefile`)
+  @Post(`:scenarioId/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
     @Param(':scenarioId') scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
@@ -408,11 +410,33 @@ export class ScenariosController {
     await ensureShapefileHasRequiredFiles(file);
 
     const result = await this.service.processCostSurfaceShapefile(
-      scenarioId,
+      req.params.scenarioId,
       req.user.id,
       file,
     );
 
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        scenarioId: req.params.scenarioId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
+  }
+
+  @ApiOperation({
+    deprecated: true,
+    description:
+      'To be removed soon to GET /projects/:projectId/cost-surface/:costSurfaceId/cost-range',
+  })
+  @Get(`:id/cost-surface`)
+  @ApiOkResponse({ type: CostRangeDto })
+  async getCostRange(
+    @Param('id') scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<CostRangeDto> {
+    const result = await this.service.getCostRange(scenarioId, req.user.id);
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
         scenarioId,
@@ -420,7 +444,7 @@ export class ScenariosController {
         resourceType: scenarioResource.name.plural,
       });
     }
-    return AsyncJobDto.forScenario().asJsonApiMetadata();
+    return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
   }
 
   @ApiConsumesShapefile()
