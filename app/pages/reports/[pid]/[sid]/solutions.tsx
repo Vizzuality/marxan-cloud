@@ -9,8 +9,8 @@ import { useBestSolution, useSolution } from 'hooks/solutions';
 
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
+import GridPage from 'layout/scenarios/reports/solutions/grid-page';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
-import IntroPage from 'layout/scenarios/reports/solutions/intro-page';
 import SelectedSolutionPage from 'layout/scenarios/reports/solutions/selected-solution-page';
 import SelectionFrequencyPage from 'layout/scenarios/reports/solutions/selection-frequency-page';
 import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
@@ -20,10 +20,10 @@ export const getServerSideProps = withProtection(withUser());
 
 const styles = {
   page: {
-    minHeight: '200mm',
+    minHeight: '297mm',
     margin: 'auto',
     padding: '8.73mm 13.49mm',
-    width: '297mm',
+    width: '210mm',
     'break-after': 'page',
   },
 };
@@ -48,7 +48,8 @@ const SolutionsReport: React.FC = () => {
 
       <MetaIcons />
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
-        <IntroPage />
+        <ReportHeader />
+        <GridPage />
       </div>
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">

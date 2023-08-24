@@ -27,7 +27,7 @@ export const ReportHeader = (): JSX.Element => {
   return (
     reportDataIsFetched && (
       <header className="flex w-full items-start justify-between pb-4">
-        <div className="mx-auto flex w-11/12 flex-col space-y-6">
+        <div className="flex w-full flex-col space-y-6">
           <div className="border-b border-gray-100 pb-4">
             <h1 className="text-xl font-medium">{projectQuery.data?.name}</h1>
 

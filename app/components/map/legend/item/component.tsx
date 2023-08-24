@@ -1,12 +1,11 @@
 import React, { Children, isValidElement, ReactNode, useMemo, useState } from 'react';
 
-import cx from 'classnames';
-
 import { useNumberFormatter } from '@react-aria/i18n';
 
 import Slider from 'components/forms/slider';
 import Icon from 'components/icon';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import OPACITY_SVG from 'svgs/map/opacity.svg?sprite';
 import DRAG_SVG from 'svgs/ui/drag.svg?sprite';
@@ -74,21 +73,21 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   return (
     <div
       key={id}
-      className={cx({
+      className={cn({
         'px-5 py-2.5': !className,
         [className]: !!className,
       })}
     >
       <header className="relative mb-1 flex justify-between">
         <div
-          className={cx({
+          className={cn({
             relative: true,
             'pl-5': icon,
           })}
         >
           {icon && <div className="absolute left-0 top-0">{icon}</div>}
           <div
-            className={cx({
+            className={cn({
               'font-heading text-sm text-white': true,
               'text-white': theme === 'dark',
               'text-gray-700': theme === 'light',
@@ -155,7 +154,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                     <button
                       aria-label="manage-opacity"
                       type="button"
-                      className={cx({
+                      className={cn({
                         'flex h-5 w-5 items-center justify-center text-white': true,
                         'text-gray-300': opacity !== 1,
                       })}
@@ -179,7 +178,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                   aria-label="manage-visibility"
                   type="button"
                   onClick={onChangeVisibility}
-                  className={cx({
+                  className={cn({
                     'flex h-5 w-5 items-center justify-center text-white': true,
                     'text-gray-300': !visibility,
                   })}
