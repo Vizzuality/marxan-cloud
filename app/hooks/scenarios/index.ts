@@ -933,6 +933,7 @@ export function useScenarioCalibrationResults(scenarioId) {
   const { data } = query;
 
   const blmValues = data?.data.map((i) => i.blmValue) || [];
+
   const { data: blmImages } = useCalibrationBLMImages({ sid: scenarioId, blmValues });
 
   return useMemo(() => {

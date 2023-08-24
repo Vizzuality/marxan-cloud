@@ -39,8 +39,6 @@ export const ReportMap = ({ id }: { id: string }): JSX.Element => {
 
   const bestSolutionQuery = useBestSolution(sid, {});
 
-  console.log(typeof bestSolutionQuery.data?.runId);
-
   const PUGridLayer = usePUGridLayer({
     cache,
     active: true,
