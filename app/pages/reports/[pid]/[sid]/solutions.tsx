@@ -52,17 +52,17 @@ const SolutionsReport: React.FC = () => {
       </div>
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
-        <ReportHeader title="Selection Frequency" />
+        <ReportHeader />
         <SelectionFrequencyPage />
       </div>
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
-        <ReportHeader title={`Selected Solution: ${solutionNumber}`} />
+        <ReportHeader />
         <SelectedSolutionPage />
       </div>
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
-        <ReportHeader title="Settings" />
+        <ReportHeader />
         <SettingsPage />
       </div>
 
