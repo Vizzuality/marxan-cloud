@@ -7,7 +7,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import LegendItem from 'components/map/legend/item/component';
 import LegendTypeGradient from 'components/map/legend/types/gradient/component';
-import FrequencyReportMap from 'layout/scenarios/reports/solutions/frequency-page/map';
+import FrequencyReportMap from 'layout/scenarios/reports/solutions/frequency/map';
 
 export const FrequencyPage = (): JSX.Element => {
   const { query } = useRouter();

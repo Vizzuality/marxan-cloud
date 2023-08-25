@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 
 import LegendItem from 'components/map/legend/item/component';
-import GridReportMap from 'layout/scenarios/reports/solutions/grid-page/map';
+import GridReportMap from 'layout/scenarios/reports/solutions/grid/map';
 
 export const PlanningUnitGridPage = (): JSX.Element => {
   const LEGEND = useMemo(() => {

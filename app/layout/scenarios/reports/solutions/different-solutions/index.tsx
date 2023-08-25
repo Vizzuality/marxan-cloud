@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useBestSolution, useMostDifferentSolutions } from 'hooks/solutions';
 
 import Icon from 'components/icon/component';
-import DifferentSolutionReportMap from 'layout/scenarios/reports/solutions/different-solutions-page/map';
+import DifferentSolutionReportMap from 'layout/scenarios/reports/solutions/different-solutions/map';
 import { cn } from 'utils/cn';
 
 import STAR_SVG from 'svgs/ui/star.svg?sprite';

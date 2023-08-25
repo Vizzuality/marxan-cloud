@@ -6,7 +6,7 @@ import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useBestSolution } from 'hooks/solutions';
 
 import LegendItem from 'components/map/legend/item/component';
-import BestSolutionReportMap from 'layout/scenarios/reports/solutions/best-solution-page/map';
+import BestSolutionReportMap from 'layout/scenarios/reports/solutions/best-solution/map';
 
 export const BestSolutionPage = (): JSX.Element => {
   const { query } = useRouter();

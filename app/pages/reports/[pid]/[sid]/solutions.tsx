@@ -4,14 +4,15 @@ import { withProtection, withUser } from 'hoc/auth';
 
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
-import BestSolutionPage from 'layout/scenarios/reports/solutions/best-solution-page';
-import DifferentSolutionsPage from 'layout/scenarios/reports/solutions/different-solutions-page';
-import FeaturesPage from 'layout/scenarios/reports/solutions/features-page';
-import FrequencyPage from 'layout/scenarios/reports/solutions/frequency-page';
-import GridPage from 'layout/scenarios/reports/solutions/grid-page';
+import BestSolutionPage from 'layout/scenarios/reports/solutions/best-solution';
+import DifferentSolutionsPage from 'layout/scenarios/reports/solutions/different-solutions';
+import FeaturesPage from 'layout/scenarios/reports/solutions/features';
+import FrequencyPage from 'layout/scenarios/reports/solutions/frequency';
+import GapAnalysisPage from 'layout/scenarios/reports/solutions/gap-analysis';
+import GridPage from 'layout/scenarios/reports/solutions/grid';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
-import ResumePage from 'layout/scenarios/reports/solutions/resume-page';
-import SolutionsTablePage from 'layout/scenarios/reports/solutions/solutions-table-page';
+import ResumePage from 'layout/scenarios/reports/solutions/resume';
+import SolutionsTablePage from 'layout/scenarios/reports/solutions/solutions-table';
 import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 
 export const getServerSideProps = withProtection(withUser());
@@ -53,12 +54,18 @@ const MainReport: React.FC = () => {
         <ResumePage />
       </div>
       {/* PAGE 5 */}
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
+        <ReportHeader />
+      </div>
       {/* PAGE 6 */}
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader />
         <FeaturesPage />
       </div>
       {/* PAGE 7 */}
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
+        <ReportHeader />
+      </div>
       {/* PAGE 8 */}
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader />
@@ -70,8 +77,11 @@ const MainReport: React.FC = () => {
         <DifferentSolutionsPage />
       </div>
       {/* PAGE 11 */}
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
+        <ReportHeader />
+        <GapAnalysisPage />
+      </div>
       {/* PAGE 12 */}
-
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader />
       </div>
