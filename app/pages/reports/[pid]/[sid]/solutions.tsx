@@ -22,7 +22,7 @@ import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 export const getServerSideProps = withProtection(withUser());
 
 const PAGE_CLASSES =
-  'm-auto flex h-full min-h-[297mm] w-[210mm] flex-col bg-white px-[8.73mm] py-[13.49mm] text-black break-after-page';
+  'border m-auto flex h-full min-h-[297mm] w-[210mm] flex-col bg-white px-[8.73mm] py-[13.49mm] text-black break-after-page';
 const MainReport: React.FC = () => {
   return (
     <>
