@@ -17,10 +17,10 @@ export const SolutionsTablePage = (): JSX.Element => {
   const bestSolutionQuery = useBestSolution(sid, {});
 
   return (
-    <>
+    <div className="relative">
       <h2 className="py-6 text-sm font-medium uppercase">Solutions table</h2>
 
-      <table className="absolute left-0 mt-52 w-full">
+      <table className="absolute -left-[14mm] mt-4 w-[210mm]">
         <thead className="h-12 text-sm">
           <tr className="text-left font-semibold">
             <th className="w-1/6 px-20">Best</th>
@@ -54,7 +54,7 @@ export const SolutionsTablePage = (): JSX.Element => {
           })}
         </tbody>
       </table>
-    </>
+    </div>
   );
 };
 

@@ -14,7 +14,7 @@ import { useProject } from 'hooks/projects';
 
 import Map from 'components/map';
 
-export const ReportMap = ({ id, runId }: { id: string; runId: number }): JSX.Element => {
+export const ReportMap = ({ id }: { id: string }): JSX.Element => {
   const accessToken = useAccessToken();
   const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
@@ -41,9 +41,13 @@ export const ReportMap = ({ id, runId }: { id: string; runId: number }): JSX.Ele
     active: true,
     sid: sid ? `${sid}` : null,
     include: 'results',
-    sublayers: ['solution'],
+    sublayers: ['cost'],
     options: {
-      runId,
+      cost: {
+        min: 0,
+        max: 1,
+      },
+      settings: {},
     },
   });
 
@@ -83,7 +87,7 @@ export const ReportMap = ({ id, runId }: { id: string; runId: number }): JSX.Ele
 
   return (
     <>
-      <div className="relative h-full w-1/2 overflow-hidden" style={{ height: '70mm' }}>
+      <div className="relative h-full w-1/2 overflow-hidden" style={{ height: '100mm' }}>
         <Map
           key={accessToken}
           className="map-report"
