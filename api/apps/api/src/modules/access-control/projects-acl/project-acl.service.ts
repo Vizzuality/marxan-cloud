@@ -57,6 +57,10 @@ export class ProjectAclService implements ProjectAccessControl {
     ProjectRoles.project_contributor,
     ProjectRoles.project_viewer,
   ];
+  private readonly canEditCostSurfaceInProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
   private readonly canEditFeatureInProjectRoles = [
     ProjectRoles.project_owner,
     ProjectRoles.project_contributor,
@@ -162,6 +166,16 @@ export class ProjectAclService implements ProjectAccessControl {
     );
 
     return userHasPermit || isPublic;
+  }
+
+  async canEditCostSurfaceInProject(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canEditCostSurfaceInProjectRoles,
+    );
   }
 
   async canEditFeatureInProject(

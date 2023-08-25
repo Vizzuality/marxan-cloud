@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   forwardRef,
   Get,
@@ -28,6 +29,9 @@ import { CostRangeDto } from '@marxan-api/modules/scenarios/dto/cost-range.dto';
 import { plainToClass } from 'class-transformer';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
+import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
+import { CostSurfaceSerializer } from '@marxan-api/modules/cost-surface/dto/cost-surface.serializer';
+import { UploadCostSurfaceShapefileDto } from '@marxan-api/modules/cost-surface/dto/upload-cost-surface-shapefile.dto';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -35,6 +39,8 @@ export class ProjectCostSurfaceController {
   constructor(
     @Inject(forwardRef(() => ScenariosService))
     public readonly scenarioService: ScenariosService,
+    public readonly costSurfaceService: CostSurfaceService,
+    public readonly costSurfaceSeralizer: CostSurfaceSerializer,
   ) {}
 
   @ImplementsAcl()
@@ -45,15 +51,30 @@ export class ProjectCostSurfaceController {
   @ApiTags(asyncJobTag)
   @Post(`:projectId/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
-    @Param(':projectId') projectId: string,
+    @Param('projectId') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
+    @Body() dto: UploadCostSurfaceShapefileDto,
   ): Promise<NotImplementedException> {
     /**
      * @todo: We will have to move ScenarioService.processCostSurfaceShapefile logic to another project-scoped
      *        service and fire it from here.
      */
-    throw new NotImplementedException();
+    const result = await this.costSurfaceService.uploadCostSurfaceShapefile(
+      req.user.id,
+      projectId,
+      dto,
+      file,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        projectId,
+        userId: req.user.id,
+      });
+    }
+
+    return this.costSurfaceSeralizer.serialize(result.right);
   }
 
   @ImplementsAcl()

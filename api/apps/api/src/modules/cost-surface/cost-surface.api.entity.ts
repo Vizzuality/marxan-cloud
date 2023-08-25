@@ -8,11 +8,18 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { BaseServiceResource } from '@marxan-api/types/resource.interface';
+
+export const costSurfaceResource: BaseServiceResource = {
+  className: 'CostSurface',
+  name: {
+    singular: 'costSurface',
+    plural: 'costSurfaces',
+  },
+};
 
 @Entity('cost_surfaces')
 @Unique('UQ_cost_surface_name_for_project', ['projectId', 'name'])
@@ -60,4 +67,20 @@ export class CostSurface {
     type: 'timestamp without time zone',
   })
   lastModifiedAt!: Date;
+}
+
+export class JSONAPICostSurface {
+  @ApiProperty()
+  type = costSurfaceResource.name.plural;
+
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  attributes!: CostSurface;
+}
+
+export class CostSurfaceResult {
+  @ApiProperty()
+  data!: JSONAPICostSurface;
 }
