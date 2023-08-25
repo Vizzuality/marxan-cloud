@@ -52,6 +52,7 @@ import { ProjectProtectedAreasService } from './project-protected-areas.service'
 import { ProjectAclModule } from '../access-control/projects-acl/project-acl.module';
 import { ProtectedAreasCrudModule } from '../protected-areas/protected-areas-crud.module';
 import { ProjectCostSurfaceController } from './project-cost-surface.controller';
+import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { ProjectCostSurfaceController } from './project-cost-surface.controller'
     ApiEventsModule,
     OutputProjectSummariesModule,
     ProtectedAreasCrudModule,
+    CostSurfaceModule,
   ],
   providers: [
     ProjectProtectedAreasService,
