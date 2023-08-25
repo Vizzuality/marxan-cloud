@@ -11,7 +11,7 @@ export const FeaturesPage = (): JSX.Element => {
   const targetedFeaturesQuery = useTargetedFeatures(sid);
 
   return (
-    <table className="mt-6">
+    <table className="mt-10">
       <thead className="h-12 text-sm">
         <tr className="text-left font-semibold">
           <th>Feature name</th>

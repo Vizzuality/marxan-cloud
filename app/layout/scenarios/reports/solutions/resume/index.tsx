@@ -20,16 +20,16 @@ export const ResumePage = (): JSX.Element => {
   const TEXT_CLASSES = 'text-sm leading-4';
 
   return (
-    <div className="flex flex-col space-y-14 border-t border-gray-100">
-      <div className="pt-10">
-        {scenarioQuery.data?.description && (
+    <div className="flex flex-col border-t border-gray-100">
+      {scenarioQuery.data?.description && (
+        <div className="pt-10">
           <div>
             <h3 className={TITLE_CLASSES}>Description:</h3>
             <p className={TEXT_CLASSES}>{scenarioQuery.data?.description}</p>
           </div>
-        )}
-      </div>
-      <div className="grid grid-cols-2 gap-20">
+        </div>
+      )}
+      <div className="mt-10 grid grid-cols-2 gap-20">
         <div>
           <div className={SECTION_CLASSES}>
             <h3 className={TITLE_CLASSES}>Contributors:</h3>

@@ -4,6 +4,7 @@ import { withProtection, withUser } from 'hoc/auth';
 
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
+import AdvancedSettingsPage from 'layout/scenarios/reports/solutions/advanced-settings';
 import BestSolutionPage from 'layout/scenarios/reports/solutions/best-solution';
 import CostSurfaceReport from 'layout/scenarios/reports/solutions/cost-surface';
 import DifferentSolutionsFirstPage from 'layout/scenarios/reports/solutions/different-solutions/first';
@@ -22,7 +23,7 @@ import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 export const getServerSideProps = withProtection(withUser());
 
 const PAGE_CLASSES =
-  'border m-auto flex h-full min-h-[297mm] w-[210mm] flex-col bg-white px-[8.73mm] py-[13.49mm] text-black break-after-page';
+  'm-auto flex h-full min-h-[274mm] w-[210mm] flex-col bg-white px-[8.73mm] py-[13.49mm] text-black break-after-page';
 const MainReport: React.FC = () => {
   return (
     <>
@@ -52,6 +53,7 @@ const MainReport: React.FC = () => {
       {/* PAGE 5 */}
       <div className={PAGE_CLASSES}>
         <ReportHeader />
+        <AdvancedSettingsPage />
       </div>
       {/* PAGE 6 */}
       <div className={PAGE_CLASSES}>
@@ -61,7 +63,7 @@ const MainReport: React.FC = () => {
       {/* PAGE 7 */}
       <div className={PAGE_CLASSES}>
         <ReportHeader />
-        <div className="mt-6 flex flex-col space-y-3">
+        <div className="mt-10 flex flex-col space-y-10">
           <PUStatusReport />
           <CostSurfaceReport />
         </div>

@@ -3,7 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import DOWNLOADS from 'services/downloads';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const baseUrl = req.headers.origin;
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : process.env.NEXT_PUBLIC_URL;
 
   const { sid, solutionId } = req.query as {
     sid: string;
@@ -21,9 +23,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     },
     data: {
       baseUrl,
-      pdfOptions: {
-        landscape: true,
-      },
       reportOptions: {
         solutionId,
       },

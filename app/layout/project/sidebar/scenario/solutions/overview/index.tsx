@@ -68,7 +68,7 @@ export const SolutionsOverview = (): JSX.Element => {
   const downloadScenarioReportMutation = useDownloadScenarioReport({
     projectName: formatFileName(projectData?.name) || '',
     scenarioName: formatFileName(scenarioData?.name) || '',
-    runId: `${(selectedSolutionData || bestSolutionData).runId}`,
+    runId: `${(selectedSolutionData || bestSolutionData)?.runId}`,
   });
 
   const downloadSolutionsSummary = useDownloadSolutionsSummary();

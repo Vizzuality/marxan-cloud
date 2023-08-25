@@ -20,7 +20,7 @@ export const SolutionsTablePage = (): JSX.Element => {
     <div className="relative">
       <h2 className="py-6 text-sm font-medium uppercase">Solutions table</h2>
 
-      <table className="absolute -left-[9mm] mt-4 w-[210mm]">
+      <table className="-ml-[12mm] mt-4 w-[220mm]">
         <thead className="h-12 text-sm">
           <tr className="text-left font-semibold">
             <th className="w-1/6 px-20">Best</th>
@@ -32,7 +32,7 @@ export const SolutionsTablePage = (): JSX.Element => {
           </tr>
         </thead>
         <tbody className="[&>*:nth-child(even)]:bg-gray-50 [&>*]:h-10">
-          {solutionsQuery.data.slice(0, 18)?.map((solution) => {
+          {solutionsQuery.data.map((solution) => {
             return (
               <tr key={solution.id}>
                 <td className="px-20">

@@ -87,7 +87,7 @@ export const ReportMap = ({ id }: { id: string }): JSX.Element => {
 
   return (
     <>
-      <div className="relative h-full w-4/6 overflow-hidden" style={{ height: '100mm' }}>
+      <div className="relative h-full w-4/6 overflow-hidden" style={{ height: '85mm' }}>
         <Map
           key={accessToken}
           className="map-report"
