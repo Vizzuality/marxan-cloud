@@ -13,6 +13,7 @@ import FrequencyPage from 'layout/scenarios/reports/solutions/frequency';
 import GapAnalysisPage from 'layout/scenarios/reports/solutions/gap-analysis';
 import GridPage from 'layout/scenarios/reports/solutions/grid';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
+import PUStatusReport from 'layout/scenarios/reports/solutions/pu-status';
 import ResumePage from 'layout/scenarios/reports/solutions/resume';
 import SolutionsTablePage from 'layout/scenarios/reports/solutions/solutions-table';
 import TargetAchievementPage from 'layout/scenarios/reports/solutions/target-achievement';
@@ -60,7 +61,10 @@ const MainReport: React.FC = () => {
       {/* PAGE 7 */}
       <div className={PAGE_CLASSES}>
         <ReportHeader />
-        <CostSurfaceReport />
+        <div className="mt-6 flex flex-col space-y-3">
+          <PUStatusReport />
+          <CostSurfaceReport />
+        </div>
       </div>
       {/* PAGE 8 */}
       <div className={PAGE_CLASSES}>
