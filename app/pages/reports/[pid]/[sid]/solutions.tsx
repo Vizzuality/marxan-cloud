@@ -11,7 +11,7 @@ import FrequencyPage from 'layout/scenarios/reports/solutions/frequency-page';
 import GridPage from 'layout/scenarios/reports/solutions/grid-page';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
 import ResumePage from 'layout/scenarios/reports/solutions/resume-page';
-import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
+import SolutionsTablePage from 'layout/scenarios/reports/solutions/solutions-table-page';
 import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 
 export const getServerSideProps = withProtection(withUser());
@@ -60,6 +60,10 @@ const MainReport: React.FC = () => {
       </div>
       {/* PAGE 7 */}
       {/* PAGE 8 */}
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
+        <ReportHeader />
+        <SolutionsTablePage />
+      </div>
       {/* PAGE 9 & 10 */}
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader />
@@ -70,7 +74,6 @@ const MainReport: React.FC = () => {
 
       <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader />
-        <SettingsPage />
       </div>
 
       <WebShotStatus />

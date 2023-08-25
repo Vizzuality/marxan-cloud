@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 import { useTargetedFeatures } from 'hooks/features';
 
-export const FeaturePage = (): JSX.Element => {
+export const FeaturesPage = (): JSX.Element => {
   const { query } = useRouter();
   const { sid } = query as { sid: string };
 
@@ -34,4 +34,4 @@ export const FeaturePage = (): JSX.Element => {
   );
 };
 
-export default FeaturePage;
+export default FeaturesPage;

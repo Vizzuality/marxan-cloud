@@ -2,15 +2,21 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useMostDifferentSolutions } from 'hooks/solutions';
+import { useBestSolution, useMostDifferentSolutions } from 'hooks/solutions';
 
+import Icon from 'components/icon/component';
 import DifferentSolutionReportMap from 'layout/scenarios/reports/solutions/different-solutions-page/map';
+import { cn } from 'utils/cn';
+
+import STAR_SVG from 'svgs/ui/star.svg?sprite';
 
 export const DifferentSolutionsPage = (): JSX.Element => {
   const { query } = useRouter();
   const { sid } = query as { sid: string };
 
   const mostDifSolutionsQuery = useMostDifferentSolutions(sid);
+
+  const bestSolutionQuery = useBestSolution(sid, {});
 
   const SOLUTION_INFO_BOX_CLASSES = 'border-l-[3px] border-primary-500 pl-2';
 
@@ -23,7 +29,18 @@ export const DifferentSolutionsPage = (): JSX.Element => {
             <div key={solution.id} className="flex space-x-6 bg-gray-50 px-5 py-3">
               <DifferentSolutionReportMap id="report-map-3" runId={solution.runId} />
               <div className="flex flex-col space-y-4">
-                <p className="font-semibold">Run {solution.runId}</p>
+                <div className="flex items-center space-x-6">
+                  <p className="font-semibold">Run {solution.runId}</p>
+                  <div
+                    className={cn({
+                      'hidden rounded-2xl bg-primary-500 px-3 py-1': true,
+                      'flex items-center space-x-4': solution.id === bestSolutionQuery.data?.id,
+                    })}
+                  >
+                    <p className="text-sm text-black">Best solution</p>
+                    <Icon className="h-3 w-3 text-black" icon={STAR_SVG} />
+                  </div>
+                </div>
                 <div className={SOLUTION_INFO_BOX_CLASSES}>
                   <p>
                     Score: <span className="font-medium">{solution.score}</span>
