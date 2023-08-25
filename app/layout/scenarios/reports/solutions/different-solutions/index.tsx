@@ -22,7 +22,7 @@ export const DifferentSolutionsPage = (): JSX.Element => {
 
   return (
     <div className="flex flex-col">
-      <h2 className="py-6 text-base font-medium uppercase">Five most different solutions</h2>
+      <h2 className="py-6 text-sm font-medium uppercase">Five most different solutions</h2>
       <div className="flex flex-col space-y-3">
         {mostDifSolutionsQuery.data?.map((solution) => {
           return (
