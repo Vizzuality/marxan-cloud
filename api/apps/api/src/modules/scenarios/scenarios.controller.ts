@@ -403,21 +403,21 @@ export class ScenariosController {
   @ApiTags(asyncJobTag)
   @Post(`:scenarioId/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
-    @Param(':scenarioId') scenarioId: string,
+    @Param('scenarioId') scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<JsonApiAsyncJobMeta> {
     await ensureShapefileHasRequiredFiles(file);
 
     const result = await this.service.processCostSurfaceShapefile(
-      req.params.scenarioId,
+      scenarioId,
       req.user.id,
       file,
     );
 
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
-        scenarioId: req.params.scenarioId,
+        scenarioId,
         userId: req.user.id,
         resourceType: scenarioResource.name.plural,
       });
