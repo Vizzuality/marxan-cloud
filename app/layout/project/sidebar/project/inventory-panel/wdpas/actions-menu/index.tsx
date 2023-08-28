@@ -2,8 +2,8 @@ import { useCallback, useState } from 'react';
 
 import Icon from 'components/icon';
 import Modal from 'components/modal/component';
-import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete';
-import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
+import DeleteModal from 'layout/project/sidebar/project/inventory-panel/wdpas/modals/delete';
+import EditModal from 'layout/project/sidebar/project/inventory-panel/wdpas/modals/edit';
 import { cn } from 'utils/cn';
 
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
@@ -53,13 +53,13 @@ const ActionsMenu = ({
           <span>Edit</span>
         </button>
         <Modal
-          id="edit-feature-modal"
-          title="All features"
+          id="edit-wdpa-modal"
+          title="Protected area"
           open={modalState.edit}
           size="narrow"
           onDismiss={() => handleModal('edit', false)}
         >
-          <EditModal featureId={item.id} handleModal={handleModal} />
+          <EditModal wdpaId={item.id} handleModal={handleModal} />
         </Modal>
       </li>
       {isDeletable && (
@@ -86,7 +86,7 @@ const ActionsMenu = ({
               handleModal('delete', false);
             }}
           >
-            <DeleteModal selectedFeaturesIds={[item.id]} />
+            <DeleteModal selectedWDPAIds={[item.id]} />
           </Modal>
         </li>
       )}

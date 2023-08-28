@@ -1,4 +1,4 @@
-import { useMutation, useQuery, QueryObserverOptions } from 'react-query';
+import { useMutation, useQuery, QueryObserverOptions, useQueryClient } from 'react-query';
 
 import { AxiosRequestConfig } from 'axios';
 import { useSession } from 'next-auth/react';
@@ -8,6 +8,8 @@ import { Scenario } from 'types/api/scenario';
 import { WDPA, WDPACategory } from 'types/api/wdpa';
 
 import { API } from 'services/api';
+import GEOFEATURES from 'services/geo-features';
+import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
 
 export function useWDPACategories({
@@ -116,7 +118,7 @@ export function useProjectWDPAs<T = WDPA[]>(
     {
       id: 'hfgxssshmdgf',
       wdpaId: 'hfdgjfhdg',
-      fullName: 'IUCN Ib',
+      fullName: 'Florida scrub jay',
       iucnCategory: 'IUCN Ib',
       countryId: 'mdfgjf',
       shapeLength: 45,
@@ -140,5 +142,44 @@ export function useProjectWDPAs<T = WDPA[]>(
       }).then(({ data }) => mockData),
     enabled: Boolean(pid),
     ...queryOptions,
+  });
+}
+
+export function useEditWDPA({
+  requestConfig = {
+    method: 'PATCH',
+  },
+}) {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const saveProjectWDPA = ({
+    projectId,
+    wdpaId,
+    data,
+  }: {
+    projectId: string;
+    wdpaId: string;
+    data: { fullName: string };
+  }) => {
+    return PROJECTS.request({
+      method: 'PATCH',
+      url: `/${projectId}/protected-areas/${wdpaId}`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveProjectWDPA, {
+    onSuccess: async (data, variables) => {
+      const { projectId } = variables;
+      await queryClient.invalidateQueries(['wdpas', projectId]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
   });
 }
