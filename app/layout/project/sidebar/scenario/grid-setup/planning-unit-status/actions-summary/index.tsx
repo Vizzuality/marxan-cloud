@@ -49,6 +49,8 @@ export const ActionsSummary = ({
     puIncludedValue,
     puExcludedValue,
     puAvailableValue,
+    drawingValue,
+    uploadingValue,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
@@ -212,9 +214,10 @@ export const ActionsSummary = ({
             </Button>
           </div>
         </div>
-        {puAction === 'include' && (
-          <ActionsSummaryButtons onCancel={() => onCancelPUSelection('include')} />
-        )}
+        {puAction === 'include' &&
+          (puTmpIncludedValue.length > 0 || drawingValue || uploadingValue) && (
+            <ActionsSummaryButtons onCancel={() => onCancelPUSelection('include')} />
+          )}
       </div>
       {/* // ? Excluded areas  */}
       <div className="flex flex-col space-y-3 py-3">
@@ -250,9 +253,10 @@ export const ActionsSummary = ({
             </Button>
           </div>
         </div>
-        {puAction === 'exclude' && (
-          <ActionsSummaryButtons onCancel={() => onCancelPUSelection('exclude')} />
-        )}
+        {puAction === 'exclude' &&
+          (puTmpExcludedValue.length > 0 || drawingValue || uploadingValue) && (
+            <ActionsSummaryButtons onCancel={() => onCancelPUSelection('exclude')} />
+          )}
       </div>
       {/* // ? Available areas  */}
       <div className="flex flex-col space-y-3 py-3">
@@ -288,9 +292,10 @@ export const ActionsSummary = ({
             </Button>
           </div>
         </div>
-        {puAction === 'available' && (
-          <ActionsSummaryButtons onCancel={() => onCancelPUSelection('available')} />
-        )}
+        {puAction === 'available' &&
+          (puTmpAvailableValue.length > 0 || drawingValue || uploadingValue) && (
+            <ActionsSummaryButtons onCancel={() => onCancelPUSelection('available')} />
+          )}
       </div>
     </div>
   );
