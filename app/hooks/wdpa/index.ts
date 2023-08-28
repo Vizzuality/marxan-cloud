@@ -128,7 +128,7 @@ export function useProjectWDPAs<T = WDPA[]>(
   ];
 
   return useQuery({
-    queryKey: ['protected-areas', pid],
+    queryKey: ['wdpas', pid],
     queryFn: async () =>
       API.request<WDPA[]>({
         method: 'GET',

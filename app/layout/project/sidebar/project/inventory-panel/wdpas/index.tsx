@@ -121,7 +121,7 @@ const InventoryPanelProtectedAreas = ({
         onToggleSeeOnMap={toggleSeeOnMap}
         ActionsComponent={ActionsMenu}
       />
-      {displayBulkActions && <WDPABulkActionMenu selectedFeaturesIds={selectedWDPAIds} />}
+      {displayBulkActions && <WDPABulkActionMenu selectedWDPAIds={selectedWDPAIds} />}
     </div>
   );
 };
