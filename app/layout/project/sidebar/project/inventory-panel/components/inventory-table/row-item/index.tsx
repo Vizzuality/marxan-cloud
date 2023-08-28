@@ -17,7 +17,7 @@ const RowItem = ({
   onToggleSeeOnMap,
   ActionsComponent,
 }: RowItem) => {
-  const { id, name, scenarios, tag, isVisibleOnMap } = item;
+  const { id, name, scenarios, tag, isVisibleOnMap, isCustom } = item;
 
   return (
     <tr key={id} className="align-top">
@@ -29,6 +29,7 @@ const RowItem = ({
           onChange={onSelectRow}
           value={id}
           checked={selectedIds.includes(id)}
+          disabled={!isCustom}
         />
       </td>
       <td className="px-1 pb-2 pt-5">
@@ -61,21 +62,23 @@ const RowItem = ({
               icon={isVisibleOnMap ? SHOW_SVG : HIDE_SVG}
             />
           </button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <button type="button" className="h-5 w-5">
-                <MoreHorizontal className="h-4 w-4 text-white" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto rounded-2xl border-transparent p-0"
-              side="bottom"
-              sideOffset={5}
-              align="start"
-            >
-              <ActionsComponent item={item} />
-            </PopoverContent>
-          </Popover>
+          {isCustom && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <button type="button" className="h-5 w-5">
+                  <MoreHorizontal className="h-4 w-4 text-white" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto rounded-2xl border-transparent p-0"
+                side="bottom"
+                sideOffset={5}
+                align="start"
+              >
+                <ActionsComponent item={item} />
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       </td>
     </tr>
