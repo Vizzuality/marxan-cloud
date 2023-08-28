@@ -131,6 +131,46 @@ export class ProjectCostSurfaceController {
 
   @ImplementsAcl()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Updates the Cost Surface with the data from the provided DTO',
+  })
+  @ApiParam({
+    name: 'costSurfaceId',
+    description: 'The id of the Cost Surface to be updated',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'The id of the Project that the Cost Surface is associated to',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Patch(`:projectId/cost-surface/:costSurfaceId`)
+  async updateCostSurface(
+    @Param('projectId') projectId: string,
+    @Param('costSurfaceId') costSurfaceId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: UploadCostSurfaceShapefileDto,
+  ): Promise<NotImplementedException> {
+    const result = await this.costSurfaceService.updateCostSurfaceShapefile(
+      req.user.id,
+      projectId,
+      costSurfaceId,
+      dto,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        projectId,
+        costSurfaceId,
+        userId: req.user.id,
+      });
+    }
+
+    return this.costSurfaceSeralizer.serialize(result.right);
+  }
+
+  @ImplementsAcl()
+  @UseGuards(JwtAuthGuard)
   @Get(`:projectId/cost-surface/:costSurfaceId/cost-range`)
   @ApiOkResponse({ type: CostRangeDto })
   async getCostRange(
