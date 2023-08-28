@@ -3,7 +3,7 @@ import { ChangeEvent } from 'react';
 export type DataItem = {
   id: string;
   name: string;
-  scenarios: number;
+  scenarios?: number;
   tag?: string;
   isVisibleOnMap: boolean;
   isCustom?: boolean;
