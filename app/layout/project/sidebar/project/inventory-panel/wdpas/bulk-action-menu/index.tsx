@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal/component';
-import DeleteModal from 'layout/project/sidebar/project/inventory-panel/protected-areas/modals/delete';
+import DeleteModal from 'layout/project/sidebar/project/inventory-panel/wdpas/modals/delete';
 import { WDPA } from 'types/api/wdpa';
 
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
@@ -48,7 +48,7 @@ const WDPABulkActionMenu = ({
       </div>
 
       <Modal
-        id="delete-features-modal"
+        id="delete-wdpas-modal"
         open={modalState.delete}
         size="narrow"
         dismissable

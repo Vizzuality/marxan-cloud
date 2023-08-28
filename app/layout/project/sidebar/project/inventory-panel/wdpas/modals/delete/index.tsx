@@ -12,7 +12,7 @@ import { useProjectWDPAs } from 'hooks/wdpa';
 import { Button } from 'components/button/component';
 import Icon from 'components/icon/component';
 import { ModalProps } from 'components/modal';
-import { bulkDeleteWDPAFromProject } from 'layout/project/sidebar/project/inventory-panel/protected-areas/bulk-action-menu/utils';
+import { bulkDeleteWDPAFromProject } from 'layout/project/sidebar/project/inventory-panel/wdpas/bulk-action-menu/utils';
 import { WDPA } from 'types/api/wdpa';
 
 import ALERT_SVG from 'svgs/ui/new-layout/alert.svg?sprite';
@@ -79,7 +79,7 @@ const DeleteModal = ({
 
   return (
     <div className="flex flex-col space-y-5 px-8 py-1">
-      <h2 className="font-heading font-bold text-black">{`Delete feature${
+      <h2 className="font-heading font-bold text-black">{`Delete protected area${
         selectedWDPAIds.length > 1 ? 's' : ''
       }`}</h2>
       <p className="font-heading text-sm font-medium text-black">
@@ -97,7 +97,7 @@ const DeleteModal = ({
           </div>
         ) : (
           <span>
-            Are you sure you want to delete &quot;{PAsNames[0]}&quot; feature? <br />
+            Are you sure you want to delete &quot;{PAsNames[0]}&quot; protected area? <br />
             This action cannot be undone.
           </span>
         )}
