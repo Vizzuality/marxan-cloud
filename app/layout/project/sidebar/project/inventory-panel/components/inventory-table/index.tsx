@@ -24,7 +24,7 @@ const InventoryTable = ({
 
   return (
     <>
-      {loading && !data.length && (
+      {loading && !data?.length && (
         <div className="relative min-h-[200px]">
           <Loading
             visible={true}
