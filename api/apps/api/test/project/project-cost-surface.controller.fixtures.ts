@@ -101,7 +101,16 @@ export const getProjectCostSurfaceControllerFixtures = async () => {
         PlanningUnitGridShape.Square,
       );
     },
-
+    GivenCostSurfaceMetadataForProject: async (
+      projectId: string,
+      name: string,
+      min = 0,
+      max = 0,
+    ) => {
+      return await costSurfaceRepo.save(
+        costSurfaceRepo.create({ name, projectId, min, max }),
+      );
+    },
     GivenMockCostSurfaceShapefile: () => {
       return __dirname + `/../upload-feature/import-files/wetlands.zip`;
     },
@@ -119,6 +128,16 @@ export const getProjectCostSurfaceControllerFixtures = async () => {
           name: costSurfaceName,
         });
     },
+    WhenUpdatingCostSurfaceForProject: async (
+      projectId: string,
+      costSurfaceId: string,
+      costSurfaceName: string,
+    ) => {
+      return request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/cost-surface/${costSurfaceId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: costSurfaceName });
+    },
 
     ThenCostSurfaceAPIEntityWasProperlySaved: async (name: string) => {
       const savedCostSurface = await costSurfaceRepo.findOne({
@@ -126,6 +145,28 @@ export const getProjectCostSurfaceControllerFixtures = async () => {
       });
       expect(savedCostSurface).toBeDefined();
       expect(savedCostSurface?.name).toEqual(name);
+    },
+
+    ThenCostSurfaceAPIEntityWasProperlyUpdated: async (
+      response: request.Response,
+      name: string,
+    ) => {
+      const jsonAPICostSurface: JSONAPICostSurface = response.body.data;
+      const savedCostSurface = await costSurfaceRepo.findOneOrFail({
+        where: { id: jsonAPICostSurface.id },
+      });
+      expect(savedCostSurface.name).toEqual(name);
+      expect(savedCostSurface.name).toEqual(jsonAPICostSurface.attributes.name);
+    },
+
+    ThenCostSurfaceAPIEntityWasNotUpdated: async (costSurface: CostSurface) => {
+      const savedCostSurface = await costSurfaceRepo.findOneOrFail({
+        where: { id: costSurface.id },
+      });
+      expect(savedCostSurface).toBeDefined();
+      expect(savedCostSurface.name).toEqual(costSurface.name);
+      expect(savedCostSurface.min).toEqual(costSurface.min);
+      expect(savedCostSurface.max).toEqual(costSurface.max);
     },
 
     ThenProjectNotEditableErrorWasReturned: (
@@ -149,6 +190,26 @@ export const getProjectCostSurfaceControllerFixtures = async () => {
       const error: any =
         response.body.errors[0].meta.rawError.response.message[0];
       expect(error).toContain(`name should not be empty`);
+    },
+    ThenNotFoundErrorWasReturned: (
+      response: request.Response,
+      projectId: string,
+    ) => {
+      const error: any = response.body.errors[0].meta.rawError.response.message;
+      expect(error).toContain(
+        `Cost Surface for Project with id ${projectId} not found`,
+      );
+    },
+
+    ThenNameAlreadyExistsErrorWasReturned: (
+      response: request.Response,
+      costSurfaceId: string,
+    ) => {
+      const error: any = response.body.errors[0].meta.rawError.response.message;
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+      expect(error).toContain(
+        `Cost Surface with id ${costSurfaceId} cannot be updated: name is already in use in the associated Project`,
+      );
     },
   };
 };

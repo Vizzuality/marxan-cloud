@@ -6,8 +6,20 @@ import { ProjectAclService } from '@marxan-api/modules/access-control/projects-a
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { projectNotEditable } from '@marxan-api/modules/projects/projects.service';
 import { UploadCostSurfaceShapefileDto } from '@marxan-api/modules/cost-surface/dto/upload-cost-surface-shapefile.dto';
+import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateProjectCostSurface } from '@marxan-api/modules/cost-surface/application/update-project-cost-surface.command';
+
+export const costSurfaceNotEditableWithinProject = Symbol(
+  `cost surface not editable within project`,
+);
+
+export const costSurfaceNotFoundForProject = Symbol(
+  `cost surface not found for project`,
+);
+export const costSurfaceNameAlreadyExistsForProject = Symbol(
+  `cost surface already exists for project`,
+);
 
 @Injectable()
 export class CostSurfaceService {
@@ -51,5 +63,48 @@ export class CostSurfaceService {
       new UpdateProjectCostSurface(projectId, costSurface.id, file),
     );
     return right(void 0);
+  }
+
+  async updateCostSurfaceShapefile(
+    userId: string,
+    projectId: string,
+    costSurfaceId: string,
+    dto: UpdateCostSurfaceDto,
+  ): Promise<
+    Either<
+      | typeof projectNotEditable
+      | typeof costSurfaceNotFoundForProject
+      | typeof costSurfaceNameAlreadyExistsForProject,
+      CostSurface
+    >
+  > {
+    if (
+      !(await this.projectAclService.canEditCostSurfaceInProject(
+        userId,
+        projectId,
+      ))
+    ) {
+      return left(projectNotEditable);
+    }
+
+    const nameCount = await this.costSurfaceRepository.count({
+      where: { name: dto.name },
+    });
+    if (nameCount > 0) {
+      return left(costSurfaceNameAlreadyExistsForProject);
+    }
+
+    let costSurface = await this.costSurfaceRepository.findOne({
+      where: { id: costSurfaceId },
+    });
+    if (!costSurface) {
+      return left(costSurfaceNotFoundForProject);
+    }
+
+    costSurface.name = dto.name;
+
+    costSurface = await this.costSurfaceRepository.save(costSurface);
+
+    return right(costSurface);
   }
 }
