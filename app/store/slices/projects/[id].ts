@@ -1,12 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { CostSurface } from 'types/api/cost-surface';
+import { Feature } from 'types/api/feature';
+import { WDPA } from 'types/api/wdpa';
+
 interface ProjectShowStateProps {
   search: string;
   filters: Record<string, unknown> | [];
   sort: string;
   layerSettings: Record<string, any>;
-  selectedFeatures: string[];
-  selectedCostSurface: string | null;
+  selectedCostSurface: CostSurface['id'][];
+  selectedFeatures: Feature['id'][];
+  selectedWDPA: WDPA['id'][];
   isSidebarOpen: boolean;
 }
 
@@ -16,7 +21,8 @@ const initialState: ProjectShowStateProps = {
   sort: '-lastModifiedAt',
   layerSettings: {},
   selectedFeatures: [],
-  selectedCostSurface: null,
+  selectedCostSurface: [],
+  selectedWDPA: [],
   isSidebarOpen: true,
 } satisfies ProjectShowStateProps;
 
@@ -71,6 +77,10 @@ const projectsDetailSlice = createSlice({
     ) => {
       state.selectedCostSurface = action.payload;
     },
+    // WDPA
+    setSelectedWDPA: (state, action: PayloadAction<ProjectShowStateProps['selectedWDPA']>) => {
+      state.selectedFeatures = action.payload;
+    },
   },
 });
 
@@ -81,6 +91,7 @@ export const {
   setLayerSettings,
   setSelectedFeatures,
   setSelectedCostSurface,
+  setSelectedWDPA,
   setSidebarVisibility,
 } = projectsDetailSlice.actions;
 

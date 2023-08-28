@@ -1,31 +1,32 @@
-import { useMemo } from 'react';
+import { useMutation, useQuery, QueryObserverOptions } from 'react-query';
 
-import { useMutation, useQuery } from 'react-query';
-
+import { AxiosRequestConfig } from 'axios';
 import { useSession } from 'next-auth/react';
 
-import SCENARIOS from 'services/scenarios';
-import WDPA from 'services/wdpa';
+import { Project } from 'types/api/project';
+import { Scenario } from 'types/api/scenario';
+import { WDPA, WDPACategory } from 'types/api/wdpa';
 
-import {
-  UseWDPACategoriesProps,
-  UseSaveScenarioProtectedAreasProps,
-  SaveScenarioProtectedAreasProps,
-} from './types';
+import { API } from 'services/api';
+import SCENARIOS from 'services/scenarios';
 
 export function useWDPACategories({
   adminAreaId,
   customAreaId,
   scenarioId,
-}: UseWDPACategoriesProps) {
+}: {
+  adminAreaId?: WDPA['id'];
+  customAreaId?: WDPA['id'];
+  scenarioId: Scenario['id'];
+}) {
   const { data: session } = useSession();
 
   return useQuery(
     ['protected-areas', adminAreaId, customAreaId],
     async () =>
-      WDPA.request({
+      API.request<WDPACategory[]>({
         method: 'GET',
-        url: `/${scenarioId}/protected-areas`,
+        url: `/scenarios/${scenarioId}/protected-areas`,
         params: {
           ...(adminAreaId && {
             'filter[adminAreaId]': adminAreaId,
@@ -49,10 +50,24 @@ export function useSaveScenarioProtectedAreas({
   requestConfig = {
     method: 'POST',
   },
-}: UseSaveScenarioProtectedAreasProps) {
+}: {
+  requestConfig?: AxiosRequestConfig;
+}) {
   const { data: session } = useSession();
 
-  const saveScenarioProtectedAreas = ({ id, data }: SaveScenarioProtectedAreasProps) => {
+  const saveScenarioProtectedAreas = ({
+    id,
+    data,
+  }: {
+    id: Scenario['id'];
+    data: {
+      areas: {
+        id: string;
+        selected: boolean;
+      }[];
+      threshold: number;
+    };
+  }) => {
     return SCENARIOS.request({
       url: `/${id}/protected-areas`,
       data,
@@ -63,12 +78,28 @@ export function useSaveScenarioProtectedAreas({
     });
   };
 
-  return useMutation(saveScenarioProtectedAreas, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      console.info('Error', error, variables, context);
-    },
+  return useMutation(saveScenarioProtectedAreas);
+}
+
+export function useProjectWDPAs<T = WDPA[]>(
+  pid: Project['id'],
+  params: { sort?: string } = {},
+  queryOptions: QueryObserverOptions<WDPA[], Error, T> = {}
+) {
+  const { data: session } = useSession();
+
+  return useQuery({
+    queryKey: ['protected-areas', pid],
+    queryFn: async () =>
+      API.request<WDPA[]>({
+        method: 'GET',
+        url: `/projects/${pid}/protected-areas`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        params,
+      }).then(({ data }) => data),
+    enabled: Boolean(pid),
+    ...queryOptions,
   });
 }
