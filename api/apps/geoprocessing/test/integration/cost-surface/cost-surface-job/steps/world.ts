@@ -11,7 +11,7 @@ import { FromShapefileJobInput } from '@marxan/artifact-cache';
 import { defaultSrid } from '@marxan/utils/geo/spatial-data-format';
 
 import { getFixtures } from '../../planning-unit-fixtures';
-import { CostSurfaceShapefileRecord } from '../../../../../src/modules/surface-cost/ports/cost-surface-shapefile-record';
+import { CostSurfaceShapefileRecord } from '@marxan-geoprocessing/modules/cost-surface/ports/cost-surface-shapefile-record';
 
 export const createWorld = async (app: INestApplication) => {
   const newCost = [199.99, 300, 1];

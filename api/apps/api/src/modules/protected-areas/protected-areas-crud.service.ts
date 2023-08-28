@@ -1,9 +1,9 @@
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
 import { ProtectedArea } from '@marxan/protected-areas';
@@ -24,6 +24,8 @@ import { apiConnections } from '../../ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IUCNCategory } from '@marxan/iucn';
 import { isDefined } from '@marxan/utils';
+import { Scenario } from '../scenarios/scenario.api.entity';
+import { groupBy } from 'lodash';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -76,6 +78,8 @@ export class ProtectedAreasCrudService extends AppBaseService<
   constructor(
     @InjectRepository(ProtectedArea, apiConnections.geoprocessingDB.name)
     protected readonly repository: Repository<ProtectedArea>,
+    @InjectRepository(Scenario)
+    protected readonly scenarioRepository: Repository<Scenario>,
   ) {
     super(repository, 'protected_area', 'protected_areas', {
       logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
@@ -148,6 +152,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
         'countryId',
         'status',
         'designation',
+        'scenarioUsageCount',
       ],
       keyForAttribute: 'camelCase',
     };
@@ -236,5 +241,62 @@ export class ProtectedAreasCrudService extends AppBaseService<
         { planningAreaId, iucnCategories },
       )
       .getMany();
+  }
+
+  async listForProject(projectId: string) {
+    /**
+     * Get a list of protected areas used in project scenarios and assemble this
+     * into a map of protected area ids to lists of the scenarios where each
+     * protected area is in use.
+     */
+    const protectedAreaUsedInProjectScenarios = await this.scenarioRepository
+      .find({
+        where: {
+          projectId,
+          protectedAreaFilterByIds: Not(IsNull()),
+        },
+      })
+      .then((scenarios) =>
+        groupBy(
+          scenarios.flatMap((scenario) =>
+            scenario.protectedAreaFilterByIds
+              ?.filter(isDefined)
+              .map((protectedAreaId) => ({
+                scenarioId: scenario.id,
+                protectedAreaId,
+              })),
+          ),
+          'protectedAreaId',
+        ),
+      );
+
+    /**
+     * Get a list of all the protected areas that are linked to a given project,
+     * and add a count of the number of scenarios where each protected area is
+     * used.
+     */
+    const projectCustomProtectedAreas = await this.repository
+      .find({
+        where: {
+          projectId,
+        },
+        order: {
+          fullName: 'ASC',
+        },
+      })
+      .then((protectedAreas) =>
+        protectedAreas.map((protectedArea) => ({
+          ...protectedArea,
+          scenarioUsageCount:
+            protectedAreaUsedInProjectScenarios[protectedArea.id]?.length ?? 0,
+        })),
+      );
+
+    const serializer = new JSONAPISerializer.Serializer(
+      'protected_areas',
+      this.serializerConfig,
+    );
+
+    return serializer.serialize(projectCustomProtectedAreas);
   }
 }

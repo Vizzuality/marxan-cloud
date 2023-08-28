@@ -47,6 +47,12 @@ import { ProjectsProxyController } from '@marxan-api/modules/projects/projects-p
 import { WebshotModule } from '@marxan/webshot';
 import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.module';
 import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.module';
+import { ProjectProtectedAreasController } from './project-protected-areas.controller';
+import { ProjectProtectedAreasService } from './project-protected-areas.service';
+import { ProjectAclModule } from '../access-control/projects-acl/project-acl.module';
+import { ProtectedAreasCrudModule } from '../protected-areas/protected-areas-crud.module';
+import { ProjectCostSurfaceController } from './project-cost-surface.controller';
+import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 
 @Module({
   imports: [
@@ -78,6 +84,7 @@ import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/outpu
     ShapefilesModule,
     PlanningUnitGridModule,
     ProjectBlmModule,
+    ProjectAclModule,
     CloneModule,
     LegacyProjectImportModule,
     AccessControlModule,
@@ -87,8 +94,11 @@ import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/outpu
     LegacyProjectImportRepositoryModule,
     ApiEventsModule,
     OutputProjectSummariesModule,
+    ProtectedAreasCrudModule,
+    CostSurfaceModule,
   ],
   providers: [
+    ProjectProtectedAreasService,
     ProjectsCrudService,
     ProjectsService,
     GeoFeatureSerializer,
@@ -106,7 +116,9 @@ import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/outpu
     ProjectsListingController,
     ProjectDetailsController,
     ProjectsController,
+    ProjectProtectedAreasController,
     ProjectsProxyController,
+    ProjectCostSurfaceController,
   ],
   // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
   exports: [ProjectsCrudService, TypeOrmModule, ProjectsService],

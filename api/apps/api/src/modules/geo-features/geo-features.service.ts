@@ -367,7 +367,7 @@ export class GeoFeaturesService extends AppBaseService<
     projectId: string,
     data: UploadShapefileDTO,
     features: Record<string, any>[],
-  ): Promise<void> {
+  ): Promise<Either<Error, GeoFeature>> {
     const apiQueryRunner = this.apiDataSource.createQueryRunner();
     const geoQueryRunner = this.geoDataSource.createQueryRunner();
 
@@ -377,9 +377,10 @@ export class GeoFeaturesService extends AppBaseService<
     await apiQueryRunner.startTransaction();
     await geoQueryRunner.startTransaction();
 
+    let geoFeature: GeoFeature;
     try {
       // Create single row in features
-      const geofeature = await this.createFeature(
+      geoFeature = await this.createFeature(
         apiQueryRunner.manager,
         projectId,
         data,
@@ -389,7 +390,7 @@ export class GeoFeaturesService extends AppBaseService<
       await this.createFeatureTag(
         apiQueryRunner.manager,
         projectId,
-        geofeature.id,
+        geoFeature.id,
         data.tagName,
       );
 
@@ -397,7 +398,7 @@ export class GeoFeaturesService extends AppBaseService<
       for (const feature of features) {
         await this.createFeatureData(
           geoQueryRunner.manager,
-          geofeature.id,
+          geoFeature.id,
           feature.geometry,
           feature.properties,
         );
@@ -419,6 +420,8 @@ export class GeoFeaturesService extends AppBaseService<
       await apiQueryRunner.release();
       await geoQueryRunner.release();
     }
+
+    return right(geoFeature);
   }
 
   public async updateFeatureForProject(
@@ -756,16 +759,11 @@ export class GeoFeaturesService extends AppBaseService<
       return left(featureDataCannotBeUploadedWithCsv);
     }
 
-    const newFeatures = await this.featureAmountUploads.uploadFeatureFromCsv({
+   return await this.featureAmountUploads.uploadFeatureFromCsv({
       fileBuffer,
       projectId,
       userId,
     });
-
-    if (isLeft(newFeatures)) {
-      return newFeatures.left;
-    }
-    return newFeatures;
   }
 
   private async extendFindAllGeoFeatureWithScenarioUsage(

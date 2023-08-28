@@ -24,6 +24,7 @@ import {
 import { projectResource, ProjectResultSingular } from './project.api.entity';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
@@ -67,7 +68,6 @@ import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
-import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
 import { ShapefileService } from '@marxan/shapefile-converter';
@@ -153,6 +153,7 @@ import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
 import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
 import { outputProjectSummaryResource } from './output-project-summaries/output-project-summary.api.entity';
+import { isNil } from 'lodash';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -728,15 +729,19 @@ export class ProjectsController {
   @ApiOperation({
     description: `Upload shapefiles of species or bioregional features.`,
   })
-  @ApiOkResponse({ type: ShapefileUploadResponse })
+  @ApiOkResponse({ type: GeoFeature })
   @ApiTags(inlineJobTag)
+  @ApiBody({
+    description: 'Shapefile to upload',
+    type: UploadShapefileDTO,
+  })
   @Post(`:id/features/shapefile`)
   @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
   async uploadFeatures(
     @Param('id') projectId: string,
     @UploadedFile() shapefile: Express.Multer.File,
     @Body() body: UploadShapefileDTO,
-  ): Promise<ShapefileUploadResponse> {
+  ): Promise<GeoFeature> {
     await ensureShapefileHasRequiredFiles(shapefile);
 
     const { data } = await this.shapefileService.transformToGeoJson(shapefile, {
@@ -747,13 +752,26 @@ export class ProjectsController {
       throw new BadRequestException(`Only FeatureCollection is supported.`);
     }
 
-    await this.geoFeatureService.createFeaturesForShapefile(
+    const newFeatureOrError = await this.geoFeatureService.createFeaturesForShapefile(
       projectId,
       body,
       data.features,
     );
 
-    return { success: true };
+    if (isLeft(newFeatureOrError)) {
+      // @debt Use mapDomainToHttpException() instead
+      throw new InternalServerErrorException(newFeatureOrError.left);
+    } else {
+      const result = await this.geoFeatureService.getById(
+        newFeatureOrError.right.id,
+      );
+      if (isNil(result)) {
+        // @debt Use mapDomainToHttpException() instead
+        throw new NotFoundException();
+      }
+
+      return this.geoFeatureSerializer.serialize(result);
+    }
   }
 
   @ImplementsAcl()

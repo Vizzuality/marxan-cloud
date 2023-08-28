@@ -8,4 +8,4 @@ export {
   JobInput,
   jobSubmissionFailed,
 } from './surface-cost-job-input';
-export { surfaceCostQueueName } from './surface-cost-queue-name';
+export { costSurfaceQueueName } from './cost-surface-queue-name';

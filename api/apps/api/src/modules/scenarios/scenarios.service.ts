@@ -94,9 +94,9 @@ import { ExportScenario } from '../clone/export/application/export-scenario.comm
 import {
   SetInitialCostSurface,
   SetInitialCostSurfaceError,
-} from './cost-surface/application/set-initial-cost-surface.command';
-import { UpdateCostSurface } from './cost-surface/application/update-cost-surface.command';
-import { DeleteScenario } from './cost-surface/infra/delete-scenario.command';
+} from '@marxan-api/modules/cost-surface/application/set-initial-cost-surface.command';
+import { UpdateCostSurface } from '@marxan-api/modules/cost-surface/application/update-cost-surface.command';
+import { DeleteScenario } from '@marxan-api/modules/cost-surface/infra/delete-scenario.command';
 import {
   lockedByAnotherUser,
   noLockInPlace,
@@ -612,7 +612,7 @@ export class ScenariosService {
     return right(geoJson);
   }
 
-  async getCostSurfaceCsv(
+  async getPuDatCsv(
     scenarioId: string,
     userId: string,
     stream: stream.Writable,

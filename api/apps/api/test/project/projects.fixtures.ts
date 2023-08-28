@@ -57,13 +57,13 @@ export const getFixtures = async () => {
       scenarioIdB: string,
     ) =>
       await request(app.getHttpServer())
-        .get(
+        .post(
           `/api/v1/projects/comparison-map/${scenarioIdA}/compare/${scenarioIdB}`,
         )
         .set('Authorization', `Bearer ${randomUserToken}`)
         .send({ baseUrl: 'webshorUrl' }),
     ThenCorrectPdfBufferIsReceived: (response: request.Response) => {
-      expect(response.status).toEqual(200);
+      expect(response.status).toEqual(201);
       expect(response.body).toBeInstanceOf(Buffer);
       expect(Object.keys(response.body).length).toBe(1214);
     },

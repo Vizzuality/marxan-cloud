@@ -443,7 +443,7 @@ module "ingress_staging" {
   project_tags   = var.project_tags
 }
 
-git sadata "azurerm_postgresql_flexible_server" "marxan_staging_14" {
+data "azurerm_postgresql_flexible_server" "marxan_staging_14" {
   name                = data.terraform_remote_state.core.outputs.sql_server_staging_14_name
   resource_group_name = data.azurerm_resource_group.resource_group.name
 }

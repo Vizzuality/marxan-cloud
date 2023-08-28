@@ -1,7 +1,7 @@
 import { FeatureAmountCSVDto } from '@marxan-api/modules/geo-features/dto/feature-amount-csv.dto';
-import { Stream } from 'stream';
+import { Readable } from 'stream';
 import { parseStream } from 'fast-csv';
-import { validateOrReject } from 'class-validator';
+import { validateSync } from 'class-validator';
 import { missingPuidColumnInFeatureAmountCsvUpload } from '@marxan-api/modules/geo-features/geo-features.service';
 import { left } from 'fp-ts/Either';
 
@@ -21,13 +21,11 @@ export async function featureAmountCsvParser(
   fileBuffer: Buffer,
 ): Promise<FeatureAmountCSVDto[]> {
   return new Promise((resolve, reject) => {
-    // TODO: we might want to accumulate all errors and retirve the offending line number
+    // @todo: we might want to accumulate all errors and retrieve the offending line number
     const parsedData: FeatureAmountCSVDto[] = [];
     const seenPuids = new Set();
-    const stream = new Stream.PassThrough();
-    stream.end(fileBuffer);
 
-    parseStream(stream, { headers: true })
+    parseStream(Readable.from(fileBuffer), { headers: true })
       .on('headers', (h) => {
         const uniqueHeaders = [...new Set(h)];
         if (uniqueHeaders.length !== h.length) {
@@ -43,7 +41,7 @@ export async function featureAmountCsvParser(
       .on('data', (data) => {
         const puid: number = parseInt(data.puid);
         if (seenPuids.has(puid)) {
-          reject(duplicatePuidsInFeatureAmountCsvUpload);
+          reject(left(duplicatePuidsInFeatureAmountCsvUpload));
         }
         seenPuids.add(puid);
         for (const key in data) {
@@ -53,19 +51,15 @@ export async function featureAmountCsvParser(
               featureName: key,
               amount: parseFloat(data[key]),
             });
-            validateOrReject(featureAmount)
-              .then(() => {
-                parsedData.push(featureAmount);
-              })
-              .catch((err) => {
-                reject(new Error(err));
-              });
+            const validationErrors = validateSync(featureAmount);
+            if (validationErrors.length > 0) {
+              reject(validationErrors);
+            }
+            parsedData.push(featureAmount);
           }
         }
       })
-      .on('end', () => {
-        resolve(parsedData);
-      })
+      .on('end', () => resolve(parsedData))
       .on('error', reject);
   });
 }

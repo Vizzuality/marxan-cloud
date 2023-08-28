@@ -3,10 +3,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { PlanningUnitGridShape } from '../../scenarios-planning-unit/src';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { PlanningUnitsGeom } from './planning-units.geo.entity';
+import { CostSurfacePuDataGeoEntity } from '@marxan/cost-surfaces';
 
 @Entity('projects_pu')
 export class ProjectsPuEntity {
@@ -40,4 +42,12 @@ export class ProjectsPuEntity {
     enumName: 'planning_unit_grid_shape',
   })
   geomType!: PlanningUnitGridShape;
+
+  @OneToMany(
+    () => CostSurfacePuDataGeoEntity,
+    (costSurfacePuData: CostSurfacePuDataGeoEntity) =>
+      costSurfacePuData.projectsPu,
+    { onDelete: 'CASCADE' },
+  )
+  costSurfacePuData!: CostSurfacePuDataGeoEntity[];
 }

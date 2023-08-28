@@ -40,7 +40,6 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { plainToClass } from 'class-transformer';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
@@ -76,7 +75,6 @@ import { ScenarioFeaturesGapDataService } from '../scenarios-features/scenario-f
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
 import { ScenarioFeaturesOutputGapDataService } from '../scenarios-features/scenario-features-output-gap-data.service';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
-import { CostRangeDto } from './dto/cost-range.dto';
 import {
   AsyncJobDto,
   JsonApiAsyncJobMeta,
@@ -110,12 +108,14 @@ import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { WebshotPdfReportConfig } from '@marxan/webshot/webshot.dto';
 import { ClearLockStatusParams } from '@marxan-api/modules/scenarios/dto/clear-lock-status-param.dto';
+import { CostRangeDto } from "@marxan-api/modules/scenarios/dto/cost-range.dto";
+import { plainToClass } from "class-transformer";
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
 
 const marxanRunTag = 'Marxan Run';
-const marxanRunFiles = 'Marxan Run - Files';
+export const marxanRunFiles = 'Marxan Run - Files';
 
 @ImplementsAcl()
 @UseGuards(JwtAuthGuard)
@@ -393,12 +393,17 @@ export class ScenariosController {
     return await this.geoFeatureSetSerializer.serialize(result.right);
   }
 
+  @ApiOperation({
+    deprecated: true,
+    description:
+      'To be removed soon to POST /projects/:projectId/cost-surface/shapefile',
+  })
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
   @ApiTags(asyncJobTag)
-  @Post(`:id/cost-surface/shapefile`)
+  @Post(`:scenarioId/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
-    @Param('id') scenarioId: string,
+    @Param('scenarioId') scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<JsonApiAsyncJobMeta> {
@@ -420,6 +425,11 @@ export class ScenariosController {
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
+  @ApiOperation({
+    deprecated: true,
+    description:
+      'To be removed soon to GET /projects/:projectId/cost-surface/:costSurfaceId/cost-range',
+  })
   @Get(`:id/cost-surface`)
   @ApiOkResponse({ type: CostRangeDto })
   async getCostRange(
@@ -1033,6 +1043,8 @@ export class ScenariosController {
     return this.scenarioSolutionSerializer.serialize(result.right);
   }
 
+  @ImplementsAcl()
+  @UseGuards(JwtAuthGuard)
   @ApiTags(marxanRunFiles)
   @Header('Content-Type', 'text/csv')
   @ApiOkResponse({
@@ -1043,17 +1055,17 @@ export class ScenariosController {
   @ApiOperation({
     description: `Uploaded cost surface data`,
   })
-  @Get(`:id/marxan/dat/pu.dat`)
-  async getScenarioCostSurface(
-    @Param('id', ParseUUIDPipe) id: string,
+  @Get(`:scenarioId/marxan/dat/pu.dat`)
+  async getPuDatFile(
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Res() res: Response,
   ): Promise<void> {
-    const result = await this.service.getCostSurfaceCsv(id, req.user.id, res);
+    const result = await this.service.getPuDatCsv(scenarioId, req.user.id, res);
 
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
-        scenarioId: id,
+        scenarioId,
         userId: req.user.id,
         resourceType: scenarioResource.name.plural,
       });

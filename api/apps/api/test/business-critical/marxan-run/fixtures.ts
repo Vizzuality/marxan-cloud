@@ -40,11 +40,6 @@ export const getFixtures = async () => {
         ScenariosTestUtils.deleteScenario(app, authToken, scenario),
       );
     },
-    GivenCostSurfaceTemplateFilled: async () => {
-      await request(app.getHttpServer())
-        .get(`/api/v1/scenarios/${scenario}/cost-surface/shapefile-template`)
-        .set('Authorization', `Bearer ${authToken}`);
-    },
     WhenMarxanExecutionIsRequested: async () => {
       // TODO currently not implemented yet: 501
       await request(app.getHttpServer())
