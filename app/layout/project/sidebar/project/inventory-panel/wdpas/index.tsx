@@ -65,10 +65,10 @@ const InventoryPanelProtectedAreas = ({
 
   const handleSelectWDPA = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
     if (evt.target.checked) {
-      setSelectedWDPAIds((prevSelectedFeatures) => [...prevSelectedFeatures, evt.target.value]);
+      setSelectedWDPAIds((prevSelectedWDPAs) => [...prevSelectedWDPAs, evt.target.value]);
     } else {
-      setSelectedWDPAIds((prevSelectedFeatures) =>
-        prevSelectedFeatures.filter((featureId) => featureId !== evt.target.value)
+      setSelectedWDPAIds((prevSelectedWDPAs) =>
+        prevSelectedWDPAs.filter((wdpaId) => wdpaId !== evt.target.value)
       );
     }
   }, []);
