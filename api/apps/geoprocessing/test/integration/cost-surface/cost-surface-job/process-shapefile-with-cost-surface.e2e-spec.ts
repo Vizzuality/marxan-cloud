@@ -2,7 +2,7 @@ import { CostSurfaceProcessor } from '@marxan-geoprocessing/modules/cost-surface
 import { INestApplication } from '@nestjs/common';
 import { PromiseType } from 'utility-types';
 import { bootstrapApplication, delay } from '../../../utils';
-import { createWorld } from './steps/world';
+import { createWorld } from '../steps/world';
 
 let app: INestApplication;
 let sut: CostSurfaceProcessor;
@@ -23,7 +23,7 @@ describe(`given scenario has some planning units`, () => {
     await app?.close();
   }, 500 * 1000);
   it(`updates cost surface`, async () => {
-    await sut.process(world.getShapefileWithCost());
+    await sut.process(world.getShapefileForScenarioWithCost());
     await delay(1000);
     await world.ThenCostIsUpdated();
   }, 10000);

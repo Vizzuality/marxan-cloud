@@ -10,8 +10,13 @@ import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { FromShapefileJobInput } from '@marxan/artifact-cache';
 import { defaultSrid } from '@marxan/utils/geo/spatial-data-format';
 
-import { getFixtures } from '../../planning-unit-fixtures';
+import { getFixtures } from '../planning-unit-fixtures';
 import { CostSurfaceShapefileRecord } from '@marxan-geoprocessing/modules/cost-surface/ports/cost-surface-shapefile-record';
+import {
+  FromProjectShapefileJobInput,
+  ProjectCostSurfaceJobInput,
+} from '@marxan/artifact-cache/surface-cost-job-input';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 
 export const createWorld = async (app: INestApplication) => {
   const newCost = [199.99, 300, 1];
@@ -26,8 +31,10 @@ export const createWorld = async (app: INestApplication) => {
     cleanup: async () => {
       await fixtures.cleanup();
     },
+    WhenTheJobIsProcessed: async (job: Job<ProjectCostSurfaceJobInput>) =>
+      fixtures.projectCostSurfaceProcessor.process(job),
     GivenPuCostDataExists: fixtures.GivenPuCostDataExists,
-    getShapefileWithCost: () =>
+    getShapefileForScenarioWithCost: () =>
       (({
         data: {
           scenarioId: fixtures.scenarioId,
@@ -35,6 +42,18 @@ export const createWorld = async (app: INestApplication) => {
         },
         id: 'test-job',
       } as unknown) as Job<FromShapefileJobInput>),
+    getShapefileForProjectWithCost: (
+      projectId: string,
+      costSurfaceId: string,
+    ) =>
+      (({
+        data: {
+          projectId,
+          costSurfaceId,
+          shapefile,
+        },
+        id: 'test-job',
+      } as unknown) as Job<FromProjectShapefileJobInput>),
     ThenCostIsUpdated: async () => {
       const newCost = await fixtures.GetPuCostsData(fixtures.scenarioId);
       expect(newCost).toEqual(
@@ -45,6 +64,18 @@ export const createWorld = async (app: INestApplication) => {
         })),
       );
     },
+    ThenTheInitialCostIsCalculated: async () =>
+      fixtures.costSurfacePuDataRepo
+        .find()
+        .then((cost: CostSurfacePuDataEntity[]) =>
+          cost.forEach((cost) => expect(cost.cost).toEqual(0)),
+        ),
+    ThenTheProjectCostSurfaceIsUpdated: async () =>
+      fixtures.costSurfacePuDataRepo
+        .find()
+        .then((cost: CostSurfacePuDataEntity[]) =>
+          expect(cost[0].cost).toEqual(199.99),
+        ),
   };
 };
 

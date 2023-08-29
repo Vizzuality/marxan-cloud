@@ -23,6 +23,7 @@ import { PingController } from '@marxan-geoprocessing/modules/ping/ping.controll
 import { LegacyProjectImportModule } from './legacy-project-import/legacy-project-import.module';
 import { UnusedResourcesCleanUpModule } from './modules/unused-resources-cleanup/unused-resources-cleanup.module';
 import { CleanupTasksModule } from './modules/cleanup-tasks/cleanup-tasks.module';
+import { ProjectCostSurfaceModule } from '@marxan-geoprocessing/modules/cost-surface/project/project-cost-surface.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { CleanupTasksModule } from './modules/cleanup-tasks/cleanup-tasks.module
     FeaturesModule,
     ApiEventsModule,
     CostSurfaceModule,
+    ProjectCostSurfaceModule,
     ScenarioPlanningUnitsInclusionModule,
     ScenarioProtectedAreaCalculationModule,
     PlanningAreaModule,

@@ -1,9 +1,3 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
 
-export class UploadCostSurfaceShapefileDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  name!: string;
-}
+export class UploadCostSurfaceShapefileDto extends UpdateCostSurfaceDto {}

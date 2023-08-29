@@ -15,17 +15,14 @@ describe('Upload Cost Surface Shapefile', () => {
     const costSurfaceName = 'costSuperCoolName';
 
     // ACT
-    const response = await fixtures.WhenUploadingCostSurfaceShapefileForProject(
+    await fixtures.WhenUploadingCostSurfaceShapefileForProject(
       projectId,
       costSurfaceName,
       shapefilePath,
     );
 
     // ASSERT
-    await fixtures.ThenCostCurfaceAPIEntityWasProperlySaved(
-      response,
-      costSurfaceName,
-    );
+    await fixtures.ThenCostSurfaceAPIEntityWasProperlySaved(costSurfaceName);
   });
 
   it(`should return error when the cost surface name is empty`, async () => {

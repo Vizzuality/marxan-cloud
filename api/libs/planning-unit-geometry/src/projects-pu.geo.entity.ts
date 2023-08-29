@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { PlanningUnitsGeom } from './planning-units.geo.entity';
-import { CostSurfacePuDataGeoEntity } from '@marxan/cost-surfaces';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 
 @Entity('projects_pu')
 export class ProjectsPuEntity {
@@ -44,10 +44,10 @@ export class ProjectsPuEntity {
   geomType!: PlanningUnitGridShape;
 
   @OneToMany(
-    () => CostSurfacePuDataGeoEntity,
-    (costSurfacePuData: CostSurfacePuDataGeoEntity) =>
+    () => CostSurfacePuDataEntity,
+    (costSurfacePuData: CostSurfacePuDataEntity) =>
       costSurfacePuData.projectsPu,
     { onDelete: 'CASCADE' },
   )
-  costSurfacePuData!: CostSurfacePuDataGeoEntity[];
+  costSurfacePuData!: CostSurfacePuDataEntity[];
 }

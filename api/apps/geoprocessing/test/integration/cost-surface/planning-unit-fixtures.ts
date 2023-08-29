@@ -9,6 +9,8 @@ import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
+import { ProjectCostSurfaceProcessor } from '@marxan-geoprocessing/modules/cost-surface/application/project-cost-surface.processor';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 
 export const getFixtures = async (app: INestApplication) => {
   const projectId = v4();
@@ -23,6 +25,13 @@ export const getFixtures = async (app: INestApplication) => {
   const puCostDataRepo: Repository<ScenariosPuCostDataGeo> = app.get(
     getRepositoryToken(ScenariosPuCostDataGeo),
   );
+  const costSurfacePuDataRepo: Repository<CostSurfacePuDataEntity> = app.get(
+    getRepositoryToken(CostSurfacePuDataEntity),
+  );
+
+  const projectCostSurfaceProcessor: ProjectCostSurfaceProcessor = app.get(
+    ProjectCostSurfaceProcessor,
+  );
 
   const scenarioPuData = await GivenScenarioPuDataExists(
     entityManager,
@@ -34,6 +43,8 @@ export const getFixtures = async (app: INestApplication) => {
   const planningUnitsPuids = scenarioPuData.map((row) => row.projectPu.puid);
 
   return {
+    projectCostSurfaceProcessor,
+    costSurfacePuDataRepo,
     planningUnitDataRepo: scenarioPuData,
     planningUnitCostDataRepo: puCostDataRepo,
     scenarioId,

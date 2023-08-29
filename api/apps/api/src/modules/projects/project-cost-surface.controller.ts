@@ -4,7 +4,6 @@ import {
   forwardRef,
   Get,
   Inject,
-  NotImplementedException,
   Param,
   Post,
   Req,
@@ -30,8 +29,12 @@ import { plainToClass } from 'class-transformer';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
-import { CostSurfaceSerializer } from '@marxan-api/modules/cost-surface/dto/cost-surface.serializer';
 import { UploadCostSurfaceShapefileDto } from '@marxan-api/modules/cost-surface/dto/upload-cost-surface-shapefile.dto';
+import {
+  AsyncJobDto,
+  JsonApiAsyncJobMeta,
+} from '@marxan-api/dto/async-job.dto';
+import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -40,7 +43,6 @@ export class ProjectCostSurfaceController {
     @Inject(forwardRef(() => ScenariosService))
     public readonly scenarioService: ScenariosService,
     public readonly costSurfaceService: CostSurfaceService,
-    public readonly costSurfaceSeralizer: CostSurfaceSerializer,
   ) {}
 
   @ImplementsAcl()
@@ -55,11 +57,9 @@ export class ProjectCostSurfaceController {
     @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: UploadCostSurfaceShapefileDto,
-  ): Promise<NotImplementedException> {
-    /**
-     * @todo: We will have to move ScenarioService.processCostSurfaceShapefile logic to another project-scoped
-     *        service and fire it from here.
-     */
+  ): Promise<JsonApiAsyncJobMeta> {
+    await ensureShapefileHasRequiredFiles(file);
+
     const result = await this.costSurfaceService.uploadCostSurfaceShapefile(
       req.user.id,
       projectId,
@@ -71,10 +71,10 @@ export class ProjectCostSurfaceController {
       throw mapAclDomainToHttpError(result.left, {
         projectId,
         userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
       });
     }
-
-    return this.costSurfaceSeralizer.serialize(result.right);
+    return AsyncJobDto.forProject().asJsonApiMetadata();
   }
 
   @ImplementsAcl()

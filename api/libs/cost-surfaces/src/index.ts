@@ -1,1 +1,1 @@
-export { CostSurfacePuDataGeoEntity } from './cost-surface-pu-data.geo.entity';
+export { CostSurfacePuDataEntity } from './cost-surface-pu-data.geo.entity';

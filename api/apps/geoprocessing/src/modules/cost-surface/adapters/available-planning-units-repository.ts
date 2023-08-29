@@ -7,6 +7,9 @@ import {
   PlanningUnitWithPuid,
 } from '../ports/available-planning-units/get-available-planning-units';
 
+/**
+ * @deprecated
+ */
 @Injectable()
 export class AvailablePlanningUnitsRepository
   implements GetAvailablePlanningUnits {
