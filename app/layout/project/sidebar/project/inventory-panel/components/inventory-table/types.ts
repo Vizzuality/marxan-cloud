@@ -4,7 +4,7 @@ export type DataItem = {
   id: string;
   name: string;
   scenarios: number;
-  tag: string;
+  tag?: string;
   isVisibleOnMap: boolean;
   isCustom: boolean;
 };
