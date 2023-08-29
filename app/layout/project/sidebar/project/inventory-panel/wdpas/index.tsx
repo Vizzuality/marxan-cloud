@@ -28,9 +28,16 @@ const InventoryPanelProtectedAreas = ({
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
+  const [selectedWDPAIds, setSelectedWDPAIds] = useState<WDPA['id'][]>([]);
+  const [filters, setFilters] = useState<Parameters<typeof useProjectWDPAs>[1]>({
+    sort: WDPA_TABLE_COLUMNS.name,
+  });
+
   const allProjectWDPAsQuery = useProjectWDPAs(
     pid,
-    {},
+    {
+      ...filters,
+    },
     {
       select: (data) =>
         data?.map((wdpa) => ({
@@ -42,11 +49,6 @@ const InventoryPanelProtectedAreas = ({
       placeholderData: [],
     }
   );
-
-  const [selectedWDPAIds, setSelectedWDPAIds] = useState<WDPA['id'][]>([]);
-  const [filters, setFilters] = useState<Parameters<typeof useProjectWDPAs>[1]>({
-    sort: WDPA_TABLE_COLUMNS.name,
-  });
 
   const data: DataItem[] = allProjectWDPAsQuery.data?.map((wdpa) => ({
     ...wdpa,
