@@ -27,7 +27,6 @@ const ActionsMenu = ({
 }): JSX.Element => {
   const isDeletable = !item.custom && !item.scenarios;
 
-  // item.isCustom && !item.scenarioUsageCount
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
     edit: false,
     delete: false,
