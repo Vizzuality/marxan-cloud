@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { useUploadFeaturesCSV, useUploadFeaturesShapefile } from 'hooks/features';
 import { useDownloadShapefileTemplate } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
+import { useUploadWDPAsCSV, useUploadWDPAsShapefile } from 'hooks/wdpa';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -23,8 +24,8 @@ import Loading from 'components/loading';
 import Modal from 'components/modal';
 import UploadTabs from 'components/upload-tabs';
 import {
-  FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE,
-  FEATURES_UPLOADER_CSV_MAX_SIZE,
+  PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE,
+  PROTECTED_AREA_UPLOADER_CSV_MAX_SIZE,
 } from 'constants/file-uploader-size-limits';
 import UploadWDPAsInfoButtonContent from 'constants/info-button-content/upload-wdpas';
 import { WDPA } from 'types/api/wdpa';
@@ -56,20 +57,16 @@ export const WDPAUploadModal = ({
 
   const { addToast } = useToasts();
 
-  const uploadFeaturesShapefileMutation = useUploadFeaturesShapefile({
-    requestConfig: {
-      method: 'POST',
-    },
-  });
+  const uploadWDPAsShapefileMutation = useUploadWDPAsShapefile({});
 
-  const uploadFeaturesCSVMutation = useUploadFeaturesCSV({});
+  const uploadWDPAsCSVMutation = useUploadWDPAsCSV({});
 
   const downloadShapefileTemplateMutation = useDownloadShapefileTemplate();
 
   const UPLOADER_MAX_SIZE =
     uploadMode === 'shapefile'
-      ? FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE
-      : FEATURES_UPLOADER_CSV_MAX_SIZE;
+      ? PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE
+      : PROTECTED_AREA_UPLOADER_CSV_MAX_SIZE;
 
   useEffect(() => {
     return () => {
@@ -177,11 +174,11 @@ export const WDPAUploadModal = ({
       };
 
       if (uploadMode === 'shapefile') {
-        uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, mutationResponse);
+        uploadWDPAsShapefileMutation.mutate({ data, id: `${pid}` }, mutationResponse);
       }
 
       if (uploadMode === 'csv') {
-        uploadFeaturesCSVMutation.mutate({ data, id: `${pid}` }, mutationResponse);
+        uploadWDPAsCSVMutation.mutate({ data, id: `${pid}` }, mutationResponse);
       }
     },
     [
@@ -189,8 +186,8 @@ export const WDPAUploadModal = ({
       addToast,
       onClose,
       uploadMode,
-      uploadFeaturesShapefileMutation,
-      uploadFeaturesCSVMutation,
+      uploadWDPAsShapefileMutation,
+      uploadWDPAsCSVMutation,
       successFile,
     ]
   );

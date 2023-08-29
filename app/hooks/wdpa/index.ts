@@ -11,6 +11,7 @@ import { API } from 'services/api';
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
+import UPLOADS from 'services/uploads';
 
 export function useWDPACategories({
   adminAreaId,
@@ -180,6 +181,66 @@ export function useEditWDPA({
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadWDPAsShapefile({
+  requestConfig = {
+    method: 'POST',
+  },
+}: {
+  requestConfig?: AxiosRequestConfig<FormData>;
+}) {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const uploadWDPAShapefile = ({ id, data }: { id: Project['id']; data: FormData }) => {
+    return UPLOADS.request<{ success: true }>({
+      url: `/projects/${id}/protected-areas/shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    } as typeof requestConfig);
+  };
+
+  return useMutation(uploadWDPAShapefile, {
+    onSuccess: async (data, variables) => {
+      const { id: projectId } = variables;
+      await queryClient.invalidateQueries(['wdpas', projectId]);
+    },
+  });
+}
+
+export function useUploadWDPAsCSV({
+  requestConfig = {
+    method: 'POST',
+  },
+}: {
+  requestConfig?: AxiosRequestConfig<FormData>;
+}) {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const uploadWDPACSV = ({ id, data }: { id: Project['id']; data: FormData }) => {
+    return UPLOADS.request<{ success: true }>({
+      url: `/projects/${id}/protected-areas/csv`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    } as typeof requestConfig);
+  };
+
+  return useMutation(uploadWDPACSV, {
+    onSuccess: async (data, variables) => {
+      const { id: projectId } = variables;
+      await queryClient.invalidateQueries(['wdpas', projectId]);
     },
   });
 }
