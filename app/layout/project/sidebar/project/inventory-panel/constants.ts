@@ -9,6 +9,7 @@ import FeatureUploadModal from './features/modals/upload';
 import { InventoryPanel } from './types';
 import ProtectedAreasTable from './wdpas';
 import ProtectedAreasFooter from './wdpas/footer';
+import WDPAUploadModal from './wdpas/modals/upload';
 
 export const INVENTORY_TABS = {
   'protected-areas': {
@@ -17,6 +18,7 @@ export const INVENTORY_TABS = {
     noData: 'No protected areas found.',
     TableComponent: ProtectedAreasTable,
     FooterComponent: ProtectedAreasFooter,
+    UploadModalComponent: WDPAUploadModal,
   },
   'cost-surface': {
     title: 'Cost Surface',
