@@ -8,10 +8,8 @@ import { useRouter } from 'next/router';
 import { AxiosError, isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 
-import { useUploadFeaturesCSV, useUploadFeaturesShapefile } from 'hooks/features';
-import { useDownloadShapefileTemplate } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
-import { useUploadWDPAsCSV, useUploadWDPAsShapefile } from 'hooks/wdpa';
+import { useUploadWDPAsShapefile } from 'hooks/wdpa';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -22,11 +20,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
-import UploadTabs from 'components/upload-tabs';
-import {
-  PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE,
-  PROTECTED_AREA_UPLOADER_CSV_MAX_SIZE,
-} from 'constants/file-uploader-size-limits';
+import { PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import UploadWDPAsInfoButtonContent from 'constants/info-button-content/upload-wdpas';
 import { WDPA } from 'types/api/wdpa';
 import { cn } from 'utils/cn';
@@ -50,7 +44,6 @@ export const WDPAUploadModal = ({
 
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState<{ name: FormValues['name'] }>(null);
-  const [uploadMode, saveUploadMode] = useState<'shapefile' | 'csv'>('shapefile');
 
   const { query } = useRouter();
   const { pid } = query as { pid: string };
@@ -58,15 +51,6 @@ export const WDPAUploadModal = ({
   const { addToast } = useToasts();
 
   const uploadWDPAsShapefileMutation = useUploadWDPAsShapefile({});
-
-  const uploadWDPAsCSVMutation = useUploadWDPAsCSV({});
-
-  const downloadShapefileTemplateMutation = useDownloadShapefileTemplate();
-
-  const UPLOADER_MAX_SIZE =
-    uploadMode === 'shapefile'
-      ? PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE
-      : PROTECTED_AREA_UPLOADER_CSV_MAX_SIZE;
 
   useEffect(() => {
     return () => {
@@ -95,7 +79,9 @@ export const WDPAUploadModal = ({
       return error.code === 'file-too-large'
         ? {
             ...error,
-            message: `File is larger than ${bytesToMegabytes(UPLOADER_MAX_SIZE)} MB`,
+            message: `File is larger than ${bytesToMegabytes(
+              PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE
+            )} MB`,
           }
         : error;
     });
@@ -173,51 +159,17 @@ export const WDPAUploadModal = ({
         },
       };
 
-      if (uploadMode === 'shapefile') {
-        uploadWDPAsShapefileMutation.mutate({ data, id: `${pid}` }, mutationResponse);
-      }
-
-      if (uploadMode === 'csv') {
-        uploadWDPAsCSVMutation.mutate({ data, id: `${pid}` }, mutationResponse);
-      }
+      uploadWDPAsShapefileMutation.mutate({ data, id: `${pid}` }, mutationResponse);
     },
-    [
-      pid,
-      addToast,
-      onClose,
-      uploadMode,
-      uploadWDPAsShapefileMutation,
-      uploadWDPAsCSVMutation,
-      successFile,
-    ]
+    [pid, addToast, onClose, uploadWDPAsShapefileMutation, successFile]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
-    maxSize: UPLOADER_MAX_SIZE,
+    maxSize: PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
-
-  const onDownloadTemplate = useCallback(() => {
-    downloadShapefileTemplateMutation.mutate(
-      { pid },
-      {
-        onError: () => {
-          addToast(
-            'download-error',
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <ul className="text-sm">Template not downloaded</ul>
-            </>,
-            {
-              level: 'error',
-            }
-          );
-        },
-      }
-    );
-  }, [pid, downloadShapefileTemplateMutation, addToast]);
 
   return (
     <Modal id="wdpa-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
@@ -240,34 +192,18 @@ export const WDPAUploadModal = ({
                   </InfoButton>
                 </div>
 
-                <UploadTabs mode={uploadMode} onChange={(mode) => saveUploadMode(mode)} />
-                {uploadMode === 'csv' && (
-                  <p className="!mt-4 text-sm text-gray-400">
-                    Please download and fill in the{' '}
-                    <button
-                      className="text-primary-500 underline hover:no-underline"
-                      onClick={onDownloadTemplate}
-                    >
-                      shapefile template
-                    </button>{' '}
-                    before upload.
-                  </p>
-                )}
-
-                {uploadMode === 'shapefile' && (
-                  <div>
-                    <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
-                      {(fprops) => (
-                        <Field id="form-name" {...fprops}>
-                          <Label theme="light" className="mb-3 uppercase">
-                            Name
-                          </Label>
-                          <Input theme="light" />
-                        </Field>
-                      )}
-                    </FieldRFF>
-                  </div>
-                )}
+                <div>
+                  <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
+                    {(fprops) => (
+                      <Field id="form-name" {...fprops}>
+                        <Label theme="light" className="mb-3 uppercase">
+                          Name
+                        </Label>
+                        <Input theme="light" />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
 
                 {!successFile && (
                   <div>
@@ -292,16 +228,13 @@ export const WDPAUploadModal = ({
                             <input {...getInputProps()} />
 
                             <p className="text-center text-sm text-gray-500">
-                              Drag and drop your{' '}
-                              {uploadMode === 'shapefile'
-                                ? 'polygon data file'
-                                : 'protected area file'}
+                              Drag and drop your polygon data file
                               <br />
                               or <b>click here</b> to upload
                             </p>
 
                             <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
-                              UPLOADER_MAX_SIZE
+                              PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE
                             )} MB`}</p>
 
                             <Loading

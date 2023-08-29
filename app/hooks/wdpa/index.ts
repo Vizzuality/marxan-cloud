@@ -213,33 +213,3 @@ export function useUploadWDPAsShapefile({
     },
   });
 }
-
-export function useUploadWDPAsCSV({
-  requestConfig = {
-    method: 'POST',
-  },
-}: {
-  requestConfig?: AxiosRequestConfig<FormData>;
-}) {
-  const queryClient = useQueryClient();
-  const { data: session } = useSession();
-
-  const uploadWDPACSV = ({ id, data }: { id: Project['id']; data: FormData }) => {
-    return UPLOADS.request<{ success: true }>({
-      url: `/projects/${id}/protected-areas/csv`,
-      data,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'multipart/form-data',
-      },
-      ...requestConfig,
-    } as typeof requestConfig);
-  };
-
-  return useMutation(uploadWDPACSV, {
-    onSuccess: async (data, variables) => {
-      const { id: projectId } = variables;
-      await queryClient.invalidateQueries(['wdpas', projectId]);
-    },
-  });
-}
