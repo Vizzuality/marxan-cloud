@@ -92,9 +92,9 @@ export function useProjectWDPAs<T = WDPA[]>(
 
   const mockData: WDPA[] = [
     {
-      id: 'hgdfghmdgf',
-      wdpaId: 'hfdgjfhdg',
-      fullName: 'IUCN Category',
+      id: 'Not Reported',
+      wdpaId: 'Not Reported',
+      fullName: 'Not Reported',
       iucnCategory: 'IUCN Category',
       countryId: 'hgdfjkd',
       shapeLength: 45,
@@ -104,10 +104,10 @@ export function useProjectWDPAs<T = WDPA[]>(
       scenarioUsageCount: 3,
     },
     {
-      id: 'hfghmdgf',
-      wdpaId: 'hfdgjfhdg',
-      fullName: 'IUCN Ia',
-      iucnCategory: 'IUCN Ia',
+      id: 'IV',
+      wdpaId: 'IV',
+      fullName: 'IUCN IV',
+      iucnCategory: 'IUCN IV',
       countryId: 'mdfgjf',
       shapeLength: 45,
       shapeArea: 30,
@@ -116,10 +116,10 @@ export function useProjectWDPAs<T = WDPA[]>(
       scenarioUsageCount: 0,
     },
     {
-      id: 'hfgxssshmdgf',
-      wdpaId: 'hfdgjfhdg',
+      id: 'II',
+      wdpaId: 'II',
       fullName: 'Florida scrub jay',
-      iucnCategory: 'IUCN Ib',
+      iucnCategory: 'IUCN II',
       countryId: 'mdfgjf',
       shapeLength: 45,
       shapeArea: 30,

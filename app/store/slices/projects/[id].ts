@@ -9,7 +9,7 @@ interface ProjectShowStateProps {
   filters: Record<string, unknown> | [];
   sort: string;
   layerSettings: Record<string, any>;
-  selectedCostSurface: CostSurface['id'][];
+  selectedCostSurface: CostSurface['id'];
   selectedFeatures: Feature['id'][];
   selectedWDPAs: WDPA['id'][];
   isSidebarOpen: boolean;
@@ -21,7 +21,7 @@ const initialState: ProjectShowStateProps = {
   sort: '-lastModifiedAt',
   layerSettings: {},
   selectedFeatures: [],
-  selectedCostSurface: [],
+  selectedCostSurface: null,
   selectedWDPAs: [],
   isSidebarOpen: true,
 } satisfies ProjectShowStateProps;

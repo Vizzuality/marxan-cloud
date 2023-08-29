@@ -20,6 +20,7 @@ import {
   useProjectPlanningAreaLayer,
   useBBOX,
   useFeaturePreviewLayers,
+  useWDPAPreviewLayer,
 } from 'hooks/map';
 import { useDownloadScenarioComparisonReport, useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -54,6 +55,7 @@ export const ProjectMap = (): JSX.Element => {
     layerSettings,
     selectedFeatures: selectedFeaturesIds,
     selectedCostSurface: selectedCostSurfaceId,
+    selectedWDPAs: selectedWDPAsIds,
   } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
@@ -144,6 +146,16 @@ export const ProjectMap = (): JSX.Element => {
     },
   });
 
+  const WDPAsPreviewLayers = useWDPAPreviewLayer({
+    wdpaIucnCategories: selectedWDPAsIds,
+    pid: `${pid}`,
+    active: true,
+    bbox,
+    options: {
+      ...layerSettings['wdpa-preview'],
+    },
+  });
+
   const selectedPreviewFeatures = useMemo(() => {
     return selectedFeaturesData
       ?.map(({ featureClassName, id }) => ({ name: featureClassName, id }))
@@ -170,14 +182,19 @@ export const ProjectMap = (): JSX.Element => {
     }
   );
 
-  const LAYERS = [PUGridLayer, PUCompareLayer, PlanningAreaLayer, ...FeaturePreviewLayers].filter(
-    (l) => !!l
-  );
+  const LAYERS = [
+    PUGridLayer,
+    PUCompareLayer,
+    PlanningAreaLayer,
+    WDPAsPreviewLayers,
+    ...FeaturePreviewLayers,
+  ].filter((l) => !!l);
 
   const LEGEND = useLegend({
     layers: [
       ...(!!selectedFeaturesData?.length ? ['features-preview'] : []),
       ...(!!selectedCostSurfaceId ? ['cost'] : []),
+      ...(!!selectedWDPAsIds?.length ? ['wdpa-preview'] : []),
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
 
       ...(!!sid1 && !!sid2 ? ['compare'] : []),
