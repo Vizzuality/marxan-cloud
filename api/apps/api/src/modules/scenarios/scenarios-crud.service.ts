@@ -74,6 +74,10 @@ export class ScenariosCrudService extends AppBaseService<
         'projectScenarioId',
       ],
       keyForAttribute: 'camelCase',
+      costSurface: {
+        ref: 'id',
+        attributes: ['name'],
+      },
       project: {
         ref: 'id',
         attributes: [
