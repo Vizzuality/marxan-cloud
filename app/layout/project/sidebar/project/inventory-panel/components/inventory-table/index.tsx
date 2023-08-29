@@ -44,25 +44,29 @@ const InventoryTable = ({
                   onChange={onSelectAll}
                 />
               </th>
-              <th className="flex-1 pl-2">
-                <HeaderItem
-                  text={'Name'}
-                  name={'name'}
-                  columns={columns}
-                  sorting={sorting}
-                  onClick={onSortChange}
-                />
-              </th>
-              <th className="flex flex-1 justify-start py-2 pl-14">
-                <HeaderItem
-                  className="justify-center"
-                  text={'Type'}
-                  name={'tag'}
-                  columns={columns}
-                  sorting={sorting}
-                  onClick={onSortChange}
-                />
-              </th>
+              {columns['name'] && (
+                <th className="flex-1 pl-2">
+                  <HeaderItem
+                    text={'Name'}
+                    name={'name'}
+                    columns={columns}
+                    sorting={sorting}
+                    onClick={onSortChange}
+                  />
+                </th>
+              )}
+              {columns['tag'] && (
+                <th className="flex flex-1 justify-start py-2 pl-14">
+                  <HeaderItem
+                    className="justify-center"
+                    text={'Type'}
+                    name={'tag'}
+                    columns={columns}
+                    sorting={sorting}
+                    onClick={onSortChange}
+                  />
+                </th>
+              )}
             </tr>
           </thead>
           <ScrollArea className="h-full">

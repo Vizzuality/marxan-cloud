@@ -37,7 +37,8 @@ export function useProjectCostSurfaces<T = CostSurface[]>(
     queryFn: async () =>
       API.request<CostSurface[]>({
         method: 'GET',
-        url: `/projects/${pid}/cost-surfaces`,
+        // !TODO: change this to the correct endpoint
+        url: `/projects/${pid}/protected-areas`,
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
