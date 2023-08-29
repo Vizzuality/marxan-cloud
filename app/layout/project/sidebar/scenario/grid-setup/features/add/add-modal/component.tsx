@@ -11,14 +11,11 @@ import {
   useSelectedFeatures,
 } from 'hooks/features';
 import { useCanEditScenario } from 'hooks/permissions';
-import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
@@ -26,9 +23,7 @@ import List from './list';
 import Toolbar from './toolbar';
 import Uploader from './uploader';
 
-export interface ScenariosFeaturesAddProps {}
-
-export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
+export const ScenariosFeaturesAdd = (): JSX.Element => {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState(null);
@@ -42,14 +37,6 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
 
   const editable = useCanEditScenario(pid, sid);
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
 
   const { data: initialSelectedFeatures } = useSelectedFeatures(sid, {});
 
@@ -126,34 +113,16 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
         },
         {
           onSuccess: () => {
-            saveScenarioMutation.mutate(
-              {
-                id: `${sid}`,
-                data: {
-                  metadata: mergeScenarioStatusMetaData(metadata, {
-                    tab: ScenarioSidebarTabs.FEATURES,
-                    subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
-                  }),
-                },
-              },
-              {
-                onSuccess: () => {
-                  setSubmitting(false);
-                  setOpen(false);
-                },
-                onError: () => {
-                  setSubmitting(false);
-                },
-              }
-            );
+            setOpen(false);
+            queryClient.invalidateQueries(['selected-features', sid]);
           },
-          onError: () => {
+          onSettled: () => {
             setSubmitting(false);
           },
         }
       );
     },
-    [sid, metadata, initialSelectedFeatures, selectedFeaturesMutation, saveScenarioMutation]
+    [sid, queryClient, initialSelectedFeatures, selectedFeaturesMutation]
   );
 
   return (

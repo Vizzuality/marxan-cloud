@@ -4,8 +4,6 @@ import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
@@ -57,7 +55,7 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
     data: selectedFeaturesData,
     isFetching: selectedFeaturesIsFetching,
     isFetched: selectedFeaturesIsFetched,
-  } = useSelectedFeatures(sid, {});
+  } = useSelectedFeatures(sid);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -187,36 +185,17 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
           data,
         },
         {
-          onSuccess: () => {
-            saveScenarioMutation.mutate(
-              {
-                id: `${sid}`,
-                data: {
-                  metadata: mergeScenarioStatusMetaData(metadata, {
-                    tab: ScenarioSidebarTabs.FEATURES,
-                    subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
-                  }),
-                },
-              },
-              {
-                onSuccess: () => {
-                  setSubmitting(false);
-                },
-                onError: () => {
-                  setSubmitting(false);
-                },
-              }
-            );
-            setDeleteFeature(null);
+          onSuccess: async () => {
+            await queryClient.invalidateQueries(['selected-features', sid]);
           },
-          onError: () => {
+          onSettled: () => {
             setSubmitting(false);
             setDeleteFeature(null);
           },
         }
       );
     },
-    [sid, metadata, getFeaturesRecipe, selectedFeaturesMutation, saveScenarioMutation]
+    [sid, queryClient, getFeaturesRecipe, selectedFeaturesMutation]
   );
 
   const onSubmit = useCallback(

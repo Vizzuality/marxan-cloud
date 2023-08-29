@@ -7,8 +7,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { TippyProps } from '@tippyjs/react/headless';
-import { useScenarioJobs } from 'layout/scenarios/edit/status/utils';
-import { cn } from 'utils/cn';
 
 import { useRunScenario, useScenario, useScenarioStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -16,6 +14,8 @@ import { useToasts } from 'hooks/toast';
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tooltip from 'components/tooltip';
+import { useScenarioJobs } from 'layout/scenarios/edit/status/utils';
+import { cn } from 'utils/cn';
 
 import ADVANCED_SETTINGS_SVG from 'svgs/navigation/advanced-settings.svg?sprite';
 import GRID_SETUP_SVG from 'svgs/navigation/grid-setup.svg?sprite';

@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 
 import { useSelectedFeatures } from 'hooks/features';
-import { useScenario } from 'hooks/scenarios';
 
 import Icon from 'components/icon';
 
@@ -14,10 +13,8 @@ import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 import TargetFeatures from './list';
 
 export const ScenariosSidebarEditFeatures = ({ onGoBack }): JSX.Element => {
-  const { push, query } = useRouter();
-  const { sid, tab } = query as { pid: string; sid: string; tab: string };
-
-  const { data: scenarioData } = useScenario(sid);
+  const { query } = useRouter();
+  const { sid } = query as { pid: string; sid: string };
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
 

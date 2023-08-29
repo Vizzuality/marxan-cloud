@@ -17,9 +17,10 @@ import { useSession } from 'next-auth/react';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
-import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
 import { Feature } from 'types/api/feature';
+import { GeoFeatureSet } from 'types/api/geo-feature-set';
 import { Project } from 'types/api/project';
+import { Scenario } from 'types/api/scenario';
 
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
@@ -71,8 +72,6 @@ export function useAllPaginatedFeatures(projectId, options: UseFeaturesOptionsPr
     ['all-paginated-features', projectId, JSON.stringify(options)],
     fetchFeatures,
     {
-      retry: false,
-      refetchOnWindowFocus: false,
       keepPreviousData: true,
       getNextPageParam: (lastPage) => {
         const {
@@ -205,7 +204,11 @@ export function useAllFeatures<T = { data: Feature[] }>(
   });
 }
 
-export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, queryOptions = {}) {
+export function useSelectedFeatures(
+  sid: Scenario['id'],
+  filters: UseFeaturesFiltersProps = {},
+  queryOptions = {}
+) {
   const { data: session } = useSession();
   const { search } = filters;
 
@@ -219,120 +222,123 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
       params: {
         omitFields: 'properties',
       },
-    });
+    }).then(({ data }) => data);
 
-  const query = useQuery(['selected-features', sid], fetchFeatures, {
+  return useQuery(['selected-features', sid], fetchFeatures, {
     ...queryOptions,
-    refetchOnWindowFocus: false,
-    retry: false,
     enabled: !!sid,
-  });
+    select: ({ data }) => {
+      const { features = [] } = data;
 
-  const { data } = query;
+      let parsedData = features.map((d) => {
+        const { featureId, geoprocessingOperations, metadata } = d;
 
-  return useMemo(() => {
-    let parsedData = data?.data?.data || {};
+        const {
+          alias,
+          featureClassName,
+          tag,
+          description,
+          properties = {},
+        } = metadata || ({} as GeoFeatureSet['features'][0]['metadata']);
 
-    const { features = [] } = parsedData;
+        let splitOptions = [];
+        let splitFeaturesOptions = [];
+        let splitSelected;
+        let splitFeaturesSelected = [];
 
-    parsedData = features.map((d): SelectedItemProps => {
-      const { featureId, geoprocessingOperations, metadata = {} } = d;
+        splitOptions = Object.keys(properties).map((k) => {
+          return {
+            key: k,
+            label: k,
+            values: properties[k].map((v) => ({ id: v, name: v })),
+          };
+        });
 
-      const { alias, featureClassName, tag, description, properties = {} } = metadata;
+        if (
+          geoprocessingOperations &&
+          !!geoprocessingOperations.find((g) => g.kind === 'split/v1')
+        ) {
+          const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
+          splitSelected = geoprocessingOperation.splitByProperty;
 
-      let splitOptions = [];
-      let splitFeaturesOptions = [];
-      let splitSelected;
-      let splitFeaturesSelected = [];
+          splitFeaturesOptions =
+            splitOptions.length && splitSelected
+              ? splitOptions
+                  .find((s) => s.key === splitSelected)
+                  .values.map((v) => ({ label: v.name, value: `${v.id}` }))
+              : [];
 
-      splitOptions = Object.keys(properties).map((k) => {
+          splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
+            return {
+              ...s,
+              id: `${s.value}`,
+              name: s.value,
+            };
+          });
+        }
+
+        let intersectFeaturesSelected = [];
+
+        if (
+          geoprocessingOperations &&
+          geoprocessingOperations.find((g) => g.kind === 'stratification/v1')
+        ) {
+          intersectFeaturesSelected = flatten(
+            geoprocessingOperations.map((ifs) => {
+              return ifs.splits.map((v) => {
+                return {
+                  ...v,
+                  label: v.value,
+                  value: v.value,
+                };
+              });
+            })
+          );
+        }
+
         return {
-          key: k,
-          label: k,
-          values: properties[k].map((v) => ({ id: v, name: v })),
+          ...d,
+          id: featureId,
+          name: alias || featureClassName,
+          type: tag,
+          description,
+
+          // SPLIT
+          splitOptions,
+          splitSelected,
+          splitFeaturesSelected,
+          splitFeaturesOptions,
+
+          // INTERSECTION
+          intersectFeaturesSelected,
         };
       });
 
-      if (geoprocessingOperations && !!geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
-        const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
-        splitSelected = geoprocessingOperation.splitByProperty;
-
-        splitFeaturesOptions =
-          splitOptions.length && splitSelected
-            ? splitOptions
-                .find((s) => s.key === splitSelected)
-                .values.map((v) => ({ label: v.name, value: `${v.id}` }))
-            : [];
-
-        splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
-          return {
-            ...s,
-            id: `${s.value}`,
-            name: s.value,
-          };
+      // Filter
+      if (search) {
+        const fuse = new Fuse(parsedData, {
+          keys: ['name'],
+          threshold: 0.25,
+        });
+        parsedData = fuse.search(search).map((f) => {
+          return f.item;
         });
       }
 
-      let intersectFeaturesSelected = [];
+      // Sort
+      parsedData = orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
 
-      if (
-        geoprocessingOperations &&
-        geoprocessingOperations.find((g) => g.kind === 'stratification/v1')
-      ) {
-        intersectFeaturesSelected = flatten(
-          geoprocessingOperations.map((ifs) => {
-            return ifs.splits.map((v) => {
-              return {
-                ...v,
-                label: v.value,
-                value: v.value,
-              };
-            });
-          })
-        );
-      }
-
-      return {
-        ...d,
-        id: featureId,
-        name: alias || featureClassName,
-        type: tag,
-        description,
-
-        // SPLIT
-        splitOptions,
-        splitSelected,
-        splitFeaturesSelected,
-        splitFeaturesOptions,
-
-        // INTERSECTION
-        intersectFeaturesSelected,
-      };
-    });
-
-    // Filter
-    if (search) {
-      const fuse = new Fuse(parsedData, {
-        keys: ['name'],
-        threshold: 0.25,
-      });
-      parsedData = fuse.search(search).map((f) => {
-        return f.item;
-      });
-    }
-
-    // Sort
-    parsedData = orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
-
-    return {
-      ...query,
-      data: parsedData,
-      rawData: data?.data?.data,
-    };
-  }, [query, data?.data?.data, search]);
+      return parsedData;
+    },
+    placeholderData: { data: {} as GeoFeatureSet },
+  });
 }
 
-export function useTargetedFeatures(sid, filters: UseFeaturesFiltersProps = {}, queryOptions = {}) {
+export function useTargetedFeatures(
+  sid: Scenario['id'],
+  filters: UseFeaturesFiltersProps = {},
+  queryOptions = {}
+) {
   const { data: session } = useSession();
   const { search } = filters;
 
@@ -343,178 +349,176 @@ export function useTargetedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
-    });
+    }).then(({ data }) => data);
 
-  const query = useQuery(['selected-features', sid], fetchFeatures, {
+  return useQuery(['targeted-features', sid], fetchFeatures, {
     ...queryOptions,
-    refetchOnWindowFocus: false,
     retry: false,
     enabled: !!sid,
-  });
+    select: ({ data }) => {
+      const { features = [] } = data;
 
-  const { data } = query;
+      let parsedData = features.map((d) => {
+        const { featureId, geoprocessingOperations, metadata } = d;
 
-  return useMemo(() => {
-    let parsedData = data?.data?.data || {};
+        const {
+          alias,
+          featureClassName,
+          tag,
+          description,
+          properties = {},
+        } = metadata || ({} as GeoFeatureSet['features'][0]['metadata']);
 
-    const { features = [] } = parsedData;
+        let splitOptions = [];
+        let splitFeaturesOptions = [];
+        let splitSelected;
+        let splitFeaturesSelected = [];
 
-    parsedData = features.map((d) => {
-      const { featureId, geoprocessingOperations, metadata = {} } = d;
+        splitOptions = Object.keys(properties).map((k) => {
+          return {
+            key: k,
+            label: k,
+            values: properties[k].map((v) => ({ id: v, name: v })),
+          };
+        });
 
-      const { alias, featureClassName, tag, description, properties = {} } = metadata;
+        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
+          const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
 
-      let splitOptions = [];
-      let splitFeaturesOptions = [];
-      let splitSelected;
-      let splitFeaturesSelected = [];
+          splitSelected = geoprocessingOperation.splitByProperty;
 
-      splitOptions = Object.keys(properties).map((k) => {
+          splitFeaturesOptions =
+            splitOptions.length && splitSelected
+              ? splitOptions
+                  .find((s) => s.key === splitSelected)
+                  .values.map((v) => ({ label: v.name, value: v.id }))
+              : [];
+
+          splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
+            return {
+              ...s,
+              id: s.value,
+              name: s.value,
+            };
+          });
+        }
+
+        let intersectFeaturesSelected = [];
+
+        if (
+          geoprocessingOperations &&
+          geoprocessingOperations.find((g) => g.kind === 'stratification/v1')
+        ) {
+          intersectFeaturesSelected = flatten(
+            geoprocessingOperations.map((ifs) => {
+              return ifs.splits.map((v) => {
+                return {
+                  ...v,
+                  label: v.value,
+                  value: v.value,
+                };
+              });
+            })
+          );
+        }
+
         return {
-          key: k,
-          label: k,
-          values: properties[k].map((v) => ({ id: v, name: v })),
+          ...d,
+          id: featureId,
+          name: alias || featureClassName,
+          type: tag,
+          description,
+
+          // SPLIT
+          splitOptions,
+          splitSelected,
+          splitFeaturesSelected,
+          splitFeaturesOptions,
+
+          // INTERSECTION
+          intersectFeaturesSelected,
         };
       });
 
-      if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
-        const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
-
-        splitSelected = geoprocessingOperation.splitByProperty;
-
-        splitFeaturesOptions =
-          splitOptions.length && splitSelected
-            ? splitOptions
-                .find((s) => s.key === splitSelected)
-                .values.map((v) => ({ label: v.name, value: v.id }))
-            : [];
-
-        splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
-          return {
-            ...s,
-            id: s.value,
-            name: s.value,
-          };
+      // Filter
+      if (search) {
+        const fuse = new Fuse(parsedData, {
+          keys: ['name'],
+          threshold: 0.25,
+        });
+        parsedData = fuse.search(search).map((f) => {
+          return f.item;
         });
       }
 
-      let intersectFeaturesSelected = [];
+      // Sort
+      parsedData = orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
 
-      if (
-        geoprocessingOperations &&
-        geoprocessingOperations.find((g) => g.kind === 'stratification/v1')
-      ) {
-        intersectFeaturesSelected = flatten(
-          geoprocessingOperations.map((ifs) => {
-            return ifs.splits.map((v) => {
-              return {
-                ...v,
-                label: v.value,
-                value: v.value,
-              };
-            });
-          })
-        );
-      }
+      parsedData = flatten(
+        parsedData.map((s) => {
+          const { id, name, splitSelected, splitFeaturesSelected, marxanSettings } = s;
+          const isSplitted = !!splitSelected;
+          // const isIntersected = !!intersectFeaturesSelected?.length;
 
-      return {
-        ...d,
-        id: featureId,
-        name: alias || featureClassName,
-        type: tag,
-        description,
+          // Generate splitted features to target
+          if (isSplitted) {
+            return splitFeaturesSelected
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((sf) => {
+                const { id: sfId, name: sfName, marxanSettings: sfMarxanSettings } = sf;
 
-        // SPLIT
-        splitOptions,
-        splitSelected,
-        splitFeaturesSelected,
-        splitFeaturesOptions,
+                return {
+                  ...sf,
+                  id: `${id}-${sfId}`,
+                  parentId: id,
+                  name: `${name} / ${sfName}`,
+                  splitted: true,
+                  splitSelected,
+                  splitFeaturesSelected,
+                  ...(!!sfMarxanSettings && {
+                    target: sfMarxanSettings.prop * 100,
+                    fpf: sfMarxanSettings.fpf,
+                  }),
+                };
+              });
+          }
 
-        // INTERSECTION
-        intersectFeaturesSelected,
-      };
-    });
+          // if (isIntersected) {
+          //   return flatten(intersectFeaturesSelected.map((ifs) => {
+          //     const {
+          //       value: ifId,
+          //       label: ifName,
+          //       marxanSettings: ifMarxanSettings,
+          //     } = ifs;
 
-    // Filter
-    if (search) {
-      const fuse = new Fuse(parsedData, {
-        keys: ['name'],
-        threshold: 0.25,
-      });
-      parsedData = fuse.search(search).map((f) => {
-        return f.item;
-      });
-    }
+          //     return {
+          //       ...ifs,
+          //       id: `${id}-${ifId}`,
+          //       parentId: id,
+          //       name: `${name} / ${ifName}`,
+          //       splitted: true,
+          //       ...!!ifMarxanSettings && {
+          //         target: ifMarxanSettings.prop * 100,
+          //         fpf: ifMarxanSettings.fpf,
+          //       },
+          //     };
+          //   }));
+          // }
 
-    // Sort
-    parsedData = orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
+          return {
+            ...s,
+            ...(!!marxanSettings && {
+              target: marxanSettings.prop * 100,
+              fpf: marxanSettings.fpf,
+            }),
+          };
+        })
+      );
 
-    parsedData = flatten(
-      parsedData.map((s) => {
-        const { id, name, splitSelected, splitFeaturesSelected, marxanSettings } = s;
-        const isSplitted = !!splitSelected;
-        // const isIntersected = !!intersectFeaturesSelected?.length;
-
-        // Generate splitted features to target
-        if (isSplitted) {
-          return splitFeaturesSelected
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((sf) => {
-              const { id: sfId, name: sfName, marxanSettings: sfMarxanSettings } = sf;
-
-              return {
-                ...sf,
-                id: `${id}-${sfId}`,
-                parentId: id,
-                name: `${name} / ${sfName}`,
-                splitted: true,
-                splitSelected,
-                splitFeaturesSelected,
-                ...(!!sfMarxanSettings && {
-                  target: sfMarxanSettings.prop * 100,
-                  fpf: sfMarxanSettings.fpf,
-                }),
-              };
-            });
-        }
-
-        // if (isIntersected) {
-        //   return flatten(intersectFeaturesSelected.map((ifs) => {
-        //     const {
-        //       value: ifId,
-        //       label: ifName,
-        //       marxanSettings: ifMarxanSettings,
-        //     } = ifs;
-
-        //     return {
-        //       ...ifs,
-        //       id: `${id}-${ifId}`,
-        //       parentId: id,
-        //       name: `${name} / ${ifName}`,
-        //       splitted: true,
-        //       ...!!ifMarxanSettings && {
-        //         target: ifMarxanSettings.prop * 100,
-        //         fpf: ifMarxanSettings.fpf,
-        //       },
-        //     };
-        //   }));
-        // }
-
-        return {
-          ...s,
-          ...(!!marxanSettings && {
-            target: marxanSettings.prop * 100,
-            fpf: marxanSettings.fpf,
-          }),
-        };
-      })
-    );
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, data?.data?.data, search]);
+      return parsedData;
+    },
+    placeholderData: { data: {} as GeoFeatureSet },
+  });
 }
 
 export function useSaveSelectedFeatures({
@@ -537,7 +541,7 @@ export function useSaveSelectedFeatures({
   };
 
   return useMutation(saveFeature, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       const { id } = variables;
       queryClient.setQueryData(['selected-features', id], data);
 

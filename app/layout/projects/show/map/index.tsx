@@ -40,7 +40,7 @@ import HelpBeacon from 'layout/help/beacon';
 import { cn } from 'utils/cn';
 
 export const ProjectMap = (): JSX.Element => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [sid1, setSid1] = useState(null);
   const [sid2, setSid2] = useState(null);
   const {
@@ -146,7 +146,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const selectedPreviewFeatures = useMemo(() => {
     return selectedFeaturesData
-      ?.map(({ featureClassName, id }) => ({ featureClassName, id }))
+      ?.map(({ featureClassName, id }) => ({ name: featureClassName, id }))
       .sort((a, b) => {
         const aIndex = selectedFeaturesIds.indexOf(a.id);
         const bIndex = selectedFeaturesIds.indexOf(b.id as string);

@@ -415,7 +415,7 @@ export function useTargetedPreviewLayers({
           : COLORS['features-preview'].ramp[selectedFeatures.length - 1 - index];
 
       return {
-        id: `feature-${id}-preview-layer-${cache}`,
+        id: `feature-${id}-targeted-preview-layer-${cache}`,
         type: 'vector',
         source: {
           type: 'vector',

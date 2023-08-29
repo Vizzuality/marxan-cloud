@@ -74,7 +74,7 @@ export interface UseFeaturePreviewLayer {
   id?: string;
 }
 
-interface PreviewFeature extends Feature {
+export interface PreviewFeature extends Feature {
   splitSelected?: string;
   splitFeaturesSelected?: string[];
 }
@@ -198,7 +198,7 @@ export interface UseLegend {
       max: number;
     };
     items?: {
-      featureClassName: string;
+      name: string;
       id: string;
     }[];
     puAction?: PUAction;

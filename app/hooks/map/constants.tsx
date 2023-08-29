@@ -204,7 +204,7 @@ export const LEGEND_LAYERS = {
             : COLORS['features-preview'].ramp[i];
 
         return {
-          value: item.featureClassName,
+          value: item.name,
           color: COLOR,
         };
       }),
