@@ -103,7 +103,7 @@ export const getProjectCostSurfaceControllerFixtures = async () => {
     },
 
     GivenMockCostSurfaceShapefile: () => {
-      return __dirname + `/../cost-surfaces/mock_cost_surface_shapefile.json`;
+      return __dirname + `/../upload-feature/import-files/wetlands.zip`;
     },
 
     WhenUploadingCostSurfaceShapefileForProject: async (
@@ -120,21 +120,12 @@ export const getProjectCostSurfaceControllerFixtures = async () => {
         });
     },
 
-    ThenCostCurfaceAPIEntityWasProperlySaved: async (
-      response: request.Response,
-      name: string,
-    ) => {
-      const jsonAPICostSurface: JSONAPICostSurface = response.body.data;
+    ThenCostSurfaceAPIEntityWasProperlySaved: async (name: string) => {
       const savedCostSurface = await costSurfaceRepo.findOne({
-        where: { id: jsonAPICostSurface.id },
+        where: { name },
       });
       expect(savedCostSurface).toBeDefined();
       expect(savedCostSurface?.name).toEqual(name);
-      expect(savedCostSurface?.name).toEqual(
-        jsonAPICostSurface.attributes.name,
-      );
-      expect(savedCostSurface?.min).toEqual(jsonAPICostSurface.attributes.min);
-      expect(savedCostSurface?.max).toEqual(jsonAPICostSurface.attributes.max);
     },
 
     ThenProjectNotEditableErrorWasReturned: (

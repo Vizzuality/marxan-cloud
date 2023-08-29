@@ -11,6 +11,10 @@ import {
 } from './cost-surface-queue.provider';
 import { CostSurfaceEventsHandler } from './cost-surface-events-handler.service';
 
+/**
+ * @deprecated: The above code and its dependencies should be removed or switched for ProjectCostSurfaceIngraModule
+ */
+
 @Module({
   imports: [
     CqrsModule,

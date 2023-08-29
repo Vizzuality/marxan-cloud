@@ -8,11 +8,11 @@ import {
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 
 @Entity('cost_surface_pu_data')
-export class CostSurfacePuDataGeoEntity {
+export class CostSurfacePuDataEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'cost_surface_id' })
   costSurfaceId!: string;
 
   @ManyToOne(
