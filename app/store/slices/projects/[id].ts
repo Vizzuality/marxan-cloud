@@ -11,7 +11,7 @@ interface ProjectShowStateProps {
   layerSettings: Record<string, any>;
   selectedCostSurface: CostSurface['id'][];
   selectedFeatures: Feature['id'][];
-  selectedWDPA: WDPA['id'][];
+  selectedWDPAs: WDPA['id'][];
   isSidebarOpen: boolean;
 }
 
@@ -22,7 +22,7 @@ const initialState: ProjectShowStateProps = {
   layerSettings: {},
   selectedFeatures: [],
   selectedCostSurface: [],
-  selectedWDPA: [],
+  selectedWDPAs: [],
   isSidebarOpen: true,
 } satisfies ProjectShowStateProps;
 
@@ -77,9 +77,9 @@ const projectsDetailSlice = createSlice({
     ) => {
       state.selectedCostSurface = action.payload;
     },
-    // WDPA
-    setSelectedWDPA: (state, action: PayloadAction<ProjectShowStateProps['selectedWDPA']>) => {
-      state.selectedFeatures = action.payload;
+    // WDPAs
+    setSelectedWDPAs: (state, action: PayloadAction<ProjectShowStateProps['selectedWDPAs']>) => {
+      state.selectedWDPAs = action.payload;
     },
   },
 });
@@ -91,7 +91,7 @@ export const {
   setLayerSettings,
   setSelectedFeatures,
   setSelectedCostSurface,
-  setSelectedWDPA,
+  setSelectedWDPAs,
   setSidebarVisibility,
 } = projectsDetailSlice.actions;
 

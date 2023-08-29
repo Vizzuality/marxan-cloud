@@ -32,6 +32,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     (state) => state['/projects/[id]']
   );
 
+  console.log({ visibleFeatures });
   const [filters, setFilters] = useState<Parameters<typeof useAllFeatures>[1]>({
     sort: FEATURES_TABLE_COLUMNS[0].name,
   });

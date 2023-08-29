@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedWDPA } from 'store/slices/projects/[id]';
+import { setSelectedWDPAs as setVisibleWDPAs } from 'store/slices/projects/[id]';
 
 import { useProjectWDPAs } from 'hooks/wdpa';
 
@@ -24,7 +24,10 @@ const InventoryPanelProtectedAreas = ({
   noData: string;
 }): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { selectedWDPA, search } = useAppSelector((state) => state['/projects/[id]']);
+  const { selectedWDPAs: visibleWDPAs, search } = useAppSelector(
+    (state) => state['/projects/[id]']
+  );
+
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
@@ -50,13 +53,6 @@ const InventoryPanelProtectedAreas = ({
     }
   );
 
-  const data: DataItem[] = allProjectWDPAsQuery.data?.map((wdpa) => ({
-    ...wdpa,
-    name: wdpa.fullName,
-    scenarios: wdpa.scenarioUsageCount,
-    isVisibleOnMap: selectedWDPA?.includes(wdpa.id),
-  }));
-
   const WDPAIds = allProjectWDPAsQuery.data?.map((wdpa) => wdpa.id);
 
   const handleSelectAll = useCallback(
@@ -78,16 +74,16 @@ const InventoryPanelProtectedAreas = ({
 
   const toggleSeeOnMap = useCallback(
     (WDPAId: WDPA['id']) => {
-      const newSelectedWDPAs = [...selectedWDPA];
+      const newSelectedWDPAs = [...visibleWDPAs];
       if (!newSelectedWDPAs.includes(WDPAId)) {
         newSelectedWDPAs.push(WDPAId);
       } else {
         const i = newSelectedWDPAs.indexOf(WDPAId);
         newSelectedWDPAs.splice(i, 1);
       }
-      dispatch(setSelectedWDPA(newSelectedWDPAs));
+      dispatch(setVisibleWDPAs(newSelectedWDPAs));
     },
-    [dispatch, selectedWDPA]
+    [dispatch, visibleWDPAs]
   );
 
   const handleSort = useCallback(
@@ -107,6 +103,13 @@ const InventoryPanelProtectedAreas = ({
   useEffect(() => {
     setSelectedWDPAIds([]);
   }, [search]);
+
+  const data: DataItem[] = allProjectWDPAsQuery.data?.map((wdpa) => ({
+    ...wdpa,
+    name: wdpa.fullName,
+    scenarios: wdpa.scenarioUsageCount,
+    isVisibleOnMap: visibleWDPAs?.includes(wdpa.id),
+  }));
 
   return (
     <div className="space-y-6">
