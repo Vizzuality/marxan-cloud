@@ -8,7 +8,6 @@ import { Scenario } from 'types/api/scenario';
 import { WDPA, WDPACategory } from 'types/api/wdpa';
 
 import { API } from 'services/api';
-import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
@@ -86,7 +85,7 @@ export function useSaveScenarioProtectedAreas({
 
 export function useProjectWDPAs<T = WDPA[]>(
   pid: Project['id'],
-  params: { sort?: string } = {},
+  params: { search?: string; sort?: string; filters?: Record<string, unknown> } = {},
   queryOptions: QueryObserverOptions<WDPA[], Error, T> = {}
 ) {
   const { data: session } = useSession();

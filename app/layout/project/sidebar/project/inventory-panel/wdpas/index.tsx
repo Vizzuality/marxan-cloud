@@ -40,6 +40,7 @@ const InventoryPanelProtectedAreas = ({
     pid,
     {
       ...filters,
+      search,
     },
     {
       select: (data) =>
@@ -72,6 +73,10 @@ const InventoryPanelProtectedAreas = ({
     }
   }, []);
 
+  useEffect(() => {
+    setSelectedWDPAIds([]);
+  }, [search]);
+
   const toggleSeeOnMap = useCallback(
     (WDPAId: WDPA['id']) => {
       const newSelectedWDPAs = [...visibleWDPAs];
@@ -99,10 +104,6 @@ const InventoryPanelProtectedAreas = ({
   );
 
   const displayBulkActions = selectedWDPAIds.length > 0;
-
-  useEffect(() => {
-    setSelectedWDPAIds([]);
-  }, [search]);
 
   const data: DataItem[] = allProjectWDPAsQuery.data?.map((wdpa) => ({
     ...wdpa,
