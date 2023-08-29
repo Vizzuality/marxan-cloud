@@ -31,19 +31,6 @@ export const PlanningUnitTabs: React.FC<PlanningUnitTabsProps> = ({
       >
         Include areas
       </button>
-
-      <button
-        type="button"
-        className={cn({
-          [BUTTON_COMMON_CLASSES]: true,
-          [BUTTON_ACTIVE_CLASSES]: type === 'available',
-          'text-white/40': type !== 'available',
-        })}
-        onClick={() => onChange('available')}
-      >
-        Available areas
-      </button>
-
       <button
         type="button"
         className={cn({
@@ -54,6 +41,17 @@ export const PlanningUnitTabs: React.FC<PlanningUnitTabsProps> = ({
         onClick={() => onChange('exclude')}
       >
         Exclude areas
+      </button>
+      <button
+        type="button"
+        className={cn({
+          [BUTTON_COMMON_CLASSES]: true,
+          [BUTTON_ACTIVE_CLASSES]: type === 'available',
+          'text-white/40': type !== 'available',
+        })}
+        onClick={() => onChange('available')}
+      >
+        Available areas
       </button>
     </div>
   );
