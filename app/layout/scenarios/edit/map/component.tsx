@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
-
 import { useRouter } from 'next/router';
 
+import { useAppSelector, useAppDispatch } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
@@ -43,7 +42,7 @@ import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import { TABS } from 'layout/project/navigation/constants';
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
-export const ScenariosEditMap: React.FC = () => {
+export const ScenariosEditMap = (): JSX.Element => {
   const [open, setOpen] = useState(true);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
@@ -54,7 +53,7 @@ export const ScenariosEditMap: React.FC = () => {
 
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
-  const scenarioSlice = getScenarioEditSlice(sid);
+  const scenarioSlice = useMemo(() => getScenarioEditSlice(sid), [sid]);
   const {
     setTmpPuIncludedValue,
     setTmpPuExcludedValue,
@@ -63,9 +62,10 @@ export const ScenariosEditMap: React.FC = () => {
     setPuAvailableValue,
     setPuIncludedValue,
     setPuExcludedValue,
+    setCache,
   } = scenarioSlice.actions;
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const {
     cache,
@@ -96,7 +96,7 @@ export const ScenariosEditMap: React.FC = () => {
 
     // Settings
     layerSettings,
-  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data = {} } = useProject(pid);
   const { bbox } = data;
@@ -431,6 +431,13 @@ export const ScenariosEditMap: React.FC = () => {
       viewportOptions: { transitionDuration: 0 },
     });
   }, [BBOX]);
+
+  useEffect(() => {
+    // ? Previously, with the navigation by tabs, whenever the user clicked to continue, the cache used by the layers on the map
+    // ? was updated and the flow continued to the next tab.
+    // ? As this flow is gone and the user is free to go wherever they want, we need to update the cache manually when the tab changes.
+    if (tab) dispatch(setCache(Date.now()));
+  }, [tab, dispatch, setCache]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);

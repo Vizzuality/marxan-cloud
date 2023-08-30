@@ -524,7 +524,7 @@ export function useSaveScenario({
 
       await queryClient.invalidateQueries(['scenarios', projectId]);
       await queryClient.invalidateQueries(['scenario', id]);
-      queryClient.setQueryData(['scenario', id], data);
+      queryClient.setQueryData(['scenario', id], { data });
     },
   });
 }
