@@ -104,7 +104,6 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
                 level: 'success',
               }
             );
-            // push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`);
             onContinue();
           },
           onError: () => {
@@ -135,11 +134,10 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
       if (isModified) {
         onCalculateProtectedAreas(values);
       } else {
-        // push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`);
         onContinue();
       }
     },
-    [wdpaData, onCalculateProtectedAreas, pid, sid, push, onContinue]
+    [wdpaData, onCalculateProtectedAreas, onContinue]
   );
 
   // Constants
