@@ -252,9 +252,9 @@ export const ScenariosEditMap = (): JSX.Element => {
     if (tab === TABS['scenario-planning-unit-status']) {
       return [
         ...(protectedCategories.length ? ['wdpa-percentage'] : []),
-        'lock-available',
         'lock-in',
         'lock-out',
+        'lock-available',
         'pugrid',
       ];
     }

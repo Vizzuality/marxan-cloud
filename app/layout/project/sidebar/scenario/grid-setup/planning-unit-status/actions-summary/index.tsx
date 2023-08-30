@@ -178,44 +178,6 @@ export const ActionsSummary = ({
 
   return (
     <div className="flex flex-col divide-y-2 divide-gray-500">
-      {/* // ? Available areas  */}
-      <div className="flex flex-col space-y-3 py-3">
-        <div className="flex">
-          <span className="flex flex-1 items-center space-x-2">
-            <Icon
-              icon={HEXAGON_SVG}
-              className="fill-none h-5 w-5 stroke-current stroke-[1.5px] text-yellow-300"
-            />
-            <span className="text-sm text-white">Available areas</span>
-          </span>
-          <span
-            className={cn('flex flex-1 items-center justify-center text-sm text-white', {
-              'text-yellow-300': puAction === 'available',
-            })}
-          >
-            {puTmpAvailableValue.length + puAvailableValue.length} PU
-          </span>
-          <div className="flex flex-1 justify-end">
-            <Button
-              className={cn('invisible', {
-                visible: PUData.available.length > 0,
-              })}
-              theme="secondary"
-              size="s"
-              data-up-action="available"
-              onClick={onClearAreas}
-            >
-              <div className="flex items-center space-x-2">
-                <span>Clear</span>
-                <Icon icon={CLOSE_SVG} className="h-2 w-2" />
-              </div>
-            </Button>
-          </div>
-        </div>
-        {puAction === 'available' && (
-          <ActionsSummaryButtons onCancel={() => onCancelPUSelection('available')} />
-        )}
-      </div>
       {/* // ? Included areas  */}
       <div className="flex flex-col space-y-3 py-3">
         <div className="flex">
@@ -290,6 +252,44 @@ export const ActionsSummary = ({
         </div>
         {puAction === 'exclude' && (
           <ActionsSummaryButtons onCancel={() => onCancelPUSelection('exclude')} />
+        )}
+      </div>
+      {/* // ? Available areas  */}
+      <div className="flex flex-col space-y-3 py-3">
+        <div className="flex">
+          <span className="flex flex-1 items-center space-x-2">
+            <Icon
+              icon={HEXAGON_SVG}
+              className="fill-none h-5 w-5 stroke-current stroke-[1.5px] text-yellow-300"
+            />
+            <span className="text-sm text-white">Available areas</span>
+          </span>
+          <span
+            className={cn('flex flex-1 items-center justify-center text-sm text-white', {
+              'text-yellow-300': puAction === 'available',
+            })}
+          >
+            {puTmpAvailableValue.length + puAvailableValue.length} PU
+          </span>
+          <div className="flex flex-1 justify-end">
+            <Button
+              className={cn('invisible', {
+                visible: PUData.available.length > 0,
+              })}
+              theme="secondary"
+              size="s"
+              data-up-action="available"
+              onClick={onClearAreas}
+            >
+              <div className="flex items-center space-x-2">
+                <span>Clear</span>
+                <Icon icon={CLOSE_SVG} className="h-2 w-2" />
+              </div>
+            </Button>
+          </div>
+        </div>
+        {puAction === 'available' && (
+          <ActionsSummaryButtons onCancel={() => onCancelPUSelection('available')} />
         )}
       </div>
     </div>
