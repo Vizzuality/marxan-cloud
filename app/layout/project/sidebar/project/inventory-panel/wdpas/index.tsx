@@ -14,9 +14,12 @@ import InventoryTable, { type DataItem } from '../components/inventory-table';
 import ActionsMenu from './actions-menu';
 import WDPABulkActionMenu from './bulk-action-menu';
 
-const WDPA_TABLE_COLUMNS = {
-  name: 'fullName',
-};
+const WDPA_TABLE_COLUMNS = [
+  {
+    name: 'fullName',
+    text: 'Name',
+  },
+];
 
 const InventoryPanelProtectedAreas = ({
   noData: noDataMessage,
@@ -33,7 +36,7 @@ const InventoryPanelProtectedAreas = ({
 
   const [selectedWDPAIds, setSelectedWDPAIds] = useState<WDPA['id'][]>([]);
   const [filters, setFilters] = useState<Parameters<typeof useProjectWDPAs>[1]>({
-    sort: WDPA_TABLE_COLUMNS.name,
+    sort: WDPA_TABLE_COLUMNS[0].name,
   });
 
   const allProjectWDPAsQuery = useProjectWDPAs(

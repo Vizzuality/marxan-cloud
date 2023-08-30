@@ -81,7 +81,6 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
   const handleSort = useCallback(
     (_sortType: (typeof filters)['sort']) => {
       const sort = filters.sort === _sortType ? `-${_sortType}` : _sortType;
-
       setFilters((prevFilters) => ({
         ...prevFilters,
         sort,
