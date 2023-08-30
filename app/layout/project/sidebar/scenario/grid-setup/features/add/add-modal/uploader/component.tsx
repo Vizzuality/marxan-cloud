@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-
-import cx from 'classnames';
+import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
@@ -23,21 +22,21 @@ import Loading from 'components/loading';
 import Uploader from 'components/uploader';
 import { FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import UploadFeaturesInfoButtonContent from 'constants/info-button-content/upload-features';
+import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-export interface ScenariosFeaturesAddUploaderProps {}
-
-export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploaderProps> = () => {
+export const ScenariosFeaturesAddUploader = (): JSX.Element => {
   const formRef = useRef(null);
+  const queryClient = useQueryClient();
 
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [successFile, setSuccessFile] = useState(null);
+  const [successFile, setSuccessFile] = useState<{ name: string }>(null);
 
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
 
@@ -113,8 +112,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
       uploadFeaturesShapefileMutation.mutate(
         { data, id: `${pid}` },
         {
-          onSuccess: () => {
-            setLoading(false);
+          onSuccess: async () => {
             setSuccessFile({ ...successFile });
             onClose();
             addToast(
@@ -128,12 +126,11 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
               }
             );
 
-            console.info('Feature shapefile uploaded');
+            await queryClient.invalidateQueries(['all-paginated-features', pid]);
           },
           onError: ({ response }) => {
             const { errors } = response.data;
 
-            setLoading(false);
             setSuccessFile(null);
 
             addToast(
@@ -151,10 +148,13 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
               }
             );
           },
+          onSettled: () => {
+            setLoading(false);
+          },
         }
       );
     },
-    [pid, addToast, onClose, uploadFeaturesShapefileMutation, successFile]
+    [pid, addToast, onClose, uploadFeaturesShapefileMutation, queryClient, successFile]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
@@ -212,7 +212,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
                           <div
                             {...props}
                             {...getRootProps()}
-                            className={cx({
+                            className={cn({
                               'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
                                 true,
                               'bg-gray-500': isDragActive,
