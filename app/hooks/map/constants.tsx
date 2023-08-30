@@ -33,7 +33,8 @@ export const COLORS = {
       '#de4210',
     ],
   },
-  wdpa: '#00F',
+  wdpa: '#12EC80',
+  'wdpa-preview': '#00f',
   features: '#6F53F7',
   highlightFeatures: '#BE6BFF',
   include: '#03E7D1',
@@ -162,7 +163,7 @@ export const LEGEND_LAYERS = {
       <Icon
         icon={SQUARE_SVG}
         className="mt-0.5 h-3.5 w-3.5 stroke-current stroke-2"
-        style={{ color: COLORS.wdpa }}
+        style={{ color: COLORS['wdpa-preview'] }}
       />
     ),
     settingsManager: {
