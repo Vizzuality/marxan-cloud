@@ -17,11 +17,11 @@ export const ScenariosSidebarEditFeatures = ({ onContinue }): JSX.Element => {
     <div className="flex h-full w-full flex-grow flex-col overflow-hidden">
       <motion.div
         key="features"
-        className="flex min-h-0 flex-col overflow-hidden"
+        className="flex flex-col overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <Section className="w-full">
+        <Section className="flex flex-col overflow-hidden">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <span className="text-xs font-semibold text-blue-400">Grid Setup</span>

@@ -7,10 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import HelpBeacon from 'layout/help/beacon';
-import ScenarioToolbar from 'layout/project/sidebar/project/scenarios-list/toolbar';
 import { flatten } from 'lodash';
-import { cn } from 'utils/cn';
 
 import { useCanEditProject } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
@@ -28,6 +25,9 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
+import HelpBeacon from 'layout/help/beacon';
+import ScenarioToolbar from 'layout/project/sidebar/project/scenarios-list/toolbar';
+import { cn } from 'utils/cn';
 
 import bgScenariosDashboard from 'images/new-layout/bg-scenarios-dashboard.png';
 
@@ -197,7 +197,7 @@ export const ScenariosList: React.FC = () => {
     <AnimatePresence>
       <div
         key="project-scenarios-sidebar"
-        className="relative col-span-7 flex flex-grow flex-col overflow-hidden"
+        className="relative flex flex-grow flex-col overflow-hidden"
       >
         <Loading
           visible={projectLoading || scenariosLoading}
@@ -218,7 +218,7 @@ export const ScenariosList: React.FC = () => {
             {hasScenarios && (
               <div
                 ref={scrollRef}
-                className="relative z-0 flex h-full max-h-[calc(100vh-400px)] flex-grow flex-col overflow-y-auto overflow-x-hidden py-6"
+                className="relative z-0 flex max-h-full flex-col overflow-y-auto overflow-x-hidden py-6"
               >
                 <ul className="space-y-3">
                   {scenariosData.map((s, i) => {

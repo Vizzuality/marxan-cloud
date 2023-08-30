@@ -110,20 +110,22 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
   }));
 
   return (
-    <div className="space-y-6">
-      <InventoryTable
-        loading={allFeaturesQuery.isFetching}
-        data={data}
-        noDataMessage={noDataMessage}
-        columns={FEATURES_TABLE_COLUMNS}
-        sorting={filters.sort}
-        selectedIds={selectedFeaturesIds}
-        onSortChange={handleSort}
-        onSelectAll={handleSelectAll}
-        onSelectRow={handleSelectFeature}
-        onToggleSeeOnMap={toggleSeeOnMap}
-        ActionsComponent={ActionsMenu}
-      />
+    <div className="flex flex-col space-y-6 overflow-hidden">
+      <div className="h-full overflow-y-auto overflow-x-hidden">
+        <InventoryTable
+          loading={allFeaturesQuery.isFetching}
+          data={data}
+          noDataMessage={noDataMessage}
+          columns={FEATURES_TABLE_COLUMNS}
+          sorting={filters.sort}
+          selectedIds={selectedFeaturesIds}
+          onSortChange={handleSort}
+          onSelectAll={handleSelectAll}
+          onSelectRow={handleSelectFeature}
+          onToggleSeeOnMap={toggleSeeOnMap}
+          ActionsComponent={ActionsMenu}
+        />
+      </div>
       {displayBulkActions && <FeaturesBulkActionMenu selectedFeaturesIds={selectedFeaturesIds} />}
     </div>
   );

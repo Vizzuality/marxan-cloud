@@ -308,10 +308,10 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
           {!!selectedFeaturesData && !!selectedFeaturesData.length && (
             <div className="relative flex min-h-0 flex-grow flex-col overflow-hidden">
               <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
-              <div className="relative overflow-y-auto overflow-x-visible px-0.5">
+              <div className="relative max-h-full overflow-y-auto overflow-x-visible px-0.5">
                 <FieldRFF name="features">
                   {({ input }) => (
-                    <ul className="max-h-[calc(100vh-400px)] space-y-1.5 overflow-y-auto py-6">
+                    <ul className="space-y-1.5 overflow-y-auto py-6">
                       {values.features.map((item, i) => {
                         return (
                           <li key={`${item.id}`}>
