@@ -103,10 +103,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = () => {
                 return <p key={featureId}>{`${name}, ${target * 100}%, ${spf}`}</p>;
               }
 
-              if (kind === 'withGeoprocessing') {
-                // console.log('hello');
-              }
-
               return null;
             })}
           </div>

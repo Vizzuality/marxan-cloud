@@ -18,8 +18,6 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import Item from 'components/features/target-spf-item';
 import Loading from 'components/loading';
 import { cn } from 'utils/cn';
-import { ScenarioSidebarTabs } from 'utils/tabs';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void }): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
@@ -197,36 +195,13 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
           data,
         },
         {
-          onSuccess: () => {
-            // push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-features']}`);
-            onGoBack();
-            saveScenarioMutation.mutate(
-              {
-                id: `${sid}`,
-                data: {
-                  metadata: mergeScenarioStatusMetaData(metadata, {
-                    tab: ScenarioSidebarTabs.FEATURES,
-                    subtab: null,
-                  }),
-                },
-              },
-              {
-                onSuccess: () => {
-                  setSubmitting(false);
-                },
-                onError: () => {
-                  setSubmitting(false);
-                },
-              }
-            );
-          },
-          onError: () => {
+          onSettled: () => {
             setSubmitting(false);
           },
         }
       );
     },
-    [sid, metadata, selectedFeaturesData, selectedFeaturesMutation, saveScenarioMutation, onGoBack]
+    [sid, selectedFeaturesData, selectedFeaturesMutation]
   );
 
   const toggleSeeOnMap = useCallback(

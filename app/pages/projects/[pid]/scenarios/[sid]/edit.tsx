@@ -93,7 +93,9 @@ const EditScenarioPage = (): JSX.Element => {
             {tab === TABS['scenario-protected-areas'] && <GridSetupProtectedAreas />}
             {tab === TABS['scenario-cost-surface'] && <GridSetupCostSurface />}
             {tab === TABS['scenario-planning-unit-status'] && <GridSetupPlanningUnits />}
-            {tab === TABS['scenario-features'] && <GridSetupFeatures />}
+            {[TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab) && (
+              <GridSetupFeatures />
+            )}
             {tab === TABS['scenario-gap-analysis'] && <GridSetupGAPAnalysis />}
 
             {/* // ? advanced settings */}

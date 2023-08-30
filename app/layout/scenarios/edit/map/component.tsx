@@ -112,28 +112,24 @@ export const ScenariosEditMap = (): JSX.Element => {
   const { data: targetedFeaturesData } = useTargetedFeatures(sid, {});
 
   const previewFeatureIsSelected = useMemo(() => {
-    // if (tab === TABS['scenario-features-add']) {
-    //   return selectedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
-    // }
-
-    // if (tab === TABS['scenario-features-target']) {
-    //   return targetedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
-    // }
-
     if (tab === TABS['scenario-features']) {
       return (
-        [...selectedFeaturesData, ...targetedFeaturesData].filter(({ id }) =>
-          selectedFeatures.includes(id)
-        ).length > 0
+        (selectedFeaturesData || []).filter(({ id }) => selectedFeatures.includes(id)).length > 0
       );
     }
 
-    return [];
+    if (tab === TABS['scenario-features-targets-spf']) {
+      return (
+        (targetedFeaturesData || []).filter(({ id }) => selectedFeatures.includes(id)).length > 0
+      );
+    }
+
+    return false;
   }, [tab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
 
   const selectedPreviewFeatures = useMemo(() => {
-    if (tab === TABS['scenario-features-add']) {
-      return selectedFeaturesData
+    if (tab === TABS['scenario-features']) {
+      return (selectedFeaturesData || [])
         .filter(({ id }) => selectedFeatures.includes(id))
         .map(({ name, id }) => ({ name, id }))
         .sort((a, b) => {
@@ -143,8 +139,8 @@ export const ScenariosEditMap = (): JSX.Element => {
         });
     }
 
-    if (tab === TABS['scenario-features-target']) {
-      return targetedFeaturesData
+    if (tab === TABS['scenario-features-targets-spf']) {
+      return (targetedFeaturesData || [])
         .filter(({ id }) => selectedFeatures.includes(id))
         .map(({ name, id }) => ({ name, id }))
         .sort((a, b) => {
@@ -228,7 +224,7 @@ export const ScenariosEditMap = (): JSX.Element => {
       return ['wdpa-percentage', 'lock-available', 'lock-in', 'lock-out'];
     }
 
-    if (tab === TABS['scenario-features']) {
+    if ([TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab)) {
       return ['wdpa-percentage', 'features', 'features-preview'];
     }
 
@@ -267,7 +263,7 @@ export const ScenariosEditMap = (): JSX.Element => {
       return ['wdpa-percentage', 'wdpa-preview', 'pugrid'];
     }
 
-    if (tab === TABS['scenario-features']) {
+    if ([TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab)) {
       return [
         ...(protectedCategories.length ? ['wdpa-percentage'] : []),
         ...(preHighlightFeatures.length ? ['features-highlight'] : []),
@@ -351,7 +347,7 @@ export const ScenariosEditMap = (): JSX.Element => {
   const TargetedPreviewLayers = useTargetedPreviewLayers({
     features: targetedFeaturesData,
     cache,
-    active: tab === TABS['scenario-features'],
+    active: tab === TABS['scenario-features-targets-spf'],
     bbox,
     options: {
       featuresRecipe,

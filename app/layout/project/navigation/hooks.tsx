@@ -70,7 +70,9 @@ export const useGridSetupItems = (): SubMenuItem[] => {
       name: 'Features',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-features']}`,
       icon: FEATURES_SVG,
-      selected: isScenarioRoute && TABS['scenario-features'] === tab,
+      selected:
+        isScenarioRoute &&
+        [TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab),
     },
     {
       name: 'Gap Analysis',
