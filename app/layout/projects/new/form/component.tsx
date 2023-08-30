@@ -167,7 +167,7 @@ const ProjectForm = ({
 
     const registeredFields = form.getRegisteredFields();
     registeredFields.forEach((f) => {
-      const omitFields = ['name', 'description', 'planningUnitGridShape'];
+      const omitFields = ['name', 'description', 'planningUnitGridShape', 'PAOptionSelected'];
       if (!omitFields.includes(f)) {
         form.change(f, null);
       }
@@ -180,7 +180,7 @@ const ProjectForm = ({
 
     const registeredFields = form.getRegisteredFields();
     registeredFields.forEach((f) => {
-      const omitFields = ['name', 'description'];
+      const omitFields = ['name', 'description', 'PAOptionSelected'];
       if (!omitFields.includes(f)) {
         form.change(f, null);
       }
@@ -339,6 +339,7 @@ const ProjectForm = ({
                                   initialSelected={PAOptionSelected}
                                   options={OPTIONS}
                                   onChange={(value: string) => {
+                                    form.change('PAOptionSelected', value);
                                     setPAOptionSelected(value);
                                     resetPlanningArea(form);
                                     resetPlanningAreaGrid(form);
