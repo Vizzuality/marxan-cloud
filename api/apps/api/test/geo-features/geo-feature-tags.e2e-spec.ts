@@ -245,6 +245,8 @@ describe('GeoFeatureTag PATCH (e2e)', () => {
 
     // ASSERT
     expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body.data.type).toBe('geo_features');
+    expect(response.body.data.attributes.featureClassName).toBe('someFeature');
     await fixtures.ThenFeatureHasTag(projectId, featureId, newTag);
   });
 

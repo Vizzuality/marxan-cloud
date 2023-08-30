@@ -869,13 +869,14 @@ export class ProjectsController {
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
+  @ApiOkResponse({type: GeoFeature})
   @Patch(':projectId/features/:featureId/tags')
   async updateGeoFeatureTag(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('featureId', ParseUUIDPipe) featureId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Body() dto: UpdateGeoFeatureTagDTO,
-  ): Promise<void> {
+  ): Promise<GeoFeature> {
     const result = await this.geoFeatureTagsService.setOrUpdateTagForFeature(
       req.user.id,
       projectId,
@@ -890,6 +891,8 @@ export class ProjectsController {
         projectId,
       });
     }
+
+    return this.geoFeatureService.serialize(result.right);
   }
 
   @ImplementsAcl()

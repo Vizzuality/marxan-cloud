@@ -135,7 +135,7 @@ export class GeoFeatureTagsService {
     Either<
       | typeof featureNotFoundWithinProject
       | typeof featureNotEditableByUserWithinProject,
-      true
+      GeoFeature
     >
   > {
     const geoFeature = await this.geoFeaturesRepo.findOne({
@@ -171,7 +171,11 @@ export class GeoFeatureTagsService {
         this.geoFeatureTagsRepo.create({ projectId, featureId, tag }),
       );
 
-      return right(true);
+      const updatedGeoFeature = await this.geoFeaturesRepo.findOneOrFail({
+        where: { id: featureId, projectId },
+      });
+
+      return right(updatedGeoFeature);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
       throw err;
