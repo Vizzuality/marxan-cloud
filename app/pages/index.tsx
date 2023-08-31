@@ -17,7 +17,7 @@ import MetaTags from 'layout/meta-tags';
 
 export const getServerSideProps = withUser();
 
-const Home: React.FC = () => {
+const Home = (): JSX.Element => {
   const { asPath } = useRouter();
 
   return (
