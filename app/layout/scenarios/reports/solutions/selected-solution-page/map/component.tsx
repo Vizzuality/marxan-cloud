@@ -34,7 +34,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
 
   const dispatch = useDispatch();
 
-  const { data = {} } = useProject(pid);
+  const { data } = useProject(pid);
   const { bbox } = data;
   const BBOX = useBBOX({
     bbox,

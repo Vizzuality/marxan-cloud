@@ -183,7 +183,7 @@ export function useProject(id: Project['id']) {
   return useQuery({
     queryKey: ['project', id],
     queryFn: async () =>
-      PROJECTS.request<{ data: Partial<Project> }>({
+      PROJECTS.request<{ data: Project }>({
         method: 'GET',
         url: `/${id}`,
         headers: {
@@ -194,7 +194,7 @@ export function useProject(id: Project['id']) {
         },
       }).then((response) => response.data.data),
     enabled: !!id,
-    placeholderData: {},
+    placeholderData: {} as Project,
   });
 }
 
