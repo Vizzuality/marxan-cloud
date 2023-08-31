@@ -36,42 +36,43 @@ const EditModal = ({
   const onEditSubmit = useCallback(
     (values: FormValues) => {
       const { fullName } = values;
-      const editWDPAPromise = editWDPAMutation.mutateAsync({
-        wdpaId: wdpaId,
-        projectId: pid,
-        data: {
-          fullName,
+      editWDPAMutation.mutate(
+        {
+          wdpaId: wdpaId,
+          projectId: pid,
+          data: {
+            fullName,
+          },
         },
-      });
-
-      Promise.all([editWDPAPromise])
-        .then(async () => {
-          await queryClient.invalidateQueries(['wdpas', pid]);
-          handleModal('edit', false);
-
-          addToast(
-            'success-edit-wdpa',
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Protected area edited</p>
-            </>,
-            {
-              level: 'success',
-            }
-          );
-        })
-        .catch(() => {
-          addToast(
-            'error-edit-wdpa',
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">It is not possible to edit this protected area</p>
-            </>,
-            {
-              level: 'error',
-            }
-          );
-        });
+        {
+          onSuccess: async () => {
+            await queryClient.invalidateQueries(['wdpas', pid]);
+            handleModal('edit', false);
+            addToast(
+              'success-edit-wdpa',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Protected area edited</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          },
+          onError: () => {
+            addToast(
+              'error-edit-wdpa',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">It is not possible to edit this protected area</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
     },
     [addToast, editWDPAMutation, wdpaId, handleModal, pid, queryClient]
   );
