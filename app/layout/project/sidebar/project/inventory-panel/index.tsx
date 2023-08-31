@@ -10,6 +10,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Search, { SearchProps } from 'components/search';
 import { NavigationInventoryTabs } from 'layout/project/navigation/types';
+import Section from 'layout/section';
 
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
@@ -62,7 +63,7 @@ const InventoryPanel = (): JSX.Element => {
   } = panel;
 
   return (
-    <section className="relative mt-6 space-y-2 rounded-[20px] bg-gray-700 p-6">
+    <Section className="relative flex flex-col space-y-2 overflow-hidden">
       <header className="flex items-center justify-between">
         <div className="space-y-1">
           <span className="text-xs font-semibold text-blue-400">Inventory Panel</span>
@@ -96,7 +97,7 @@ const InventoryPanel = (): JSX.Element => {
       )}
       {/* Not all panels have a FooterComponent */}
       {FooterComponent && <FooterComponent />}
-    </section>
+    </Section>
   );
 };
 

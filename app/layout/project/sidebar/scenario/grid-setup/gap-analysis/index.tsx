@@ -18,12 +18,12 @@ export const GridSetupGAPAnalysis = (): JSX.Element => {
   return (
     <motion.div
       key="gap-analysis"
-      className=""
+      className="flex h-full flex-col overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <Section>
+      <Section className="flex flex-col overflow-hidden">
         <div className="space-y-1">
           <span className="text-xs font-semibold text-blue-400">Grid Setup</span>
           <div className="flex items-center space-x-2">
@@ -57,12 +57,10 @@ export const GridSetupGAPAnalysis = (): JSX.Element => {
           </div>
         </div>
 
-        <div className="relative mt-1 flex min-h-0 w-full flex-grow flex-col">
-          <Toolbar search={search} onSearch={onSearch} />
+        <Toolbar search={search} onSearch={onSearch} />
 
-          <div className="max-h-[calc(100vh-400px)] overflow-y-auto">
-            <List search={search} />
-          </div>
+        <div className="max-h-full overflow-y-auto">
+          <List search={search} />
         </div>
       </Section>
     </motion.div>

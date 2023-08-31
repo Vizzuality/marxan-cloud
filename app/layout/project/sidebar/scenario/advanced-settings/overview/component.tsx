@@ -125,16 +125,16 @@ export const ScenariosAdvancedSettings = (): JSX.Element => {
           {({ handleSubmit }) => (
             <form
               className={cx({
-                'flex w-full flex-grow flex-col overflow-hidden text-gray-500': true,
+                // 'flex w-full flex-grow flex-col text-gray-500': true,
               })}
               autoComplete="off"
               noValidate
               onSubmit={handleSubmit}
             >
-              <div className="flex max-h-[calc(100vh-400px)] w-full overflow-y-auto">
-                <div className="flex w-full flex-shrink-0 flex-grow flex-col space-y-6 overflow-hidden pt-5">
-                  <div className="relative flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
-                    <div className="mr-12 space-y-10">
+              <div className="flex h-full w-full overflow-hidden">
+                <div className="flex w-full flex-grow flex-col space-y-6  pt-5">
+                  <div className="relative flex flex-grow flex-col">
+                    <div className="max-h-full space-y-10">
                       {FIELDS.map((f) => (
                         <RunField key={f.id} {...f} />
                       ))}

@@ -108,7 +108,7 @@ export const ScenariosBLMCalibration = (): JSX.Element => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <Section className="w-full">
+      <Section className="flex w-full flex-col overflow-hidden">
         <div className="space-y-1">
           <span className="text-xs font-semibold text-blue-400">Advanced Settings</span>
           <div className="flex items-center space-x-2">
@@ -116,7 +116,7 @@ export const ScenariosBLMCalibration = (): JSX.Element => {
           </div>
         </div>
 
-        <div className="relative mt-1 flex max-h-[calc(100vh-200px)] min-h-0 w-full flex-grow flex-col overflow-y-auto overflow-x-hidden">
+        <div className="relative flex max-h-full  w-full flex-grow flex-col overflow-y-auto overflow-x-hidden">
           {editable && (
             <div className="mt-9 flex items-center space-x-3">
               <p className="font-heading text-xs uppercase text-white">

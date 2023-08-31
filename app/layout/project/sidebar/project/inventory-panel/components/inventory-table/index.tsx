@@ -64,7 +64,7 @@ const InventoryTable = ({
               </th>
             </tr>
           </thead>
-          <tbody className="block max-h-[calc(100vh-430px)] divide-y divide-gray-400 overflow-y-auto overflow-x-hidden pl-1 align-baseline text-sm">
+          <tbody className="block divide-y divide-gray-400 overflow-y-auto overflow-x-hidden pl-1 align-baseline text-sm">
             {data.map((item) => (
               <RowItem
                 key={item.id}
