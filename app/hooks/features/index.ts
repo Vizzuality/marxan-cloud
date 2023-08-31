@@ -219,9 +219,6 @@ export function useSelectedFeatures(
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
-      params: {
-        omitFields: 'properties',
-      },
     }).then(({ data }) => data);
 
   return useQuery(['selected-features', sid], fetchFeatures, {
@@ -537,13 +534,13 @@ export function useSaveSelectedFeatures({
         Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
-    });
+    }).then(({ data }) => data);
   };
 
   return useMutation(saveFeature, {
     onSuccess: (data, variables, context) => {
       const { id } = variables;
-      queryClient.setQueryData(['selected-features', id], data);
+      queryClient.setQueryData(['selected-features', id], { data: data?.data });
 
       console.info('Succces', data, variables, context);
     },
