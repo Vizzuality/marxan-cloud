@@ -195,7 +195,7 @@ export const ProjectMap = (): JSX.Element => {
   useEffect(() => {
     setBounds({
       bbox: BBOX,
-      options: { padding: 50 },
+      options: { padding: { top: 50, right: 50, bottom: 50, left: 575 } },
       viewportOptions: { transitionDuration: 0 },
     });
   }, [BBOX]);
