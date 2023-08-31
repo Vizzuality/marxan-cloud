@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
@@ -24,7 +25,8 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
   const [confirmationTarget, setConfirmationTarget] = useState(null);
   const [confirmationFPF, setConfirmationFPF] = useState(null);
 
-  const { push, query } = useRouter();
+  const queryClient = useQueryClient();
+  const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const dispatch = useDispatch();
@@ -188,20 +190,22 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
         }),
       };
 
-      // // Save current features
       selectedFeaturesMutation.mutate(
         {
           id: `${sid}`,
           data,
         },
         {
+          onSuccess: async () => {
+            await queryClient.invalidateQueries(['selected-features', sid]);
+          },
           onSettled: () => {
             setSubmitting(false);
           },
         }
       );
     },
-    [sid, selectedFeaturesData, selectedFeaturesMutation]
+    [sid, queryClient, selectedFeaturesData, selectedFeaturesMutation]
   );
 
   const toggleSeeOnMap = useCallback(
