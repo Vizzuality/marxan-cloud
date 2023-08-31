@@ -61,7 +61,7 @@ export const ProjectMap = (): JSX.Element => {
   const { query } = useRouter();
 
   const { pid, tab } = query as { pid: string; tab: string };
-  const { data = {} } = useProject(pid);
+  const { data } = useProject(pid);
 
   const {
     id,

@@ -98,7 +98,7 @@ export const ScenariosEditMap = (): JSX.Element => {
     layerSettings,
   } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const { data = {} } = useProject(pid);
+  const { data } = useProject(pid);
   const { bbox } = data;
 
   const BBOX = useBBOX({
