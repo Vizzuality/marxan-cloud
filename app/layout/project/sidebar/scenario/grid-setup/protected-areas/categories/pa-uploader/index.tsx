@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
@@ -36,6 +37,7 @@ export interface ProtectedAreaUploaderProps {
 export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   input,
 }: ProtectedAreaUploaderProps) => {
+  const queryClient = useQueryClient();
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
   const formRef = useRef(null);
@@ -67,7 +69,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onDropAccepted = async (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
+  const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     setLoading(true);
     const f = acceptedFiles[0];
 
@@ -76,16 +78,6 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
     setSuccessFile({ ...successFile, name: f.name });
     saveFileData(data);
-    addToast(
-      'success-upload-protected-area',
-      <>
-        <h2 className="font-medium">Success!</h2>
-        <p className="text-sm">Protected area uploaded</p>
-      </>,
-      {
-        level: 'success',
-      }
-    );
   };
 
   const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
@@ -125,9 +117,21 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     uploadPAMutation.mutate(
       { id: `${sid}`, data: fileData },
       {
-        onSuccess: () => {
-          setLoading(false);
+        onSuccess: async () => {
           setSuccessFile({ ...successFile });
+
+          await queryClient.invalidateQueries(['protected-areas']);
+
+          addToast(
+            'success-upload-protected-area',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">Protected area uploaded</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
 
           dispatch(setCache(Date.now()));
           setOpened(false);
@@ -135,7 +139,6 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         onError: ({ response }) => {
           const { errors } = response.data;
 
-          setLoading(false);
           setSuccessFile(null);
 
           addToast(
@@ -152,6 +155,9 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
               level: 'error',
             }
           );
+        },
+        onSettled: () => {
+          setLoading(false);
         },
       }
     );
