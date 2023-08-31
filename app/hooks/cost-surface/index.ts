@@ -1,4 +1,4 @@
-import { useQuery, QueryObserverOptions } from 'react-query';
+import { useQuery, QueryObserverOptions, useMutation } from 'react-query';
 
 import { useSession } from 'next-auth/react';
 
@@ -16,17 +16,17 @@ export function useProjectCostSurfaces<T = CostSurface[]>(
 
   const mockData: CostSurface[] = [
     {
-      id: 'Cost Surface Rwanda A',
+      id: 'gfehrtf22534geyg',
       name: 'Cost Surface Rwanda A',
       scenarioUsageCount: 3,
     },
     {
-      id: 'Cost Surface Rwanda B',
+      id: 'rfjghhrtersdtbkjshfw',
       name: 'Cost Surface Rwanda B',
       scenarioUsageCount: 0,
     },
     {
-      id: 'Cost Surface Rwanda C',
+      id: '23275455HGVVCMSJHDFk',
       name: 'Cost Surface Rwanda C',
       scenarioUsageCount: 0,
     },
@@ -47,4 +47,33 @@ export function useProjectCostSurfaces<T = CostSurface[]>(
     enabled: Boolean(pid),
     ...queryOptions,
   });
+}
+
+export function useEditCostSurface() {
+  const { data: session } = useSession();
+
+  const editCostSurface = ({
+    costSurfaceId,
+    projectId,
+    body = {},
+  }: {
+    costSurfaceId: CostSurface['id'];
+    projectId: Project['id'];
+    body: Record<string, unknown>;
+  }) => {
+    // TODO: change this to the correct endpoint
+    return API.patch<CostSurface>(
+      `projects/${projectId}/cost-surfaces/${costSurfaceId}`,
+      {
+        ...body,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }
+    );
+  };
+
+  return useMutation(editCostSurface);
 }

@@ -59,7 +59,7 @@ const ActionsMenu = ({
           size="narrow"
           onDismiss={() => handleModal('edit', false)}
         >
-          <EditModal featureId={item.id} handleModal={handleModal} />
+          <EditModal costSurfaceId={item.id} handleModal={handleModal} />
         </Modal>
       </li>
       {isDeletable && (
@@ -78,7 +78,7 @@ const ActionsMenu = ({
             <span>Delete</span>
           </button>
           <Modal
-            id="delete-feature-modal"
+            id="delete-cost-surface-modal"
             dismissable
             open={modalState.delete}
             size="narrow"

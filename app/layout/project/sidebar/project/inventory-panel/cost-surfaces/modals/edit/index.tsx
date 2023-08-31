@@ -1,42 +1,26 @@
-import React, {
-  ElementRef,
-  useCallback,
-  useRef,
-  InputHTMLAttributes,
-  useState,
-  useEffect,
-} from 'react';
+import React, { useCallback, useRef } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
 import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
-import {
-  useEditFeatureTag,
-  useEditFeature,
-  useProjectFeatures,
-  useDeleteFeatureTag,
-} from 'hooks/features';
-import { useProjectTags } from 'hooks/projects';
+import { useEditCostSurface, useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
-import Icon from 'components/icon/component';
-import { Feature } from 'types/api/feature';
+import { CostSurface } from 'types/api/cost-surface';
 
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
-
-export type FormValues = { featureClassName: Feature['featureClassName']; tag: Feature['tag'] };
+export type FormValues = { name: CostSurface['name'] };
 
 const EditModal = ({
-  featureId,
+  costSurfaceId,
   handleModal,
 }: {
-  featureId: Feature['id'];
+  costSurfaceId: CostSurface['id'];
   handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
   const queryClient = useQueryClient();
@@ -46,83 +30,59 @@ const EditModal = ({
 
   const formRef = useRef<FormProps<FormValues>['form']>(null);
 
-  const featureQuery = useProjectFeatures(pid, featureId);
-  const editFeatureTagMutation = useEditFeatureTag();
-  const deleteFeatureTagMutation = useDeleteFeatureTag();
-  const editFeatureMutation = useEditFeature();
+  const allProjectCostSurfacesQuery = useProjectCostSurfaces(pid, {});
+
+  const editCostSurfaceMutation = useEditCostSurface();
 
   const onEditSubmit = useCallback(
     (values: FormValues) => {
-      const { featureClassName, tag } = values;
-      const editFeaturePromise = editFeatureMutation.mutateAsync({
-        fid: featureId,
-        body: {
-          featureClassName,
+      const { name } = values;
+
+      editCostSurfaceMutation.mutate(
+        {
+          costSurfaceId,
+          projectId: pid,
+          body: {
+            name,
+          },
         },
-      });
-
-      const editFeatureTagPromise = () => {
-        if (values.tag) {
-          return editFeatureTagMutation.mutateAsync({
-            projectId: pid,
-            featureId,
-            data: {
-              tagName: tag,
-            },
-          });
-        } else {
-          return deleteFeatureTagMutation.mutateAsync({
-            projectId: pid,
-            featureId,
-          });
+        {
+          onSuccess: async () => {
+            await queryClient.invalidateQueries(['cost-surfaces', pid]);
+            handleModal('edit', false);
+            addToast(
+              'success-edit-cost-surfaces',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Cost surface edited</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          },
+          onError: () => {
+            addToast(
+              'error-edit-cost-surfaces',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">It is not possible to edit this cost surface</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
         }
-      };
-
-      Promise.all([editFeaturePromise, editFeatureTagPromise()])
-        .then(async () => {
-          await queryClient.invalidateQueries(['all-features', pid]);
-          handleModal('edit', false);
-
-          addToast(
-            'success-edit-feature',
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Features edited</p>
-            </>,
-            {
-              level: 'success',
-            }
-          );
-        })
-        .catch(() => {
-          addToast(
-            'error-edit-feature',
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">It is not possible to edit this feature</p>
-            </>,
-            {
-              level: 'error',
-            }
-          );
-        });
+      );
     },
-    [
-      addToast,
-      deleteFeatureTagMutation,
-      editFeatureTagMutation,
-      editFeatureMutation,
-      featureId,
-      handleModal,
-      pid,
-      queryClient,
-    ]
+    [addToast, costSurfaceId, editCostSurfaceMutation, handleModal, pid, queryClient]
   );
 
   return (
     <FormRFF<FormValues>
       initialValues={{
-        featureClassName: featureQuery.data?.[0]?.featureClassName,
+        name: allProjectCostSurfacesQuery.data?.[0]?.name,
       }}
       ref={formRef}
       onSubmit={onEditSubmit}
@@ -135,12 +95,9 @@ const EditModal = ({
               <h2 className="font-heading font-bold text-black">Edit cost surface</h2>
 
               <div>
-                <FieldRFF<string>
-                  name="featureClassName"
-                  validate={composeValidators([{ presence: true }])}
-                >
+                <FieldRFF<string> name="name" validate={composeValidators([{ presence: true }])}>
                   {(fprops) => (
-                    <Field id="featureClassName" {...fprops}>
+                    <Field id="name" {...fprops}>
                       <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
                         Name
                       </Label>
