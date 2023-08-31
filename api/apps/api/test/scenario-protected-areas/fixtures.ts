@@ -110,11 +110,15 @@ export const getFixtures = async () => {
       ]);
     },
     ThenItContainsListOfCustomProtectedAreas: async (response: any) => {
-      expect(response.data).toHaveLength(1);
-      expect(response.data[0].attributes.fullName).toBe(
+      response.data.sort()
+      expect(response.data).toHaveLength(2);
+      expect(response.data[0].attributes.kind).toBe(
+        'global',
+      );
+      expect(response.data[1].attributes.fullName).toBe(
         'custom protected area',
       );
-      expect(response.data[0].attributes.scenarioUsageCount).toBe(1);
+      expect(response.data[1].attributes.scenarioUsageCount).toBe(1);
     },
     GivenCustomProtectedAreaWasAddedToProject: async () => {
       const ids: { id: string }[] = await wdpa.query(
