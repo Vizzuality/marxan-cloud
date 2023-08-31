@@ -192,7 +192,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
         'status',
         'designation',
         'scenarioUsageCount',
-        'kind'
+        'isCustom'
       ],
       keyForAttribute: 'camelCase',
     };
@@ -317,7 +317,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
      */
     const projectGlobalProtectedAreasData = await this.selectionGetService.getGlobalProtectedAreas(project);
     const projectGlobalProtectedAreas = await this.repository.find({where: {id: In(Object.values(projectGlobalProtectedAreasData.areas).flat())}})
-    projectGlobalProtectedAreas.map((protectedArea) => protectedArea.kind = 'global')
+    projectGlobalProtectedAreas.map((protectedArea) => protectedArea.isCustom = false)
 
     const projectCustomProtectedAreas = await this.repository
       .find({
@@ -333,7 +333,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
           ...protectedArea,
           scenarioUsageCount:
             protectedAreaUsedInProjectScenarios[protectedArea.id]?.length ?? 0,
-          kind: 'project',
+          isCustom: true,
         })),
       );
 
