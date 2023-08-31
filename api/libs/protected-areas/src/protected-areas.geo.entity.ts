@@ -111,4 +111,9 @@ export class ProtectedArea extends TimeUserEntityMetadata {
    * How many scenarios actively use this protected area.
    */
   scenarioUsageCount?: number;
+
+  /**
+   * Kind - global or project.
+   */
+  kind?: string;
 }

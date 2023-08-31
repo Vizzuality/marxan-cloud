@@ -1,9 +1,9 @@
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {BadRequestException, forwardRef, Inject, Injectable, Logger} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
+import {In, IsNull, Not, Repository, SelectQueryBuilder} from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
 import { ProtectedArea } from '@marxan/protected-areas';
@@ -39,6 +39,8 @@ import {
   featureNotDeletable,
   featureNotFound,
 } from '@marxan-api/modules/geo-features/geo-features.service';
+import { ProjectSnapshot } from "@marxan/projects";
+import { SelectionGetService } from "@marxan-api/modules/scenarios/protected-area/getter/selection-get.service";
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -114,6 +116,8 @@ export class ProtectedAreasCrudService extends AppBaseService<
     protected readonly repository: Repository<ProtectedArea>,
     @InjectRepository(Scenario)
     protected readonly scenarioRepository: Repository<Scenario>,
+    @Inject(forwardRef(() => SelectionGetService))
+    private readonly selectionGetService: SelectionGetService,
     private readonly projectAclService: ProjectAclService,
   ) {
     super(repository, 'protected_area', 'protected_areas', {
@@ -188,6 +192,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
         'status',
         'designation',
         'scenarioUsageCount',
+        'kind'
       ],
       keyForAttribute: 'camelCase',
     };
@@ -278,7 +283,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
       .getMany();
   }
 
-  async listForProject(projectId: string) {
+  async listForProject(project: ProjectSnapshot) {
     /**
      * Get a list of protected areas used in project scenarios and assemble this
      * into a map of protected area ids to lists of the scenarios where each
@@ -287,7 +292,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
     const protectedAreaUsedInProjectScenarios = await this.scenarioRepository
       .find({
         where: {
-          projectId,
+          projectId: project.id,
           protectedAreaFilterByIds: Not(IsNull()),
         },
       })
@@ -310,10 +315,14 @@ export class ProtectedAreasCrudService extends AppBaseService<
      * and add a count of the number of scenarios where each protected area is
      * used.
      */
+    const projectGlobalProtectedAreasData = await this.selectionGetService.getGlobalProtectedAreas(project);
+    const projectGlobalProtectedAreas = await this.repository.find({where: {id: In(Object.values(projectGlobalProtectedAreasData.areas).flat())}})
+    projectGlobalProtectedAreas.map((protectedArea) => protectedArea.kind = 'global')
+
     const projectCustomProtectedAreas = await this.repository
       .find({
         where: {
-          projectId,
+          projectId: project.id,
         },
         order: {
           fullName: 'ASC',
@@ -324,15 +333,18 @@ export class ProtectedAreasCrudService extends AppBaseService<
           ...protectedArea,
           scenarioUsageCount:
             protectedAreaUsedInProjectScenarios[protectedArea.id]?.length ?? 0,
+          kind: 'project',
         })),
       );
+
+    const allProjectProtectedAreas = [...projectGlobalProtectedAreas, ...projectCustomProtectedAreas];
 
     const serializer = new JSONAPISerializer.Serializer(
       'protected_areas',
       this.serializerConfig,
     );
 
-    return serializer.serialize(projectCustomProtectedAreas);
+    return serializer.serialize(allProjectProtectedAreas);
   }
 
   public async updateProtectedAreaName(

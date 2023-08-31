@@ -34,7 +34,7 @@ export class ProjectProtectedAreasService {
     const project = await this.projectsCrud.getById(projectId);
 
     const projectCustomAreas = await this.protectedAreasCrudService.listForProject(
-      project.id,
+      project,
     );
 
     return right(projectCustomAreas);
