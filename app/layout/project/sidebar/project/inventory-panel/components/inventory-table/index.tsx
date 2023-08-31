@@ -50,7 +50,7 @@ const InventoryTable = ({
                   <th
                     key={column.name}
                     className={cn({
-                      'flex-1 border pl-2': true,
+                      'flex-1 pl-2': true,
                       [column.className]: !!column.className,
                     })}
                   >

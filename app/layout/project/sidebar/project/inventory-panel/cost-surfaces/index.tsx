@@ -7,15 +7,18 @@ import { setSelectedCostSurfaces as setVisibleCostSurfaces } from 'store/slices/
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 
+import CostSurfacesBulkActionMenu from 'layout/project/sidebar/project/inventory-panel/cost-surfaces/bulk-action-menu';
 import ActionsMenu from 'layout/project/sidebar/project/inventory-panel/features/actions-menu';
-import FeaturesBulkActionMenu from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu';
 import { CostSurface } from 'types/api/cost-surface';
 
 import InventoryTable, { type DataItem } from '../components/inventory-table';
 
-const COST_SURFACE_TABLE_COLUMNS = {
-  name: 'Name',
-};
+const COST_SURFACE_TABLE_COLUMNS = [
+  {
+    name: 'name',
+    text: 'Name',
+  },
+];
 
 const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -28,7 +31,7 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
 
   const [selectedCostSurfaceIds, setSelectedCostSurfaceIds] = useState<CostSurface['id'][]>([]);
   const [filters, setFilters] = useState<Parameters<typeof useProjectCostSurfaces>[1]>({
-    sort: COST_SURFACE_TABLE_COLUMNS.name,
+    sort: COST_SURFACE_TABLE_COLUMNS[0].name,
   });
 
   const allProjectCostSurfacesQuery = useProjectCostSurfaces(
@@ -126,7 +129,7 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
         ActionsComponent={ActionsMenu}
       />
       {displayBulkActions && (
-        <FeaturesBulkActionMenu selectedFeaturesIds={selectedCostSurfaceIds} />
+        <CostSurfacesBulkActionMenu selectedCostSurfacesIds={selectedCostSurfaceIds} />
       )}
     </div>
   );

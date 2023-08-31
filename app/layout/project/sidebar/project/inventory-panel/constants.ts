@@ -1,13 +1,13 @@
 import { NavigationInventoryTabs } from 'layout/project/navigation/types';
 
-import CostSurfaceTable from './cost-surface';
-import CostSurfaceInfo from './cost-surface/info';
+import CostSurfaceTable from './cost-surfaces';
+import CostSurfaceInfo from './cost-surfaces/info';
 import FeaturesTable from './features';
 import FeaturesInfo from './features/info';
 import FeatureUploadModal from './features/modals/upload';
-import ProtectedAreasTable from './protected-areas';
-import ProtectedAreasFooter from './protected-areas/footer';
 import { InventoryPanel } from './types';
+import ProtectedAreasTable from './wdpas';
+import ProtectedAreasFooter from './wdpas/footer';
 
 export const INVENTORY_TABS = {
   'protected-areas': {
