@@ -51,7 +51,7 @@ const InventoryTable = ({
                     key={column.name}
                     className={cn({
                       'flex-1 pl-2': true,
-                      'flex flex-1 justify-start py-2 pl-14': column.name === 'tag',
+                      [column.className]: !!column.className,
                     })}
                   >
                     <HeaderItem

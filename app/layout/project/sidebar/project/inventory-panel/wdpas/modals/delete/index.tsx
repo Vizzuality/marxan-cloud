@@ -32,19 +32,19 @@ const DeleteModal = ({
 
   const allProjectWDPAsQuery = useProjectWDPAs(pid, {});
 
-  const selectedPAs = useMemo(() => {
+  const selectedWDPAs = useMemo(() => {
     return allProjectWDPAsQuery.data?.filter(({ id }) => selectedWDPAIds.includes(id));
   }, [allProjectWDPAsQuery.data, selectedWDPAIds]);
 
-  const PAsNames = selectedPAs.map(({ fullName }) => fullName);
+  const WDPAsNames = selectedWDPAs.map(({ fullName }) => fullName);
 
   // ? the user will be able to delete the protected areas only if they are not being used by any scenario.
-  const haveScenarioAssociated = selectedPAs.some(({ scenarioUsageCount }) =>
+  const haveScenarioAssociated = selectedWDPAs.some(({ scenarioUsageCount }) =>
     Boolean(scenarioUsageCount)
   );
 
   const handleBulkDelete = useCallback(() => {
-    const deletableWDPAsIds = selectedPAs.map(({ id }) => id);
+    const deletableWDPAsIds = selectedWDPAs.map(({ id }) => id);
 
     bulkDeleteWDPAFromProject(pid, deletableWDPAsIds, session)
       .then(async () => {
@@ -75,7 +75,7 @@ const DeleteModal = ({
           }
         );
       });
-  }, [selectedPAs, addToast, onDismiss, pid, queryClient, session]);
+  }, [selectedWDPAs, addToast, onDismiss, pid, queryClient, session]);
 
   return (
     <div className="flex flex-col space-y-5 px-8 py-1">
@@ -90,14 +90,14 @@ const DeleteModal = ({
               This action cannot be undone.
             </span>
             <ul>
-              {PAsNames.map((name) => (
+              {WDPAsNames.map((name) => (
                 <li key={name}>{name}</li>
               ))}
             </ul>
           </div>
         ) : (
           <span>
-            Are you sure you want to delete &quot;{PAsNames[0]}&quot; protected area? <br />
+            Are you sure you want to delete &quot;{WDPAsNames[0]}&quot; protected area? <br />
             This action cannot be undone.
           </span>
         )}
