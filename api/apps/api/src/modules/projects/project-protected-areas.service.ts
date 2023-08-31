@@ -1,6 +1,6 @@
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { Injectable } from '@nestjs/common';
-import { Either, left, right } from 'fp-ts/Either';
+import {Either, isLeft, left, right} from 'fp-ts/Either';
 
 import { ProjectsCrudService } from './projects-crud.service';
 import { ProjectAclService } from '../access-control/projects-acl/project-acl.service';
@@ -10,6 +10,8 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Repository } from 'typeorm';
 import { projectNotFound } from './projects.service';
 import { ProtectedAreasCrudService } from '../protected-areas/protected-areas-crud.service';
+import { GetProjectQuery } from "@marxan/projects";
+import { QueryBus } from "@nestjs/cqrs";
 
 @Injectable()
 export class ProjectProtectedAreasService {
@@ -19,6 +21,7 @@ export class ProjectProtectedAreasService {
     private readonly projectAclService: ProjectAclService,
     private readonly projectsCrud: ProjectsCrudService,
     private readonly protectedAreasCrudService: ProtectedAreasCrudService,
+    private readonly queryBus: QueryBus,
   ) {}
 
   async listForProject(
@@ -31,10 +34,16 @@ export class ProjectProtectedAreasService {
       return left(forbiddenError);
     }
 
-    const project = await this.projectsCrud.getById(projectId);
+    const projectResponse = await this.queryBus.execute(
+      new GetProjectQuery(projectId, userId),
+    );
+
+    if (isLeft(projectResponse)) {
+      return left(projectNotFound);
+    }
 
     const projectCustomAreas = await this.protectedAreasCrudService.listForProject(
-      project,
+      projectResponse.right,
     );
 
     return right(projectCustomAreas);

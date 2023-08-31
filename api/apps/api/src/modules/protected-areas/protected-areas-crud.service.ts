@@ -25,6 +25,7 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IUCNCategory } from '@marxan/iucn';
 import { isDefined } from '@marxan/utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
+import { groupBy, intersection } from 'lodash';
 import { groupBy } from 'lodash';
 import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import { Either, left, right } from 'fp-ts/Either';
@@ -316,8 +317,18 @@ export class ProtectedAreasCrudService extends AppBaseService<
      * used.
      */
     const projectGlobalProtectedAreasData = await this.selectionGetService.getGlobalProtectedAreas(project);
-    const projectGlobalProtectedAreas = await this.repository.find({where: {id: In(Object.values(projectGlobalProtectedAreasData.areas).flat())}})
-    projectGlobalProtectedAreas.map((protectedArea) => protectedArea.isCustom = false)
+
+    const selectedProjectGlobalProtectedAreasIds = intersection(Object.values(projectGlobalProtectedAreasData.areas).flat(), Object.keys(protectedAreaUsedInProjectScenarios))
+
+    const projectGlobalProtectedAreas = await this.repository.find({where: {id: In(selectedProjectGlobalProtectedAreasIds)}}).then((protectedAreas) =>
+      protectedAreas.map((protectedArea) => ({
+        ...protectedArea,
+        scenarioUsageCount:
+          protectedAreaUsedInProjectScenarios[protectedArea.id]?.length ?? 0,
+        isCustom: false,
+      })),
+    );
+
 
     const projectCustomProtectedAreas = await this.repository
       .find({
