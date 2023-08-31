@@ -1,6 +1,7 @@
 import Checkbox from 'components/forms/checkbox';
 import Loading from 'components/loading';
 import { ScrollArea } from 'components/scroll-area';
+import { cn } from 'utils/cn';
 
 import HeaderItem from './header-item';
 import RowItem from './row-item';
@@ -44,29 +45,24 @@ const InventoryTable = ({
                   onChange={onSelectAll}
                 />
               </th>
-              {columns['name'] && (
-                <th className="flex-1 pl-2">
-                  <HeaderItem
-                    text={'Name'}
-                    name={'name'}
-                    columns={columns}
-                    sorting={sorting}
-                    onClick={onSortChange}
-                  />
-                </th>
-              )}
-              {columns['tag'] && (
-                <th className="flex flex-1 justify-start py-2 pl-14">
-                  <HeaderItem
-                    className="justify-center"
-                    text={'Type'}
-                    name={'tag'}
-                    columns={columns}
-                    sorting={sorting}
-                    onClick={onSortChange}
-                  />
-                </th>
-              )}
+              {columns.map((column) => {
+                return (
+                  <th
+                    key={column.name}
+                    className={cn({
+                      'flex-1 border pl-2': true,
+                      [column.className]: !!column.className,
+                    })}
+                  >
+                    <HeaderItem
+                      text={column.text}
+                      name={column.name}
+                      sorting={sorting}
+                      onClick={onSortChange}
+                    />
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <ScrollArea className="h-full">

@@ -32,7 +32,12 @@ const RowItem = ({
           disabled={!isCustom}
         />
       </td>
-      <td className="px-1 pb-2 pt-5">
+      <td
+        className={cn({
+          'flex flex-col px-1 pb-2 pt-5': true,
+          'w-52': tag,
+        })}
+      >
         <span className="inline-flex">{name}</span>
         <div className="mt-1.5 text-xs text-gray-300">
           Currently in use in

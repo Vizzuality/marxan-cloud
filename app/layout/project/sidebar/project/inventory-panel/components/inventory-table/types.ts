@@ -14,8 +14,10 @@ export type InventoryTable = {
   data: DataItem[];
   noDataMessage: string;
   columns: {
-    [key: string]: string;
-  };
+    name: string;
+    text: string;
+    className?: string;
+  }[];
   sorting: string;
   selectedIds: string[];
   onSortChange: (field: string) => void;
