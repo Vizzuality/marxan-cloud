@@ -77,14 +77,15 @@ const ProjectForm = ({
   }, [dispatch]);
 
   const onSubmit = (values: NewProjectFields) => {
-    const { planningAreaGridId } = values;
-    delete values.PAOptionSelected;
-    delete values.planningAreaGridId;
+    const v = { ...values };
+    const { planningAreaGridId } = v;
+    delete v.PAOptionSelected;
+    delete v.planningAreaGridId;
 
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the user
     const data = {
-      ...values,
+      ...v,
       ...(planningAreaGridId && { planningAreaId: planningAreaGridId }),
       ...(planningAreaGridId && { planningUnitGridShape: 'from_shapefile' }),
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
