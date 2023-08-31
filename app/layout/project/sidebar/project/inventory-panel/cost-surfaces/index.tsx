@@ -7,8 +7,8 @@ import { setSelectedCostSurfaces as setVisibleCostSurfaces } from 'store/slices/
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 
+import ActionsMenu from 'layout/project/sidebar/project/inventory-panel/cost-surfaces/actions-menu';
 import CostSurfacesBulkActionMenu from 'layout/project/sidebar/project/inventory-panel/cost-surfaces/bulk-action-menu';
-import ActionsMenu from 'layout/project/sidebar/project/inventory-panel/features/actions-menu';
 import { CostSurface } from 'types/api/cost-surface';
 
 import InventoryTable, { type DataItem } from '../components/inventory-table';

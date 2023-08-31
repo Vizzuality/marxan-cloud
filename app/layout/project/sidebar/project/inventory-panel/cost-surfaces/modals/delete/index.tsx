@@ -39,15 +39,15 @@ const DeleteModal = ({
   }, [allProjectCostSurfacesQuery.data, selectedCostSurfacesIds]);
 
   const costSurfaceNames = selectedCostSurfaces.map(({ name }) => name);
-  // ? the user will be able to delete the features only if they are not being used by any scenario.
+  // ? the user will be able to delete the cost surfaces only if they are not being used by any scenario.
   const haveScenarioAssociated = selectedCostSurfaces.some(({ scenarioUsageCount }) =>
     Boolean(scenarioUsageCount)
   );
 
   const handleBulkDelete = useCallback(() => {
-    const deletableFeatureIds = selectedCostSurfaces.map(({ id }) => id);
+    const deletableCostSurfaceIds = selectedCostSurfaces.map(({ id }) => id);
 
-    bulkDeleteCostSurfaceFromProject(pid, deletableFeatureIds, session)
+    bulkDeleteCostSurfaceFromProject(pid, deletableCostSurfaceIds, session)
       .then(async () => {
         await queryClient.invalidateQueries(['cost-surfaces', pid]);
 
@@ -57,7 +57,7 @@ const DeleteModal = ({
           'delete-bulk-project-cost-surfaces',
           <>
             <h2 className="font-medium">Success</h2>
-            <p className="text-sm">The features were deleted successfully.</p>
+            <p className="text-sm">The cost surfaces were deleted successfully.</p>
           </>,
           {
             level: 'success',
