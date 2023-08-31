@@ -113,7 +113,7 @@ export class ProtectedArea extends TimeUserEntityMetadata {
   scenarioUsageCount?: number;
 
   /**
-   * Kind - global or project.
+   * If protected area is global or custom for project.
    */
-  kind?: string;
+  isCustom?: boolean;
 }
