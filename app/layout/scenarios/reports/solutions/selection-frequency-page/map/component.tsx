@@ -30,11 +30,11 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
 
   const { query } = useRouter();
 
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const dispatch = useDispatch();
 
-  const { data = {} } = useProject(pid);
+  const { data } = useProject(pid);
   const { bbox } = data;
   const BBOX = useBBOX({
     bbox,

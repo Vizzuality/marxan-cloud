@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
 
-import Search, { SearchProps } from './component';
+import Search, { SearchProps } from './';
 
 export default {
   title: 'Components/Search',

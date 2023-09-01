@@ -20,7 +20,7 @@ export function useWDPACategories({
 }: UseWDPACategoriesProps) {
   const { data: session } = useSession();
 
-  const query = useQuery(
+  return useQuery(
     ['protected-areas', adminAreaId, customAreaId],
     async () =>
       WDPA.request({
@@ -37,20 +37,12 @@ export function useWDPACategories({
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
-      }),
+      }).then(({ data }) => data),
     {
       enabled: !!adminAreaId || !!customAreaId,
+      select: ({ data }) => data,
     }
   );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data?.data,
-    };
-  }, [query, data?.data?.data]);
 }
 
 export function useSaveScenarioProtectedAreas({

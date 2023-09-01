@@ -99,7 +99,7 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
   const { data: session } = useSession();
 
   const onDownloadUsersData = useCallback(async () => {
-    const { data: blob, status } = await DOWNLOADS.request({
+    const { data: blob, status } = await DOWNLOADS.request<ArrayBuffer>({
       url: '/users/csv',
       responseType: 'arraybuffer',
       headers: {

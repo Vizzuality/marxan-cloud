@@ -1,50 +1,40 @@
-import React from 'react';
+import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 import { withProject } from 'hoc/projects';
 
-import Header from 'layout/header';
-import Help from 'layout/help/button';
-import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
-import ProjectHeader from 'layout/projects/show/header';
+import ProjectLayout from 'layout/project';
+import Breadcrumbs from 'layout/project/navigation/breadcrumbs';
+import Sidebar from 'layout/project/sidebar';
+import InventoryProjectHeader from 'layout/project/sidebar/project/header';
+import InventoryPanel from 'layout/project/sidebar/project/inventory-panel';
+import ScenariosList from 'layout/project/sidebar/project/scenarios-list';
 import ProjectMap from 'layout/projects/show/map';
-import ProjectScenarios from 'layout/projects/show/scenarios';
 import ProjectStatus from 'layout/projects/show/status';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
-import Wrapper from 'layout/wrapper';
 
 export const getServerSideProps = withProtection(withUser(withProject()));
 
-const ShowProjectsPage: React.FC = () => {
+const ShowProjectsPage = (): JSX.Element => {
+  const { query } = useRouter();
+  const { tab } = query as { tab: string };
+
   return (
     <Protected>
       <ProjectTitle title="" />
-
       <MetaIcons />
-
-      <main className="flex h-screen w-screen flex-col">
-        <Header size="base" />
-
-        <DocumentationLink />
-        <Help />
-
+      <ProjectLayout className="relative z-10">
+        <Sidebar className="flex-col">
+          <Breadcrumbs />
+          <InventoryProjectHeader />
+          {tab && <InventoryPanel />}
+          {!tab && <ScenariosList />}
+        </Sidebar>
         <ProjectStatus />
-
-        <div className="pt-2.5">
-          <ProjectHeader />
-        </div>
-
-        <div className="overflow-hidden py-5 md:flex-grow">
-          <Wrapper>
-            <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-12">
-              <ProjectScenarios />
-              <ProjectMap />
-            </div>
-          </Wrapper>
-        </div>
-      </main>
+        <ProjectMap />
+      </ProjectLayout>
     </Protected>
   );
 };

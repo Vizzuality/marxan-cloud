@@ -35,29 +35,35 @@ import CountryRegionSelector from 'layout/projects/new/form/country-region-selec
 import PlanningAreaGridUploader from 'layout/projects/new/form/planning-area-grid-uploader';
 import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
 import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
-import ProjectNewMap from 'layout/projects/new/map';
 
 import REGION_PU from 'images/info-buttons/img_planning_region_grid.png';
 
 import { DEFAULT_AREA, PA_OPTIONS } from './constants';
-import ProjectFormProps from './types';
 
-const ProjectForm: React.FC<ProjectFormProps> = () => {
+export type NewProjectFields = {
+  PAOptionSelected: string;
+  countryId: string;
+  planningAreaGridId: string;
+  planningUnitAreakm2: number;
+  planningUnitGridShape: string;
+  planningAreaId: string;
+  adminAreaLevel1Id: string;
+  adminAreaLevel2Id: string;
+};
+
+const ProjectForm = ({
+  onFormUpdate,
+}: {
+  onFormUpdate: (formValues: NewProjectFields) => void;
+}): JSX.Element => {
   const { addToast } = useToasts();
   const { push } = useRouter();
   const plausible = usePlausible();
-
   const [PAOptionSelected, setPAOptionSelected] = useState('');
-
   const planningAreaScrollRef = useRef(null);
-
   const { user } = useMe();
-
   const { data: organizationsData } = useOrganizations();
-
   const dispatch = useDispatch();
-
-  // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
 
   useEffect(() => {
@@ -70,19 +76,20 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     };
   }, [dispatch]);
 
-  const onSubmit = (values) => {
-    const { planningAreaGridId } = values;
-    delete values.PAOptionSelected;
-    delete values.planningAreaGridId;
+  const onSubmit = (values: NewProjectFields) => {
+    const v = { ...values };
+    const { planningAreaGridId } = v;
+    delete v.PAOptionSelected;
+    delete v.planningAreaGridId;
 
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the user
     const data = {
-      ...values,
+      ...v,
       ...(planningAreaGridId && { planningAreaId: planningAreaGridId }),
       ...(planningAreaGridId && { planningUnitGridShape: 'from_shapefile' }),
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
-    };
+    } satisfies NewProjectFields & { organizationId: string };
 
     saveProjectMutation.mutate(
       { data },
@@ -161,7 +168,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
     const registeredFields = form.getRegisteredFields();
     registeredFields.forEach((f) => {
-      const omitFields = ['name', 'description', 'planningUnitGridShape'];
+      const omitFields = ['name', 'description', 'planningUnitGridShape', 'PAOptionSelected'];
       if (!omitFields.includes(f)) {
         form.change(f, null);
       }
@@ -174,7 +181,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
     const registeredFields = form.getRegisteredFields();
     registeredFields.forEach((f) => {
-      const omitFields = ['name', 'description'];
+      const omitFields = ['name', 'description', 'PAOptionSelected'];
       if (!omitFields.includes(f)) {
         form.change(f, null);
       }
@@ -187,259 +194,240 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   }, [PAOptionSelected]);
 
   return (
-    <FormRFF
+    <FormRFF<NewProjectFields>
       onSubmit={onSubmit}
       initialValues={{
         ...DEFAULT_AREA,
       }}
     >
-      {({ form, handleSubmit, values }) => (
-        <form
-          onSubmit={handleSubmit}
-          autoComplete="off"
-          className="flex w-full flex-grow flex-col justify-between overflow-hidden"
-        >
-          <div className="grid h-full grid-cols-1 gap-0 overflow-hidden rounded-3xl bg-gray-700 md:grid-cols-2">
-            <HelpBeacon
-              id="project-new-overview"
-              title="Basic information"
-              subtitle="New project overview"
-              content={
-                <div className="space-y-2">
-                  <p>
-                    To create a new project you need to add a name, a description, a planning region
-                    and a planning grid.
-                  </p>
-                  <p>
-                    You will be able to create a planning region and grid from scratch following
-                    some simple steps or you can upload your own file.
-                  </p>
-                </div>
-              }
-              modifiers={['flip']}
-              tooltipPlacement="right"
-            >
-              <div id="project-new-form" className="flex flex-grow flex-col overflow-hidden">
-                <div className="relative flex min-h-0 flex-grow flex-col">
-                  <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
+      {({ form, handleSubmit, values }) => {
+        onFormUpdate(values);
 
-                  <div className="flex flex-grow flex-col overflow-auto p-8">
-                    <div>
-                      <h1 className="max-w-xs font-heading text-2xl text-white">
-                        Name your project and define a planning area:
-                      </h1>
-
-                      {/* NAME */}
-                      <div className="mt-8">
-                        <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
-                          {(fprops) => (
-                            <Field id="name" {...fprops}>
-                              <div className="mb-3 flex items-center space-x-2">
-                                <Label theme="dark" className="uppercase" id="name">
-                                  Project Name
-                                </Label>
-
-                                <InfoButton>
-                                  <span>
-                                    <h4 className="mb-2.5 font-heading text-lg">Project Name</h4>
-                                    <div className="space-y-2">
-                                      <p>
-                                        One project can aggregate multiple scenarios with the same
-                                        planning region and grid. Therefore, using a generic name
-                                        for the project is recommended (eg: the name of the planning
-                                        region) as well as a generic overview for the description.
-                                      </p>
-                                      <p>
-                                        In each Scenario you will be able to provide more specific
-                                        details.
-                                      </p>
-                                    </div>
-                                  </span>
-                                </InfoButton>
-                              </div>
-                              <Input theme="dark" type="text" placeholder="Write project name..." />
-                            </Field>
-                          )}
-                        </FieldRFF>
-                      </div>
-
-                      {/* DESCRIPTION */}
-                      <div className="mt-8">
-                        <FieldRFF
-                          name="description"
-                          validate={composeValidators([{ presence: true }])}
-                        >
-                          {(fprops) => (
-                            <Field id="description" {...fprops}>
-                              <Label theme="dark" className="mb-3 uppercase">
-                                Description
-                              </Label>
-                              <Textarea rows={4} placeholder="Write your project description..." />
-                            </Field>
-                          )}
-                        </FieldRFF>
-                      </div>
-
-                      {/* PLANNING AREA */}
-                      <div className="mt-10 flex flex-col justify-between">
-                        <div className="mb-5 flex items-center space-x-3">
-                          <h2 className="font-heading text-lg font-medium">
-                            Do you have a planning region or planning unit shapefile?
-                          </h2>
-                          <InfoButton>
-                            <span>
-                              <h4 className="mb-2.5 font-heading text-lg">Planning Area</h4>
-                              <div className="space-y-2">
-                                <p>
-                                  The planning area (also named planning region, study region or
-                                  study area) is the outer boundary of the region where you want to
-                                  create a plan.
-                                </p>
-                                <p>
-                                  These regions often represent administrative units (such as
-                                  countries or smaller regions), but you can also upload your own
-                                  geometry.
-                                </p>
-                                <p>
-                                  The planning region is converted to a grid of planning units, that
-                                  are the central pieces that Marxan uses in its analyses.
-                                </p>
-                                <img src={REGION_PU} alt="Region-PU" />
-                              </div>
-                            </span>
-                          </InfoButton>
-                        </div>
-
-                        {/* PLANNING AREA TYPE SELECTOR */}
-                        <FieldRFF name="PAOptionSelected">
-                          {(fprops) => (
-                            <Field id="PAOptionSelected" {...fprops}>
-                              <Select
-                                theme="dark"
-                                size="base"
-                                status="none"
-                                placeholder="Select option..."
-                                initialSelected={PAOptionSelected}
-                                options={OPTIONS}
-                                onChange={(value: string) => {
-                                  setPAOptionSelected(value);
-                                  resetPlanningArea(form);
-                                  resetPlanningAreaGrid(form);
-                                }}
-                              />
-                            </Field>
-                          )}
-                        </FieldRFF>
-                      </div>
-
-                      {PAOptionSelected === 'regular' && (
-                        <>
-                          <CountryRegionSelector
-                            country={values.countryId}
-                            region={values.adminAreaLevel1Id}
-                            subRegion={values.adminAreaLevel2Id}
-                            onClick={() => scrollDown(planningAreaScrollRef)}
-                          />
-                          {(!!values.countryId || !!values.planningAreaId) && (
-                            <PlanningAreaSelector values={values} />
-                          )}
-                          <div ref={planningAreaScrollRef} />
-                        </>
-                      )}
-
-                      {/* CUSTOM SHAPEFILE PLANNING AREA */}
-                      {PAOptionSelected === 'customPAshapefile' && (
-                        <div className="mt-3">
-                          <FieldRFF
-                            name="planningAreaId"
-                            validate={composeValidators([{ presence: true }])}
-                          >
-                            {(fprops) => {
-                              return (
-                                <PlanningAreaUploader
-                                  {...fprops}
-                                  resetPlanningArea={resetPlanningArea}
-                                  form={form}
-                                />
-                              );
-                            }}
-                          </FieldRFF>
-                          {values.planningAreaId && <PlanningAreaSelector values={values} />}
-                        </div>
-                      )}
-
-                      {/* CUSTOM GRID SHAPEFILE PLANNING AREA */}
-                      {PAOptionSelected === 'customPAshapefileGrid' && (
-                        <div className="mt-3">
-                          <FieldRFF
-                            name="planningAreaGridId"
-                            validate={composeValidators([{ presence: true }])}
-                          >
-                            {(fprops) => {
-                              return (
-                                <PlanningAreaGridUploader
-                                  {...fprops}
-                                  resetPlanningAreaGrid={resetPlanningAreaGrid}
-                                  form={form}
-                                />
-                              );
-                            }}
-                          </FieldRFF>
-                        </div>
-                      )}
-                    </div>
+        return (
+          <form
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            className="flex w-full flex-grow flex-col justify-between overflow-hidden"
+          >
+            <div className="grid h-full grid-cols-1 gap-0 overflow-hidden">
+              <HelpBeacon
+                id="project-new-overview"
+                title="Basic information"
+                subtitle="New project overview"
+                content={
+                  <div className="space-y-2">
+                    <p>
+                      To create a new project you need to add a name, a description, a planning
+                      region and a planning grid.
+                    </p>
+                    <p>
+                      You will be able to create a planning region and grid from scratch following
+                      some simple steps or you can upload your own file.
+                    </p>
                   </div>
-                  <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
-                </div>
+                }
+                modifiers={['flip']}
+                tooltipPlacement="right"
+              >
+                <div id="project-new-form" className="flex flex-grow flex-col overflow-hidden">
+                  <div className="relative flex min-h-0 flex-grow flex-col">
+                    <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-black" />
 
-                {/* BUTTON BAR */}
-                <div className="mt-4 flex px-8 pb-8">
-                  <Link href="/projects" passHref>
-                    <Button theme="secondary" size="xl">
-                      Cancel
+                    <div className="flex flex-grow flex-col overflow-auto p-8">
+                      <div>
+                        <h1 className="max-w-xs font-heading text-2xl text-white">
+                          Name your project and define a planning area:
+                        </h1>
+
+                        {/* NAME */}
+                        <div className="mt-8">
+                          <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
+                            {(fprops) => (
+                              <Field id="name" {...fprops}>
+                                <div className="mb-3 flex items-center space-x-2">
+                                  <Label theme="dark" className="uppercase" id="name">
+                                    Project Name
+                                  </Label>
+
+                                  <InfoButton>
+                                    <span>
+                                      <h4 className="mb-2.5 font-heading text-lg">Project Name</h4>
+                                      <div className="space-y-2">
+                                        <p>
+                                          One project can aggregate multiple scenarios with the same
+                                          planning region and grid. Therefore, using a generic name
+                                          for the project is recommended (eg: the name of the
+                                          planning region) as well as a generic overview for the
+                                          description.
+                                        </p>
+                                        <p>
+                                          In each Scenario you will be able to provide more specific
+                                          details.
+                                        </p>
+                                      </div>
+                                    </span>
+                                  </InfoButton>
+                                </div>
+                                <Input
+                                  theme="dark"
+                                  type="text"
+                                  placeholder="Write project name..."
+                                />
+                              </Field>
+                            )}
+                          </FieldRFF>
+                        </div>
+
+                        {/* DESCRIPTION */}
+                        <div className="mt-8">
+                          <FieldRFF
+                            name="description"
+                            validate={composeValidators([{ presence: true }])}
+                          >
+                            {(fprops) => (
+                              <Field id="description" {...fprops}>
+                                <Label theme="dark" className="mb-3 uppercase">
+                                  Description
+                                </Label>
+                                <Textarea
+                                  rows={4}
+                                  placeholder="Write your project description..."
+                                />
+                              </Field>
+                            )}
+                          </FieldRFF>
+                        </div>
+
+                        {/* PLANNING AREA */}
+                        <div className="mt-10 flex flex-col justify-between">
+                          <div className="mb-5 flex items-center space-x-3">
+                            <h2 className="font-heading text-lg font-medium">
+                              Do you have a planning region or planning unit shapefile?
+                            </h2>
+                            <InfoButton>
+                              <span>
+                                <h4 className="mb-2.5 font-heading text-lg">Planning Area</h4>
+                                <div className="space-y-2">
+                                  <p>
+                                    The planning area (also named planning region, study region or
+                                    study area) is the outer boundary of the region where you want
+                                    to create a plan.
+                                  </p>
+                                  <p>
+                                    These regions often represent administrative units (such as
+                                    countries or smaller regions), but you can also upload your own
+                                    geometry.
+                                  </p>
+                                  <p>
+                                    The planning region is converted to a grid of planning units,
+                                    that are the central pieces that Marxan uses in its analyses.
+                                  </p>
+                                  <img src={REGION_PU} alt="Region-PU" />
+                                </div>
+                              </span>
+                            </InfoButton>
+                          </div>
+
+                          {/* PLANNING AREA TYPE SELECTOR */}
+                          <FieldRFF name="PAOptionSelected">
+                            {(fprops) => (
+                              <Field id="PAOptionSelected" {...fprops}>
+                                <Select
+                                  theme="dark"
+                                  size="base"
+                                  status="none"
+                                  placeholder="Select option..."
+                                  initialSelected={PAOptionSelected}
+                                  options={OPTIONS}
+                                  onChange={(value: string) => {
+                                    form.change('PAOptionSelected', value);
+                                    setPAOptionSelected(value);
+                                    resetPlanningArea(form);
+                                    resetPlanningAreaGrid(form);
+                                  }}
+                                />
+                              </Field>
+                            )}
+                          </FieldRFF>
+                        </div>
+
+                        {PAOptionSelected === 'regular' && (
+                          <>
+                            <CountryRegionSelector
+                              country={values.countryId}
+                              region={values.adminAreaLevel1Id}
+                              subRegion={values.adminAreaLevel2Id}
+                              onClick={() => scrollDown(planningAreaScrollRef)}
+                            />
+                            {(!!values.countryId || !!values.planningAreaId) && (
+                              <PlanningAreaSelector values={values} />
+                            )}
+                            <div ref={planningAreaScrollRef} />
+                          </>
+                        )}
+
+                        {/* CUSTOM SHAPEFILE PLANNING AREA */}
+                        {PAOptionSelected === 'customPAshapefile' && (
+                          <div className="mt-3">
+                            <FieldRFF
+                              name="planningAreaId"
+                              validate={composeValidators([{ presence: true }])}
+                            >
+                              {(fprops) => {
+                                return (
+                                  <PlanningAreaUploader
+                                    {...fprops}
+                                    resetPlanningArea={resetPlanningArea}
+                                    form={form}
+                                  />
+                                );
+                              }}
+                            </FieldRFF>
+                            {values.planningAreaId && <PlanningAreaSelector values={values} />}
+                          </div>
+                        )}
+
+                        {/* CUSTOM GRID SHAPEFILE PLANNING AREA */}
+                        {PAOptionSelected === 'customPAshapefileGrid' && (
+                          <div className="mt-3">
+                            <FieldRFF
+                              name="planningAreaGridId"
+                              validate={composeValidators([{ presence: true }])}
+                            >
+                              {(fprops) => {
+                                return (
+                                  <PlanningAreaGridUploader
+                                    {...fprops}
+                                    resetPlanningAreaGrid={resetPlanningAreaGrid}
+                                    form={form}
+                                  />
+                                );
+                              }}
+                            </FieldRFF>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-black" />
+                  </div>
+
+                  {/* BUTTON BAR */}
+                  <div className="mt-4 flex px-8 pb-8">
+                    <Link href="/projects" passHref>
+                      <Button theme="secondary" size="xl">
+                        Cancel
+                      </Button>
+                    </Link>
+                    <Button className="ml-6" theme="primary" size="xl" type="submit">
+                      Save
                     </Button>
-                  </Link>
-                  <Button className="ml-6" theme="primary" size="xl" type="submit">
-                    Save
-                  </Button>
+                  </div>
                 </div>
-              </div>
-            </HelpBeacon>
-
-            <HelpBeacon
-              id="project-new-map"
-              title="MAP VIEW"
-              subtitle="New planning area and grid"
-              content={
-                <div className="space-y-2">
-                  <p>
-                    On the map you will be able to see your selected or uploaded planning area and
-                    grid.
-                  </p>
-                  <p>
-                    If you are creating a new grid, you can change the shape and size of the
-                    planning units and look at the different results here to find the best
-                    combination for your conservation plan.
-                  </p>
-                </div>
-              }
-              modifiers={['flip']}
-              tooltipPlacement="right"
-            >
-              <div className="h-full w-full">
-                <ProjectNewMap
-                  country={values.countryId}
-                  region={values.adminAreaLevel1Id}
-                  subregion={values.adminAreaLevel2Id}
-                  planningUnitGridShape={values.planningUnitGridShape}
-                  planningUnitAreakm2={values.planningUnitAreakm2}
-                  paOptionSelected={PAOptionSelected}
-                />
-              </div>
-            </HelpBeacon>
-          </div>
-        </form>
-      )}
+              </HelpBeacon>
+            </div>
+          </form>
+        );
+      }}
     </FormRFF>
   );
 };

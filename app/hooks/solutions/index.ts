@@ -5,14 +5,13 @@ import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
 
+import { Scenario } from 'types/api/scenario';
+import { Solution } from 'types/api/solution';
+
 import DOWNLOADS from 'services/downloads';
 import SCENARIOS from 'services/scenarios';
 
-import {
-  DownloadScenarioSolutionsProps,
-  UseDownloadScenarioSolutionsProps,
-  UseSolutionsOptionsProps,
-} from './types';
+import { UseDownloadScenarioSolutionsProps, UseSolutionsOptionsProps } from './types';
 
 export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
   const { data: session } = useSession();
@@ -89,10 +88,10 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
   }, [query, pages]);
 }
 
-export function useAllSolutions(sid, options: UseSolutionsOptionsProps = {}) {
+export function useAllSolutions(sid: Scenario['id'], options: UseSolutionsOptionsProps = {}) {
   const { data: session } = useSession();
 
-  const { filters = {}, sort } = options;
+  const { filters = {}, sort, ...rest } = options;
 
   const parsedFilters = Object.keys(filters).reduce((acc, k) => {
     return {
@@ -102,7 +101,7 @@ export function useAllSolutions(sid, options: UseSolutionsOptionsProps = {}) {
   }, {});
 
   const fetchSolutions = () =>
-    SCENARIOS.request({
+    SCENARIOS.request<{ data: Solution[] }>({
       method: 'GET',
       url: `/${sid}/marxan/solutions`,
       headers: {
@@ -114,21 +113,15 @@ export function useAllSolutions(sid, options: UseSolutionsOptionsProps = {}) {
         ...(sort && {
           sort,
         }),
+        ...rest,
       },
     }).then((response) => response.data);
 
-  const query = useQuery(['all-solutions', sid, JSON.stringify(options)], fetchSolutions, {
+  return useQuery(['all-solutions', sid, JSON.stringify(options)], fetchSolutions, {
     keepPreviousData: true,
+    select: ({ data }) => data,
+    enabled: Boolean(sid),
   });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data]);
 }
 
 export function useSolution(sid, solutionId) {
@@ -240,8 +233,8 @@ export function useDownloadSolutions({
 }: UseDownloadScenarioSolutionsProps) {
   const { data: session } = useSession();
 
-  const downloadScenarioSolutions = ({ id }: DownloadScenarioSolutionsProps) => {
-    return DOWNLOADS.request({
+  const downloadScenarioSolutions = ({ id }: { id: Scenario['id'] }) => {
+    return DOWNLOADS.request<ArrayBuffer>({
       url: `/scenarios/${id}/marxan/output`,
       responseType: 'arraybuffer',
       headers: {

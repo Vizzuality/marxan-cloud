@@ -8,6 +8,10 @@ import cx from 'classnames';
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import HelpBeacon from 'layout/help/beacon';
+import ScenarioSettings from 'layout/projects/show/scenarios/settings';
+import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
+import ScenarioTypes from 'layout/projects/show/scenarios/types';
 import { flatten } from 'lodash';
 
 import { useCanEditProject } from 'hooks/permissions';
@@ -28,10 +32,6 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
 import ScenarioItem from 'components/scenarios/item';
-import HelpBeacon from 'layout/help/beacon';
-import ScenarioSettings from 'layout/projects/show/scenarios/settings';
-import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
-import ScenarioTypes from 'layout/projects/show/scenarios/types';
 
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 
@@ -50,7 +50,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   const { search, filters, sort } = useSelector((state) => state['/projects/[id]']);
 
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const editable = useCanEditProject(pid);
 
@@ -90,10 +90,10 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
       {
         onSuccess: () => {
           addToast(
-            `success-project-delete-${deleteScenario.id}`,
+            `success-scenario-delete-${deleteScenario.id}`,
             <>
               <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">{`Project "${deleteScenario.name}" deleted`}</p>
+              <p className="text-sm">{`Scenario "${deleteScenario.name}" deleted`}</p>
             </>,
             {
               level: 'success',

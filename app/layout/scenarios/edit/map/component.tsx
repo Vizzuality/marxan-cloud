@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
-
 import { useRouter } from 'next/router';
 
+import { useAppSelector, useAppDispatch } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
@@ -23,7 +22,7 @@ import {
   useTargetedPreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useCostSurfaceRange, useScenario, useScenarioPU } from 'hooks/scenarios';
+import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 import { useWDPACategories } from 'hooks/wdpa';
 
@@ -40,10 +39,10 @@ import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
+import { TABS } from 'layout/project/navigation/constants';
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
-export const ScenariosEditMap: React.FC = () => {
+export const ScenariosEditMap = (): JSX.Element => {
   const [open, setOpen] = useState(true);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
@@ -52,9 +51,9 @@ export const ScenariosEditMap: React.FC = () => {
 
   const { query } = useRouter();
 
-  const { pid, sid } = query as { pid: string; sid: string };
+  const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
-  const scenarioSlice = getScenarioEditSlice(sid);
+  const scenarioSlice = useMemo(() => getScenarioEditSlice(sid), [sid]);
   const {
     setTmpPuIncludedValue,
     setTmpPuExcludedValue,
@@ -63,13 +62,12 @@ export const ScenariosEditMap: React.FC = () => {
     setPuAvailableValue,
     setPuIncludedValue,
     setPuExcludedValue,
+    setCache,
   } = scenarioSlice.actions;
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const {
-    tab,
-    subtab,
     cache,
 
     // WDPA
@@ -98,9 +96,9 @@ export const ScenariosEditMap: React.FC = () => {
 
     // Settings
     layerSettings,
-  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const { data = {} } = useProject(pid);
+  const { data } = useProject(pid);
   const { bbox } = data;
 
   const BBOX = useBBOX({
@@ -108,29 +106,30 @@ export const ScenariosEditMap: React.FC = () => {
   });
 
   const { data: scenarioData } = useScenario(sid);
-  const {
-    data: { excluded, included, available },
-  } = useScenarioPU(sid);
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
 
   const { data: targetedFeaturesData } = useTargetedFeatures(sid, {});
 
   const previewFeatureIsSelected = useMemo(() => {
-    if (subtab === ScenarioSidebarSubTabs.FEATURES_ADD) {
-      return selectedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
+    if (tab === TABS['scenario-features']) {
+      return (
+        (selectedFeaturesData || []).filter(({ id }) => selectedFeatures.includes(id)).length > 0
+      );
     }
 
-    if (subtab === ScenarioSidebarSubTabs.FEATURES_TARGET) {
-      return targetedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
+    if (tab === TABS['scenario-features-targets-spf']) {
+      return (
+        (targetedFeaturesData || []).filter(({ id }) => selectedFeatures.includes(id)).length > 0
+      );
     }
 
-    return [];
-  }, [subtab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
+    return false;
+  }, [tab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
 
   const selectedPreviewFeatures = useMemo(() => {
-    if (subtab === ScenarioSidebarSubTabs.FEATURES_ADD) {
-      return selectedFeaturesData
+    if (tab === TABS['scenario-features']) {
+      return (selectedFeaturesData || [])
         .filter(({ id }) => selectedFeatures.includes(id))
         .map(({ name, id }) => ({ name, id }))
         .sort((a, b) => {
@@ -140,8 +139,8 @@ export const ScenariosEditMap: React.FC = () => {
         });
     }
 
-    if (subtab === ScenarioSidebarSubTabs.FEATURES_TARGET) {
-      return targetedFeaturesData
+    if (tab === TABS['scenario-features-targets-spf']) {
+      return (targetedFeaturesData || [])
         .filter(({ id }) => selectedFeatures.includes(id))
         .map(({ name, id }) => ({ name, id }))
         .sort((a, b) => {
@@ -152,7 +151,7 @@ export const ScenariosEditMap: React.FC = () => {
     }
 
     return [];
-  }, [subtab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
+  }, [tab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
 
   const { data: costSurfaceRangeData } = useCostSurfaceRange(sid);
 
@@ -185,163 +184,123 @@ export const ScenariosEditMap: React.FC = () => {
   const [bounds, setBounds] = useState(null);
 
   const include = useMemo(() => {
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null)
-      return 'lock-status,protection';
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
-    )
+    if (tab === TABS['scenario-protected-areas']) {
       return 'protection';
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE)
+    }
+
+    if (tab === TABS['scenario-cost-surface']) {
       return 'cost';
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
-    )
-      return 'lock-status,protection';
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
-    )
-      return 'lock-status,protection';
+    }
 
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS)
+    if (tab === TABS['scenario-gap-analysis']) {
       return 'features';
+    }
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return 'protection,features';
+    if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
+      return 'protection,features';
+    }
 
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
+    if (tab === TABS['scenario-solutions']) {
       return 'results';
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
+    }
+
+    if (tab === TABS['scenario-target-achievement']) {
       return 'results,features';
+    }
 
     return 'protection';
-  }, [tab, subtab]);
+  }, [tab]);
 
   const sublayers = useMemo(() => {
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return ['wdpa-percentage'];
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
-    )
+    if (tab === TABS['scenario-protected-areas']) {
       return ['wdpa-percentage'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE)
+    }
+
+    if (tab === TABS['scenario-cost-surface']) {
       return ['cost'];
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
-    )
+    }
+
+    if (tab === TABS['scenario-planning-unit-status']) {
       return ['wdpa-percentage', 'lock-available', 'lock-in', 'lock-out'];
+    }
 
-    if (
-      tab === ScenarioSidebarTabs.FEATURES &&
-      subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS &&
-      subtab !== null
-    )
-      return ['wdpa-percentage', 'features-preview'];
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS)
+    if ([TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab)) {
+      return ['wdpa-percentage', 'features', 'features-preview'];
+    }
+
+    if (tab === TABS['scenario-gap-analysis']) {
       return ['features'];
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === null) return ['wdpa-percentage'];
+    }
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
+    if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
+      return ['wdpa-percentage', 'features'];
+    }
 
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
+    if ([TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab)) {
       return ['frequency', 'solution'];
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
-      return ['features'];
+    }
 
     return [];
-  }, [tab, subtab]);
+  }, [tab]);
 
   const layers = useMemo(() => {
     const protectedCategories = protectedAreas || [];
 
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) {
-      return [...(protectedCategories.length ? ['wdpa-percentage'] : []), 'pugrid'];
-    }
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE)
+    if (tab === TABS['scenario-cost-surface']) {
       return ['cost', 'pugrid'];
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
-    )
-      return ['wdpa-percentage', 'lock-available', 'lock-in', 'lock-out', 'pugrid'];
-
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW &&
-      !!protectedCategories.length
-    )
-      return ['wdpa-preview', 'pugrid'];
-    if (
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD &&
-      !!protectedCategories.length
-    )
-      return ['wdpa-percentage', 'pugrid'];
-
-    if (
-      tab === ScenarioSidebarTabs.FEATURES &&
-      subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS
-    ) {
+    }
+    if (tab === TABS['scenario-planning-unit-status']) {
       return [
         ...(protectedCategories.length ? ['wdpa-percentage'] : []),
+        'lock-in',
+        'lock-out',
+        'lock-available',
+        'pugrid',
+      ];
+    }
+
+    if (tab === TABS['scenario-protected-areas'] && !!protectedCategories.length) {
+      return ['wdpa-percentage', 'wdpa-preview', 'pugrid'];
+    }
+
+    if ([TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab)) {
+      return [
+        ...(protectedCategories.length ? ['wdpa-percentage'] : []),
+        ...(preHighlightFeatures.length ? ['features-highlight'] : []),
         !!previewFeatureIsSelected && 'features-preview',
         'pugrid',
       ];
     }
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === null) {
-      return [...(protectedCategories.length ? ['wdpa-percentage'] : []), 'pugrid'];
-    }
-    if (
-      tab === ScenarioSidebarTabs.FEATURES &&
-      subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS &&
-      !preHighlightFeatures.length
-    )
+
+    if (tab === TABS['scenario-gap-analysis']) {
       return ['features', 'pugrid'];
-    if (
-      tab === ScenarioSidebarTabs.FEATURES &&
-      subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS &&
-      !!preHighlightFeatures.length
-    )
-      return ['features', 'features-highlight', 'pugrid'];
+    }
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
+    if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
+      return ['wdpa-percentage', 'features'];
+    }
 
-    if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS
-    )
+    if ([TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab)) {
       return ['frequency', 'solution', 'pugrid'];
+    }
+
     if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS &&
+      [TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab) &&
       !postHighlightFeatures.length
-    )
+    ) {
       return ['features'];
+    }
+
     if (
-      tab === ScenarioSidebarTabs.SOLUTIONS &&
-      subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS &&
+      [TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab) &&
       !!postHighlightFeatures.length
-    )
+    ) {
       return ['features', 'features-highlight'];
+    }
 
     return ['pugrid'];
   }, [
     tab,
-    subtab,
     protectedAreas,
     previewFeatureIsSelected,
     preHighlightFeatures.length,
@@ -365,9 +324,7 @@ export const ScenariosEditMap: React.FC = () => {
     ...wdpaCategories,
     pid: `${pid}`,
     cache,
-    active:
-      tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-      subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
+    active: tab === TABS['scenario-protected-areas'],
     bbox,
     options: {
       ...layerSettings['wdpa-preview'],
@@ -377,7 +334,7 @@ export const ScenariosEditMap: React.FC = () => {
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
     cache,
-    active: tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.FEATURES_ADD,
+    active: tab === TABS['scenario-features'],
     bbox,
     options: {
       featuresRecipe,
@@ -390,8 +347,7 @@ export const ScenariosEditMap: React.FC = () => {
   const TargetedPreviewLayers = useTargetedPreviewLayers({
     features: targetedFeaturesData,
     cache,
-    active:
-      tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.FEATURES_TARGET,
+    active: tab === TABS['scenario-features-targets-spf'],
     bbox,
     options: {
       featuresRecipe,
@@ -410,8 +366,7 @@ export const ScenariosEditMap: React.FC = () => {
     options: {
       wdpaIucnCategories: protectedAreas,
       wdpaThreshold:
-        tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-        subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
+        tab === TABS['scenario-protected-areas']
           ? wdpaThreshold * 100
           : scenarioData?.wdpaThreshold,
       puAction,
@@ -452,10 +407,7 @@ export const ScenariosEditMap: React.FC = () => {
     options: {
       wdpaIucnCategories: protectedAreas,
       wdpaThreshold:
-        tab === ScenarioSidebarTabs.PLANNING_UNIT &&
-        subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
-          ? wdpaThreshold
-          : scenarioData?.wdpaThreshold,
+        tab === TABS['scenario-protected-areas'] ? wdpaThreshold : scenarioData?.wdpaThreshold,
       cost: costSurfaceRangeData,
       items: selectedPreviewFeatures,
       puAction,
@@ -471,10 +423,17 @@ export const ScenariosEditMap: React.FC = () => {
   useEffect(() => {
     setBounds({
       bbox: BBOX,
-      options: { padding: 50 },
+      options: { padding: { top: 50, right: 50, bottom: 50, left: 575 } },
       viewportOptions: { transitionDuration: 0 },
     });
   }, [BBOX]);
+
+  useEffect(() => {
+    // ? Previously, with the navigation by tabs, whenever the user clicked to continue, the cache used by the layers on the map
+    // ? was updated and the flow continued to the next tab.
+    // ? As this flow is gone and the user is free to go wherever they want, we need to update the cache manually when the tab changes.
+    if (tab) dispatch(setCache(Date.now()));
+  }, [tab, dispatch, setCache]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
@@ -655,7 +614,7 @@ export const ScenariosEditMap: React.FC = () => {
   );
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-4xl">
+    <div className="relative h-full w-full overflow-hidden">
       <Map
         key={accessToken}
         bounds={bounds}
@@ -690,8 +649,6 @@ export const ScenariosEditMap: React.FC = () => {
 
       {/* Controls */}
       <Controls>
-        <LoadingControl loading={!mapTilesLoaded} />
-
         <ZoomControl
           viewport={{
             ...viewport,
@@ -710,6 +667,7 @@ export const ScenariosEditMap: React.FC = () => {
           }}
           onFitBoundsChange={handleFitBoundsChange}
         />
+        <LoadingControl loading={!mapTilesLoaded} />
       </Controls>
 
       {/* Legend */}

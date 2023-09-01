@@ -1,7 +1,7 @@
 import { PUAction } from 'store/slices/scenarios/types';
 
-import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
 import { TargetSPFItemProps } from 'components/features/target-spf-item/types';
+import { Feature } from 'types/api/feature';
 
 export interface UseGeoJSONLayer {
   cache?: number;
@@ -74,11 +74,16 @@ export interface UseFeaturePreviewLayer {
   id?: string;
 }
 
+export interface PreviewFeature extends Feature {
+  splitSelected?: string;
+  splitFeaturesSelected?: string[];
+}
+
 export interface UseFeaturePreviewLayers {
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
-  features?: SelectedItemProps[];
+  features?: PreviewFeature[];
   options?: {
     featuresRecipe?: Record<string, any>[];
     featureHoverId?: string;
@@ -192,7 +197,10 @@ export interface UseLegend {
       min: number;
       max: number;
     };
-    items?: string[];
+    items?: {
+      name: string;
+      id: string;
+    }[];
     puAction?: PUAction;
     puIncludedValue?: string[];
     puExcludedValue?: string[];

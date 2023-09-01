@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { ScenarioPlanningUnit } from 'hooks/scenarios/types';
 
 import { injectReducer } from 'store';
-import { Solution } from 'types/api/project';
+import { Solution } from 'types/api/solution';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 
 import type { PUAction } from './types';

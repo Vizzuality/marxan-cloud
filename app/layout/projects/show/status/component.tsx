@@ -9,6 +9,7 @@ import { useScenariosStatus } from 'hooks/scenarios';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import { Job } from 'types/api/job';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import PROCESSING_SVG from 'svgs/ui/processing.svg?sprite';
@@ -20,16 +21,13 @@ import {
   useProjectJobFailure,
   useProjectTextFailure,
   useProjectJobDone,
-  useProjectTextDone,
   useProjectJobRunning,
   useProjectTextRunning,
 } from './utils';
 
-export interface ProjectStatusProps {}
-
-export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
+export const ProjectStatus = (): JSX.Element => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { data: projectData } = useProject(pid);
   const { data: scenarioStatusData } = useScenariosStatus(pid);
@@ -44,9 +42,8 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
   const TEXT_FAILURE = useProjectTextFailure(JOB_FAILURE);
 
   // Done
-  const JOB_DONE_REF = useRef(null);
+  const JOB_DONE_REF = useRef<Job>(null);
   const JOB_DONE = useProjectJobDone(JOBS, new Date(projectData?.lastModifiedAt).getTime());
-  const TEXT_DONE = useProjectTextDone(JOB_DONE, JOB_DONE_REF);
 
   // Running
   const JOB_RUNNING = useProjectJobRunning(JOBS, JOB_FAILURE);
@@ -83,7 +80,7 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
 
   return (
     <div className="pointer-events-none absolute left-0 top-0 z-50 flex h-full w-full flex-col justify-end">
-      {(JOB_RUNNING || JOB_FAILURE || JOB_DONE) && (
+      {(JOB_RUNNING || JOB_FAILURE) && (
         <motion.div
           className="pointer-events-auto absolute left-0 top-0 z-10 h-full w-full bg-black bg-opacity-75"
           key="status-overlay"
@@ -92,7 +89,7 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
         />
       )}
 
-      {(JOB_RUNNING || JOB_DONE) && !JOB_FAILURE && (
+      {JOB_RUNNING && !JOB_FAILURE && (
         <motion.div
           className="pointer-events-auto absolute left-1/2 top-1/2 z-10"
           key="status-text"
@@ -100,9 +97,7 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
           animate={{ opacity: 1, y: '-50%', x: '-50%' }}
         >
           <div className="w-full max-w-md space-y-5 p-10 text-center">
-            <h3 className="font-heading text-xs uppercase tracking-wide">
-              {TEXT_RUNNING || TEXT_DONE}
-            </h3>
+            <h3 className="font-heading text-xs uppercase tracking-wide">{TEXT_RUNNING}</h3>
 
             <Icon icon={PROCESSING_SVG} className="m-auto" style={{ width: 40, height: 10 }} />
 

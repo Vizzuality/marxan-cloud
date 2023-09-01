@@ -20,7 +20,7 @@ export interface TitleProps {}
 export const Title: React.FC<TitleProps> = () => {
   const { query } = useRouter();
   const { addToast } = useToasts();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
   const { data: scenarioData, isLoading: scenarioIsLoading } = useScenario(sid);
@@ -111,7 +111,7 @@ export const Title: React.FC<TitleProps> = () => {
           },
         },
         {
-          onSuccess: ({ data: { data: s } }) => {
+          onSuccess: ({ data }) => {
             addToast(
               'save-scenario-name',
               <>
@@ -122,7 +122,7 @@ export const Title: React.FC<TitleProps> = () => {
                 level: 'success',
               }
             );
-            console.info('Scenario name saved succesfully', s);
+            console.info('Scenario name saved succesfully', data);
           },
           onError: () => {
             addToast(

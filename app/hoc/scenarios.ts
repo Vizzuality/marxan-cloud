@@ -1,7 +1,11 @@
 import { QueryClient } from 'react-query';
 
+import { NAVIGATION_TREE } from 'layout/project/navigation/constants';
+import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import { dehydrate } from 'react-query/hydration';
+import { Project } from 'types/api/project';
+import { Scenario } from 'types/api/scenario';
 
 import ROLES from 'services/roles';
 import SCENARIOS from 'services/scenarios';
@@ -9,7 +13,7 @@ import USERS from 'services/users';
 
 import { mergeDehydratedState } from './utils';
 
-const fetchUser = (session, queryClient) => {
+const fetchUser = (session: Session, queryClient: QueryClient) => {
   return queryClient.prefetchQuery('me', () =>
     USERS.request({
       method: 'GET',
@@ -26,7 +30,11 @@ const fetchUser = (session, queryClient) => {
   );
 };
 
-const fetchProjectUsers = (session, queryClient, { pid }) => {
+const fetchProjectUsers = (
+  session: Session,
+  queryClient: QueryClient,
+  { pid }: { pid: Project['id'] }
+) => {
   return queryClient.prefetchQuery(['roles', pid], () =>
     ROLES.request({
       method: 'GET',
@@ -42,9 +50,13 @@ const fetchProjectUsers = (session, queryClient, { pid }) => {
   );
 };
 
-const fetchScenario = (session, queryClient, { sid }) => {
-  return queryClient.prefetchQuery(['scenarios', sid], () =>
-    SCENARIOS.request({
+const fetchScenario = (
+  session: Session,
+  queryClient: QueryClient,
+  { sid }: { sid: Scenario['id'] }
+) => {
+  return queryClient.prefetchQuery(['scenario', sid], () =>
+    SCENARIOS.request<{ data: Scenario }>({
       method: 'GET',
       url: `/${sid}`,
       headers: {
@@ -56,7 +68,11 @@ const fetchScenario = (session, queryClient, { sid }) => {
   );
 };
 
-const fetchScenarioLock = (session, queryClient, { sid }) => {
+const fetchScenarioLock = (
+  session: Session,
+  queryClient: QueryClient,
+  { sid }: { sid: Scenario['id'] }
+) => {
   return queryClient.prefetchQuery(['scenario-lock', sid], () =>
     SCENARIOS.request({
       method: 'GET',
@@ -72,7 +88,7 @@ const fetchScenarioLock = (session, queryClient, { sid }) => {
 };
 
 export function withScenario(getServerSidePropsFunc?: Function) {
-  return async (context: any) => {
+  return async (context) => {
     const session = await getSession(context);
 
     if (!session) {
@@ -91,14 +107,12 @@ export function withScenario(getServerSidePropsFunc?: Function) {
       };
     }
 
-    const { params } = context;
-
-    const { sid } = params;
-
+    const { query } = context;
+    const { sid } = query as { sid: string };
     const queryClient = new QueryClient();
 
     await fetchScenario(session, queryClient, { sid });
-    const scenario = queryClient.getQueryData<any>(['scenarios', sid]);
+    const scenario = queryClient.getQueryData<{ data: Scenario }>(['scenario', sid])?.data;
 
     if (!scenario) {
       return {
@@ -204,6 +218,74 @@ export function withScenarioLock(getServerSidePropsFunc?: Function) {
 
       const { dehydratedState: prevDehydratedState } = SSPF.props;
 
+      const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
+
+      const newDehydratedState = mergeDehydratedState(prevDehydratedState, currentDehydratedState);
+
+      return {
+        ...SSPF,
+        props: {
+          session,
+          ...SSPF.props,
+          dehydratedState: newDehydratedState,
+        },
+      };
+    }
+
+    return {
+      props: {
+        session,
+        dehydratedState: JSON.parse(JSON.stringify(dehydrate(queryClient))),
+      },
+    };
+  };
+}
+
+export function withSolutions(getServerSidePropsFunc?: Function) {
+  return async (context) => {
+    const session = await getSession(context);
+
+    if (!session) {
+      if (getServerSidePropsFunc) {
+        const SSPF = (await getServerSidePropsFunc(context)) || {};
+
+        return {
+          props: {
+            ...SSPF.props,
+          },
+        };
+      }
+
+      return {
+        props: {},
+      };
+    }
+
+    const { query } = context;
+
+    const { pid, tab, sid } = query as { pid: string; tab: string; sid: string };
+
+    const queryClient = new QueryClient();
+
+    await fetchScenario(session, queryClient, { sid });
+    const scenario = queryClient.getQueryData<{ data: Scenario }>(['scenario', sid])?.data;
+
+    // ? if the scenario has not been ran at least once and the user tries to access the solutions tab,
+    // ? it will be redirected to the overview tab as the solutions menu should be disabled.
+    if (NAVIGATION_TREE.solutions.includes(tab) && !scenario.ranAtLeastOnce) {
+      return {
+        props: {},
+        redirect: {
+          destination: `/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas`,
+          permanent: false,
+        },
+      };
+    }
+
+    if (getServerSidePropsFunc) {
+      const SSPF = (await getServerSidePropsFunc(context)) || {};
+
+      const { dehydratedState: prevDehydratedState } = SSPF.props;
       const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
 
       const newDehydratedState = mergeDehydratedState(prevDehydratedState, currentDehydratedState);

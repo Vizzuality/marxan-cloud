@@ -11,7 +11,7 @@ import {
 
 import { useRouter } from 'next/router';
 
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
@@ -20,7 +20,10 @@ import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
-import type { Project } from 'types/api/project';
+import { Job } from 'types/api/job';
+import { Project } from 'types/api/project';
+import { Scenario } from 'types/api/scenario';
+import { createDownloadLink } from 'utils/download';
 
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
@@ -29,8 +32,6 @@ import UPLOADS from 'services/uploads';
 
 import {
   UseScenariosOptionsProps,
-  UseSaveScenarioProps,
-  SaveScenarioProps,
   UseDeleteScenarioProps,
   DeleteScenarioProps,
   UseUploadScenarioCostSurfaceProps,
@@ -43,8 +44,6 @@ import {
   UseUploadPAProps,
   UseDuplicateScenarioProps,
   DuplicateScenarioProps,
-  UseRunScenarioProps,
-  RunScenarioProps,
   UseCancelRunScenarioProps,
   CancelRunScenarioProps,
   UseSaveScenarioCalibrationRangeProps,
@@ -120,13 +119,21 @@ export function useScenariosStatus(pId, requestConfig = {}, queryConfig = {}) {
   }, [query, data?.data]);
 }
 
-export function useScenarioStatus(pId, sId) {
+export function useScenarioStatus(pId: Project['id'], sId: Scenario['id']) {
   const { data: session } = useSession();
 
-  const query = useQuery(
-    ['scenarios-status', pId, sId],
-    async () =>
-      PROJECTS.request({
+  return useQuery({
+    queryKey: ['scenarios-status', pId, sId],
+    queryFn: async () =>
+      PROJECTS.request<{
+        data: {
+          id: string;
+          type: 'project-jobs';
+          jobs: Job[];
+          scenarios: { id: Scenario['id']; jobs: Job[] }[];
+        };
+        meta: unknown;
+      }>({
         method: 'GET',
         url: `/${pId}/scenarios/status`,
         headers: {
@@ -135,28 +142,21 @@ export function useScenarioStatus(pId, sId) {
       }).then((response) => {
         return response.data;
       }),
-    {
-      enabled: !!sId,
-      placeholderData: {
-        data: {
-          scenarios: [],
-        },
+    enabled: !!sId,
+    placeholderData: {
+      data: {
+        scenarios: [],
+        jobs: [],
+        id: 'placeholder',
+        type: 'project-jobs',
       },
-      refetchInterval: 1000,
-    }
-  );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    const scenarios = data?.data?.scenarios || [];
-    const CURRENT = scenarios.find((s) => s.id === sId);
-
-    return {
-      ...query,
-      data: CURRENT || {},
-    };
-  }, [query, data?.data, sId]);
+      meta: {},
+    },
+    refetchInterval: 1000,
+    select: ({ data }) => {
+      return (data?.scenarios || []).find((s) => s.id === sId);
+    },
+  });
 }
 
 export function useScenariosStatusOnce({
@@ -441,7 +441,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
                 ranAtLeastOnce,
                 numberOfRuns,
                 onEdit: () => {
-                  push(`/projects/${projectId}/scenarios/${id}/edit`);
+                  push(`/projects/${projectId}/scenarios/${id}/edit?tab=protected-areas`);
                 },
               };
             });
@@ -475,67 +475,56 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   ]);
 }
 
-export function useScenario(id) {
+export function useScenario(id: Scenario['id']) {
   const { data: session } = useSession();
 
-  const query = useQuery(
-    ['scenarios', id],
-    async () =>
-      SCENARIOS.request({
+  return useQuery({
+    queryKey: ['scenario', id],
+    queryFn: async () =>
+      SCENARIOS.request<{ data: Scenario }>({
         method: 'GET',
         url: `/${id}`,
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
-      }).then((response) => {
-        return response.data;
-      }),
-    {
-      enabled: !!id,
-    }
-  );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
+      }).then((response) => response.data),
+    enabled: !!id,
+    placeholderData: {
+      // ? not a fan of this, but it's the only way to make the types work
+      data: {} as Scenario,
+    },
+    select: ({ data }) => data,
+  });
 }
 
 export function useSaveScenario({
   requestConfig = {
     method: 'POST',
   },
-}: UseSaveScenarioProps) {
+}: {
+  requestConfig?: AxiosRequestConfig<{ data: Scenario }>;
+}) {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
 
-  const saveScenario = ({ id, data }: SaveScenarioProps) => {
-    return SCENARIOS.request({
+  const saveScenario = ({ id, data }: { id?: Scenario['id']; data: Record<string, unknown> }) => {
+    return SCENARIOS.request<{ data: Scenario }>({
       url: id ? `/${id}` : '/',
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
-    });
+    }).then((response) => response.data);
   };
 
   return useMutation(saveScenario, {
-    onSuccess: (data: any, variables, context) => {
-      const { id, projectId } = data?.data?.data;
-      // const { isoDate, started } = data?.data?.meta;
-      queryClient.invalidateQueries(['scenarios', projectId]);
-      queryClient.setQueryData(['scenarios', id], data?.data);
+    onSuccess: async ({ data }) => {
+      const { id, projectId } = data;
 
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
+      await queryClient.invalidateQueries(['scenarios', projectId]);
+      await queryClient.invalidateQueries(['scenario', id]);
+      queryClient.setQueryData(['scenario', id], { data });
     },
   });
 }
@@ -664,40 +653,6 @@ export function useCostSurfaceRange(id) {
       data,
     };
   }, [query, data]);
-}
-
-export function useDownloadCostSurface() {
-  const { data: session } = useSession();
-
-  const downloadScenarioCostSurface = ({ pid }: { pid: Project['id'] }) => {
-    return DOWNLOADS.get<ArrayBuffer>(`/projects/${pid}/project-grid/shapefile-template`, {
-      responseType: 'arraybuffer',
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'application/zip',
-      },
-    });
-  };
-
-  return useMutation(downloadScenarioCostSurface, {
-    onSuccess: (data, variables, context) => {
-      const { data: blob } = data;
-      const { pid } = variables;
-
-      const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `cost-surface-${pid}.zip`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
-    },
-  });
 }
 
 export function useUploadCostSurface({
@@ -857,11 +812,13 @@ export function useRunScenario({
   requestConfig = {
     method: 'POST',
   },
-}: UseRunScenarioProps) {
+}: {
+  requestConfig?: AxiosRequestConfig;
+}) {
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
 
-  const duplicateScenario = ({ id }: RunScenarioProps) => {
-    // Pending endpoint
+  const runScenario = ({ id }: { id: Scenario['id'] }) => {
     return SCENARIOS.request({
       url: `/${id}/marxan`,
       headers: {
@@ -871,12 +828,12 @@ export function useRunScenario({
     });
   };
 
-  return useMutation(duplicateScenario, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Success', data, variables, context);
+  return useMutation(runScenario, {
+    onSuccess: async (data, variables) => {
+      const { id } = variables;
+      await queryClient.invalidateQueries(['scenario', id]);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });
@@ -1125,6 +1082,34 @@ export function useDeletePUScenaro() {
       console.info('Success', data, variables, context);
       // const { id } = variables;
       // queryClient.invalidateQueries(['scenarios-pu', id]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDownloadSolutionsSummary() {
+  const { data: session } = useSession();
+
+  const downloadScenarioSolutionsSummary = ({ id }: { id: Project['id'] }) => {
+    return DOWNLOADS.request<ArrayBuffer>({
+      method: 'GET',
+      url: `/projects/${id}/output-summary`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+    });
+  };
+
+  return useMutation(downloadScenarioSolutionsSummary, {
+    onSuccess: (data, variables) => {
+      const { data: blob } = data;
+      const { id } = variables;
+
+      createDownloadLink(blob, `solutions-${id}.zip`);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);

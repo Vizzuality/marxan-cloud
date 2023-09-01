@@ -1,8 +1,8 @@
 import React, { ButtonHTMLAttributes, AnchorHTMLAttributes, FC } from 'react';
 
-import cx from 'classnames';
-
 import Link, { LinkProps } from 'next/link';
+
+import { cn } from 'utils/cn';
 
 const THEME = {
   primary:
@@ -23,7 +23,7 @@ const THEME = {
   danger:
     'text-red-700 bg-transparent hover:text-white hover:bg-red-700 active:bg-red-600 border border-red-700 hover:border-red-600 active:border-red-500',
   'danger-alt':
-    'text-white hover:bg-transparent border border-red-700 hover:text-red-700 bg-red-700 active:bg-red-600 hover:border hover:border-red-700 active:text-white active:border-red-500',
+    'text-white hover:bg-transparent border border-red-500 hover:text-red-500 bg-red-500 active:bg-red-600 hover:border hover:border-red-500 active:text-white active:border-red-600',
 
   spacial:
     'text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 flex items-center justify-center rounded-4xl focus:outline-none',
@@ -92,7 +92,7 @@ type Overload = {
 const hasHref = (props: ButtonProps | AnchorProps): props is AnchorProps => 'href' in props;
 
 function buildClassName({ className, disabled, size, theme }) {
-  return cx({
+  return cn({
     'group relative flex items-center justify-center rounded-4xl transition-colors focus:outline-none':
       true,
     [THEME[theme]]: true,

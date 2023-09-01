@@ -7,6 +7,8 @@ import Icon from 'components/icon';
 import HEXAGON_SVG from 'svgs/map/hexagon.svg?sprite';
 import SQUARE_SVG from 'svgs/map/square.svg?sprite';
 
+import { UseLegend } from './types';
+
 export const COLORS = {
   primary: '#00BFFF',
   'features-preview': {
@@ -31,7 +33,8 @@ export const COLORS = {
       '#de4210',
     ],
   },
-  wdpa: '#00F',
+  wdpa: '#12EC80',
+  'wdpa-preview': '#00f',
   features: '#6F53F7',
   highlightFeatures: '#BE6BFF',
   include: '#03E7D1',
@@ -160,7 +163,7 @@ export const LEGEND_LAYERS = {
       <Icon
         icon={SQUARE_SVG}
         className="mt-0.5 h-3.5 w-3.5 stroke-current stroke-2"
-        style={{ color: COLORS.wdpa }}
+        style={{ color: COLORS['wdpa-preview'] }}
       />
     ),
     settingsManager: {
@@ -184,7 +187,7 @@ export const LEGEND_LAYERS = {
     },
   }),
 
-  'features-preview': (options) => {
+  'features-preview': (options: UseLegend['options']) => {
     const { items } = options;
 
     return {

@@ -34,7 +34,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
 
   const { query } = useRouter();
 
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { data: projectData } = useProject(pid);
   const { bbox } = projectData;
@@ -63,7 +63,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
   useEffect(() => {
     setBounds({
       bbox: BBOX,
-      options: { padding: 50 },
+      options: { padding: { top: 50, right: 50, bottom: 50, left: 575 } },
       viewportOptions: { transitionDuration: 0 },
     });
   }, [BBOX]);
@@ -110,7 +110,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
   );
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-4xl">
+    <div className="relative h-full w-full overflow-hidden">
       <Map
         key={accessToken}
         bounds={bounds}
@@ -145,8 +145,6 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
 
       {/* Controls */}
       <Controls>
-        <LoadingControl loading={!mapTilesLoaded} />
-
         <ZoomControl
           viewport={{
             ...viewport,
@@ -165,6 +163,8 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
           }}
           onFitBoundsChange={handleFitBoundsChange}
         />
+
+        <LoadingControl loading={!mapTilesLoaded} />
       </Controls>
 
       {/* Legend */}

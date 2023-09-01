@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -56,7 +56,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
 
   const { uploadingGridId } = useSelector((state) => state['/projects/new']);
 
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = async (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     const f = acceptedFiles[0];
 
     const data = new FormData();
@@ -108,7 +108,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
     );
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
     // `file-too-large` backend error message is not friendly.
@@ -116,7 +116,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
         ? {
-            error,
+            ...error,
             message: `File is larger than ${bytesToMegabytes(
               PLANNING_AREA_GRID_UPLOADER_MAX_SIZE
             )} MB`,

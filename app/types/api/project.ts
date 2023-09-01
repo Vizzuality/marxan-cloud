@@ -4,6 +4,26 @@ export interface Project {
   area?: string;
   description?: string;
   contributors?: Record<string, unknown>[];
+  bbox?: number[];
+  countryId?: string;
+  createdAt?: string;
+  customProtectedAreas?: Record<string, unknown>[];
+  adminAreaLevel1I?: string;
+  adminAreaLevel2Id?: string;
+  planningAreaId?: string;
+  planningUnitAreakm2?: number;
+  planningUnitGridShape?: string;
+  publicMetadata?: {
+    [key: string]: unknown;
+  };
+  type?: string;
+  lastModifiedAt?: string;
+  isPublic?: boolean;
+  planningArea?: PlanningArea;
+  planningAreaName?: string;
+  metadata?: {
+    [key: string]: unknown;
+  };
 }
 
 export type PlanningUnit = 'square' | 'hexagon' | 'from_shapefile';

@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
 
 import Button from 'components/button';
-import MAP_WARNING_SVG from 'svgs/notifications/map-warning.svg';
+
+import MAP_WARNING_SVG from 'svgs/notifications/map-warning.svg?sprite';
+
 import ConfirmationPrompt, { ConfirmationPromptProps } from './index';
 
 export default {

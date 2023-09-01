@@ -211,7 +211,7 @@ export function useWDPAPreviewLayer({
               ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
             ],
             paint: {
-              'fill-color': COLORS.wdpa,
+              'fill-color': COLORS['wdpa-preview'],
             },
           },
           {
@@ -415,7 +415,7 @@ export function useTargetedPreviewLayers({
           : COLORS['features-preview'].ramp[selectedFeatures.length - 1 - index];
 
       return {
-        id: `feature-${id}-preview-layer-${cache}`,
+        id: `feature-${id}-targeted-preview-layer-${cache}`,
         type: 'vector',
         source: {
           type: 'vector',
@@ -525,6 +525,7 @@ export function usePUGridPreviewLayer({
  * PROYECT LAYERS
  *******************************************************************
  */
+
 export function useProjectPlanningAreaLayer({
   active,
   pId,
@@ -813,7 +814,7 @@ export function usePUGridLayer({
                         ['has', 'percentageProtected'],
                         ['>=', ['get', 'percentageProtected'], wdpaThreshold],
                       ],
-                      0.5 * WdpaPercentageOpacity,
+                      0.9 * WdpaPercentageOpacity,
                       0,
                     ],
                   },

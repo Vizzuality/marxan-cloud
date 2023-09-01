@@ -75,20 +75,6 @@ export const useProjectJobDone = (jobs, lastJobCheck) => {
   }, [jobs, lastJobCheck]);
 };
 
-export const useProjectTextDone = (JOB_DONE, JOB_DONE_REF) => {
-  return useMemo(() => {
-    if (JOB_DONE && TEXTS_RUNNING[JOB_DONE.kind]) {
-      return TEXTS_RUNNING[JOB_DONE.kind || JOB_DONE_REF?.current?.kind]();
-    }
-
-    if (JOB_DONE && !TEXTS_RUNNING[JOB_DONE.kind]) {
-      console.warn(`${JOB_DONE.kind} does not have a proper TEXT`);
-    }
-
-    return null;
-  }, [JOB_DONE, JOB_DONE_REF]);
-};
-
 export const useProjectJobRunning = (jobs, JOB_FAILURE) => {
   return useMemo(() => {
     return !JOB_FAILURE && jobs.find((j) => j.status === 'running');
