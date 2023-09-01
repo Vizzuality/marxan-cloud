@@ -1,19 +1,22 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import Link from 'next/link';
 
 import { useMe } from 'hooks/me';
 
 import LinkButton from 'components/button';
+import { AnchorButtonProps } from 'components/button';
+import Icon from 'components/icon';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Title from 'layout/header/title';
-import Breadcrumbs from 'layout/project/navigation/breadcrumbs';
+import { MENU_ITEM_COMMON_CLASSES, ICON_COMMON_CLASSES } from 'layout/project/navigation/constants';
+import UserMenu from 'layout/project/navigation/user-menu';
 import Wrapper from 'layout/wrapper';
 import { cn } from 'utils/cn';
 
 import LOGO_BLACK_SVG from 'svgs/logo-black.svg';
 import LOGO_SVG from 'svgs/logo.svg';
+import MENU_SVG from 'svgs/navigation/menu.svg?sprite';
 
 export interface HeaderProps {
   className?: string;
@@ -58,25 +61,42 @@ export const Header = ({
       >
         <Wrapper>
           <nav className="navbar-expand-lg relative mt-10 flex flex-wrap items-center justify-between md:mt-0">
-            {!user && (
-              <Link href="/">
-                <img
-                  alt="Marxan logo"
-                  src={theme === 'light' ? LOGO_BLACK_SVG : LOGO_SVG}
-                  style={SIZE[size].logo}
-                />
-              </Link>
-            )}
-            {user && (
-              <div className="pt-8">
-                <Breadcrumbs />
-              </div>
-            )}
+            <Link href="/">
+              <img
+                alt="Marxan logo"
+                src={theme === 'light' ? LOGO_BLACK_SVG : LOGO_SVG}
+                style={SIZE[size].logo}
+              />
+            </Link>
             {!published && <Title />}
-
             {!maintenance && (
               <>
-                {!user && (
+                {user ? (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button type="button" className={MENU_ITEM_COMMON_CLASSES}>
+                        <Icon
+                          className={cn({
+                            [ICON_COMMON_CLASSES]: true,
+                            'h-6 w-6': true,
+                            'text-white group-hover:text-gray-300': (
+                              ['dark', 'transparent'] as HeaderProps['theme'][]
+                            ).includes(theme),
+                            'group-hover:text-gray-300': theme === 'light',
+                          })}
+                          icon={MENU_SVG}
+                        />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      side="left"
+                      className="min-w-[410px] rounded-b-4xl rounded-tl-xl rounded-tr-4xl bg-white p-4"
+                      collisionPadding={48}
+                    >
+                      <UserMenu />
+                    </PopoverContent>
+                  </Popover>
+                ) : (
                   <div
                     className="flex items-center space-x-4"
                     style={{
@@ -85,10 +105,12 @@ export const Header = ({
                   >
                     <LinkButton
                       href="/auth/sign-in"
-                      theme={cx({
-                        clear: theme === 'light',
-                        'secondary-alt': theme !== 'light',
-                      })}
+                      theme={
+                        cn({
+                          clear: theme === 'light',
+                          'secondary-alt': theme !== 'light',
+                        }) as AnchorButtonProps['theme']
+                      }
                       size="s"
                     >
                       Sign in
