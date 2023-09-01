@@ -27,12 +27,11 @@ export const ReportMap = ({ id }: { id: string }): JSX.Element => {
 
   const dispatch = useAppDispatch();
 
-  const { data = {} } = useProject(pid);
+  const { data } = useProject(pid);
   const scenarioQuery = useScenario(sid);
 
-  const { bbox } = data;
   const BBOX = useBBOX({
-    bbox,
+    bbox: data?.bbox,
   });
 
   const minZoom = 2;
