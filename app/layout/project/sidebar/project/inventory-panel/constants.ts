@@ -2,6 +2,7 @@ import { NavigationInventoryTabs } from 'layout/project/navigation/types';
 
 import CostSurfaceTable from './cost-surfaces';
 import CostSurfaceInfo from './cost-surfaces/info';
+import CostSurfaceUploadModal from './cost-surfaces/modals/upload';
 import FeaturesTable from './features';
 import FeaturesInfo from './features/info';
 import FeatureUploadModal from './features/modals/upload';
@@ -22,6 +23,7 @@ export const INVENTORY_TABS = {
     search: 'Search cost surfaces',
     noData: 'No cost surfaces found.',
     InfoComponent: CostSurfaceInfo,
+    UploadModalComponent: CostSurfaceUploadModal,
     TableComponent: CostSurfaceTable,
   },
   features: {

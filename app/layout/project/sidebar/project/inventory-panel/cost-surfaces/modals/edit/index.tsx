@@ -5,7 +5,7 @@ import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
-import { useEditCostSurface, useProjectCostSurfaces } from 'hooks/cost-surface';
+import { useEditProjectCostSurface, useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -32,13 +32,13 @@ const EditModal = ({
 
   const allProjectCostSurfacesQuery = useProjectCostSurfaces(pid, {});
 
-  const editCostSurfaceMutation = useEditCostSurface();
+  const editProjectCostSurfaceMutation = useEditProjectCostSurface();
 
   const onEditSubmit = useCallback(
     (values: FormValues) => {
       const { name } = values;
 
-      editCostSurfaceMutation.mutate(
+      editProjectCostSurfaceMutation.mutate(
         {
           costSurfaceId,
           projectId: pid,
@@ -76,7 +76,7 @@ const EditModal = ({
         }
       );
     },
-    [addToast, costSurfaceId, editCostSurfaceMutation, handleModal, pid, queryClient]
+    [addToast, costSurfaceId, editProjectCostSurfaceMutation, handleModal, pid, queryClient]
   );
 
   return (

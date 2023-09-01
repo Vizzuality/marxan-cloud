@@ -6,7 +6,7 @@ export type DataItem = {
   scenarios: number;
   tag?: string;
   isVisibleOnMap: boolean;
-  isCustom: boolean;
+  isCustom?: boolean;
 };
 
 export type InventoryTable = {

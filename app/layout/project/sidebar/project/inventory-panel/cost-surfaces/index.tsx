@@ -45,6 +45,7 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
         data?.map((cs) => ({
           id: cs.id,
           name: cs.name,
+          isCustom: cs.isCustom,
           scenarioUsageCount: cs.scenarioUsageCount,
         })),
       keepPreviousData: true,
@@ -106,11 +107,12 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
 
   const displayBulkActions = selectedCostSurfaceIds.length > 0;
 
-  const data: DataItem[] = allProjectCostSurfacesQuery.data?.map((wdpa) => ({
-    ...wdpa,
-    name: wdpa.name,
-    scenarios: wdpa.scenarioUsageCount,
-    isVisibleOnMap: visibleCostSurfaces?.includes(wdpa.id),
+  const data: DataItem[] = allProjectCostSurfacesQuery.data?.map((cs) => ({
+    ...cs,
+    name: cs.name,
+    scenarios: cs.scenarioUsageCount,
+    isCustom: cs.isCustom,
+    isVisibleOnMap: visibleCostSurfaces?.includes(cs.id),
   }));
 
   return (
