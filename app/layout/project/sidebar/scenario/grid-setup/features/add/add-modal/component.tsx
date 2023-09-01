@@ -94,7 +94,7 @@ export const ScenariosFeaturesAdd = (): JSX.Element => {
           data: {
             status: 'draft',
             features: selected.map((fId) => {
-              const initialFeature = initialSelectedFeatures.find((f) => f.id === fId) || {};
+              const initialFeature = initialSelectedFeatures?.find((f) => f.id === fId) || {};
               const { marxanSettings, geoprocessingOperations } = initialFeature;
 
               return {
