@@ -108,8 +108,9 @@ import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { WebshotPdfReportConfig } from '@marxan/webshot/webshot.dto';
 import { ClearLockStatusParams } from '@marxan-api/modules/scenarios/dto/clear-lock-status-param.dto';
-import { CostRangeDto } from '@marxan-api/modules/scenarios/dto/cost-range.dto';
-import { plainToClass } from 'class-transformer';
+import { CostRangeDto } from "@marxan-api/modules/scenarios/dto/cost-range.dto";
+import { plainToClass } from "class-transformer";
+import { ProjectsService } from "@marxan-api/modules/projects/projects.service";
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -137,6 +138,7 @@ export class ScenariosController {
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
+    private readonly projectsService: ProjectsService
   ) {}
 
   @ApiOperation({
@@ -1419,5 +1421,52 @@ export class ScenariosController {
     }
 
     return result.right;
+  }
+
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    deprecated: true,
+    description:
+      'To be removed soon to POST /projects/:projectId/protected-areas/shapefile',
+  })
+  @GeometryFileInterceptor(GeometryKind.Complex)
+  @ApiTags(asyncJobTag)
+  @Post(':id/protected-areas/shapefile')
+  async shapefileForProtectedArea(
+    @Param('id') scenarioId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: UploadShapefileDto,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const scenario = await this.service.getById(scenarioId, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(scenario)) {
+      throw mapAclDomainToHttpError(scenario.left, {
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+
+
+    const outcome = await this.projectsService.addProtectedAreaFor(
+      scenario.right.projectId,
+      file,
+      { authenticatedUser: req.user },
+      dto,
+    );
+
+    if (isLeft(outcome)) {
+      if (isLeft(outcome)) {
+        throw mapAclDomainToHttpError(outcome.left, {
+          scenarioId,
+          userId: req.user.id,
+          resourceType: scenarioResource.name.plural,
+        });
+      }
+    }
+
+    return AsyncJobDto.forProject().asJsonApiMetadata();
   }
 }
