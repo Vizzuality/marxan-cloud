@@ -52,6 +52,7 @@ export const ProjectMap = (): JSX.Element => {
     isSidebarOpen,
     layerSettings,
     selectedFeatures: selectedFeaturesIds,
+    selectedCostSurfaces: selectedCostSurfacesIds,
   } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
@@ -106,19 +107,19 @@ export const ProjectMap = (): JSX.Element => {
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
     sid: sid ? `${sid}` : null,
-    include: 'results',
-    sublayers: [...(sid1 && !sid2 ? ['frequency'] : [])],
+    include: 'results,cost',
+    sublayers: [
+      ...(sid1 && !sid2 ? ['frequency'] : []),
+      ...(!!selectedCostSurfacesIds.length ? ['cost'] : []),
+    ],
     options: {
+      cost: { min: 1, max: 100 },
       settings: {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
         features: layerSettings.features,
         cost: layerSettings.cost,
-        'lock-in': layerSettings['lock-in'],
-        'lock-out': layerSettings['lock-out'],
-        'lock-available': layerSettings['lock-available'],
         frequency: layerSettings.frequency,
-        solution: layerSettings.solution,
       },
     },
   });
@@ -159,6 +160,7 @@ export const ProjectMap = (): JSX.Element => {
   const LEGEND = useLegend({
     layers: [
       ...(!!selectedFeaturesData?.length ? ['features-preview'] : []),
+      ...(!!selectedCostSurfacesIds?.length ? ['cost'] : []),
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
 
       ...(!!sid1 && !!sid2 ? ['compare'] : []),
@@ -168,6 +170,7 @@ export const ProjectMap = (): JSX.Element => {
     ],
     options: {
       layerSettings,
+      cost: { min: 1, max: 100 },
       items: selectedPreviewFeatures,
     },
   });

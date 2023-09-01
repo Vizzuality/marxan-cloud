@@ -17,8 +17,8 @@ export function useProjectCostSurfaces<T = CostSurface[]>(
 
   const mockData: CostSurface[] = [
     {
-      id: 'gfehrtf22534geyg',
-      name: 'Cost Surface Rwanda A',
+      id: 'b7454579-c48e-4e2f-8438-833280cb65d8',
+      name: 'Brazil 15 k Cost Surface',
       isCustom: true,
       scenarioUsageCount: 3,
     },
