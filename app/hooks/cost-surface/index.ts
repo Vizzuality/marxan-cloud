@@ -10,7 +10,7 @@ import UPLOADS from 'services/uploads';
 
 export function useProjectCostSurfaces<T = CostSurface[]>(
   pid: Project['id'],
-  params: { search?: string; sort?: string; filters?: Record<string, unknown> } = {},
+  params: { search?: string; sort?: string } = {},
   queryOptions: QueryObserverOptions<CostSurface[], Error, T> = {}
 ) {
   const { data: session } = useSession();
