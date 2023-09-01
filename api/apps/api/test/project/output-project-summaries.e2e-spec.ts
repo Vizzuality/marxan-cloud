@@ -109,11 +109,11 @@ describe('when generating output summary metadata for a project', () => {
   it('should generate zip files', async () => {
     // This test will arrange 2 scenarios, with 5 runs, and 5 Planning Units
     const projectId = await fixtures.GivenProjectExistsOnAPI('project');
-    const scenario1Id = await fixtures.GivenScenarioExistsOnAPI(
+    const scenario1Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
       'scenario1Name',
       projectId,
     );
-    const scenario2Id = await fixtures.GivenScenarioExistsOnAPI(
+    const scenario2Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
       'scenario2Name',
       projectId,
     );
@@ -184,11 +184,11 @@ describe('when generating output summary metadata for a project', () => {
   it('should generate zip files for any subsequent scenario runs', async () => {
     // This test will arrange 2 scenarios, with 5 runs, and 5 Planning Units
     const projectId = await fixtures.GivenProjectExistsOnAPI('project');
-    const scenario1Id = await fixtures.GivenScenarioExistsOnAPI(
+    const scenario1Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
       'scenario1Name',
       projectId,
     );
-    const scenario2Id = await fixtures.GivenScenarioExistsOnAPI(
+    const scenario2Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
       'scenario2Name',
       projectId,
     );
@@ -272,6 +272,78 @@ describe('when generating output summary metadata for a project', () => {
       scenarioIdToNameMapping,
     );
   });
+
+  it('should only generate zip files for scenarios that have been run', async () => {
+    const projectId = await fixtures.GivenProjectExistsOnAPI('project');
+    const scenario1Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
+      'scenario1Name',
+      projectId,
+    );
+    const scenario2Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
+      'scenario2Name',
+      projectId,
+    );
+
+    const scenarioWithNoRunId = await fixtures.GivenScenarioWithNoRunsExistsOnAPI(
+      'scenarioWithNorun',
+      projectId,
+    );
+
+    const projectPus = await fixtures.GivenProjectPuDataExists(projectId);
+    await fixtures.GivenScenarioPuDataExists(
+      projectId,
+      scenario1Id,
+      projectPus,
+    );
+    await fixtures.GivenScenarioPuDataExists(
+      projectId,
+      scenario2Id,
+      projectPus,
+    );
+
+    await fixtures.GivenOutputScenarioPuDataExists(
+      projectId,
+      scenario1Id,
+      scenarioPuDataForScenario1,
+    );
+    await fixtures.GivenOutputScenarioResultsExists(
+      projectId,
+      scenario1Id,
+      scenarioRunResultsForScenario1,
+    );
+
+    await fixtures.GivenOutputScenarioPuDataExists(
+      projectId,
+      scenario2Id,
+      scenarioPuDataForScenario2,
+    );
+    await fixtures.GivenOutputScenarioResultsExists(
+      projectId,
+      scenario2Id,
+      scenarioRunResultsForScenario2,
+    );
+
+    await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
+
+    const summaryEntityRun1 = await fixtures.ThenOutputSummaryForProjectIsPersisted(
+      projectId,
+    );
+    await fixtures.ThenSummaryCSVWasProperlyGenerated(
+      summaryEntityRun1,
+      marxanSummaryDataForProject,
+    );
+
+    await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
+
+    const summaryEntityRun2 = await fixtures.ThenOutputSummaryForProjectIsPersisted(
+      projectId,
+    );
+
+    await fixtures.ThenOutputCSVDoesNotContainScenarioWith(
+      summaryEntityRun2,
+      scenarioWithNoRunId,
+    );
+  });
 });
 
 const NUMBER_OF_PU_IN_SAMPLE = 5;
@@ -320,7 +392,18 @@ const getFixtures = async () => {
       await projectRepo.insert({ id: projectId, name, organizationId: orgId });
       return projectId;
     },
-    GivenScenarioExistsOnAPI: async (name: string, projectId: string) => {
+    GivenScenarioWithAtLeastOneRunExistsOnAPI: async (
+      name: string,
+      projectId: string,
+    ) => {
+      const id = v4();
+      await scenarioRepo.insert({ id, name, projectId, numberOfRuns: 1 });
+      return id;
+    },
+    GivenScenarioWithNoRunsExistsOnAPI: async (
+      name: string,
+      projectId: string,
+    ) => {
       const id = v4();
       await scenarioRepo.insert({ id, name, projectId });
       return id;
@@ -430,6 +513,37 @@ const getFixtures = async () => {
         `${outputProjectSummaryFolder}${outputProjectSummaryScenariosFilename}`,
       );
       await ThenOutputCSVWasProperlyGenerated(csvContent, data);
+    },
+    ThenOutputCSVDoesNotContainScenarioWith: async (
+      summaryEntity: any,
+      scenarioIdToExclude: string,
+    ) => {
+      const csvContent = await extractFileFromZip(
+        Readable.from(summaryEntity.summary_zipped_data),
+        `${outputProjectSummaryFolder}${outputProjectSummaryScenariosFilename}`,
+      );
+      const csvStream = parseStream(Readable.from(csvContent), {
+        headers: true,
+        objectMode: true,
+      });
+
+      let isScenarioPresent = false;
+
+      const checkScenarioPresence = await new Promise((resolve, reject) => {
+        csvStream.on('data', (chunk) => {
+          if (chunk.projectScenarioId === scenarioIdToExclude) {
+            isScenarioPresent = true;
+          }
+        });
+        csvStream.on('error', (err) => {
+          reject(err);
+        });
+        csvStream.on('finish', () => {
+          resolve(isScenarioPresent);
+        });
+      });
+
+      expect(checkScenarioPresence).toBe(false);
     },
   };
 };
