@@ -26,6 +26,11 @@ import { IUCNCategory } from '@marxan/iucn';
 import { isDefined } from '@marxan/utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { groupBy } from 'lodash';
+import {UpdateFeatureNameDto} from "@marxan-api/modules/geo-features/dto/update-feature-name.dto";
+import {Either, left, right} from "fp-ts/Either";
+import {UpdateProtectedAreaNameDto} from "@marxan-api/modules/protected-areas/dto/rename.protected-area.dto";
+import {projectNotEditable} from "@marxan-api/modules/projects/projects.service";
+import {ProjectAclService} from "@marxan-api/modules/access-control/projects-acl/project-acl.service";
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -48,6 +53,9 @@ export const protectedAreaResource: BaseServiceResource = {
     plural: 'protected_areas',
   },
 };
+
+export const globalProtectedAreaNotEditable = Symbol('global protected area cannot be renamed');
+export const protectedAreNotFound = Symbol('protected area not found');
 
 class ProtectedAreaFilters {
   /**
@@ -80,6 +88,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
     protected readonly repository: Repository<ProtectedArea>,
     @InjectRepository(Scenario)
     protected readonly scenarioRepository: Repository<Scenario>,
+    private readonly projectAclService: ProjectAclService,
   ) {
     super(repository, 'protected_area', 'protected_areas', {
       logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
@@ -298,5 +307,42 @@ export class ProtectedAreasCrudService extends AppBaseService<
     );
 
     return serializer.serialize(projectCustomProtectedAreas);
+  }
+
+  public async updateProtectedAreaNameForProject(
+    userId: string,
+    protectedAreaId: string,
+    updateProtectedAreaNameDto: UpdateProtectedAreaNameDto,
+  ): Promise<
+    Either<
+      | typeof protectedAreNotFound
+      | typeof globalProtectedAreaNotEditable
+      | typeof projectNotEditable,
+      ProtectedArea
+    >
+  > {
+    const protectedArea = await this.repository.findOne({
+      where: { id: protectedAreaId },
+    });
+    if (!protectedArea) {
+      return left(protectedAreNotFound);
+    }
+    if (!protectedArea.projectId) {
+      return left(globalProtectedAreaNotEditable);
+    }
+
+    if (!(await this.projectAclService.canEditProject(userId, protectedArea.projectId))) {
+      return left(projectNotEditable);
+    }
+
+
+    await this.repository.update(protectedAreaId, {
+      fullName: updateProtectedAreaNameDto.name,
+    });
+
+    const updatedProtectedArea = await this.repository.findOneOrFail({
+      where: { id: protectedAreaId },
+    });
+    return right(updatedProtectedArea);
   }
 }

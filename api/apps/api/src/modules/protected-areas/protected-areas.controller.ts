@@ -1,8 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
-  ParseUUIDPipe,
+  ParseUUIDPipe, Patch,
   Req,
   Res,
   UseGuards,
@@ -36,7 +37,11 @@ import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-categ
 import { Request, Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
-import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import {ImplementsAcl, IsMissingAclImplementation} from '@marxan-api/decorators/acl.decorator';
+import {inlineJobTag} from "@marxan-api/dto/inline-job-tag";
+import {RequestWithAuthenticatedUser} from "@marxan-api/app.controller";
+import {UpdateFeatureNameDto} from "@marxan-api/modules/geo-features/dto/update-feature-name.dto";
+import {UpdateProtectedAreaNameDto} from "@marxan-api/modules/protected-areas/dto/rename.protected-area.dto";
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -171,5 +176,23 @@ export class ProtectedAreasController {
     return await this.service.serialize(
       await this.service.getById(id, fetchSpecification),
     );
+  }
+
+
+  @ApiOperation({
+    description: `Updates the name of a protected by id`,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the protected area to be renamed',
+  })
+  @ApiTags(inlineJobTag)
+  @Patch(`:id`)
+  async updateName(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() body: UpdateProtectedAreaNameDto,
+  ): Promise<void> {
+
   }
 }
