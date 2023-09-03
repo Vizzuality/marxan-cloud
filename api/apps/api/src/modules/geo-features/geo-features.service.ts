@@ -759,7 +759,7 @@ export class GeoFeaturesService extends AppBaseService<
       return left(featureDataCannotBeUploadedWithCsv);
     }
 
-   return await this.featureAmountUploads.uploadFeatureFromCsv({
+    return await this.featureAmountUploads.uploadFeatureFromCsv({
       fileBuffer,
       projectId,
       userId,

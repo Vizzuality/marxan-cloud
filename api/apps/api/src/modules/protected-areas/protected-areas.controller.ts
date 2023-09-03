@@ -3,7 +3,8 @@ import {
   Controller,
   Get,
   Param,
-  ParseUUIDPipe, Patch,
+  ParseUUIDPipe,
+  Patch,
   Req,
   Res,
   UseGuards,
@@ -37,11 +38,16 @@ import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-categ
 import { Request, Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
-import {ImplementsAcl, IsMissingAclImplementation} from '@marxan-api/decorators/acl.decorator';
-import {inlineJobTag} from "@marxan-api/dto/inline-job-tag";
-import {RequestWithAuthenticatedUser} from "@marxan-api/app.controller";
-import {UpdateFeatureNameDto} from "@marxan-api/modules/geo-features/dto/update-feature-name.dto";
-import {UpdateProtectedAreaNameDto} from "@marxan-api/modules/protected-areas/dto/rename.protected-area.dto";
+import {
+  ImplementsAcl,
+  IsMissingAclImplementation,
+} from '@marxan-api/decorators/acl.decorator';
+import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
+import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
+import { UpdateProtectedAreaNameDto } from '@marxan-api/modules/protected-areas/dto/rename.protected-area.dto';
+import { isLeft } from 'fp-ts/Either';
+import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -178,7 +184,6 @@ export class ProtectedAreasController {
     );
   }
 
-
   @ApiOperation({
     description: `Updates the name of a protected by id`,
   })
@@ -192,7 +197,17 @@ export class ProtectedAreasController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Body() body: UpdateProtectedAreaNameDto,
-  ): Promise<void> {
+  ) {
+    const result = await this.service.updateProtectedAreaName(
+      req.user.id,
+      id,
+      body,
+    );
 
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left);
+    } else {
+      return this.service.serialize(result.right);
+    }
   }
 }

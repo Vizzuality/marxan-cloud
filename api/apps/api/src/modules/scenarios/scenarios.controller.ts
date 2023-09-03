@@ -108,8 +108,8 @@ import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { WebshotPdfReportConfig } from '@marxan/webshot/webshot.dto';
 import { ClearLockStatusParams } from '@marxan-api/modules/scenarios/dto/clear-lock-status-param.dto';
-import { CostRangeDto } from "@marxan-api/modules/scenarios/dto/cost-range.dto";
-import { plainToClass } from "class-transformer";
+import { CostRangeDto } from '@marxan-api/modules/scenarios/dto/cost-range.dto';
+import { plainToClass } from 'class-transformer';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
