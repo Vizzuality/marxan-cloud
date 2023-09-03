@@ -26,11 +26,11 @@ import { IUCNCategory } from '@marxan/iucn';
 import { isDefined } from '@marxan/utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { groupBy } from 'lodash';
-import {UpdateFeatureNameDto} from "@marxan-api/modules/geo-features/dto/update-feature-name.dto";
-import {Either, left, right} from "fp-ts/Either";
-import {UpdateProtectedAreaNameDto} from "@marxan-api/modules/protected-areas/dto/rename.protected-area.dto";
-import {projectNotEditable} from "@marxan-api/modules/projects/projects.service";
-import {ProjectAclService} from "@marxan-api/modules/access-control/projects-acl/project-acl.service";
+import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
+import { Either, left, right } from 'fp-ts/Either';
+import { UpdateProtectedAreaNameDto } from '@marxan-api/modules/protected-areas/dto/rename.protected-area.dto';
+import { projectNotEditable } from '@marxan-api/modules/projects/projects.service';
+import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -54,8 +54,12 @@ export const protectedAreaResource: BaseServiceResource = {
   },
 };
 
-export const globalProtectedAreaNotEditable = Symbol('global protected area cannot be renamed');
-export const protectedAreNotFound = Symbol('protected area not found');
+export const globalProtectedAreaNotEditable = Symbol(
+  'global protected area cannot be renamed',
+);
+export const protectedAreaNotFound = Symbol('protected area not found');
+
+export const protectedAreaNotEditable = Symbol('User not allowed to edit protected areas of the project')
 
 class ProtectedAreaFilters {
   /**
@@ -309,15 +313,15 @@ export class ProtectedAreasCrudService extends AppBaseService<
     return serializer.serialize(projectCustomProtectedAreas);
   }
 
-  public async updateProtectedAreaNameForProject(
+  public async updateProtectedAreaName(
     userId: string,
     protectedAreaId: string,
     updateProtectedAreaNameDto: UpdateProtectedAreaNameDto,
   ): Promise<
     Either<
-      | typeof protectedAreNotFound
+      | typeof protectedAreaNotFound
       | typeof globalProtectedAreaNotEditable
-      | typeof projectNotEditable,
+      | typeof protectedAreaNotEditable,
       ProtectedArea
     >
   > {
@@ -325,16 +329,20 @@ export class ProtectedAreasCrudService extends AppBaseService<
       where: { id: protectedAreaId },
     });
     if (!protectedArea) {
-      return left(protectedAreNotFound);
+      return left(protectedAreaNotFound);
     }
     if (!protectedArea.projectId) {
       return left(globalProtectedAreaNotEditable);
     }
 
-    if (!(await this.projectAclService.canEditProject(userId, protectedArea.projectId))) {
-      return left(projectNotEditable);
+    if (
+      !(await this.projectAclService.canEditProject(
+        userId,
+        protectedArea.projectId,
+      ))
+    ) {
+      return left(protectedAreaNotEditable);
     }
-
 
     await this.repository.update(protectedAreaId, {
       fullName: updateProtectedAreaNameDto.name,

@@ -101,6 +101,10 @@ import {
   tagNotFoundForProject,
 } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { outputProjectSummaryNotFound } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
+import {
+  globalProtectedAreaNotEditable, protectedAreaNotEditable,
+  protectedAreaNotFound,
+} from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -176,7 +180,10 @@ export const mapAclDomainToHttpError = (
     | typeof noFeaturesFoundInInFeatureAmountCsvUpload
     | ImportProjectError
     | typeof featureDataCannotBeUploadedWithCsv
-    | typeof outputProjectSummaryNotFound,
+    | typeof outputProjectSummaryNotFound
+    | typeof globalProtectedAreaNotEditable
+    | typeof protectedAreaNotFound
+    | typeof protectedAreaNotEditable,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -390,6 +397,12 @@ export const mapAclDomainToHttpError = (
       throw new NotFoundException(
         `Output Summary for Project with id: ${options?.projectId} not found`,
       );
+    case globalProtectedAreaNotEditable:
+      throw new ForbiddenException('Global protected areas are not editable.');
+    case protectedAreaNotFound:
+      throw new NotFoundException('Protected area not found.');
+    case protectedAreaNotEditable:
+      throw new ForbiddenException('User not allowed to edit protected areas of the project');
 
     default:
       const _exhaustiveCheck: never = errorToCheck;

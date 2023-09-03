@@ -1,6 +1,6 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { getFixtures } from './upload-feature.fixtures';
-import {v4} from "uuid";
+import { v4 } from 'uuid';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -23,8 +23,10 @@ test(`custom feature csv upload`, async () => {
 });
 
 test('custom feature csv upload when project not found', async () => {
-  const falseProjectId = v4()
-  const response = await fixtures.WhenUploadingCsvWhenProjectNotFound(falseProjectId);
+  const falseProjectId = v4();
+  const response = await fixtures.WhenUploadingCsvWhenProjectNotFound(
+    falseProjectId,
+  );
   await fixtures.ThenProjectNotFoundErrorIsReturned(response, falseProjectId);
   await fixtures.AndNoFeatureUploadIsRegistered();
 });
@@ -57,6 +59,3 @@ test('custom feature csv upload with duplicated header', async () => {
   await fixtures.ThenDuplicatedHeaderErrorIsReturned(response);
   await fixtures.AndNoFeatureUploadIsRegistered();
 });
-
-
-

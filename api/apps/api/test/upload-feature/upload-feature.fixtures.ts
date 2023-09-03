@@ -135,10 +135,7 @@ export const getFixtures = async () => {
       return request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/features/csv`)
         .set('Authorization', `Bearer ${token}`)
-        .attach(
-          `file`,
-          __dirname + `/import-files/missing_puids_upload.csv`,
-        )
+        .attach(`file`, __dirname + `/import-files/missing_puids_upload.csv`)
         .field({
           name: customFeatureName,
           description: customFeatureDesc,
@@ -149,10 +146,7 @@ export const getFixtures = async () => {
       return request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/features/csv`)
         .set('Authorization', `Bearer ${token}`)
-        .attach(
-          `file`,
-          __dirname + `/import-files/no_features_upload.csv`,
-        )
+        .attach(`file`, __dirname + `/import-files/no_features_upload.csv`)
         .field({
           name: customFeatureName,
           description: customFeatureDesc,
@@ -163,10 +157,7 @@ export const getFixtures = async () => {
       return request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/features/csv`)
         .set('Authorization', `Bearer ${token}`)
-        .attach(
-          `file`,
-          __dirname + `/import-files/duplicate_puids_upload.csv`,
-        )
+        .attach(`file`, __dirname + `/import-files/duplicate_puids_upload.csv`)
         .field({
           name: customFeatureName,
           description: customFeatureDesc,
@@ -177,10 +168,7 @@ export const getFixtures = async () => {
       return request(app.getHttpServer())
         .post(`/api/v1/projects/${falseProjectId}/features/csv`)
         .set('Authorization', `Bearer ${token}`)
-        .attach(
-          `file`,
-          __dirname + `/import-files/missing_puids_upload.csv`,
-        )
+        .attach(`file`, __dirname + `/import-files/missing_puids_upload.csv`)
         .field({
           name: customFeatureName,
           description: customFeatureDesc,
@@ -358,16 +346,25 @@ export const getFixtures = async () => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
       expect(result.body.errors[0].title).toEqual('Missing PUID column');
     },
-    ThenNoFeaturesInCsvFileErrorIsReturned: async (result: request.Response) => {
+    ThenNoFeaturesInCsvFileErrorIsReturned: async (
+      result: request.Response,
+    ) => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
     },
     ThenDuplicatedPUIDErrorIsReturned: async (result: request.Response) => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
-      expect(result.body.errors[0].title).toEqual('Duplicate PUIDs in feature amount CSV upload');
+      expect(result.body.errors[0].title).toEqual(
+        'Duplicate PUIDs in feature amount CSV upload',
+      );
     },
-    ThenProjectNotFoundErrorIsReturned: async (result: request.Response, falseProjectId: string) => {
+    ThenProjectNotFoundErrorIsReturned: async (
+      result: request.Response,
+      falseProjectId: string,
+    ) => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.NOT_FOUND);
-      expect(result.body.errors[0].title).toEqual(`Project with id ${falseProjectId} not found`);
+      expect(result.body.errors[0].title).toEqual(
+        `Project with id ${falseProjectId} not found`,
+      );
     },
     ThenDuplicatedHeaderErrorIsReturned: async (result: request.Response) => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
@@ -377,9 +374,7 @@ export const getFixtures = async () => {
     },
     ThenPuidsNotPresentErrorIsReturned: async (result: request.Response) => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
-      expect(result.body.errors[0].title).toEqual(
-        'Unknown PUIDs',
-      );
+      expect(result.body.errors[0].title).toEqual('Unknown PUIDs');
     },
     AndNoFeatureUploadIsRegistered: async () => {
       const featureImportRegistryRecord = await featureImportRegistry.findOne({
