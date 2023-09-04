@@ -4,6 +4,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-q
 
 import { useRouter } from 'next/router';
 
+import { AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import { formatDistance } from 'date-fns';
 import flatten from 'lodash/flatten';
@@ -818,6 +819,51 @@ export function useDownloadShapefileTemplate() {
       link.click();
       link.remove();
       console.info('Success', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDownloadScenarioComparisonReport({
+  requestConfig = {
+    method: 'GET',
+  },
+  projectId,
+}: {
+  requestConfig?: AxiosRequestConfig;
+  projectId: string;
+}) {
+  const { data: session } = useSession();
+
+  const downloadScenarioComparisonReport = ({
+    sid1,
+    sid2,
+    projectName,
+  }: {
+    sid1: string;
+    sid2: string;
+    projectName: string;
+  }) => {
+    const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
+
+    return axios.request({
+      url: `${baseUrl}/api/reports/project/${projectId}/comparison?sid1=${sid1}&sid2=${sid2}`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(downloadScenarioComparisonReport, {
+    onSuccess: (data, variables) => {
+      const { projectName } = variables;
+      const { data: blob } = data;
+      createDownloadLink(blob, `${projectName}-scenario-comparison.pdf`);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);

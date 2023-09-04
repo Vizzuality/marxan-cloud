@@ -136,6 +136,7 @@ export const COLORS = {
     ],
     '#FFF': ['99', '910', '109', '1010'],
   },
+  ['compare-legend']: ['#DE3397', '#1C9BD0'],
 };
 
 export const LEGEND_LAYERS = {
@@ -413,11 +414,11 @@ export const LEGEND_LAYERS = {
       items: [
         {
           value: `${scenario1?.name}`,
-          color: '#DE3397',
+          color: COLORS['compare-legend'][0],
         },
         {
           value: scenario2?.name,
-          color: '#1C9BD0',
+          color: COLORS['compare-legend'][1],
         },
       ],
     };

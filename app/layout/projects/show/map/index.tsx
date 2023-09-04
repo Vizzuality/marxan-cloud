@@ -20,10 +20,12 @@ import {
   useBBOX,
   useFeaturePreviewLayers,
 } from 'hooks/map';
-import { useProject } from 'hooks/projects';
+import { useDownloadScenarioComparisonReport, useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
 import Select from 'components/forms/select';
+import Icon from 'components/icon/component';
 import Loading from 'components/loading';
 import Map from 'components/map';
 import Controls from 'components/map/controls';
@@ -37,12 +39,15 @@ import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import HelpBeacon from 'layout/help/beacon';
+import { Scenario } from 'types/api/scenario';
 import { cn } from 'utils/cn';
 
+import PRINT_SVG from 'svgs/ui/print.svg?sprite';
+
 export const ProjectMap = (): JSX.Element => {
-  const [open, setOpen] = useState(true);
-  const [sid1, setSid1] = useState(null);
-  const [sid2, setSid2] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [sid1, setSid1] = useState<Scenario['id']>(null);
+  const [sid2, setSid2] = useState<Scenario['id']>(null);
   const {
     isSidebarOpen,
     layerSettings,
@@ -59,19 +64,12 @@ export const ProjectMap = (): JSX.Element => {
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const { query } = useRouter();
-
   const { pid, tab } = query as { pid: string; tab: string };
   const { data } = useProject(pid);
 
-  const {
-    id,
-    bbox,
-    // countryId,
-    // adminAreaLevel1Id,
-    // adminAreaLevel2Id,
-    // planningUnitGridShape,
-    // planningUnitAreakm2,
-  } = data;
+  const { addToast } = useToasts();
+
+  const { id, bbox, name: projectName } = data;
 
   const BBOX = useBBOX({
     bbox,
@@ -127,7 +125,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const PUCompareLayer = usePUCompareLayer({
     active: !!sid1 && !!sid2,
-    sid1,
+    sid: sid1,
     sid2,
     options: {
       ...layerSettings.compare,
@@ -313,6 +311,53 @@ export const ProjectMap = (): JSX.Element => {
     [dispatch, layerSettings]
   );
 
+  const downloadScenarioComparisonReportMutation = useDownloadScenarioComparisonReport({
+    projectId: pid,
+  });
+
+  const onDownloadReport = useCallback(() => {
+    addToast(
+      `info-generating-report-${pid}`,
+      <>
+        <h2 className="font-medium">Info</h2>
+        <p className="text-sm">{`Generating "${projectName}" scenario comparison PDF report`}</p>
+      </>,
+      {
+        level: 'info',
+      }
+    );
+
+    downloadScenarioComparisonReportMutation.mutate(
+      { sid1, sid2, projectName },
+      {
+        onSuccess: () => {
+          addToast(
+            `success-generating-report-${pid}`,
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">{`"${projectName}" scenario comparison PDF report generated`}</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+        },
+        onError: () => {
+          addToast(
+            `error-generating-report-${pid}`,
+            <>
+              <h2 className="font-medium">Error</h2>
+              <p className="text-sm">{`"${projectName}" scenario comparison PDF report not generated`}</p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
+  }, [pid, sid1, sid2, projectName, downloadScenarioComparisonReportMutation, addToast]);
+
   return (
     <AnimatePresence>
       {id && (
@@ -403,7 +448,15 @@ export const ProjectMap = (): JSX.Element => {
             />
             <LoadingControl loading={!mapTilesLoaded} />
           </Controls>
-
+          {/* Print */}
+          {!tab && sid1 && sid2 && (
+            <button
+              className="absolute bottom-32 right-5 flex h-14 w-14 items-center justify-center rounded-full bg-black"
+              onClick={onDownloadReport}
+            >
+              <Icon icon={PRINT_SVG} className="h-5 w-5 text-white" />
+            </button>
+          )}
           {/* Legend */}
           <div className="absolute bottom-16 right-5 w-full max-w-xs">
             <Legend

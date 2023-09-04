@@ -119,7 +119,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = () => {
 
           <div className="space-y-2">
             <p className="font-medium">Range of cost surface values:</p>
-            <p>{`${costSurfaceRangeData.min} - ${costSurfaceRangeData.max}`}</p>
+            <p>{`${costSurfaceRangeData?.min} - ${costSurfaceRangeData?.max}`}</p>
           </div>
 
           <div className="space-y-2">

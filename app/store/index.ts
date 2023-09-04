@@ -3,6 +3,7 @@ import projects from 'store/slices/projects';
 import projectsDetail from 'store/slices/projects/[id]';
 import projectsNew from 'store/slices/projects/new';
 import reportsBlm from 'store/slices/reports/blm';
+import reportsComparison from 'store/slices/reports/comparison';
 import reportsFrequency from 'store/slices/reports/frequency';
 import reportsSolutions from 'store/slices/reports/solutions';
 
@@ -17,6 +18,7 @@ const staticReducers = {
   '/reports/solutions': reportsSolutions,
   '/reports/blm': reportsBlm,
   '/reports/frequency': reportsFrequency,
+  '/reports/comparison': reportsComparison,
 };
 
 // ? As of date, I have not found a way to type async reducers, so they are just not typed.
