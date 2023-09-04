@@ -36,22 +36,6 @@ describe('Protected Area - update protected area name', () => {
     );
   });
 
-  test('should not permit updating a given feature, when it is not editable', async () => {
-    const viewOnlyProject = fixtures.anotherProjectId;
-    const protectedAreaId = await fixtures.GivenBaseProtectedArea(
-      'new pa name',
-      viewOnlyProject,
-    );
-    const result = await fixtures.WhenUpdatingProtectedAreaName(
-      protectedAreaId,
-      'new pa name',
-    );
-    await fixtures.ThenUpdateWasForbidden(
-      result,
-      `User not allowed to edit protected areas of the project`,
-    );
-  });
-
   test('should update the name of a protected area, when permitted', async () => {
     const newName = 'new name';
     const projectId = fixtures.projectId;

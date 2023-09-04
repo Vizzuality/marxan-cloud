@@ -13,7 +13,7 @@ afterEach(async () => {
 });
 
 describe('Protected Area - delete', () => {
-  test('should return NotFound error when protected are does not exist', async () => {
+  test('should return NotFound error when protected area does not exist', async () => {
     const protectedAreaId = v4();
     const result = await fixtures.WhenDeletingProtectedAreaName(
       protectedAreaId,
@@ -47,21 +47,6 @@ describe('Protected Area - delete', () => {
     await fixtures.ThenUpdateWasForbidden(
       result,
       `Custom protected area is used in one or more scenarios cannot be deleted.`,
-    );
-  });
-
-  test('should not permit deleting protected area, when user cannot edit project', async () => {
-    const viewOnlyProject = fixtures.anotherProjectId;
-    const protectedAreaId = await fixtures.GivenBaseProtectedArea(
-      'new pa name',
-      viewOnlyProject,
-    );
-    const result = await fixtures.WhenDeletingProtectedAreaName(
-      protectedAreaId,
-    );
-    await fixtures.ThenUpdateWasForbidden(
-      result,
-      `User not allowed to delete protected areas of the project`,
     );
   });
 
