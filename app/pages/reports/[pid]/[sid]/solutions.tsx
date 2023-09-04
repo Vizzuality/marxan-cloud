@@ -1,69 +1,97 @@
 import React from 'react';
 
-import { useRouter } from 'next/router';
-
 import { withProtection, withUser } from 'hoc/auth';
-
-import { useScenario } from 'hooks/scenarios';
-import { useBestSolution, useSolution } from 'hooks/solutions';
 
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
+import AdvancedSettingsPage from 'layout/scenarios/reports/solutions/advanced-settings';
+import BestSolutionPage from 'layout/scenarios/reports/solutions/best-solution';
+import CostSurfaceReport from 'layout/scenarios/reports/solutions/cost-surface';
+import DifferentSolutionsFirstPage from 'layout/scenarios/reports/solutions/different-solutions/first';
+import DifferentSolutionsSecondPage from 'layout/scenarios/reports/solutions/different-solutions/second';
+import FeaturesPage from 'layout/scenarios/reports/solutions/features';
+import FrequencyPage from 'layout/scenarios/reports/solutions/frequency';
+import GapAnalysisPage from 'layout/scenarios/reports/solutions/gap-analysis';
+import GridPage from 'layout/scenarios/reports/solutions/grid';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
-import IntroPage from 'layout/scenarios/reports/solutions/intro-page';
-import SelectedSolutionPage from 'layout/scenarios/reports/solutions/selected-solution-page';
-import SelectionFrequencyPage from 'layout/scenarios/reports/solutions/selection-frequency-page';
-import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
+import PUStatusReport from 'layout/scenarios/reports/solutions/pu-status';
+import ResumePage from 'layout/scenarios/reports/solutions/resume';
+import SolutionsTablePage from 'layout/scenarios/reports/solutions/solutions-table';
+import TargetAchievementPage from 'layout/scenarios/reports/solutions/target-achievement';
 import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 
 export const getServerSideProps = withProtection(withUser());
 
-const styles = {
-  page: {
-    minHeight: '200mm',
-    margin: 'auto',
-    padding: '8.73mm 13.49mm',
-    width: '297mm',
-    'break-after': 'page',
-  },
-};
-
-const SolutionsReport: React.FC = () => {
-  const { query } = useRouter();
-  const { sid, solutionId } = query as { sid: string; solutionId: string };
-
-  const { data: scenarioData } = useScenario(sid);
-
-  const { data: selectedSolutionData } = useSolution(sid, solutionId);
-
-  const { data: bestSolutionData } = useBestSolution(sid, {
-    enabled: scenarioData?.ranAtLeastOnce,
-  });
-
-  const { runId: solutionNumber } = selectedSolutionData || bestSolutionData;
-
+const PAGE_CLASSES =
+  'm-auto flex h-full min-h-[274mm] w-[210mm] flex-col bg-white px-[8.73mm] py-[13.49mm] text-black break-after-page';
+const MainReport: React.FC = () => {
   return (
     <>
       <Head title="Solutions Report" />
 
       <MetaIcons />
-      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
-        <IntroPage />
+      {/* PAGE 1 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <GridPage />
       </div>
-
-      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
-        <ReportHeader title="Selection Frequency" />
-        <SelectionFrequencyPage />
+      {/* PAGE 2 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <FrequencyPage />
       </div>
-
-      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
-        <ReportHeader title={`Selected Solution: ${solutionNumber}`} />
-        <SelectedSolutionPage />
+      {/* PAGE 3 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <BestSolutionPage />
       </div>
-
-      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
-        <ReportHeader title="Settings" />
-        <SettingsPage />
+      {/* PAGE 4 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <ResumePage />
+      </div>
+      {/* PAGE 5 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <AdvancedSettingsPage />
+      </div>
+      {/* PAGE 6 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <FeaturesPage />
+      </div>
+      {/* PAGE 7 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <div className="mt-10 flex flex-col space-y-10">
+          <PUStatusReport />
+          <CostSurfaceReport />
+        </div>
+      </div>
+      {/* PAGE 8 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <SolutionsTablePage />
+      </div>
+      {/* PAGE 9 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <DifferentSolutionsFirstPage />
+      </div>
+      {/* PAGE 10 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <DifferentSolutionsSecondPage />
+      </div>
+      {/* PAGE 11 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <GapAnalysisPage />
+      </div>
+      {/* PAGE 12 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <TargetAchievementPage />
       </div>
 
       <WebShotStatus />
@@ -71,4 +99,4 @@ const SolutionsReport: React.FC = () => {
   );
 };
 
-export default SolutionsReport;
+export default MainReport;

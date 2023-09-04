@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
-
-import { useDispatch } from 'react-redux';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
+import { useAppDispatch } from 'store/hooks';
 import { setMaps } from 'store/slices/reports/solutions';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
@@ -12,56 +11,59 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useAccessToken } from 'hooks/auth';
 import { useBBOX, usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
-import { useBestSolution, useSolution } from 'hooks/solutions';
+import { useScenario, useScenarioPU } from 'hooks/scenarios';
+import { useWDPACategories } from 'hooks/wdpa';
 
 import Map from 'components/map';
 
-export interface ScenariosReportMapProps {
-  id: string;
-}
-
-export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
-  id,
-}: ScenariosReportMapProps) => {
+export const ReportMap = ({ id }: { id: string }): JSX.Element => {
   const accessToken = useAccessToken();
   const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const { query } = useRouter();
 
-  const { pid, sid, solutionId } = query as { pid: string; sid: string; solutionId: string };
+  const { pid, sid } = query as { pid: string; sid: string };
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { data } = useProject(pid);
-  const { bbox } = data;
+  const scenarioQuery = useScenario(sid);
+
   const BBOX = useBBOX({
-    bbox,
+    bbox: data?.bbox,
   });
-
-  const { data: scenarioData } = useScenario(sid);
-
-  const { data: selectedSolutionData } = useSolution(sid, solutionId);
-
-  const { data: bestSolutionData } = useBestSolution(sid, {
-    enabled: scenarioData?.ranAtLeastOnce,
-  });
-  const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
 
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
 
+  const PUDataQuery = useScenarioPU(sid);
+
+  const protectedAreasQuery = useWDPACategories({
+    adminAreaId: data?.adminAreaLevel2Id || data?.adminAreaLevel1I || data?.countryId,
+    customAreaId:
+      !data?.adminAreaLevel2Id && !data?.adminAreaLevel1I && !data?.countryId
+        ? data?.planningAreaId
+        : null,
+    scenarioId: sid,
+  });
+  const protectedAreas = protectedAreasQuery.data?.filter((a) => a.selected).map((a) => a.name);
+
   const PUGridLayer = usePUGridLayer({
     cache,
     active: true,
     sid: sid ? `${sid}` : null,
-    include: 'results',
-    sublayers: ['solution'],
+    include: 'protection',
+    sublayers: ['lock-in', 'lock-out', 'lock-available', 'wdpa-percentage'],
     options: {
-      runId: SOLUTION_DATA?.runId,
+      wdpaIucnCategories: protectedAreas,
+      wdpaThreshold: scenarioQuery.data?.wdpaThreshold,
+      puIncludedValue: PUDataQuery.data?.included,
+      puExcludedValue: PUDataQuery.data?.excluded,
+      puAvailableValue: PUDataQuery.data?.available,
+      settings: {},
     },
   });
 
@@ -93,10 +95,6 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
     [accessToken]
   );
 
-  // const handleMapLoad = () => {
-  //   dispatch(setMaps({ [id]: true }));
-  // };
-
   useEffect(() => {
     if (mapTilesLoaded) {
       dispatch(setMaps({ [id]: true }));
@@ -105,7 +103,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
 
   return (
     <>
-      <div className="relative h-full w-2/3 overflow-hidden" style={{ height: '146.05mm' }}>
+      <div className="relative h-full w-4/6 overflow-hidden" style={{ height: '85mm' }}>
         <Map
           key={accessToken}
           className="map-report"
@@ -141,4 +139,4 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
   );
 };
 
-export default ScenariosReportMap;
+export default ReportMap;

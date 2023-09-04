@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
 
@@ -10,13 +10,11 @@ import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario, useScenarioPU } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-export interface WebShotStatusProps {}
-
 globalThis.MARXAN = {
   webshot_ready: false,
 };
 
-export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
+export const WebShotStatus = () => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 

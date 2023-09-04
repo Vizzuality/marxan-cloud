@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useDispatch } from 'react-redux';
 
@@ -13,24 +13,18 @@ import { useAccessToken } from 'hooks/auth';
 import { useBBOX, usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
+import { useBestSolution, useSolution } from 'hooks/solutions';
 
 import Map from 'components/map';
 
-export interface ScenariosReportMapProps {
-  id: string;
-}
-
-export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
-  id,
-}: ScenariosReportMapProps) => {
+export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
+  const accessToken = useAccessToken();
   const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
-  const accessToken = useAccessToken();
-
   const { query } = useRouter();
 
-  const { pid, sid } = query as { pid: string; sid: string };
+  const { pid, sid, solutionId } = query as { pid: string; sid: string; solutionId: string };
 
   const dispatch = useDispatch();
 
@@ -42,6 +36,13 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
 
   const { data: scenarioData } = useScenario(sid);
 
+  const { data: selectedSolutionData } = useSolution(sid, solutionId);
+
+  const { data: bestSolutionData } = useBestSolution(sid, {
+    enabled: scenarioData?.ranAtLeastOnce,
+  });
+  const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
+
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
@@ -52,9 +53,9 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
     active: true,
     sid: sid ? `${sid}` : null,
     include: 'results',
-    sublayers: ['frequency'],
+    sublayers: ['solution'],
     options: {
-      wdpaThreshold: scenarioData?.wdpaThreshold,
+      runId: SOLUTION_DATA?.runId,
     },
   });
 

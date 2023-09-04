@@ -195,35 +195,26 @@ export function useMostDifferentSolutions(sid) {
   }, [query, data]);
 }
 
-export function useBestSolution(sid, queryOptions) {
+export function useBestSolution(sid: Scenario['id'], queryOptions = {}) {
   const { data: session } = useSession();
 
-  const query = useQuery(
-    ['solutions-best', sid],
-    async () =>
-      SCENARIOS.request({
+  return useQuery({
+    queryKey: ['solutions-best', sid],
+    queryFn: async () =>
+      SCENARIOS.request<{ data: Solution }>({
         method: 'GET',
         url: `/${sid}/marxan/solutions/best`,
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
-      }).then((response) => {
-        return response.data;
-      }),
-    {
-      keepPreviousData: true,
-      ...queryOptions,
-    }
-  );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data || {},
-    };
-  }, [query, data]);
+      }).then((response) => response.data),
+    ...queryOptions,
+    placeholderData: {
+      data: {} as Solution,
+    },
+    keepPreviousData: true,
+    select: ({ data }) => data,
+  });
 }
 
 export function useDownloadSolutions({

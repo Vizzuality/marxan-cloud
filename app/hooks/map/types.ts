@@ -121,7 +121,7 @@ export interface UsePUGridLayer {
     puIncludedValue?: string[];
     puExcludedValue?: string[];
     puAvailableValue?: string[];
-    runId?: string;
+    runId?: number;
     features?: string[];
     preHighlightFeatures?: Array<string>;
     postHighlightFeatures?: Array<string>;
@@ -206,7 +206,7 @@ export interface UseLegend {
     puIncludedValue?: string[];
     puExcludedValue?: string[];
     puAvailableValue?: string[];
-    runId?: string;
+    runId?: number;
     numberOfRuns?: number;
     layerSettings?: Record<string, Record<string, unknown>>;
   };

@@ -96,7 +96,7 @@ export interface UseDownloadScenarioReportProps {
   requestConfig?: AxiosRequestConfig;
   projectName: string;
   scenarioName: string;
-  runId: string;
+  runId: number | string;
 }
 
 export interface DownloadScenarioReportProps {
