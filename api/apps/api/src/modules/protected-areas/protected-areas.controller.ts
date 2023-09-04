@@ -200,13 +200,16 @@ export class ProtectedAreasController {
     name: 'id',
     description: 'Id of the protected area to be renamed',
   })
+  @ApiOkResponse({
+    type: ProtectedAreaResult,
+  })
   @ApiTags(inlineJobTag)
   @Patch(`:id`)
   async updateName(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Body() body: UpdateProtectedAreaNameDto,
-  ) {
+  ): Promise<ProtectedAreaResult> {
     const result = await this.service.updateProtectedAreaName(
       req.user.id,
       id,
