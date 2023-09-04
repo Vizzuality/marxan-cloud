@@ -33,8 +33,8 @@ export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element =>
 
   const { layerSettings } = useAppSelector((state) => state['/projects/[id]']);
 
-  const { data = {} } = useProject(pid);
-  const { bbox } = data;
+  const { data } = useProject(pid);
+  const { bbox } = data || {};
   const BBOX = useBBOX({
     bbox,
   });
