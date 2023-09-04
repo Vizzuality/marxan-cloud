@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -48,6 +51,12 @@ import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/updat
 import { UpdateProtectedAreaNameDto } from '@marxan-api/modules/protected-areas/dto/rename.protected-area.dto';
 import { isLeft } from 'fp-ts/Either';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
+import { projectNotFound } from '@marxan-api/modules/projects/projects.service';
+import {
+  featureIsLinkedToOneOrMoreScenarios,
+  featureNotDeletable,
+  featureNotFound,
+} from '@marxan-api/modules/geo-features/geo-features.service';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -208,6 +217,31 @@ export class ProtectedAreasController {
       throw mapAclDomainToHttpError(result.left);
     } else {
       return this.service.serialize(result.right);
+    }
+  }
+
+  @ApiOperation({
+    description: 'Deletes a custom protected area by id',
+  })
+  @ApiParam({
+    name: 'protectedAreaId',
+    description: 'ID of the Protected Area to be deleted',
+  })
+  @ApiTags(inlineJobTag)
+  @Delete(':id')
+  async deleteFeature(
+    @Param('id') protectedAreaId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.service.deleteProtectedArea(
+      req.user.id,
+      protectedAreaId,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left);
+    } else {
+      return;
     }
   }
 }

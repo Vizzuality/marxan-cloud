@@ -29,8 +29,16 @@ import { groupBy } from 'lodash';
 import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import { Either, left, right } from 'fp-ts/Either';
 import { UpdateProtectedAreaNameDto } from '@marxan-api/modules/protected-areas/dto/rename.protected-area.dto';
-import { projectNotEditable } from '@marxan-api/modules/projects/projects.service';
+import {
+  projectNotEditable,
+  projectNotFound,
+} from '@marxan-api/modules/projects/projects.service';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
+import {
+  featureIsLinkedToOneOrMoreScenarios,
+  featureNotDeletable,
+  featureNotFound,
+} from '@marxan-api/modules/geo-features/geo-features.service';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -57,9 +65,23 @@ export const protectedAreaResource: BaseServiceResource = {
 export const globalProtectedAreaNotEditable = Symbol(
   'global protected area cannot be renamed',
 );
+
+export const globalProtectedAreaNotDeletable = Symbol(
+  'global protected area cannot be deleted',
+);
 export const protectedAreaNotFound = Symbol('protected area not found');
 
-export const protectedAreaNotEditable = Symbol('User not allowed to edit protected areas of the project')
+export const customProtectedAreaNotEditableByUser = Symbol(
+  'User not allowed to edit protected areas of the project',
+);
+
+export const customProtectedAreaNotDeletableByUser = Symbol(
+  'User not allowed to delete protected areas of the project',
+);
+
+export const customProtectedAreaIsUsedInOneOrMoreScenarios = Symbol(
+  'Custom protected area is used in one or more scenarios',
+);
 
 class ProtectedAreaFilters {
   /**
@@ -321,7 +343,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
     Either<
       | typeof protectedAreaNotFound
       | typeof globalProtectedAreaNotEditable
-      | typeof protectedAreaNotEditable,
+      | typeof customProtectedAreaNotEditableByUser,
       ProtectedArea
     >
   > {
@@ -341,7 +363,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
         protectedArea.projectId,
       ))
     ) {
-      return left(protectedAreaNotEditable);
+      return left(customProtectedAreaNotEditableByUser);
     }
 
     await this.repository.update(protectedAreaId, {
@@ -352,5 +374,51 @@ export class ProtectedAreasCrudService extends AppBaseService<
       where: { id: protectedAreaId },
     });
     return right(updatedProtectedArea);
+  }
+
+  public async deleteProtectedArea(
+    userId: string,
+    protectedAreaId: string,
+  ): Promise<
+    Either<
+      | typeof protectedAreaNotFound
+      | typeof globalProtectedAreaNotDeletable
+      | typeof customProtectedAreaNotDeletableByUser
+      | typeof customProtectedAreaIsUsedInOneOrMoreScenarios,
+      true
+    >
+  > {
+    const protectedArea = await this.repository.findOne({
+      where: { id: protectedAreaId },
+    });
+    if (!protectedArea) {
+      return left(protectedAreaNotFound);
+    }
+    if (!protectedArea.projectId) {
+      return left(globalProtectedAreaNotDeletable);
+    }
+
+    if (
+      !(await this.projectAclService.canEditProject(
+        userId,
+        protectedArea.projectId,
+      ))
+    ) {
+      return left(customProtectedAreaNotDeletableByUser);
+    }
+
+    const projectProtectedAreas = await this.listForProject(
+      protectedArea.projectId,
+    );
+    const protectedAreaData = projectProtectedAreas.data.find(
+      (pa: ProtectedArea) => pa.id === protectedAreaId,
+    );
+    if (protectedAreaData?.attributes.scenarioUsageCount > 0) {
+      return left(customProtectedAreaIsUsedInOneOrMoreScenarios);
+    }
+
+    await this.repository.delete(protectedAreaId);
+
+    return right(true);
   }
 }

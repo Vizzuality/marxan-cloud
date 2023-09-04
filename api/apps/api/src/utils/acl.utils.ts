@@ -102,8 +102,12 @@ import {
 } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { outputProjectSummaryNotFound } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
 import {
-  globalProtectedAreaNotEditable, protectedAreaNotEditable,
+  customProtectedAreaNotEditableByUser,
+  globalProtectedAreaNotEditable,
+  customProtectedAreaNotDeletableByUser,
   protectedAreaNotFound,
+  customProtectedAreaIsUsedInOneOrMoreScenarios,
+  globalProtectedAreaNotDeletable,
 } from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
 
 interface ErrorHandlerOptions {
@@ -183,7 +187,10 @@ export const mapAclDomainToHttpError = (
     | typeof outputProjectSummaryNotFound
     | typeof globalProtectedAreaNotEditable
     | typeof protectedAreaNotFound
-    | typeof protectedAreaNotEditable,
+    | typeof customProtectedAreaNotEditableByUser
+    | typeof customProtectedAreaNotDeletableByUser
+    | typeof customProtectedAreaIsUsedInOneOrMoreScenarios
+    | typeof globalProtectedAreaNotDeletable,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -399,10 +406,24 @@ export const mapAclDomainToHttpError = (
       );
     case globalProtectedAreaNotEditable:
       throw new ForbiddenException('Global protected areas are not editable.');
+    case globalProtectedAreaNotDeletable:
+      throw new ForbiddenException(
+        'Global protected areas can not be deleted.',
+      );
     case protectedAreaNotFound:
       throw new NotFoundException('Protected area not found.');
-    case protectedAreaNotEditable:
-      throw new ForbiddenException('User not allowed to edit protected areas of the project');
+    case customProtectedAreaNotEditableByUser:
+      throw new ForbiddenException(
+        'User not allowed to edit protected areas of the project',
+      );
+    case customProtectedAreaNotDeletableByUser:
+      throw new ForbiddenException(
+        'User not allowed to delete protected areas of the project',
+      );
+    case customProtectedAreaIsUsedInOneOrMoreScenarios:
+      throw new ForbiddenException(
+        `Custom protected area is used in one or more scenarios cannot be deleted.`,
+      );
 
     default:
       const _exhaustiveCheck: never = errorToCheck;
