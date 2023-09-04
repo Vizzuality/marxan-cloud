@@ -8,10 +8,6 @@ import cx from 'classnames';
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import HelpBeacon from 'layout/help/beacon';
-import ScenarioSettings from 'layout/projects/show/scenarios/settings';
-import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
-import ScenarioTypes from 'layout/projects/show/scenarios/types';
 import { flatten } from 'lodash';
 
 import { useCanEditProject } from 'hooks/permissions';
@@ -32,6 +28,11 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
 import ScenarioItem from 'components/scenarios/item';
+import HelpBeacon from 'layout/help/beacon';
+import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
+import ScenarioSettings from 'layout/projects/show/scenarios/settings';
+import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
+import ScenarioTypes from 'layout/projects/show/scenarios/types';
 
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 
@@ -224,7 +225,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
           <div className="relative overflow-hidden" id="scenarios-list">
             {!hasScenarios && (search || hasFilters) && (
               <div className="py-6">
-                <>No results found</>
+                <NoResults />
               </div>
             )}
 

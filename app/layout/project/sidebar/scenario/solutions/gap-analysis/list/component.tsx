@@ -15,6 +15,7 @@ import { useBestSolution } from 'hooks/solutions';
 
 import Item from 'components/gap-analysis/item';
 import Loading from 'components/loading';
+import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 
 export interface ScenariosPostGapAnalysisListProps {
   search?: string;
@@ -111,15 +112,10 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
           </div>
         )}
 
-        <div className="py-6">
-          {!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length) && (
-            <div className="flex h-40 w-full items-center justify-center text-sm uppercase">
-              No results found
-            </div>
-          )}
-
-          {allFeaturesData &&
-            allFeaturesData.map((item, i) => {
+        {!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length) && <NoResults />}
+        {allFeaturesData.length > 0 && (
+          <div className="py-6">
+            {allFeaturesData.map((item, i) => {
               return (
                 <div
                   key={`${item.id}`}
@@ -136,7 +132,8 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
                 </div>
               );
             })}
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />

@@ -9,6 +9,7 @@ import useBottomScrollListener from 'hooks/scroll';
 
 import Item from 'components/features/raw-item';
 import Loading from 'components/loading';
+import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 
 export interface ScenariosFeaturesAddListProps {
   search?: string;
@@ -75,11 +76,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
         )}
 
         <div>
-          {!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length) && (
-            <div className="flex h-40 w-full items-center justify-center text-sm uppercase">
-              No results found
-            </div>
-          )}
+          {!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length) && <NoResults />}
 
           {allFeaturesData &&
             allFeaturesData.map((item) => {

@@ -7,5 +7,5 @@ export type RowItem = {
   selectedIds: string[];
   onSelectRow: (evt: ChangeEvent<HTMLInputElement>) => void;
   onToggleSeeOnMap: (id: string) => void;
-  ActionsComponent: ({ item }) => JSX.Element;
+  ActionsComponent: ({ item }: { item: DataItem }) => JSX.Element;
 };

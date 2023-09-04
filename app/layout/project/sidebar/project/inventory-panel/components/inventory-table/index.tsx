@@ -1,5 +1,6 @@
 import Checkbox from 'components/forms/checkbox';
 import Loading from 'components/loading';
+import { ScrollArea } from 'components/scroll-area';
 
 import HeaderItem from './header-item';
 import RowItem from './row-item';
@@ -32,8 +33,8 @@ const InventoryTable = ({
       )}
       {noData && <div className="flex h-[200px] items-center justify-center">{noDataMessage}</div>}
       {!!data?.length && (
-        <table className="w-full table-auto space-y-2">
-          <thead className="text-left text-xs font-semibold uppercase">
+        <table className="relative flex h-full w-full flex-col space-y-2 overflow-hidden after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-700 after:via-gray-700">
+          <thead className="relative block text-left text-xs font-semibold uppercase before:pointer-events-none before:absolute before:left-0 before:top-full before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-700 before:via-gray-700">
             <tr className="flex w-full items-center pl-1">
               <th>
                 <Checkbox
@@ -64,18 +65,20 @@ const InventoryTable = ({
               </th>
             </tr>
           </thead>
-          <tbody className="block divide-y divide-gray-400 overflow-y-auto overflow-x-hidden pl-1 align-baseline text-sm">
-            {data.map((item) => (
-              <RowItem
-                key={item.id}
-                item={item}
-                selectedIds={selectedIds}
-                onSelectRow={onSelectRow}
-                onToggleSeeOnMap={onToggleSeeOnMap}
-                ActionsComponent={ActionsComponent}
-              />
-            ))}
-          </tbody>
+          <ScrollArea className="h-full">
+            <tbody className="block h-full divide-y divide-gray-400 pb-4 pl-1 align-baseline text-sm">
+              {data.map((item) => (
+                <RowItem
+                  key={item.id}
+                  item={item}
+                  selectedIds={selectedIds}
+                  onSelectRow={onSelectRow}
+                  onToggleSeeOnMap={onToggleSeeOnMap}
+                  ActionsComponent={ActionsComponent}
+                />
+              ))}
+            </tbody>
+          </ScrollArea>
         </table>
       )}
     </>

@@ -9,6 +9,7 @@ import useBottomScrollListener from 'hooks/scroll';
 
 import Item from 'components/features/intersect-item';
 import Loading from 'components/loading';
+import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 
 export interface ScenariosFeaturesIntersectListProps {
   search?: string;
@@ -88,11 +89,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
         )}
 
         <div className="py-3" style={{ transform: 'translateZ(0)' }}>
-          {!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length) && (
-            <div className="flex h-40 w-full items-center justify-center text-sm uppercase">
-              No results found
-            </div>
-          )}
+          {!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length) && <NoResults />}
 
           {allFeaturesData &&
             allFeaturesData.map((item, i) => {

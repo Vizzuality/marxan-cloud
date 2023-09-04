@@ -22,6 +22,7 @@ import Label from 'components/forms/label';
 import Select from 'components/forms/select';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+import { ScrollArea } from 'components/scroll-area';
 import Section from 'layout/section';
 
 import ProtectedAreasSelected from '../pa-selected';
@@ -196,7 +197,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
   }
 
   return (
-    <Section>
+    <Section className="flex h-full flex-col overflow-hidden">
       <div className="space-y-1">
         <span className="text-xs font-semibold text-blue-400">Grid Setup</span>
         <h3 className="flex items-center space-x-2">
@@ -240,7 +241,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
             <form
               onSubmit={handleSubmit}
               autoComplete="off"
-              className="relative flex w-full flex-grow flex-col overflow-hidden"
+              className="relative flex w-full flex-col overflow-hidden"
             >
               <Loading
                 visible={submitting}
@@ -248,12 +249,12 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
                 iconClassName="w-10 h-10 text-white"
               />
 
-              <div className="relative flex flex-grow flex-col overflow-hidden">
-                <div className="relative overflow-y-auto overflow-x-visible px-0.5">
-                  <div className="py-6">
-                    {/* WDPA */}
+              <ScrollArea className="relative h-full pr-3 before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-700 before:via-gray-700 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-700 after:via-gray-700">
+                <div className="relative flex flex-grow flex-col">
+                  <div className="relative overflow-x-visible px-0.5">
+                    <div className="py-6">
+                      {/* WDPA */}
 
-                    <div>
                       <FieldRFF name="wdpaIucnCategories">
                         {(fprops) => (
                           <Field id="wdpaIucnCategories" {...fprops}>
@@ -333,55 +334,56 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
                           </Field>
                         )}
                       </FieldRFF>
+
+                      {WDPA_CATEGORIES_OPTIONS.length > 1 && (
+                        <p className="py-4 text-center text-sm">or</p>
+                      )}
+
+                      <FieldRFF name="uploadedProtectedArea">
+                        {(flprops) => {
+                          return <ProtectedAreaUploader {...flprops} />;
+                        }}
+                      </FieldRFF>
+
+                      {areWDPAreasSelected && (
+                        <ProtectedAreasSelected
+                          form={form}
+                          options={WDPA_OPTIONS}
+                          title="Selected protected areas:"
+                          wdpaIucnCategories={values.wdpaIucnCategories}
+                        />
+                      )}
+
+                      {areProjectPAreasSelected && (
+                        <ProtectedAreasSelected
+                          form={form}
+                          options={PROJECT_PA_OPTIONS}
+                          title="Uploaded protected areas:"
+                          wdpaIucnCategories={values.wdpaIucnCategories}
+                        />
+                      )}
                     </div>
-
-                    {WDPA_CATEGORIES_OPTIONS.length > 1 && (
-                      <p className="py-4 text-center text-sm">or</p>
-                    )}
-
-                    <FieldRFF name="uploadedProtectedArea">
-                      {(flprops) => {
-                        return <ProtectedAreaUploader {...flprops} />;
-                      }}
-                    </FieldRFF>
-
-                    {areWDPAreasSelected && (
-                      <ProtectedAreasSelected
-                        form={form}
-                        options={WDPA_OPTIONS}
-                        title="Selected protected areas:"
-                        wdpaIucnCategories={values.wdpaIucnCategories}
-                      />
-                    )}
-
-                    {areProjectPAreasSelected && (
-                      <ProtectedAreasSelected
-                        form={form}
-                        options={PROJECT_PA_OPTIONS}
-                        title="Uploaded protected areas:"
-                        wdpaIucnCategories={values.wdpaIucnCategories}
-                      />
-                    )}
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-col space-y-4 text-xs text-white">
-                <p className="leading-relaxed opacity-50">
-                  UNEP-WCMC and IUCN (2022), Protected Planet: The World Database on Protected Areas
-                  (WDPA) [On-line], [05/2022], Cambridge, UK: UNEP-WCMC and IUCN.
-                </p>
-                <p>
-                  Available at:{' '}
-                  <a
-                    className="text-primary-500"
-                    href="www.protectedplanet.net"
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    www.protectedplanet.net.
-                  </a>
-                </p>
-              </div>
+
+                <div className="flex flex-col space-y-4 text-xs text-white">
+                  <p className="leading-relaxed opacity-50">
+                    UNEP-WCMC and IUCN (2022), Protected Planet: The World Database on Protected
+                    Areas (WDPA) [On-line], [05/2022], Cambridge, UK: UNEP-WCMC and IUCN.
+                  </p>
+                  <p>
+                    Available at:{' '}
+                    <a
+                      className="text-primary-500"
+                      href="www.protectedplanet.net"
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      www.protectedplanet.net.
+                    </a>
+                  </p>
+                </div>
+              </ScrollArea>
 
               <div className="mt-5 flex justify-center space-x-2">
                 <Button theme="secondary-alt" size="lg" type="submit" className="relative px-20">

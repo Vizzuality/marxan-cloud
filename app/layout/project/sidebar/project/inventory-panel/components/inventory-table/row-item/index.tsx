@@ -85,4 +85,6 @@ const RowItem = ({
   );
 };
 
+export { type RowItem } from './types';
+
 export default RowItem;

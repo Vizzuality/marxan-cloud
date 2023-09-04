@@ -111,7 +111,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
 
   return (
     <div className="flex flex-col space-y-6 overflow-hidden">
-      <div className="h-full overflow-y-auto overflow-x-hidden">
+      <div className="h-full overflow-hidden">
         <InventoryTable
           loading={allFeaturesQuery.isFetching}
           data={data}

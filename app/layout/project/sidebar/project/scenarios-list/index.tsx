@@ -17,7 +17,6 @@ import {
   useDuplicateScenario,
   useCancelRunScenario,
 } from 'hooks/scenarios';
-import useBottomScrollListener from 'hooks/scroll';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -25,7 +24,9 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
+import { ScrollArea } from 'components/scroll-area';
 import HelpBeacon from 'layout/help/beacon';
+import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 import ScenarioToolbar from 'layout/project/sidebar/project/scenarios-list/toolbar';
 import { cn } from 'utils/cn';
 
@@ -55,10 +56,7 @@ export const ScenariosList: React.FC = () => {
 
   const {
     data: scenariosData,
-    fetchNextPage: scenariosFetchNextPage,
-    hasNextPage,
     isFetching: scenariosIsFetching,
-    isFetchingNextPage: scenariosIsFetchingNextPage,
     isFetched: scenariosIsFetched,
   } = useScenarios(pid, {
     search,
@@ -67,10 +65,6 @@ export const ScenariosList: React.FC = () => {
       ...filters,
     },
     sort,
-  });
-
-  const scrollRef = useBottomScrollListener(() => {
-    if (hasNextPage) scenariosFetchNextPage();
   });
 
   const projectLoading = projectIsFetching && !projectIsFetched;
@@ -205,22 +199,29 @@ export const ScenariosList: React.FC = () => {
           iconClassName="w-10 h-10 text-primary-500"
         />
 
-        <div key="projects-scenarios" className="relative flex flex-grow flex-col overflow-hidden">
+        <div
+          key="projects-scenarios"
+          className="relative flex flex-grow flex-col space-y-3 overflow-hidden"
+        >
           {(hasScenarios || search || hasFilters) && <ScenarioToolbar />}
 
-          <div className="relative overflow-hidden" id="scenarios-list">
+          <div
+            className={cn({
+              'relative overflow-hidden': true,
+              'relative flex h-full flex-col overflow-hidden before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-black before:via-black after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-black after:via-black':
+                hasScenarios,
+            })}
+            id="scenarios-list"
+          >
             {!hasScenarios && (search || hasFilters) && (
               <div className="py-6">
-                <>No results found</>
+                <NoResults />
               </div>
             )}
 
             {hasScenarios && (
-              <div
-                ref={scrollRef}
-                className="relative z-0 flex max-h-full flex-col overflow-y-auto overflow-x-hidden py-6"
-              >
-                <ul className="space-y-3">
+              <ScrollArea className="flex h-full flex-col overflow-hidden">
+                <ul className="space-y-3 py-5">
                   {scenariosData.map((s, i) => {
                     const TAG = i === 0 ? HelpBeacon : Fragment;
 
@@ -256,21 +257,8 @@ export const ScenariosList: React.FC = () => {
                     );
                   })}
                 </ul>
-              </div>
+              </ScrollArea>
             )}
-
-            <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-black via-black" />
-
-            <div
-              className={cn({
-                'opacity-100': scenariosIsFetchingNextPage,
-                'pointer-events-none absolute bottom-0 left-0 z-20 w-full text-center font-heading text-xs uppercase opacity-0 transition':
-                  true,
-              })}
-            >
-              <div className="bg-gray-200 py-1">Loading more...</div>
-              <div className="h-6 w-full bg-white" />
-            </div>
           </div>
 
           {!hasScenarios && !search && !hasFilters && scenariosIsFetched && (

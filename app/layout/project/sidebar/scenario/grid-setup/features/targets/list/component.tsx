@@ -18,6 +18,7 @@ import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Item from 'components/features/target-spf-item';
 import Loading from 'components/loading';
+import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 import { cn } from 'utils/cn';
 
 export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void }): JSX.Element => {
@@ -264,11 +265,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
             iconClassName="w-10 h-10 text-white"
           />
 
-          {(!targetedFeaturesData || !targetedFeaturesData.length) && (
-            <div className="flex h-40 w-full items-center justify-center text-sm uppercase">
-              No results found
-            </div>
-          )}
+          {(!targetedFeaturesData || !targetedFeaturesData.length) && <NoResults />}
 
           {!!targetedFeaturesData && !!targetedFeaturesData.length && (
             <div className="relative flex flex-grow flex-col overflow-hidden">
