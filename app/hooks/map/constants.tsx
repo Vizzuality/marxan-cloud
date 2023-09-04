@@ -254,7 +254,7 @@ export const LEGEND_LAYERS = {
 
     return {
       id: 'cost',
-      name: 'Cost surface',
+      name: options.cost.name,
       type: 'gradient',
       settingsManager: {
         opacity: true,

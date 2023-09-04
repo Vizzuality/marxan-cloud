@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedCostSurfaces as setVisibleCostSurfaces } from 'store/slices/projects/[id]';
+import { setSelectedCostSurface as setVisibleCostSurface } from 'store/slices/projects/[id]';
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 
@@ -22,7 +22,7 @@ const COST_SURFACE_TABLE_COLUMNS = [
 
 const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { selectedCostSurfaces: visibleCostSurfaces, search } = useAppSelector(
+  const { selectedCostSurface: visibleCostSurface, search } = useAppSelector(
     (state) => state['/projects/[id]']
   );
 
@@ -81,16 +81,13 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
 
   const toggleSeeOnMap = useCallback(
     (costSurfaceId: CostSurface['id']) => {
-      const newSelectedCostSurfaces = [...visibleCostSurfaces];
-      if (!newSelectedCostSurfaces.includes(costSurfaceId)) {
-        newSelectedCostSurfaces.push(costSurfaceId);
+      if (costSurfaceId === visibleCostSurface) {
+        dispatch(setVisibleCostSurface(null));
       } else {
-        const i = newSelectedCostSurfaces.indexOf(costSurfaceId);
-        newSelectedCostSurfaces.splice(i, 1);
+        dispatch(setVisibleCostSurface(costSurfaceId));
       }
-      dispatch(setVisibleCostSurfaces(newSelectedCostSurfaces));
     },
-    [dispatch, visibleCostSurfaces]
+    [dispatch, visibleCostSurface]
   );
 
   const handleSort = useCallback(
@@ -112,7 +109,7 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
     name: cs.name,
     scenarios: cs.scenarioUsageCount,
     isCustom: cs.isCustom,
-    isVisibleOnMap: visibleCostSurfaces?.includes(cs.id),
+    isVisibleOnMap: visibleCostSurface === cs.id,
   }));
 
   return (

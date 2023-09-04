@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import pick from 'lodash/pick';
 
 import { useAccessToken } from 'hooks/auth';
+import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useAllFeatures } from 'hooks/features';
 import {
   useLegend,
@@ -52,7 +53,7 @@ export const ProjectMap = (): JSX.Element => {
     isSidebarOpen,
     layerSettings,
     selectedFeatures: selectedFeaturesIds,
-    selectedCostSurfaces: selectedCostSurfacesIds,
+    selectedCostSurface: selectedCostSurfaceId,
   } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
@@ -110,7 +111,7 @@ export const ProjectMap = (): JSX.Element => {
     include: 'results,cost',
     sublayers: [
       ...(sid1 && !sid2 ? ['frequency'] : []),
-      ...(!!selectedCostSurfacesIds.length ? ['cost'] : []),
+      ...(!!selectedCostSurfaceId ? ['cost'] : []),
     ],
     options: {
       cost: { min: 1, max: 100 },
@@ -153,6 +154,22 @@ export const ProjectMap = (): JSX.Element => {
       });
   }, [selectedFeaturesIds, selectedFeaturesData]);
 
+  const allProjectCostSurfacesQuery = useProjectCostSurfaces(
+    pid,
+    {},
+    {
+      select: (data) =>
+        data
+          ?.map((cs) => ({
+            id: cs.id,
+            name: cs.name,
+          }))
+          .find((cs) => cs.id === selectedCostSurfaceId),
+      keepPreviousData: true,
+      placeholderData: [],
+    }
+  );
+
   const LAYERS = [PUGridLayer, PUCompareLayer, PlanningAreaLayer, ...FeaturePreviewLayers].filter(
     (l) => !!l
   );
@@ -160,7 +177,7 @@ export const ProjectMap = (): JSX.Element => {
   const LEGEND = useLegend({
     layers: [
       ...(!!selectedFeaturesData?.length ? ['features-preview'] : []),
-      ...(!!selectedCostSurfacesIds?.length ? ['cost'] : []),
+      ...(!!selectedCostSurfaceId ? ['cost'] : []),
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
 
       ...(!!sid1 && !!sid2 ? ['compare'] : []),
@@ -170,7 +187,7 @@ export const ProjectMap = (): JSX.Element => {
     ],
     options: {
       layerSettings,
-      cost: { min: 1, max: 100 },
+      cost: { name: allProjectCostSurfacesQuery.data?.name, min: 1, max: 100 },
       items: selectedPreviewFeatures,
     },
   });
