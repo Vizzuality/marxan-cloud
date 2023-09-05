@@ -22,6 +22,8 @@ const InventoryTable = ({
 }: InventoryTable): JSX.Element => {
   const noData = !loading && data?.length === 0;
 
+  const noDataCustom = !loading && data?.every((item) => !item.isCustom);
+
   return (
     <>
       {loading && !data?.length && (
@@ -43,6 +45,7 @@ const InventoryTable = ({
                   theme="light"
                   className="block h-4 w-4 checked:bg-blue-400"
                   onChange={onSelectAll}
+                  disabled={noDataCustom}
                 />
               </th>
               {columns.map((column) => {
