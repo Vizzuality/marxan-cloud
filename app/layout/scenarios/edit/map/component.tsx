@@ -205,7 +205,7 @@ export const ScenariosEditMap = (): JSX.Element => {
     }
 
     if (tab === TABS['scenario-target-achievement']) {
-      return 'results,features';
+      return 'features,results';
     }
 
     return 'protection';
@@ -234,6 +234,10 @@ export const ScenariosEditMap = (): JSX.Element => {
 
     if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
       return ['wdpa-percentage', 'features'];
+    }
+
+    if (tab === TABS['scenario-target-achievement']) {
+      return ['features'];
     }
 
     if ([TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab)) {
@@ -280,7 +284,11 @@ export const ScenariosEditMap = (): JSX.Element => {
       return ['wdpa-percentage', 'features'];
     }
 
-    if ([TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab)) {
+    if (tab === TABS['scenario-target-achievement']) {
+      return ['pugrid', 'features', 'features-highlight'];
+    }
+
+    if (tab === TABS['scenario-solutions']) {
       return ['frequency', 'solution', 'pugrid'];
     }
 

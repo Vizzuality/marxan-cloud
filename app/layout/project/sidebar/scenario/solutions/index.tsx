@@ -21,9 +21,9 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import STAR_SVG from 'svgs/ui/star.svg?sprite';
 
-import PostGapAnalysis from './gap-analysis';
 import SolutionsDetails from './overview';
 import ScheduleScenario from './schedule';
+import TargetAchievement from './target-achievement';
 
 export const SECTIONS = [
   {
@@ -174,7 +174,7 @@ export const ScenariosSidebarShowSolutions = (): JSX.Element => {
                   )}
 
                   {subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS && (
-                    <PostGapAnalysis key="post-gap-analysis" />
+                    <TargetAchievement key="post-gap-analysis" />
                   )}
                 </div>
                 <div className="absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />

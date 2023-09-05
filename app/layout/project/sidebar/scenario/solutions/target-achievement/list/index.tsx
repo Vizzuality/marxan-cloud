@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
-
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { usePostGapAnalysis } from 'hooks/gap-analysis';
@@ -16,22 +13,17 @@ import { useBestSolution } from 'hooks/solutions';
 import Item from 'components/gap-analysis/item';
 import Loading from 'components/loading';
 import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
+import { cn } from 'utils/cn';
 
-export interface ScenariosPostGapAnalysisListProps {
-  search?: string;
-}
-
-export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisListProps> = ({
-  search,
-}: ScenariosPostGapAnalysisListProps) => {
+export const TargetAchievementList = ({ search }: { search?: string }): JSX.Element => {
   const { query } = useRouter();
   const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setPostHighlightFeatures } = scenarioSlice.actions;
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const { selectedSolution, postHighlightFeatures } = useSelector(
+  const { selectedSolution, postHighlightFeatures } = useAppSelector(
     (state) => state[`/scenarios/${sid}/edit`]
   );
 
@@ -96,7 +88,7 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
 
       <div
         ref={scrollRef}
-        className={cx({
+        className={cn({
           'divide-y divide-dashed divide-black divide-opacity-20 overflow-y-auto overflow-x-hidden bg-gray-700':
             true,
         })}
@@ -119,7 +111,7 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
               return (
                 <div
                   key={`${item.id}`}
-                  className={cx({
+                  className={cn({
                     'border-t border-dashed': i !== 0,
                   })}
                 >
@@ -139,7 +131,7 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
       <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
 
       <div
-        className={cx({
+        className={cn({
           'opacity-100': allFeaturesIsFetchingNextPage,
           'pointer-events-none absolute bottom-0 left-0 z-20 w-full text-center font-heading text-xs uppercase opacity-0 transition':
             true,
@@ -152,4 +144,4 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
   );
 };
 
-export default ScenariosPostGapAnalysisList;
+export default TargetAchievementList;
