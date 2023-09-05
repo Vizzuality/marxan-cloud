@@ -608,14 +608,7 @@ export function useUploadPA({
     });
   };
 
-  return useMutation(uploadPAShapefile, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      console.info('Error', error, variables, context);
-    },
-  });
+  return useMutation(uploadPAShapefile);
 }
 
 export function useCostSurfaceRange(id) {
