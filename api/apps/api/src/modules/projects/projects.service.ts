@@ -918,6 +918,10 @@ export class ProjectsService {
       return left(submissionFailed);
     }
 
+    // This is a small workaround - FE is getting new list of features right after receiving 200, sometimes PA is not being saved by geoprocessing yet
+    await this.delay(1000);
     return right(true);
   }
+  delay = (ms = 1000) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
 }
