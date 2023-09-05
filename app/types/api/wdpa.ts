@@ -1,16 +1,21 @@
 import { Job } from './job';
 
-export interface WDPA {
-  id: string;
-  wdpaId: string;
+export interface WDPAAttributes {
+  countryId: string;
+  designation?: string;
   fullName: string;
   iucnCategory: string;
-  countryId: string;
+  scenarioUsageCount: number;
   shapeLength?: number;
   shapeArea?: number;
   status?: Job['status'];
-  designation?: string;
-  scenarioUsageCount: number;
+  wdpaId: string;
+}
+
+export interface WDPA {
+  id: string;
+  type: string;
+  attributes: WDPAAttributes;
 }
 
 export interface WDPACategory {

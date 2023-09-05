@@ -49,8 +49,7 @@ const InventoryPanelProtectedAreas = ({
       select: (data) =>
         data?.map((wdpa) => ({
           id: wdpa.id,
-          fullName: wdpa.fullName,
-          scenarioUsageCount: wdpa.scenarioUsageCount,
+          attributes: wdpa.attributes,
         })),
       keepPreviousData: true,
       placeholderData: [],
@@ -110,8 +109,8 @@ const InventoryPanelProtectedAreas = ({
 
   const data: DataItem[] = allProjectWDPAsQuery.data?.map((wdpa) => ({
     ...wdpa,
-    name: wdpa.fullName,
-    scenarios: wdpa.scenarioUsageCount,
+    name: wdpa.attributes.fullName,
+    scenarios: wdpa.attributes.scenarioUsageCount,
     isVisibleOnMap: visibleWDPAs?.includes(wdpa.id),
   }));
 

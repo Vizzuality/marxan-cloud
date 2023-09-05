@@ -90,56 +90,17 @@ export function useProjectWDPAs<T = WDPA[]>(
 ) {
   const { data: session } = useSession();
 
-  const mockData: WDPA[] = [
-    {
-      id: 'Not Reported',
-      wdpaId: 'Not Reported',
-      fullName: 'Not Reported',
-      iucnCategory: 'IUCN Category',
-      countryId: 'hgdfjkd',
-      shapeLength: 45,
-      shapeArea: 30,
-      status: 'done',
-      designation: 'd',
-      scenarioUsageCount: 3,
-    },
-    {
-      id: 'IV',
-      wdpaId: 'IV',
-      fullName: 'IUCN IV',
-      iucnCategory: 'IUCN IV',
-      countryId: 'mdfgjf',
-      shapeLength: 45,
-      shapeArea: 30,
-      status: 'done',
-      designation: 'd',
-      scenarioUsageCount: 0,
-    },
-    {
-      id: 'II',
-      wdpaId: 'II',
-      fullName: 'Florida scrub jay',
-      iucnCategory: 'IUCN II',
-      countryId: 'mdfgjf',
-      shapeLength: 45,
-      shapeArea: 30,
-      status: 'done',
-      designation: 'd',
-      scenarioUsageCount: 0,
-    },
-  ];
-
   return useQuery({
     queryKey: ['wdpas', pid],
     queryFn: async () =>
-      API.request<WDPA[]>({
+      API.request<{ data: WDPA[] }>({
         method: 'GET',
         url: `/projects/${pid}/protected-areas`,
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
         params,
-      }).then(({ data }) => mockData),
+      }).then(({ data }) => data.data),
     enabled: Boolean(pid),
     ...queryOptions,
   });
