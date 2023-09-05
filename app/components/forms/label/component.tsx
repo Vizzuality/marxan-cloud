@@ -1,6 +1,6 @@
 import React from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: 'block font-heading font-medium text-xs text-white',
@@ -17,7 +17,7 @@ export interface LabelProps {
 const LabelComponent = ({ id, theme = 'dark', children, className }: LabelProps, ref) => {
   return (
     <label
-      className={cx({
+      className={cn({
         [THEME[theme]]: true,
         [className]: !!className,
       })}
