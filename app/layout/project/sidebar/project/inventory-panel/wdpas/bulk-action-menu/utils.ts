@@ -3,7 +3,7 @@ import { Session } from 'next-auth';
 import { Project } from 'types/api/project';
 import { WDPA } from 'types/api/wdpa';
 
-import PROJECTS from 'services/projects';
+import { API } from 'services/api';
 
 export function bulkDeleteWDPAFromProject(
   pid: Project['id'],
@@ -17,7 +17,7 @@ export function bulkDeleteWDPAFromProject(
     pid: Project['id'];
     wdpaid: WDPA['id'];
   }) => {
-    return PROJECTS.delete(`/${pid}/protected-areas/${wdpaid}`, {
+    return API.delete(`/protected-areas/${wdpaid}`, {
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
