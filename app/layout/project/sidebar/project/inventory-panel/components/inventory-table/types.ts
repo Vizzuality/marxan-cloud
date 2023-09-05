@@ -1,7 +1,10 @@
 import { ChangeEvent } from 'react';
 
+import { WDPAAttributes } from 'types/api/wdpa';
+
 export type DataItem = {
   id: string;
+  attributes?: WDPAAttributes;
   name: string;
   scenarios: number;
   tag?: string;

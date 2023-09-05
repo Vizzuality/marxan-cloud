@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 
 import { Project } from 'types/api/project';
 import { Scenario } from 'types/api/scenario';
-import { WDPA, WDPACategory } from 'types/api/wdpa';
+import { WDPA } from 'types/api/wdpa';
 
 import { API } from 'services/api';
 import PROJECTS from 'services/projects';
@@ -26,9 +26,9 @@ export function useWDPACategories({
   return useQuery(
     ['protected-areas', adminAreaId, customAreaId],
     async () =>
-      API.request<WDPACategory[]>({
+      API.request({
         method: 'GET',
-        url: `/scenarios/${scenarioId}/protected-areas`,
+        url: `scenarios/${scenarioId}/protected-areas`,
         params: {
           ...(adminAreaId && {
             'filter[adminAreaId]': adminAreaId,
@@ -43,7 +43,6 @@ export function useWDPACategories({
       }).then(({ data }) => data),
     {
       enabled: !!adminAreaId || !!customAreaId,
-      select: ({ data }) => data,
     }
   );
 }

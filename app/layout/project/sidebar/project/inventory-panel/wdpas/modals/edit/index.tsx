@@ -12,9 +12,9 @@ import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
-import { WDPA } from 'types/api/wdpa';
+import { WDPA, WDPAAttributes } from 'types/api/wdpa';
 
-export type FormValues = { fullName: WDPA['fullName'] };
+export type FormValues = { fullName: WDPAAttributes['fullName'] };
 
 const EditModal = ({
   wdpaId,
@@ -80,7 +80,7 @@ const EditModal = ({
   return (
     <FormRFF<FormValues>
       initialValues={{
-        fullName: allProjectWDPAsQuery.data?.[0]?.fullName,
+        fullName: allProjectWDPAsQuery.data?.[0]?.attributes.fullName,
       }}
       ref={formRef}
       onSubmit={onEditSubmit}

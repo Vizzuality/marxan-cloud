@@ -22,14 +22,14 @@ import Loading from 'components/loading';
 import Modal from 'components/modal';
 import { PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import UploadWDPAsInfoButtonContent from 'constants/info-button-content/upload-wdpas';
-import { WDPA } from 'types/api/wdpa';
+import { WDPAAttributes } from 'types/api/wdpa';
 import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export type FormValues = {
-  name: WDPA['fullName'];
+  name: WDPAAttributes['fullName'];
   file: File;
 };
 

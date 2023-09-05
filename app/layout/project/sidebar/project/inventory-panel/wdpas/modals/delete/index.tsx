@@ -36,11 +36,11 @@ const DeleteModal = ({
     return allProjectWDPAsQuery.data?.filter(({ id }) => selectedWDPAIds.includes(id));
   }, [allProjectWDPAsQuery.data, selectedWDPAIds]);
 
-  const WDPAsNames = selectedWDPAs.map(({ fullName }) => fullName);
+  const WDPAsNames = selectedWDPAs.map(({ attributes }) => attributes.fullName);
 
   // ? the user will be able to delete the protected areas only if they are not being used by any scenario.
-  const haveScenarioAssociated = selectedWDPAs.some(({ scenarioUsageCount }) =>
-    Boolean(scenarioUsageCount)
+  const haveScenarioAssociated = selectedWDPAs.some(({ attributes }) =>
+    Boolean(attributes.scenarioUsageCount)
   );
 
   const handleBulkDelete = useCallback(() => {
