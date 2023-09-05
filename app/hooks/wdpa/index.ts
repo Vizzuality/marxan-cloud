@@ -8,7 +8,6 @@ import { Scenario } from 'types/api/scenario';
 import { WDPA } from 'types/api/wdpa';
 
 import { API } from 'services/api';
-import PROJECTS from 'services/projects';
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
 
@@ -110,21 +109,12 @@ export function useEditWDPA({
     method: 'PATCH',
   },
 }) {
-  const queryClient = useQueryClient();
   const { data: session } = useSession();
 
-  const saveProjectWDPA = ({
-    projectId,
-    wdpaId,
-    data,
-  }: {
-    projectId: string;
-    wdpaId: string;
-    data: { fullName: string };
-  }) => {
-    return PROJECTS.request({
+  const saveProjectWDPA = ({ wdpaId, data }: { wdpaId: string; data: { name: string } }) => {
+    return API.request({
       method: 'PATCH',
-      url: `/${projectId}/protected-areas/${wdpaId}`,
+      url: `/protected-areas/${wdpaId}`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
@@ -133,15 +123,7 @@ export function useEditWDPA({
     });
   };
 
-  return useMutation(saveProjectWDPA, {
-    onSuccess: async (data, variables) => {
-      const { projectId } = variables;
-      await queryClient.invalidateQueries(['wdpas', projectId]);
-    },
-    onError: (error, variables, context) => {
-      console.info('Error', error, variables, context);
-    },
-  });
+  return useMutation(saveProjectWDPA);
 }
 
 export function useUploadWDPAsShapefile({

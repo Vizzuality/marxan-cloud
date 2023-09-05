@@ -39,9 +39,8 @@ const EditModal = ({
       editWDPAMutation.mutate(
         {
           wdpaId: wdpaId,
-          projectId: pid,
           data: {
-            fullName,
+            name: fullName,
           },
         },
         {
