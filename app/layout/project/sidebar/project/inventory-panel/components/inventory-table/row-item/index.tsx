@@ -70,7 +70,13 @@ const RowItem = ({
           {isCustom && (
             <Popover>
               <PopoverTrigger asChild>
-                <button type="button" className="h-5 w-5">
+                <button
+                  type="button"
+                  className={cn({
+                    'h-5 w-5': true,
+                    invisible: !isCustom,
+                  })}
+                >
                   <HiDotsHorizontal className="h-4 w-4 text-white" />
                 </button>
               </PopoverTrigger>

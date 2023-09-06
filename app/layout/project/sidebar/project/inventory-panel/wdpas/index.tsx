@@ -117,20 +117,22 @@ const InventoryPanelProtectedAreas = ({
   }));
 
   return (
-    <div className="space-y-6">
-      <InventoryTable
-        loading={allProjectWDPAsQuery.isFetching}
-        data={data}
-        noDataMessage={noDataMessage}
-        columns={WDPA_TABLE_COLUMNS}
-        sorting={filters.sort}
-        selectedIds={selectedWDPAIds}
-        onSortChange={handleSort}
-        onSelectAll={handleSelectAll}
-        onSelectRow={handleSelectWDPA}
-        onToggleSeeOnMap={toggleSeeOnMap}
-        ActionsComponent={ActionsMenu}
-      />
+    <div className="flex flex-col space-y-6 overflow-hidden">
+      <div className="h-full overflow-hidden">
+        <InventoryTable
+          loading={allProjectWDPAsQuery.isFetching}
+          data={data}
+          noDataMessage={noDataMessage}
+          columns={WDPA_TABLE_COLUMNS}
+          sorting={filters.sort}
+          selectedIds={selectedWDPAIds}
+          onSortChange={handleSort}
+          onSelectAll={handleSelectAll}
+          onSelectRow={handleSelectWDPA}
+          onToggleSeeOnMap={toggleSeeOnMap}
+          ActionsComponent={ActionsMenu}
+        />
+      </div>
       {displayBulkActions && <WDPABulkActionMenu selectedWDPAIds={selectedWDPAIds} />}
     </div>
   );
