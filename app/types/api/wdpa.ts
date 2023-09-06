@@ -10,6 +10,7 @@ export interface WDPAAttributes {
   shapeArea?: number;
   status?: Job['status'];
   wdpaId: string;
+  isCustom?: boolean;
 }
 
 export interface WDPA {

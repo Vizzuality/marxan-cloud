@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, ChangeEvent, useMemo } from 'react';
+import { useState, useCallback, useEffect, ChangeEvent } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -109,8 +109,9 @@ const InventoryPanelProtectedAreas = ({
 
   const data: DataItem[] = allProjectWDPAsQuery.data?.map((wdpa) => ({
     ...wdpa,
-    name: wdpa.attributes.fullName,
+    name: wdpa.attributes.isCustom ? wdpa.attributes.fullName : wdpa.attributes.iucnCategory,
     scenarios: wdpa.attributes.scenarioUsageCount,
+    isCustom: wdpa.attributes.isCustom,
     isVisibleOnMap: visibleWDPAs?.includes(wdpa.id),
   }));
 
