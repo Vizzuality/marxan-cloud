@@ -27,6 +27,7 @@ const InventoryPanelProtectedAreas = ({
   noData: string;
 }): JSX.Element => {
   const dispatch = useAppDispatch();
+
   const { selectedWDPAs: visibleWDPAs, search } = useAppSelector(
     (state) => state['/projects/[id]']
   );

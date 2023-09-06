@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
@@ -49,6 +50,7 @@ export const WDPAUploadModal = ({
   const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
+  const queryClient = useQueryClient();
 
   const uploadWDPAsShapefileMutation = useUploadWDPAsShapefile({});
 
@@ -126,6 +128,7 @@ export const WDPAUploadModal = ({
               level: 'success',
             }
           );
+          queryClient.invalidateQueries(['wdpas', pid]);
         },
         onError: (error: AxiosError | Error) => {
           let errors: { status: number; title: string }[] = [];
