@@ -1,8 +1,8 @@
-import { useState } from 'react';
-
-import { useSelector } from 'react-redux';
+import { useCallback, useState } from 'react';
 
 import { withProtection, withUser } from 'hoc/auth';
+
+import { useAppSelector } from 'store/hooks';
 
 import HelpBeacon from 'layout/help/beacon';
 import MetaIcons from 'layout/meta-icons';
@@ -11,6 +11,7 @@ import Breadcrumbs from 'layout/project/navigation/breadcrumbs';
 import Sidebar from 'layout/project/sidebar';
 import ProjectNewForm from 'layout/projects/new/form';
 import { NewProjectFields } from 'layout/projects/new/form';
+import { ProjectFormProps } from 'layout/projects/new/form';
 import ProjectNewMap from 'layout/projects/new/map';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
@@ -20,7 +21,14 @@ export const getServerSideProps = withProtection(withUser());
 const NewProjectsPage = (): JSX.Element => {
   const [formValues, setFormValues] = useState<NewProjectFields>();
 
-  const { bbox } = useSelector((state) => state['/projects/new']);
+  const { bbox } = useAppSelector((state) => state['/projects/new']);
+
+  const onFormUpdate = useCallback(
+    (_formValues: Parameters<ProjectFormProps['onFormUpdate']>[0]) => {
+      setFormValues(_formValues);
+    },
+    []
+  );
 
   return (
     <Protected>
@@ -28,13 +36,9 @@ const NewProjectsPage = (): JSX.Element => {
       <MetaIcons />
       <ProjectLayout className="z-10">
         <Sidebar>
-          <div className="flex flex-col">
+          <div className="flex h-full flex-col">
             <Breadcrumbs />
-            <ProjectNewForm
-              onFormUpdate={(_formValues) => {
-                setFormValues(_formValues);
-              }}
-            />
+            <ProjectNewForm onFormUpdate={onFormUpdate} />
           </div>
         </Sidebar>
 

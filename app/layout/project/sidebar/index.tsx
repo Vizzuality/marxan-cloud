@@ -17,7 +17,7 @@ export const Sidebar = ({
 
   const handleSidebar = useCallback(() => {
     dispatch(setSidebarVisibility(!isSidebarOpen));
-  }, [isSidebarOpen]);
+  }, [dispatch, isSidebarOpen]);
 
   return (
     <aside

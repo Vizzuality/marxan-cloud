@@ -45,6 +45,7 @@ module.exports = {
       };
     }, {}),
     colors: {
+      border: 'hsl(var(--border))',
       transparent: 'transparent',
       current: 'currentColor',
       primary: {

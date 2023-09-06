@@ -17,6 +17,7 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import Item from 'components/features/selected-item';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
+import { ScrollArea } from 'components/scroll-area';
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
@@ -212,7 +213,6 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
         },
         {
           onSuccess: () => {
-            // dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
             saveScenarioMutation.mutate({
               id: `${sid}`,
               data: {
@@ -235,8 +235,6 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
 
   const handleContinue = useCallback(() => {
     setSubmitting(true);
-    // dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
-    // push(`/projects/${pid}/scenarios/${sid}/edit?tab=features-target`);
     onContinue();
   }, [onContinue]);
 
@@ -288,7 +286,7 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
-          className="relative flex flex-grow flex-col overflow-hidden"
+          className="relative flex flex-grow flex-col space-y-2 overflow-hidden"
         >
           <FormSpyRFF
             subscription={{ dirty: true, touched: true }}
@@ -306,49 +304,49 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
           />
 
           {!!selectedFeaturesData && !!selectedFeaturesData.length && (
-            <div className="relative flex min-h-0 flex-grow flex-col overflow-hidden">
-              <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
-              <div className="relative max-h-full overflow-y-auto overflow-x-visible px-0.5">
-                <FieldRFF name="features">
-                  {({ input }) => (
-                    <ul className="space-y-1.5 overflow-y-auto py-6">
-                      {values.features.map((item, i) => {
-                        return (
-                          <li key={`${item.id}`}>
-                            <Item
-                              {...item}
-                              editable={editable}
-                              onSplitSelected={(s) => {
-                                onSplitSelected(item.id, s, input);
-                              }}
-                              onSplitFeaturesSelected={(s) => {
-                                onSplitFeaturesSelected(item.id, s, input);
-                              }}
-                              onIntersectSelected={(id) => {
-                                setIntersecting(id);
-                              }}
-                              onRemove={() => {
-                                setDeleteFeature(item);
-                              }}
-                              isShown={isShown(item.id)}
-                              onSeeOnMap={() => toggleSeeOnMap(item.id)}
-                            />
-                            <ConfirmationPrompt
-                              title={`Are you sure you want to remove "${deleteFeature?.name}" feature?`}
-                              icon={DELETE_WARNING_SVG}
-                              open={!!deleteFeature}
-                              onAccept={() => onRemove(deleteFeature?.id, input)}
-                              onRefuse={() => setDeleteFeature(null)}
-                              onDismiss={() => setDeleteFeature(null)}
-                            />
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </FieldRFF>
-              </div>
-              <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
+            <div className="relative flex h-full min-h-0 flex-grow flex-col overflow-hidden before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-700 before:via-gray-700 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-700 after:via-gray-700">
+              <ScrollArea className="h-full">
+                <div className="relative max-h-full px-0.5">
+                  <FieldRFF name="features">
+                    {({ input }) => (
+                      <ul className="space-y-1.5 overflow-y-auto py-6">
+                        {values.features.map((item, i) => {
+                          return (
+                            <li key={`${item.id}`}>
+                              <Item
+                                {...item}
+                                editable={editable}
+                                onSplitSelected={(s) => {
+                                  onSplitSelected(item.id, s, input);
+                                }}
+                                onSplitFeaturesSelected={(s) => {
+                                  onSplitFeaturesSelected(item.id, s, input);
+                                }}
+                                onIntersectSelected={(id) => {
+                                  setIntersecting(id);
+                                }}
+                                onRemove={() => {
+                                  setDeleteFeature(item);
+                                }}
+                                isShown={isShown(item.id)}
+                                onSeeOnMap={() => toggleSeeOnMap(item.id)}
+                              />
+                              <ConfirmationPrompt
+                                title={`Are you sure you want to remove "${deleteFeature?.name}" feature?`}
+                                icon={DELETE_WARNING_SVG}
+                                open={!!deleteFeature}
+                                onAccept={() => onRemove(deleteFeature?.id, input)}
+                                onRefuse={() => setDeleteFeature(null)}
+                                onDismiss={() => setDeleteFeature(null)}
+                              />
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </FieldRFF>
+                </div>
+              </ScrollArea>
             </div>
           )}
 

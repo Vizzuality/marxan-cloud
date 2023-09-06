@@ -3,6 +3,7 @@ import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 
 import InfoButton from 'components/info-button';
+import { ScrollArea } from 'components/scroll-area';
 import Section from 'layout/section';
 
 import List from './list';
@@ -28,7 +29,7 @@ export const SolutionsTargetAchievements = (): JSX.Element => {
           <div className="space-y-1">
             <span className="text-xs font-semibold text-blue-400">Solutions</span>
             <div className="flex items-center space-x-2">
-              <h3 className="text-lg font-medium">Gap Analysis</h3>
+              <h3 className="text-lg font-medium">Target Achievement</h3>
               <InfoButton theme="primary" className="bg-gray-300">
                 <div>
                   <h4 className="mb-2.5 font-heading text-lg">
@@ -51,10 +52,12 @@ export const SolutionsTargetAchievements = (): JSX.Element => {
             </div>
           </div>
 
-          <div className="relative flex min-h-0 w-full flex-grow flex-col overflow-hidden">
+          <div className="flex w-full flex-grow flex-col space-y-2 overflow-hidden">
             <Toolbar search={search} onSearch={onSearch} />
-            <div className="max-h-full overflow-y-auto">
-              <List search={search} />
+            <div className="relative flex h-full flex-grow flex-col overflow-hidden before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-700 before:via-gray-700 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-700 after:via-gray-700">
+              <ScrollArea className="h-full pr-3">
+                <List search={search} />
+              </ScrollArea>
             </div>
           </div>
         </Section>

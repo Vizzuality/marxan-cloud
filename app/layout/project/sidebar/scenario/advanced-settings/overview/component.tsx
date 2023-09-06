@@ -2,8 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { Form as FormRFF } from 'react-final-form';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
@@ -13,6 +11,7 @@ import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
+import { ScrollArea } from 'components/scroll-area';
 import Section from 'layout/section';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
@@ -108,61 +107,56 @@ export const ScenariosAdvancedSettings = (): JSX.Element => {
   return (
     <motion.div
       key="cost-surface"
-      className="flex min-h-0 flex-col items-start justify-start overflow-hidden"
+      className="flex h-full flex-col items-start justify-start overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <Section className="w-full">
-        <div className="space-y-1">
-          <span className="text-xs font-semibold text-blue-400">Advanced Settings</span>
-          <div className="flex items-center space-x-2">
-            <h3 className="text-lg font-medium">Overview</h3>
+      <Section className="h-full w-full overflow-hidden">
+        <div className="flex h-full flex-col space-y-1">
+          <div className="space-y-1">
+            <span className="text-xs font-semibold text-blue-400">Advanced Settings</span>
+            <div className="flex items-center space-x-2">
+              <h3 className="text-lg font-medium">Overview</h3>
+            </div>
           </div>
-        </div>
 
-        <FormRFF onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
-          {({ handleSubmit }) => (
-            <form
-              className={cx({
-                // 'flex w-full flex-grow flex-col text-gray-500': true,
-              })}
-              autoComplete="off"
-              noValidate
-              onSubmit={handleSubmit}
-            >
-              <div className="flex h-full w-full overflow-hidden">
-                <div className="flex w-full flex-grow flex-col space-y-6  pt-5">
-                  <div className="relative flex flex-grow flex-col">
-                    <div className="max-h-full space-y-10">
-                      {FIELDS.map((f) => (
-                        <RunField key={f.id} {...f} />
-                      ))}
-                    </div>
+          <div className="h-full overflow-hidden">
+            <FormRFF onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
+              {({ handleSubmit }) => (
+                <form
+                  autoComplete="off"
+                  noValidate
+                  onSubmit={handleSubmit}
+                  className="relative flex h-full flex-col"
+                >
+                  <div className="relative flex h-full flex-col overflow-hidden before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-700 before:via-gray-700 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-700 after:via-gray-700">
+                    <ScrollArea className="h-full pr-4">
+                      <div className="space-y-10 py-5">
+                        {FIELDS.map((f) => (
+                          <RunField key={f.id} {...f} />
+                        ))}
+                      </div>
+                    </ScrollArea>
                   </div>
-
                   {editable && (
-                    <div className="flex-shrink-0 px-10">
+                    <div className="flex w-full py-5">
                       <Button
                         type="submit"
                         theme="primary"
                         size="base"
-                        className="w-full"
+                        className="flex w-full items-center space-x-5 text-lg"
                         disabled={submitting}
                       >
-                        <div className="flex items-center space-x-5">
-                          <div className="text-left">
-                            <div className="text-lg">Save</div>
-                          </div>
-                        </div>
+                        Save
                       </Button>
                     </div>
                   )}
-                </div>
-              </div>
-            </form>
-          )}
-        </FormRFF>
+                </form>
+              )}
+            </FormRFF>
+          </div>
+        </div>
       </Section>
     </motion.div>
   );

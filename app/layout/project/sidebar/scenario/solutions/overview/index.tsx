@@ -177,7 +177,7 @@ export const SolutionsOverview = (): JSX.Element => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <Section>
+      <Section className="flex flex-col overflow-hidden">
         <div className="space-y-1">
           <span className="text-xs font-semibold text-blue-400">Solutions</span>
           <div className="flex items-center space-x-2">

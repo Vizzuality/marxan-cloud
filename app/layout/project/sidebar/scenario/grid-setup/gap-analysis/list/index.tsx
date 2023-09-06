@@ -13,6 +13,7 @@ import useBottomScrollListener from 'hooks/scroll';
 
 import Item from 'components/gap-analysis/item';
 import Loading from 'components/loading';
+import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 import { cn } from 'utils/cn';
 
 export interface ScenariosPreGapAnalysisListProps {
@@ -96,11 +97,7 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
         )}
 
         <ul className="py-6">
-          {!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length) && (
-            <div className="flex h-40 w-full items-center justify-center text-sm uppercase">
-              No results found
-            </div>
-          )}
+          {!allFeaturesIsFetching && (!allFeaturesData || !allFeaturesData.length) && <NoResults />}
 
           {allFeaturesData &&
             allFeaturesData.map((item, i) => {

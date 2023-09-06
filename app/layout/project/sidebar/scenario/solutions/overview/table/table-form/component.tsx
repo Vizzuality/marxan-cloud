@@ -23,6 +23,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import LoadingMore from 'components/loading-more/component';
+import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 
 import FIVE_DIFF_SOLUTIONS_IMG from 'images/info-buttons/img_5_different_solutions.png';
 
@@ -221,11 +222,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             </div>
           )}
 
-          {noSolutionResults && (
-            <div className="flex h-40 w-full items-center justify-center text-sm uppercase">
-              No results found
-            </div>
-          )}
+          {noSolutionResults && <NoResults />}
 
           {allSolutionsFetched && !noSolutionResults && (
             <SolutionsTable
