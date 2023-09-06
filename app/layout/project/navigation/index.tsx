@@ -16,6 +16,7 @@ import { useToasts } from 'hooks/toast';
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tooltip from 'components/tooltip';
+import HelpBeacon from 'layout/help/beacon';
 import { useScenarioJobs } from 'layout/scenarios/edit/status/utils';
 import { cn } from 'utils/cn';
 
@@ -149,7 +150,7 @@ export const Navigation = (): JSX.Element => {
         },
       }
     );
-  }, [addToast, runScenarioMutation, sid]);
+  }, [addToast, runScenarioMutation, sid, plausible, user]);
 
   const isSolutionsSectionEnabled = scenarioQuery.data?.ranAtLeastOnce ?? false;
 
@@ -300,68 +301,111 @@ export const Navigation = (): JSX.Element => {
                   <SubMenu items={gridSetupItems} />
                 </li>
               )}
-              <li
-                className={cn({
-                  [MENU_ITEM_COMMON_CLASSES]: true,
-                  [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute && NAVIGATION_TREE.marxanSettings.includes(tab),
-                })}
+              <HelpBeacon
+                id="advanced-settings"
+                title="Advanced Settings"
+                subtitle="Marxan settings"
+                content={
+                  <div className="space-y-2">
+                    <p>Before you run Marxan, you can adjust some parameters.</p>
+                    <p>
+                      Everything is pre-set to the default values recommended by the Marxan manual,
+                      but you can choose other allowed values.
+                    </p>
+                    <p>
+                      Please see info buttons and refer to the Marxan resources available from the
+                      marxan solutions website for more information on settings.
+                    </p>
+                  </div>
+                }
+                placement="top-end"
+                tooltipPlacement="right"
               >
-                <Tooltip
-                  placement="right"
-                  offset={TOOLTIP_OFFSET}
-                  content={<MenuTooltip>Marxan Settings</MenuTooltip>}
+                <li
+                  className={cn({
+                    [MENU_ITEM_COMMON_CLASSES]: true,
+                    [MENU_ITEM_ACTIVE_CLASSES]:
+                      isScenarioRoute && NAVIGATION_TREE.marxanSettings.includes(tab),
+                  })}
                 >
-                  <button
-                    type="button"
-                    className={MENU_ITEM_BUTTON_COMMON_CLASSES}
-                    onClick={() => toggleSubmenu('marxanSettings')}
+                  <Tooltip
+                    placement="right"
+                    offset={TOOLTIP_OFFSET}
+                    content={<MenuTooltip>Advanced settings</MenuTooltip>}
                   >
-                    <Icon className={ICON_COMMON_CLASSES} icon={ADVANCED_SETTINGS_SVG} />
-                  </button>
-                </Tooltip>
-              </li>
+                    <button
+                      type="button"
+                      className={MENU_ITEM_BUTTON_COMMON_CLASSES}
+                      onClick={() => toggleSubmenu('marxanSettings')}
+                    >
+                      <Icon className={ICON_COMMON_CLASSES} icon={ADVANCED_SETTINGS_SVG} />
+                    </button>
+                  </Tooltip>
+                </li>
+              </HelpBeacon>
               {submenuState.marxanSettings && (
                 <li>
                   <SubMenu items={advancedSettingsItems} />
                 </li>
               )}
-              <li
-                className={cn({
-                  [MENU_ITEM_COMMON_CLASSES]: true,
-                  [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute &&
-                    NAVIGATION_TREE.solutions.includes(tab) &&
-                    isSolutionsSectionEnabled,
-                })}
+              <HelpBeacon
+                id="solutions"
+                title="Solutions"
+                subtitle="View the results"
+                content={
+                  <div className="space-y-2">
+                    <p>
+                      Under <strong className="font-bold">Solution Overview</strong> you will find
+                      the information for each of the individual solutions as a table. You can see
+                      all solutions or you can filter to see only the 5 most different ones. You can
+                      select which solution to view on the map and download the results.
+                    </p>
+                    <p>
+                      Under <strong className="font-bold">Target Achievement</strong> you can see
+                      how well the solutions meet your feature targets.
+                    </p>
+                  </div>
+                }
+                placement="top-end"
+                tooltipPlacement="right"
               >
-                <Tooltip
-                  placement="right"
-                  offset={TOOLTIP_OFFSET}
-                  content={<MenuTooltip>Solutions</MenuTooltip>}
+                <li
+                  className={cn({
+                    [MENU_ITEM_COMMON_CLASSES]: true,
+                    [MENU_ITEM_ACTIVE_CLASSES]:
+                      isScenarioRoute &&
+                      NAVIGATION_TREE.solutions.includes(tab) &&
+                      isSolutionsSectionEnabled,
+                  })}
                 >
-                  <button
-                    type="button"
-                    className={cn({
-                      [MENU_ITEM_BUTTON_COMMON_CLASSES]: true,
-                      [MENU_ITEM_BUTTON_DISABLED_CLASSES]: !isSolutionsSectionEnabled,
-                    })}
-                    onClick={(evt: MouseEvent<HTMLButtonElement>) => {
-                      return !isSolutionsSectionEnabled
-                        ? evt.preventDefault()
-                        : toggleSubmenu('solutions');
-                    }}
+                  <Tooltip
+                    placement="right"
+                    offset={TOOLTIP_OFFSET}
+                    content={<MenuTooltip>Solutions</MenuTooltip>}
                   >
-                    <Icon
+                    <button
+                      type="button"
                       className={cn({
-                        [ICON_COMMON_CLASSES]: true,
-                        [ICON_DISABLED_CLASSES]: !isSolutionsSectionEnabled,
+                        [MENU_ITEM_BUTTON_COMMON_CLASSES]: true,
+                        [MENU_ITEM_BUTTON_DISABLED_CLASSES]: !isSolutionsSectionEnabled,
                       })}
-                      icon={SOLUTIONS_SVG}
-                    />
-                  </button>
-                </Tooltip>
-              </li>
+                      onClick={(evt: MouseEvent<HTMLButtonElement>) => {
+                        return !isSolutionsSectionEnabled
+                          ? evt.preventDefault()
+                          : toggleSubmenu('solutions');
+                      }}
+                    >
+                      <Icon
+                        className={cn({
+                          [ICON_COMMON_CLASSES]: true,
+                          [ICON_DISABLED_CLASSES]: !isSolutionsSectionEnabled,
+                        })}
+                        icon={SOLUTIONS_SVG}
+                      />
+                    </button>
+                  </Tooltip>
+                </li>
+              </HelpBeacon>
               {submenuState.solutions && (
                 <li>
                   <SubMenu items={solutionsItems} />

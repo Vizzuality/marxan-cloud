@@ -1,18 +1,16 @@
-import React, {
-  ReactNode,
-  ReactElement,
+import {
   cloneElement,
   useState,
   useEffect,
   useCallback,
   useRef,
+  ReactElement,
+  HTMLAttributes,
 } from 'react';
 
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 import { useResizeDetector } from 'react-resize-detector';
-
-import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
@@ -24,31 +22,37 @@ import { useHelp } from 'hooks/help';
 import Tooltip from 'components/tooltip';
 import HelpSpotlight from 'layout/help/spotlight';
 import HelpTooltip from 'layout/help/tooltip';
+import { cn } from 'utils/cn';
 
-const flipModifier = {
+export interface HelpBeaconProps {
+  id: string;
+  title: string;
+  subtitle?: string;
+  content: ReactElement;
+  children: ReactElement;
+  placement?: Placement;
+  modifiers?: ('flip' | 'hide')[];
+  tooltipPlacement?: Placement;
+  beaconClassName?: HTMLAttributes<HTMLDivElement>['className'];
+}
+interface Modifier {
+  name: HelpBeaconProps['modifiers'][number];
+  enabled: boolean;
+}
+
+const flipModifier: Modifier = {
   name: 'flip',
   enabled: false,
 };
 
-const hideModifier = {
+const hideModifier: Modifier = {
   name: 'hide',
   enabled: true,
 };
 
 const MODIFIERS = [flipModifier, hideModifier];
-export interface HelpBeaconProps {
-  id: string;
-  title: string;
-  subtitle?: string;
-  content: ReactNode;
-  children: ReactElement;
-  placement?: Placement;
-  modifiers?: string[];
-  tooltipPlacement?: Placement;
-  beaconClassName?: string;
-}
 
-export const HelpBeacon: React.FC<HelpBeaconProps> = ({
+export const HelpBeacon = ({
   id,
   title,
   subtitle,
@@ -58,16 +62,16 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   modifiers = ['flip', 'hide'],
   tooltipPlacement = 'bottom',
   beaconClassName,
-}: HelpBeaconProps) => {
+}: HelpBeaconProps): JSX.Element => {
   const { active, beacons, addBeacon } = useHelp();
   const [visible, setVisible] = useState(false);
   const { pathname } = useRouter();
 
-  const updateTimeout = useRef(null);
+  const updateTimeout = useRef<NodeJS.Timer>(null);
   const updateTime = useRef(5);
 
-  const childrenRef = useRef(null);
-  const [beaconRef, setBeaconRef] = useState(null);
+  const childrenRef = useRef<HTMLDivElement>(null);
+  const [beaconRef, setBeaconRef] = useState<HTMLDivElement>(null);
 
   const CHILDREN = cloneElement(children, {
     ref: childrenRef,
@@ -156,7 +160,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 ref={(el) => setBeaconRef(el)}
-                className={cx({
+                className={cn({
                   'z-30': !beaconClassName,
                   [beaconClassName]: !!beaconClassName,
                   'pointer-events-auto visible': active,
@@ -171,8 +175,8 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
                 <button
                   aria-label="manage-visibility"
                   type="button"
-                  className={cx({
-                    'beacon relative flex h-6 w-6 translate-y-3/4 transform items-center justify-center rounded-full border-2 border-gray-800 bg-primary-500 transition focus:outline-none':
+                  className={cn({
+                    'beacon relative flex h-6 w-6 translate-y-3/4 transform items-center justify-center rounded-full border-2 border-gray-700 bg-primary-500 transition focus:outline-none':
                       true,
                   })}
                   onClick={() => {
