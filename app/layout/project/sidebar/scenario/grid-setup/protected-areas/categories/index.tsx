@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import { useAppDispatch } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import intersection from 'lodash/intersection';
@@ -32,14 +32,13 @@ import ProtectedAreaUploader from './pa-uploader';
 export const WDPACategories = ({ onContinue }): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
-  const formRef = useRef(null);
 
-  const { push, query } = useRouter();
+  const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const editable = useCanEditScenario(pid, sid);
   const { data: projectData } = useProject(pid);
@@ -179,13 +178,8 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
 
   useEffect(() => {
     dispatch(setWDPACategories(INITIAL_VALUES));
-    // We need to setWDPACategories' initial values on first render only.
-    // The way to pull this off is to add no dependencies to useEffect, but
-    // eslint will complain about it. So we disable this check.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch, setWDPACategories, INITIAL_VALUES]);
 
-  // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
     return (
       <Loading
@@ -206,7 +200,6 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
       </div>
       <FormRFF
         onSubmit={onSubmit}
-        key="protected-areas-categories"
         mutators={{
           removeWDPAFilter: (args, state, utils) => {
             const [id, arr] = args;
@@ -216,17 +209,15 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
             if (i > -1) {
               newArr.splice(i, 1);
             }
+
             utils.changeValue(state, 'wdpaIucnCategories', () => newArr);
           },
         }}
+        initialValuesEqual={() => true}
         initialValues={INITIAL_VALUES}
       >
         {({ form, values, handleSubmit }) => {
-          formRef.current = form;
-
-          const { values: stateValues } = formRef?.current?.getState();
-
-          dispatch(setWDPACategories(stateValues));
+          dispatch(setWDPACategories(values));
 
           const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
           const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
