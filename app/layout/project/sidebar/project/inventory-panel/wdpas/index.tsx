@@ -57,7 +57,9 @@ const InventoryPanelProtectedAreas = ({
     }
   );
 
-  const WDPAIds = allProjectWDPAsQuery.data?.map((wdpa) => wdpa.id);
+  const WDPAIds = allProjectWDPAsQuery.data
+    ?.filter((wdpa) => wdpa.attributes.isCustom)
+    .map((wdpa) => wdpa.id);
 
   const handleSelectAll = useCallback(
     (evt: ChangeEvent<HTMLInputElement>) => {

@@ -28,7 +28,7 @@ const RowItem = ({
           className="block h-4 w-4 checked:bg-blue-400"
           onChange={onSelectRow}
           value={id}
-          checked={selectedIds.includes(id)}
+          checked={isCustom && selectedIds.includes(id)}
           disabled={!isCustom}
         />
       </td>
