@@ -869,7 +869,7 @@ export class ProjectsController {
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
-  @ApiOkResponse({type: GeoFeature})
+  @ApiOkResponse({ type: GeoFeature })
   @Patch(':projectId/features/:featureId/tags')
   async updateGeoFeatureTag(
     @Param('projectId', ParseUUIDPipe) projectId: string,

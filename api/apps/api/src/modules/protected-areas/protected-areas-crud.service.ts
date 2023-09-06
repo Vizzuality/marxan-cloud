@@ -5,7 +5,6 @@ import {
   forwardRef,
   Inject,
   Injectable,
-  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -34,22 +33,10 @@ import { Scenario } from '../scenarios/scenario.api.entity';
 import { groupBy, intersection } from 'lodash';
 import { ProjectSnapshot } from '@marxan/projects';
 import { SelectionGetService } from '@marxan-api/modules/scenarios/protected-area/getter/selection-get.service';
-import { groupBy } from 'lodash';
-import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import { Either, left, right } from 'fp-ts/Either';
 import { UpdateProtectedAreaNameDto } from '@marxan-api/modules/protected-areas/dto/rename.protected-area.dto';
-import {
-  projectNotEditable,
-  projectNotFound,
-} from '@marxan-api/modules/projects/projects.service';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
-import {
-  featureIsLinkedToOneOrMoreScenarios,
-  featureNotDeletable,
-  featureNotFound,
-} from '@marxan-api/modules/geo-features/geo-features.service';
-import { ProjectSnapshot } from "@marxan/projects";
-import { SelectionGetService } from "@marxan-api/modules/scenarios/protected-area/getter/selection-get.service";
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -125,6 +112,8 @@ export class ProtectedAreasCrudService extends AppBaseService<
     protected readonly repository: Repository<ProtectedArea>,
     @InjectRepository(Scenario)
     protected readonly scenarioRepository: Repository<Scenario>,
+    @InjectRepository(Project)
+    protected readonly projectRepository: Repository<Project>,
     @Inject(forwardRef(() => SelectionGetService))
     private readonly selectionGetService: SelectionGetService,
     private readonly projectAclService: ProjectAclService,
@@ -447,9 +436,11 @@ export class ProtectedAreasCrudService extends AppBaseService<
       return left(customProtectedAreaNotDeletableByUser);
     }
 
-    const projectProtectedAreas = await this.listForProject(
-      protectedArea.projectId,
-    );
+    const project = await this.projectRepository.findOneOrFail({
+      where: { id: protectedArea.projectId },
+    });
+
+    const projectProtectedAreas = await this.listForProject(project);
     const protectedAreaData = projectProtectedAreas.data.find(
       (pa: ProtectedArea) => pa.id === protectedAreaId,
     );
