@@ -66,16 +66,16 @@ export const useGridSetupItems = (): SubMenuItem[] => {
       selected: isScenarioRoute && tab === TABS['scenario-protected-areas'],
     },
     {
-      name: 'Cost Surface',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-cost-surface']}`,
-      icon: COST_SURFACE_SVG,
-      selected: isScenarioRoute && tab === TABS['scenario-cost-surface'],
-    },
-    {
       name: 'Planning Unit Status',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-planning-unit-status']}`,
       icon: PLANNING_UNITS_SVG,
       selected: isScenarioRoute && tab === TABS['scenario-planning-unit-status'],
+    },
+    {
+      name: 'Cost Surface',
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-cost-surface']}`,
+      icon: COST_SURFACE_SVG,
+      selected: isScenarioRoute && tab === TABS['scenario-cost-surface'],
     },
     {
       name: 'Features',
