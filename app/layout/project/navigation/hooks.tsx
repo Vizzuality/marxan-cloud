@@ -5,7 +5,6 @@ import { useFeatureFlags } from 'hooks/feature-flags';
 import BLM_CALIBRATION_SVG from 'svgs/navigation/blm-calibration.svg?sprite';
 import COST_SURFACE_SVG from 'svgs/navigation/cost-surface.svg?sprite';
 import FEATURES_SVG from 'svgs/navigation/features.svg?sprite';
-import GAP_ANALYSIS_SVG from 'svgs/navigation/gap-analysis.svg?sprite';
 import OVERVIEW_SVG from 'svgs/navigation/overview.svg?sprite';
 import PLANNING_UNITS_SVG from 'svgs/navigation/planning-units.svg?sprite';
 import PROTECTED_AREA_SVG from 'svgs/navigation/protected-areas.svg?sprite';
@@ -88,7 +87,7 @@ export const useGridSetupItems = (): SubMenuItem[] => {
     {
       name: 'Gap Analysis',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-gap-analysis']}`,
-      icon: GAP_ANALYSIS_SVG,
+      icon: TARGET_SVG,
       selected: isScenarioRoute && TABS['scenario-gap-analysis'] === tab,
     },
   ];
