@@ -70,7 +70,7 @@ export const Navigation = (): JSX.Element => {
     inventory: NAVIGATION_TREE.inventory.includes(tab),
     gridSetup: isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab),
     solutions: isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab),
-    advancedSettings: isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab),
+    marxanSettings: isScenarioRoute && NAVIGATION_TREE.marxanSettings.includes(tab),
   });
 
   const inventoryItems = useInventoryItems();
@@ -145,8 +145,8 @@ export const Navigation = (): JSX.Element => {
     if (isProjectRoute && NAVIGATION_TREE.inventory.includes(tab)) toggleSubmenu('inventory');
     if (isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab)) toggleSubmenu('gridSetup');
     if (isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab)) toggleSubmenu('solutions');
-    if (isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab))
-      toggleSubmenu('advancedSettings');
+    if (isScenarioRoute && NAVIGATION_TREE.marxanSettings.includes(tab))
+      toggleSubmenu('marxanSettings');
   }, [tab, isProjectRoute, isScenarioRoute, toggleSubmenu]);
 
   const runJob = JOBS.find(({ kind }) => kind === 'run');
@@ -292,24 +292,24 @@ export const Navigation = (): JSX.Element => {
                 className={cn({
                   [MENU_ITEM_COMMON_CLASSES]: true,
                   [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab),
+                    isScenarioRoute && NAVIGATION_TREE.marxanSettings.includes(tab),
                 })}
               >
                 <Tooltip
                   placement="right"
                   offset={TOOLTIP_OFFSET}
-                  content={<MenuTooltip>Advanced settings</MenuTooltip>}
+                  content={<MenuTooltip>Marxan Settings</MenuTooltip>}
                 >
                   <button
                     type="button"
                     className={MENU_ITEM_BUTTON_COMMON_CLASSES}
-                    onClick={() => toggleSubmenu('advancedSettings')}
+                    onClick={() => toggleSubmenu('marxanSettings')}
                   >
                     <Icon className={ICON_COMMON_CLASSES} icon={ADVANCED_SETTINGS_SVG} />
                   </button>
                 </Tooltip>
               </li>
-              {submenuState.advancedSettings && (
+              {submenuState.marxanSettings && (
                 <li>
                   <SubMenu items={advancedSettingsItems} />
                 </li>

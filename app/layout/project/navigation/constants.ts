@@ -31,7 +31,7 @@ export const NAVIGATION_TREE = {
     TABS['scenario-features-targets-spf'],
     TABS['scenario-gap-analysis'],
   ],
-  advancedSettings: [TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']],
+  marxanSettings: [TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']],
   solutions: [TABS['scenario-solutions'], TABS['scenario-target-achievement']],
 } satisfies { [key in NavigationTreeCategories]: string[] };
 
