@@ -14,7 +14,7 @@ export default defineConfig({
     command: process.env.CI ? 'yarn build && yarn start' : 'yarn dev',
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    timeout: 150 * 1000,
     env: {
       NEXTAUTH_URL: `http://localhost:${PORT}`,
       NEXTAUTH_SECRET: 'cats',
