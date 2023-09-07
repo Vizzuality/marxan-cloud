@@ -3,6 +3,6 @@ export type NavigationTreeCategories =
   | 'inventory'
   | 'gridSetup'
   | 'solutions'
-  | 'advancedSettings';
+  | 'marxanSettings';
 
 export type NavigationInventoryTabs = 'protected-areas' | 'cost-surface' | 'features';

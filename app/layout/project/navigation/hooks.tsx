@@ -17,11 +17,10 @@ import type { SubMenuItem } from './submenu';
 const SCENARIO_ROUTE = '/projects/[pid]/scenarios/';
 
 export const useInventoryItems = (): SubMenuItem[] => {
+  const { showPA, showCS } = useFeatureFlags();
   const { query, route } = useRouter();
   const { pid, tab } = query as { pid: string; tab: string };
   const isProjectRoute = route.startsWith('/projects/[pid]');
-
-  const { showPA, showCS } = useFeatureFlags();
 
   return [
     ...(showPA
@@ -122,7 +121,7 @@ export const useAdvancedSettingsItems = (): SubMenuItem[] => {
 
   return [
     {
-      name: 'Overview',
+      name: 'Advanced Settings',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-advanced-settings']}`,
       icon: OVERVIEW_SVG,
       selected: isScenarioRoute && tab === TABS['scenario-advanced-settings'],
