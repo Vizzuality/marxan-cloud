@@ -34,9 +34,10 @@ const includeSelections: IncludeSelections = {
   },
   features: {
     attributes: ', "featureList"',
-    select: 'array_to_string(feature_list, \',\') as "featureList"',
+    select: 'array_to_string(feature_list, \';\') as "featureList"',
     alias: 'features',
   },
+
   cost: {
     attributes: ', "costValue"',
     select: 'COALESCE(cost,1) as "costValue"',
