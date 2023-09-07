@@ -250,7 +250,7 @@ export const Navigation = (): JSX.Element => {
                 <Tooltip
                   placement="right"
                   offset={TOOLTIP_OFFSET}
-                  content={<MenuTooltip>Scenario</MenuTooltip>}
+                  content={<MenuTooltip>Scenarios</MenuTooltip>}
                 >
                   <Link href={`/projects/${pid}`} className={MENU_ITEM_BUTTON_COMMON_CLASSES}>
                     <Icon className={ICON_COMMON_CLASSES} icon={SCENARIO_LIST_SVG} />
