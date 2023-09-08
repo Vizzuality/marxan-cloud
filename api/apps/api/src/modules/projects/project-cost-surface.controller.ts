@@ -43,6 +43,9 @@ import {
   JsonApiAsyncJobMeta,
 } from '@marxan-api/dto/async-job.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
+import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
+import { CostSurfaceSerializer } from '@marxan-api/modules/cost-surface/dto/cost-surface.serializer';
+import { JSONAPICostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -51,6 +54,7 @@ export class ProjectCostSurfaceController {
     @Inject(forwardRef(() => ScenariosService))
     public readonly scenarioService: ScenariosService,
     public readonly costSurfaceService: CostSurfaceService,
+    public readonly costSurfaceSeralizer: CostSurfaceSerializer,
   ) {}
 
   @ImplementsAcl()
@@ -105,8 +109,8 @@ export class ProjectCostSurfaceController {
     @Param('projectId') projectId: string,
     @Param('costSurfaceId') costSurfaceId: string,
     @Req() req: RequestWithAuthenticatedUser,
-    @Body() dto: UploadCostSurfaceShapefileDto,
-  ): Promise<NotImplementedException> {
+    @Body() dto: UpdateCostSurfaceDto,
+  ): Promise<JSONAPICostSurface> {
     const result = await this.costSurfaceService.updateCostSurfaceShapefile(
       req.user.id,
       projectId,
