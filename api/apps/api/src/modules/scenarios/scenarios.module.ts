@@ -52,6 +52,7 @@ import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entit
 import { WebshotModule } from '@marxan/webshot';
 import { DeleteScenarioModule } from './delete-scenario/delete-scenario.module';
 import { LegacyProjectImportCheckerModule } from '../legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.module';
+import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { LegacyProjectImportCheckerModule } from '../legacy-project-import/domai
       UsersScenariosApiEntity,
       ScenarioLockEntity,
       IssuedAuthnToken,
+      CostSurface,
     ]),
     TypeOrmModule.forFeature(
       [ScenariosPlanningUnitGeoEntity],

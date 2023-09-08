@@ -97,6 +97,17 @@ export class Scenario extends TimeUserEntityMetadata {
   @Column('integer', { name: 'project_scenario_id' })
   projectScenarioId!: number;
 
+  @ApiProperty({ type: () => CostSurface })
+  @ManyToOne(() => CostSurface)
+  @JoinColumn({
+    name: 'cost_surface_id',
+    referencedColumnName: 'id',
+  })
+  costSurface?: CostSurface;
+
+  @Column('uuid', { name: 'cost_surface_id' })
+  costSurfaceId!: string;
+
   /**
    * List of ids of protected areas associated to the scenario.
    */

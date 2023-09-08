@@ -20,6 +20,7 @@ import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/
 import { GivenProjectExists } from './steps/given-project';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 // TODO: This test file is highly coupled, some tests relies on other tests, some expectations are not clear. This one should be a priority to refactor
 let fixtures: FixtureType<typeof getFixtures>;
@@ -81,6 +82,14 @@ describe('ScenariosModule (e2e)', () => {
     await fixtures.GivenViewerWasAddedToProject();
     const response = await fixtures.WhenCreatingAScenarioAsAProjectViewer();
     fixtures.ThenForbiddenIsReturned(response);
+  });
+
+  it('Creating a scenario will fail because the associated project does not have a default cost surface', async () => {
+    await fixtures.GivenProjectHasNoDefaultCostSurface();
+    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner(
+      false,
+    );
+    fixtures.ThenCostSurfaceNotFoundMessageIsReturned(response);
   });
 
   it('Creating a scenario with complete data should succeed', async () => {
@@ -203,6 +212,9 @@ async function getFixtures() {
   const scenariosRepo: Repository<Scenario> = app.get(
     getRepositoryToken(Scenario),
   );
+  const costSurfaceRepo: Repository<CostSurface> = app.get(
+    getRepositoryToken(CostSurface),
+  );
 
   return {
     GivenUserIsLoggedIn: async (user: string) => {
@@ -262,15 +274,23 @@ async function getFixtures() {
     },
 
     GivenPreviousScenario: async (name: string, projectScenarioId: number) => {
+      const costSurface = await costSurfaceRepo.findOneOrFail({
+        where: { projectId, isDefault: true },
+      });
       const scenario = await scenariosRepo.save({
         name,
         type: ScenarioType.marxan,
         projectId,
+        costSurfaceId: costSurface.id,
       });
       await scenariosRepo.save({
         id: scenario.id,
         projectScenarioId,
+        costSurfaceId: costSurface.id,
       });
+    },
+    GivenProjectHasNoDefaultCostSurface: async () => {
+      await costSurfaceRepo.delete({ projectId, isDefault: true });
     },
 
     WhenCreatingAScenarioWithIncompleteData: async () =>
@@ -426,6 +446,12 @@ async function getFixtures() {
     ) => {
       expect(response.body.errors[0].title).toEqual(
         `Scenario for Project with id ${projectId} could not be created`,
+      );
+    },
+
+    ThenCostSurfaceNotFoundMessageIsReturned: (response: request.Response) => {
+      expect(response.body.errors[0].title).toEqual(
+        `Cost Surface not found for Project with id ${projectId}`,
       );
     },
 

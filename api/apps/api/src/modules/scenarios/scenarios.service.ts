@@ -109,9 +109,9 @@ import {
   WebshotPdfReportConfig,
   WebshotService,
 } from '@marxan/webshot';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
-import { EntityManager } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { UserId } from '@marxan/domain-ids';
 import {
   DeleteScenario as DeleteScenarioUnusedResources,
@@ -121,6 +121,8 @@ import { LegacyProjectImportChecker } from '../legacy-project-import/domain/lega
 import { lastValueFrom } from 'rxjs';
 import { AdjustPlanningUnitsInput } from '@marxan-api/modules/analysis/entry-points/adjust-planning-units-input';
 import { submissionFailed } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
+import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
+import { costSurfaceNotFound } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -186,6 +188,8 @@ export class ScenariosService {
     private readonly commandBus: CommandBus,
     private readonly blmValuesRepository: ScenarioBlmRepo,
     private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
+    @InjectRepository(CostSurface)
+    private readonly costSurfaceRepository: Repository<CostSurface>,
     private readonly scenarioAclService: ScenarioAccessControl,
     private readonly webshotService: WebshotService,
     @InjectEntityManager(apiConnections.geoprocessingDB)
@@ -264,7 +268,8 @@ export class ScenariosService {
       | ProjectNotReady
       | ProjectDoesntExist
       | SetInitialCostSurfaceError
-      | typeof scenarioNotCreated,
+      | typeof scenarioNotCreated
+      | typeof costSurfaceNotFound,
       Scenario
     >
   > {
@@ -295,6 +300,18 @@ export class ScenariosService {
 
     if (isRight(isLegacyProjectCompleted) && !isLegacyProjectCompleted.right)
       return left(projectNotReady);
+
+    //When creating a scenario it will use the project's default cost surface
+    const costSurfaceDefault = await this.costSurfaceRepository.findOne({
+      where: {
+        projectId: input.projectId,
+        isDefault: true,
+      },
+    });
+    if (!costSurfaceDefault) {
+      return left(costSurfaceNotFound);
+    }
+    validatedMetadata.costSurfaceId = costSurfaceDefault.id;
 
     let scenario;
     try {

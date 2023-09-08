@@ -48,4 +48,6 @@ export class CreateScenarioDTO {
   @IsOptional()
   @IsEnum(Object.values(JobStatus))
   status?: JobStatus;
+
+  costSurfaceId?: string;
 }

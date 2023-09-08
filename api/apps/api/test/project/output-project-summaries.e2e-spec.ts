@@ -20,6 +20,7 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
 import { Parse, ParseStream } from 'unzipper';
 import { GivenProjectsPu } from '../../../geoprocessing/test/steps/given-projects-pu-exists';
+import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 beforeEach(async () => {
@@ -362,6 +363,9 @@ const getFixtures = async () => {
     getRepositoryToken(Scenario),
   );
   const projectRepo = app.get<Repository<Project>>(getRepositoryToken(Project));
+  const costSurfaceRepo = app.get<Repository<CostSurface>>(
+    getRepositoryToken(CostSurface),
+  );
   const organizationRepo = app.get<Repository<Organization>>(
     getRepositoryToken(Organization),
   );
@@ -397,7 +401,20 @@ const getFixtures = async () => {
       projectId: string,
     ) => {
       const id = v4();
-      await scenarioRepo.insert({ id, name, projectId, numberOfRuns: 1 });
+      const costSurface = await costSurfaceRepo.save({
+        projectId,
+        name: `${name} cost surface`,
+        min: 0,
+        max: 0,
+        isDefault: false,
+      });
+      await scenarioRepo.insert({
+        id,
+        name,
+        projectId,
+        numberOfRuns: 1,
+        costSurfaceId: costSurface.id,
+      });
       return id;
     },
     GivenScenarioWithNoRunsExistsOnAPI: async (
@@ -405,7 +422,19 @@ const getFixtures = async () => {
       projectId: string,
     ) => {
       const id = v4();
-      await scenarioRepo.insert({ id, name, projectId });
+      const costSurface = await costSurfaceRepo.save({
+        projectId,
+        name: `${name} cost surface`,
+        min: 0,
+        max: 0,
+        isDefault: false,
+      });
+      await scenarioRepo.insert({
+        id,
+        name,
+        projectId,
+        costSurfaceId: costSurface.id,
+      });
       return id;
     },
 

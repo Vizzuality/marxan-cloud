@@ -30,6 +30,7 @@ import { MarkLegacyProjectImportPieceAsFailedHandler } from './mark-legacy-proje
 import { RunLegacyProjectImportHandler } from './run-legacy-project-import.handler';
 import { StartLegacyProjectImportHandler } from './start-legacy-project-import.handler';
 import { UpdateSolutionsAreLockedHandler } from './update-solutions-are-locked-to-legacy-project-import.handler';
+import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { UpdateSolutionsAreLockedHandler } from './update-solutions-are-locked-t
     ]),
     LegacyProjectImportRepositoryModule,
     SpecificationModule,
+    CostSurfaceModule,
   ],
   providers: [
     {

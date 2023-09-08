@@ -1,6 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 import { E2E_CONFIG } from './e2e.config';
 import { TestClientApi } from './utils/test-client/test-client-api';
+import { Repository } from 'typeorm';
+import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('ProjectsModule (e2e)', () => {
   let api: TestClientApi;
@@ -37,6 +40,20 @@ describe('ProjectsModule (e2e)', () => {
         .expect(HttpStatus.CREATED);
 
       expect(projectResponse.data.type).toBe('projects');
+
+      const costSurfaceRepo: Repository<CostSurface> = api
+        .getNestInstance()
+        .get<Repository<CostSurface>>(getRepositoryToken(CostSurface));
+
+      const costSurface = await costSurfaceRepo.find({
+        where: { projectId: projectResponse.data.id, isDefault: true },
+      });
+
+      expect(costSurface.length).toBe(1);
+      expect(costSurface[0]).toBeDefined();
+      expect(costSurface[0].projectId).toBe(projectResponse.data.id);
+      expect(costSurface[0].isDefault).toBeTruthy();
+      // @TODO Missing checks for min/max costs, as it's not a synchronous process
     });
 
     it('should succeed when giving complete required data', async () => {
@@ -55,6 +72,20 @@ describe('ProjectsModule (e2e)', () => {
 
       expect(projectResponse.body.data.type).toBe('projects');
       expect(projectResponse.body.meta.started).toBeTruthy();
+
+      const costSurfaceRepo: Repository<CostSurface> = api
+        .getNestInstance()
+        .get<Repository<CostSurface>>(getRepositoryToken(CostSurface));
+
+      const costSurface = await costSurfaceRepo.find({
+        where: { projectId: projectResponse.body.data.id, isDefault: true },
+      });
+
+      expect(costSurface.length).toBe(1);
+      expect(costSurface[0]).toBeDefined();
+      expect(costSurface[0].projectId).toBe(projectResponse.body.data.id);
+      expect(costSurface[0].isDefault).toBeTruthy();
+      // @TODO Missing checks for min/max costs, as it's not a synchronous process
 
       await api.utils.generateProjectBlmValues(projectResponse.body.data.id);
       const scenarioData = {

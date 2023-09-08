@@ -38,6 +38,7 @@ export class ExportScenarioHandler
       name: scenario.name + ' - copy',
       projectId: scenario.projectId,
       metadata: scenario.metadata,
+      costSurfaceId: scenario.costSurfaceId,
     });
     // No need to inform projectScenarioId, because it will be generated automatically by the trigger
   }
