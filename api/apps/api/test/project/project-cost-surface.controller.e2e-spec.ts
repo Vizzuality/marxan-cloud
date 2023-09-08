@@ -43,7 +43,7 @@ describe('Upload Cost Surface Shapefile', () => {
   });
 });
 
-describe('Upload Cost Surface Shapefile', () => {
+describe('Update Cost Surface', () => {
   beforeEach(async () => {
     fixtures = await getProjectCostSurfaceControllerFixtures();
   });
@@ -58,17 +58,14 @@ describe('Upload Cost Surface Shapefile', () => {
     const costSurfaceName = 'someNewName';
 
     // ACT
-    const response = await fixtures.WhenUpdatingCostSurfaceForProject(
+    await fixtures.WhenUpdatingCostSurfaceForProject(
       projectId,
       costSurface.id,
       costSurfaceName,
     );
 
     // ASSERT
-    await fixtures.ThenCostSurfaceAPIEntityWasProperlySaved(
-      response,
-      costSurfaceName,
-    );
+    await fixtures.ThenCostSurfaceAPIEntityWasProperlySaved(costSurfaceName);
   });
 
   it(`should return error when the cost surface could not be found`, async () => {

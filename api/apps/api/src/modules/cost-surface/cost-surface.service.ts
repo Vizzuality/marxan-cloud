@@ -87,10 +87,10 @@ export class CostSurfaceService {
       return left(projectNotEditable);
     }
 
-    const nameCount = await this.costSurfaceRepository.count({
-      where: { name: dto.name },
+    const sameNameCostSurface = await this.costSurfaceRepository.count({
+      where: { projectId, name: dto.name },
     });
-    if (nameCount > 0) {
+    if (sameNameCostSurface) {
       return left(costSurfaceNameAlreadyExistsForProject);
     }
 
