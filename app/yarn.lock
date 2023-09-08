@@ -7967,6 +7967,7 @@ __metadata:
     react-dom: 18.2.0
     react-dropzone: ^11.3.1
     react-final-form: 6.5.9
+    react-icons: 4.11.0
     react-intersection-observer: ^8.31.1
     react-joyride: ^2.3.0
     react-map-gl: ^6.1.13
@@ -18600,6 +18601,15 @@ __metadata:
     react: ^16.6.0 || ^17.0.0
     react-dom: ^16.6.0 || ^17.0.0
   checksum: e7fbc5083437105044da626a48c0ca3a32a687ef249e9a1f74717dd29f44d6ebecb9a9f4ab6ae36e76a98d2d94fa2ae11bc46171fdc01138314eef945f5df2a6
+  languageName: node
+  linkType: hard
+
+"react-icons@npm:4.11.0":
+  version: 4.11.0
+  resolution: "react-icons@npm:4.11.0"
+  peerDependencies:
+    react: "*"
+  checksum: 7b8b80bbe2dabcc54b6c2129b7761a04b19caebe24389adc7683478ef41212b9ca0b53c63abcc06b3c01b94c84855ec5142b4c357e19c4aaaad9a4db23a3c485
   languageName: node
   linkType: hard
 

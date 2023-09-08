@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { HiOutlineArrowUpOnSquareStack } from 'react-icons/hi2';
+
 import { useUploadScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -18,7 +20,6 @@ import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 export const UploadPUMethod = (): JSX.Element => {
   const { query } = useRouter();
@@ -185,10 +186,7 @@ export const UploadPUMethod = (): JSX.Element => {
         <input {...getInputProps()} />
 
         <div className="flex w-full flex-col items-center justify-center space-y-4">
-          <Icon
-            className="h-6 w-6 stroke-current text-white group-hover:text-black"
-            icon={UPLOAD_SVG}
-          />
+          <HiOutlineArrowUpOnSquareStack className="h-6 w-6 stroke-current text-gray-400" />
 
           <p className="text-center text-sm font-medium text-white">
             Drag and drop your polygon data file <br /> or click here to upload
