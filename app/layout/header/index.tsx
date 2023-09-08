@@ -46,7 +46,7 @@ export const Header = ({
   size,
   theme = 'dark',
 }: HeaderProps): JSX.Element => {
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   return (
     <>

@@ -13,7 +13,7 @@ export interface GuideRequestProps {
 }
 
 export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }: GuideRequestProps) => {
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   const { onActive } = useHelp();
 

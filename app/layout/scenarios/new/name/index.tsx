@@ -5,9 +5,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
-import Pill from 'layout/pill';
 import { usePlausible } from 'next-plausible';
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
@@ -20,6 +18,8 @@ import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Loading from 'components/loading';
+import Pill from 'layout/pill';
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 export const ScenariosSidebarName = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
@@ -29,7 +29,7 @@ export const ScenariosSidebarName = (): JSX.Element => {
   const { addToast } = useToasts();
 
   const { data: project } = useProject(pid);
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   const mutation = useSaveScenario({
     requestConfig: {

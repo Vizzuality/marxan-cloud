@@ -51,7 +51,7 @@ function fetchProjectUsers(pId, session) {
 
 export function useProjectsUsers(projectsIds: string[]) {
   const { data: session } = useSession();
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   const userQueries = useQueries(
     projectsIds.map((p) => {
@@ -97,7 +97,7 @@ export function useProjectsUsers(projectsIds: string[]) {
 
 export function useProjectUsers(projectId) {
   const { data: session } = useSession();
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   const query = useQuery(['roles', projectId], () => fetchProjectUsers(projectId, session), {
     enabled: !!projectId,

@@ -35,7 +35,7 @@ const BUTTON_CLASSES = 'flex items-center space-x-2 rounded-xl text-gray-500 hov
 
 export const UserMenu = (): JSX.Element => {
   const { data: session } = useSession();
-  const { user } = useMe();
+  const { data: user } = useMe();
   const { active, onActive } = useHelp();
   const plausible = usePlausible();
 
@@ -73,11 +73,11 @@ export const UserMenu = (): JSX.Element => {
       <div className="mb-3 flex space-x-4">
         <div>
           <Avatar
-            bgImage={user.avatar}
-            {...(!user.avatar && { bgColor: COLOR_ME })}
+            bgImage={user.avatarDataUrl}
+            {...(!user.avatarDataUrl && { bgColor: COLOR_ME })}
             className="border-transparent"
           >
-            {!user.avatar && user.displayName.slice(0, 2).toUpperCase()}
+            {!user.avatarDataUrl && user.displayName.slice(0, 2).toUpperCase()}
           </Avatar>
         </div>
         <div className="flex flex-col space-y-2">

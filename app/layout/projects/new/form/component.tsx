@@ -62,7 +62,7 @@ const ProjectForm = ({ onFormUpdate }: ProjectFormProps): JSX.Element => {
   const plausible = usePlausible();
   const [PAOptionSelected, setPAOptionSelected] = useState('');
   const planningAreaScrollRef = useRef(null);
-  const { user } = useMe();
+  const { data: user } = useMe();
   const { data: organizationsData } = useOrganizations();
   const dispatch = useDispatch();
   const saveProjectMutation = useSaveProject({});

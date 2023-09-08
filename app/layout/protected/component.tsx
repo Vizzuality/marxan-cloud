@@ -11,7 +11,7 @@ import GuideRequest from 'layout/guide-request';
 // const SESSION_BUFFER_TIME = 30 * 60 * 1000; // 30 min
 
 const Protected = ({ children }: PropsWithChildren) => {
-  const { user } = useMe();
+  const { data: user } = useMe();
   const { data: session, status } = useSession();
   const [modal, setModal] = useState(false);
   const loading = status === 'loading';

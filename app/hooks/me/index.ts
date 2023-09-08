@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 
 import { useSession } from 'next-auth/react';
 
+import { User } from 'types/api/user';
+
 import USERS from 'services/users';
 
 import {
@@ -23,10 +25,10 @@ export function useMe() {
   const { data: session, status } = useSession();
   const loading = status === 'loading';
 
-  const query = useQuery(
+  return useQuery(
     'me',
     () =>
-      USERS.request({
+      USERS.request<{ data: User }>({
         method: 'GET',
         url: '/me',
         headers: {
@@ -37,17 +39,9 @@ export function useMe() {
       }),
     {
       enabled: !!session && !loading,
+      select: ({ data }) => data,
     }
   );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      user: data?.data,
-    };
-  }, [query, data?.data]);
 }
 
 // SAVE
