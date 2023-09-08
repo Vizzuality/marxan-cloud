@@ -13,6 +13,7 @@ export const costSurfaceNotEditableWithinProject = Symbol(
   `cost surface not editable within project`,
 );
 
+export const costSurfaceNotFound = Symbol(`cost surface not found`);
 export const costSurfaceNotFoundForProject = Symbol(
   `cost surface not found for project`,
 );
@@ -36,6 +37,22 @@ export class CostSurfaceService {
       max: 1,
       isDefault: true,
     });
+  }
+
+  async createDefaultCostSurfaceForProject(
+    projectId: string,
+    projectName?: string,
+  ): Promise<CostSurface> {
+    // Min and max will be updated later asynchronously
+    const costSurface = this.costSurfaceRepository.create({
+      projectId,
+      name: CostSurfaceService.defaultCostSurfaceName(projectName),
+      isDefault: true,
+      min: 0,
+      max: 0,
+    });
+
+    return this.costSurfaceRepository.save(costSurface);
   }
 
   async uploadCostSurfaceShapefile(
@@ -117,5 +134,9 @@ export class CostSurfaceService {
     costSurface = await this.costSurfaceRepository.save(costSurface);
 
     return right(costSurface);
+  }
+
+  static defaultCostSurfaceName(projectName?: string): string {
+    return `${projectName ? projectName + ' - ' : ''}Default Cost Surface`;
   }
 }

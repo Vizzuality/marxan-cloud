@@ -111,6 +111,7 @@ import {
 } from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
 import {
   costSurfaceNameAlreadyExistsForProject,
+  costSurfaceNotFound,
   costSurfaceNotFoundForProject,
 } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
@@ -197,7 +198,8 @@ export const mapAclDomainToHttpError = (
     | typeof customProtectedAreaIsUsedInOneOrMoreScenarios
     | typeof globalProtectedAreaNotDeletable
     | typeof costSurfaceNotFoundForProject
-    | typeof costSurfaceNameAlreadyExistsForProject,
+    | typeof costSurfaceNameAlreadyExistsForProject
+    | typeof costSurfaceNotFound,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -384,6 +386,10 @@ export const mapAclDomainToHttpError = (
     case costSurfaceNotFoundForProject:
       throw new NotFoundException(
         `Cost Surface for Project with id ${options?.projectId} not found`,
+      );
+    case costSurfaceNotFound:
+      throw new NotFoundException(
+        `Cost Surface not found for Project with id ${options?.projectId}`,
       );
     case costSurfaceNameAlreadyExistsForProject:
       throw new ForbiddenException(

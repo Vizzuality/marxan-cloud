@@ -22,6 +22,7 @@ import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 export type TestSpecification = {
   id: string;
@@ -103,6 +104,7 @@ export async function GivenProjectExists(
   projectData: Record<string, any> = {},
 ) {
   await GivenOrganizationExists(em, organizationId);
+  await GivenDefaultCostSurfaceForProject(em, projectId);
 
   return em
     .createQueryBuilder()
@@ -114,6 +116,25 @@ export async function GivenProjectExists(
       organization_id: organizationId,
       planning_unit_grid_shape: PlanningUnitGridShape.Square,
       ...projectData,
+    })
+    .execute();
+}
+
+async function GivenDefaultCostSurfaceForProject(
+  em: EntityManager,
+  projectId: string,
+  name?: string,
+) {
+  return em
+    .createQueryBuilder()
+    .insert()
+    .into(`cost_surfaces`)
+    .values({
+      name: CostSurfaceService.defaultCostSurfaceName(name || projectId),
+      project_id: projectId,
+      min: 0,
+      max: 0,
+      is_default: true,
     })
     .execute();
 }
@@ -331,6 +352,7 @@ export async function DeletePlanningAreas(
     projectId: projectId,
   });
 }
+
 export async function DeleteProjectPus(em: EntityManager, projectId: string) {
   const projectsPuRepo = em.getRepository(ProjectsPuEntity);
   const planningUnitsGeomRepo = em.getRepository(PlanningUnitsGeom);
