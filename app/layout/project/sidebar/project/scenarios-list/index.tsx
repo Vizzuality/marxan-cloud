@@ -16,6 +16,7 @@ import {
   useScenarios,
   useDuplicateScenario,
   useCancelRunScenario,
+  useDownloadSolutionsSummary,
 } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -42,8 +43,9 @@ export const ScenariosList: React.FC = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToasts();
 
-  const [modal, setModal] = useState(false);
+  const [modal, setModal] = useState<boolean>(false);
   const [deleteScenario, setDelete] = useState(null);
+  const [solutionsReportLoader, setSolutionsReportLoader] = useState<boolean>(false);
 
   const { search, filters, sort } = useSelector((state) => state['/projects/[id]']);
 
@@ -187,6 +189,33 @@ export const ScenariosList: React.FC = () => {
     [addToast, cancelRunMutation]
   );
 
+  const downloadSolutionsSummary = useDownloadSolutionsSummary();
+
+  const onDownloadSolutionsSummary = useCallback(() => {
+    setSolutionsReportLoader(true);
+
+    downloadSolutionsSummary.mutate(
+      { id: pid },
+      {
+        onError: () => {
+          addToast(
+            'download-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">Solutions report not downloaded</ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+        onSettled: () => {
+          setSolutionsReportLoader(false);
+        },
+      }
+    );
+  }, [downloadSolutionsSummary, addToast, pid]);
+
   return (
     <AnimatePresence>
       <div
@@ -204,7 +233,6 @@ export const ScenariosList: React.FC = () => {
           className="relative flex flex-grow flex-col space-y-3 overflow-hidden"
         >
           {(hasScenarios || search || hasFilters) && <ScenarioToolbar />}
-
           <div
             className={cn({
               'relative overflow-hidden': true,
@@ -260,7 +288,6 @@ export const ScenariosList: React.FC = () => {
               </ScrollArea>
             )}
           </div>
-
           {!hasScenarios && !search && !hasFilters && scenariosIsFetched && (
             <div className="flex flex-col space-y-2">
               <motion.div
@@ -323,7 +350,23 @@ export const ScenariosList: React.FC = () => {
           )}
 
           {(hasScenarios || search || hasFilters) && (
-            <div className="flex w-full flex-shrink-0 items-center justify-center rounded-[20px] bg-gray-700 p-6">
+            <div className="flex w-full flex-shrink-0 flex-col items-center justify-center rounded-[20px] bg-gray-700 p-6">
+              {hasScenarios && (
+                <Button
+                  theme="primary-alt"
+                  size="base"
+                  className="mb-5 flex w-full overflow-hidden uppercase"
+                  disabled={solutionsReportLoader}
+                  onClick={onDownloadSolutionsSummary}
+                >
+                  <Loading
+                    visible={solutionsReportLoader}
+                    className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
+                    iconClassName="w-10 h-10 text-primary-500"
+                  />
+                  {scenariosData.length === 1 ? 'Export scenario data' : 'Export scenarios data'}
+                </Button>
+              )}
               <Button
                 theme="primary"
                 size="base"
