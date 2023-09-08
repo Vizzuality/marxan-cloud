@@ -1,31 +1,27 @@
 import React, { useCallback, useState } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
-
-import cx from 'classnames';
-
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { setUploadMode, setLegacyProjectId } from 'store/slices/projects/new';
+
+import { HiOutlineArrowUpOnSquareStack } from 'react-icons/hi2';
 
 import { useCancelImportLegacyProject } from 'hooks/projects';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
-
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
+import { cn } from 'utils/cn';
 
 import { UPLOAD_PROJECT_TYPES } from './constants';
 import LegacyUploadModal from './legacy-upload-modal';
 import UploadModal from './upload-modal';
 
-export interface ProjectsUploadBtnProps {}
-
-export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
+export const ProjectsUploadBtn = (): JSX.Element => {
   const [modal, setModal] = useState(false);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const { uploadMode, legacyProjectId } = useSelector((state) => state['/projects/new']);
+  const { uploadMode, legacyProjectId } = useAppSelector((state) => state['/projects/new']);
   const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
 
   const onCancelImportLegacyProject = useCallback(() => {
@@ -69,9 +65,10 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
         onClick={() => {
           setModal(true);
         }}
+        className="space-x-4"
       >
         <span>Upload project</span>
-        <Icon className="ml-4 h-3 w-3 stroke-current" icon={UPLOAD_SVG} />
+        <HiOutlineArrowUpOnSquareStack className="h-5 w-5" />
       </Button>
 
       <Modal
@@ -90,7 +87,7 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
                 return (
                   <li
                     key={`${u.id}`}
-                    className={cx({
+                    className={cn({
                       'group cursor-pointer rounded-3xl border-2 border-transparent transition-all hover:border-gray-100 hover:shadow-2xl':
                         true,
                       'pointer-events-none opacity-25': u.disabled,
@@ -119,7 +116,6 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
           </div>
         )}
         {uploadMode === 'default' && <UploadModal onDismiss={onDismiss} />}
-
         {uploadMode === 'legacy' && <LegacyUploadModal onDismiss={onDismiss} />}
       </Modal>
     </>

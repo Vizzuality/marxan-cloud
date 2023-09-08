@@ -5,14 +5,13 @@ import { useRouter } from 'next/router';
 import { useAppDispatch } from 'store/hooks';
 import { setSearch } from 'store/slices/projects/[id]';
 
+import { HiOutlineArrowUpOnSquareStack } from 'react-icons/hi2';
+
 import Button from 'components/button';
-import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Search, { SearchProps } from 'components/search';
 import { NavigationInventoryTabs } from 'layout/project/navigation/types';
 import Section from 'layout/section';
-
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 import { INVENTORY_TABS } from './constants';
 import { InventoryPanel } from './types';
@@ -79,7 +78,7 @@ const InventoryPanel = (): JSX.Element => {
         </div>
         <Button theme="primary" size="base" className="space-x-3" onClick={handleUploader}>
           <span>Upload</span>
-          <Icon icon={UPLOAD_SVG} className="h-5 w-5 stroke-current" />
+          <HiOutlineArrowUpOnSquareStack className="h-5 w-5" />
         </Button>
       </header>
       <Search
@@ -91,11 +90,7 @@ const InventoryPanel = (): JSX.Element => {
         theme="dark"
       />
       {TableComponent && <TableComponent noData={noData} />}
-      {/* TODO: Upload modal won't be optional; currently checking their existence only for development purposes */}
-      {UploadModalComponent && (
-        <UploadModalComponent isOpen={isOpenUploader} onDismiss={closeUploadModal} />
-      )}
-      {/* Not all panels have a FooterComponent */}
+      <UploadModalComponent isOpen={isOpenUploader} onDismiss={closeUploadModal} />
       {FooterComponent && <FooterComponent />}
     </Section>
   );
