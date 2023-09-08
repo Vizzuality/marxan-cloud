@@ -72,8 +72,9 @@ export class FeatureService {
     bbox?: BBox,
   ): Promise<Buffer> {
     const { z, x, y, id } = tileSpecification;
-    const attributes = 'feature_id, properties';
-    const table = `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, 0.1) as the_geom, properties, feature_id from "${this.featuresRepository.metadata.tableName}")`;
+    const simplificationLevel = 360/Math.pow(2, z);
+    const attributes = 'feature_id, properties, ';
+    const table = `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) as the_geom, properties, feature_id from "${this.featuresRepository.metadata.tableName}")`;
     const customQuery = this.buildFeaturesWhereQuery(id, bbox);
     return this.tileService.getTile({
       z,
