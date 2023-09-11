@@ -1,9 +1,8 @@
-import React, { useCallback } from 'react';
-
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { PUAction } from 'store/slices/scenarios/types';
 
@@ -21,30 +20,20 @@ import PlanningUnitMethods from './actions';
 import Tabs from './tabs';
 import type { PlanningUnitTabsProps } from './tabs';
 
-export interface ScenariosSidebarAnalysisSectionsProps {
-  onChangeSection: (s: string) => void;
-}
-
 export const GridSetupPlanningUnits = (): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
-  const scenarioSlice = getScenarioEditSlice(sid);
+  const scenarioSlice = useMemo(() => getScenarioEditSlice(sid), [sid]);
+  const { setLayerSettings } = scenarioSlice.actions;
 
-  const { setPUAction, setPuIncludedValue, setPuExcludedValue, setPuAvailableValue } =
-    scenarioSlice.actions;
+  const { setPUAction } = scenarioSlice.actions;
 
-  const { puAction } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { puAction } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const editable = useCanEditScenario(pid, sid);
-  const { data: PUData } = useScenarioPU(sid, {
-    onSuccess: ({ included, excluded, available }) => {
-      dispatch(setPuIncludedValue(included));
-      dispatch(setPuExcludedValue(excluded));
-      dispatch(setPuAvailableValue(available));
-    },
-  });
+  const { data: PUData } = useScenarioPU(sid);
 
   const onChangeTab = useCallback(
     (t: Parameters<PlanningUnitTabsProps['onChange']>[0]) => {
@@ -52,6 +41,33 @@ export const GridSetupPlanningUnits = (): JSX.Element => {
     },
     [dispatch, setPUAction]
   );
+
+  useEffect(() => {
+    dispatch(
+      setLayerSettings({
+        id: 'lock-available',
+        settings: { visibility: true },
+      })
+    );
+    dispatch(
+      setLayerSettings({
+        id: 'lock-in',
+        settings: { visibility: true },
+      })
+    );
+    dispatch(
+      setLayerSettings({
+        id: 'lock-out',
+        settings: { visibility: true },
+      })
+    );
+    dispatch(
+      setLayerSettings({
+        id: 'wdpa-percentage',
+        settings: { visibility: true },
+      })
+    );
+  }, [dispatch, setLayerSettings]);
 
   return (
     <motion.div

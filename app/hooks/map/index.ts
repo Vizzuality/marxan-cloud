@@ -176,18 +176,20 @@ export function useWDPAPreviewLayer({
   pid,
   active,
   bbox,
-  wdpaIucnCategories,
+  WDPACategories = [],
   cache = 0,
   options,
 }: UseWDPAPreviewLayer) {
-  const { opacity = 1, visibility = true } = options || {};
+  const { layerSettings } = options || {};
+
   return useMemo(() => {
     if (!active || !bbox) return null;
+
+    const visibleCategories = WDPACategories.filter((id) => layerSettings[id]?.visibility);
 
     return {
       id: `wdpa-preview-layer-${cache}`,
       type: 'vector',
-      opacity,
       source: {
         type: 'vector',
         tiles: [
@@ -200,14 +202,14 @@ export function useWDPAPreviewLayer({
             type: 'fill',
             'source-layer': 'layer0',
             layout: {
-              visibility: visibility ? 'visible' : 'none',
+              visibility: 'visible',
             },
             // wdpaIucnCategories are filtered in two steps as they are custom and WDPA.
             // We have not way to separate them into two arrays but it would be ideal
             filter: [
               'any',
-              ['all', ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]]],
-              ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
+              ['all', ['in', ['get', 'iucn_cat'], ['literal', visibleCategories]]],
+              ['all', ['in', ['get', 'id'], ['literal', visibleCategories]]],
             ],
             paint: {
               'fill-color': COLORS['wdpa-preview'],
@@ -217,12 +219,12 @@ export function useWDPAPreviewLayer({
             type: 'line',
             'source-layer': 'layer0',
             layout: {
-              visibility: visibility ? 'visible' : 'none',
+              visibility: 'visible',
             },
             filter: [
               'any',
-              ['all', ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]]],
-              ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
+              ['all', ['in', ['get', 'iucn_cat'], ['literal', visibleCategories]]],
+              ['all', ['in', ['get', 'id'], ['literal', visibleCategories]]],
             ],
             paint: {
               'line-color': '#000',
@@ -231,7 +233,7 @@ export function useWDPAPreviewLayer({
         ],
       },
     };
-  }, [pid, active, bbox, wdpaIucnCategories, cache, opacity, visibility]);
+  }, [pid, active, bbox, WDPACategories, cache, layerSettings]);
 }
 
 // Feature preview layer
@@ -281,7 +283,7 @@ export function useFeaturePreviewLayers({
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
 
-    const { featuresRecipe = [], selectedFeatures = [] } = options;
+    const { featuresRecipe = [], selectedFeatures = [], layerSettings } = options;
 
     const FEATURES = [...features]
       .filter((ft) => selectedFeatures.includes(ft.id as string))
@@ -291,26 +293,20 @@ export function useFeaturePreviewLayers({
         return bIndex - aIndex;
       });
 
-    const { opacity = 1, visibility = true } = options || {};
-
-    const getLayerVisibility = () => {
+    const getLayerVisibility = (
+      visibility: (typeof layerSettings)[string]['visibility']
+    ): 'visible' | 'none' => {
       if (!visibility) {
         return 'none';
       }
+
       return 'visible';
     };
 
-    return FEATURES.map((f, index) => {
+    return FEATURES.map((f) => {
       const { id } = f;
-
       const F = featuresRecipe.find((fr) => fr.id === id) || f;
-
-      const COLOR =
-        selectedFeatures.length > COLORS['features-preview'].ramp.length
-          ? chroma.scale(COLORS['features-preview'].ramp).colors(selectedFeatures.length)[
-              selectedFeatures.length - 1 - index
-            ]
-          : COLORS['features-preview'].ramp[selectedFeatures.length - 1 - index];
+      const settings = layerSettings[id] || { visibility: true, opacity: 1, color: '#000' };
 
       return {
         id: `feature-${id}-preview-layer-${cache}`,
@@ -337,11 +333,11 @@ export function useFeaturePreviewLayers({
                 ],
               }),
               layout: {
-                visibility: getLayerVisibility(),
+                visibility: getLayerVisibility(settings?.visibility),
               },
               paint: {
-                'fill-color': COLOR,
-                'fill-opacity': opacity,
+                'fill-color': settings?.color,
+                'fill-opacity': settings?.opacity,
               },
             },
             {
@@ -358,11 +354,11 @@ export function useFeaturePreviewLayers({
                 ],
               }),
               layout: {
-                visibility: getLayerVisibility(),
+                visibility: getLayerVisibility(settings?.visibility),
               },
               paint: {
                 'line-color': '#000',
-                'line-opacity': 0.5 * opacity,
+                'line-opacity': 0.5 * settings?.opacity,
               },
             },
           ],
@@ -607,12 +603,12 @@ export function usePUGridLayer({
       wdpaThreshold = 0,
       cost = {
         min: 0,
-        max: 1,
+        max: 100,
       },
       puIncludedValue,
       puExcludedValue,
       puAvailableValue,
-      features = [],
+      // features = [],
       preHighlightFeatures = [],
       postHighlightFeatures = [],
       runId,
@@ -621,25 +617,21 @@ export function usePUGridLayer({
     const {
       pugrid: PUgridSettings = {},
       'wdpa-percentage': WdpaPercentageSettings = {},
-      features: FeaturesSettings = {},
-      'features-highlight': FeaturesHighlightSettings = {},
-      cost: CostSettings = {},
+      // features: FeaturesSettings = {},
+      'cost-surface': CostSettings = {},
       'lock-in': LockInSettings = {},
       'lock-out': LockOutSettings = {},
       'lock-available': LockAvailableSettings = {},
       frequency: FrequencySettings = {},
       solution: SolutionSettings = {},
+      ...restLayerSettings
     } = settings;
 
     const { opacity: PUgridOpacity = 1, visibility: PUgridVisibility = true } = PUgridSettings;
     const { opacity: WdpaPercentageOpacity = 1, visibility: WdpaPercentageVisibility = true } =
       WdpaPercentageSettings;
-    const { opacity: FeaturesOpacity = 1, visibility: FeaturesVisibility = true } =
-      FeaturesSettings;
-    const {
-      opacity: FeaturesHighlightOpacity = 1,
-      visibility: FeaturesHighlightVisibility = true,
-    } = FeaturesHighlightSettings;
+    // const { opacity: FeaturesOpacity = 1, visibility: FeaturesVisibility = true } =
+    //   FeaturesSettings;
     const { opacity: CostOpacity = 1, visibility: CostVisibility = true } = CostSettings;
     const { opacity: LockInOpacity = 1, visibility: LockInVisibility = true } = LockInSettings;
     const { opacity: LockOutOpacity = 1, visibility: LockOutVisibility = true } = LockOutSettings;
@@ -696,75 +688,69 @@ export function usePUGridLayer({
           // ANALYSIS - GAP ANALYSIS
           ...(sublayers.includes('features')
             ? [
-                {
+                // ...(features?.length
+                //   ? [
+                //       {
+                //         type: 'fill',
+                //         'source-layer': 'layer0',
+                //         layout: {
+                //           visibility: getLayerVisibility(FeaturesVisibility),
+                //         },
+                //         // ...runId && {
+                //         //   filter: [
+                //         //     'all',
+                //         //     ['in', `-${runId}-`, ['get', 'valuePosition']],
+                //         //   ],
+                //         // },
+                //         paint: {
+                //           'fill-color': COLORS.features,
+                //           'fill-opacity': [
+                //             'case',
+                //             [
+                //               'any',
+                //               ...features.map((id) => {
+                //                 return ['in', id, ['get', 'featureList']];
+                //               }),
+                //             ],
+                //             0.5 * FeaturesOpacity,
+                //             0,
+                //           ],
+                //         },
+                //       },
+                //     ]
+                //   : []),
+                ...preHighlightFeatures.map((id) => ({
                   type: 'fill',
                   'source-layer': 'layer0',
                   layout: {
-                    visibility: getLayerVisibility(FeaturesVisibility),
-                  },
-                  // ...runId && {
-                  //   filter: [
-                  //     'all',
-                  //     ['in', `-${runId}-`, ['get', 'valuePosition']],
-                  //   ],
-                  // },
-                  paint: {
-                    'fill-color': COLORS.features,
-                    'fill-opacity': [
-                      'case',
-                      [
-                        'any',
-                        ...features.map((id) => {
-                          return ['in', id, ['get', 'featureList']];
-                        }),
-                      ],
-                      0.5 * FeaturesOpacity,
-                      0,
-                    ],
-                  },
-                },
-                {
-                  type: 'fill',
-                  'source-layer': 'layer0',
-                  layout: {
-                    visibility: getLayerVisibility(FeaturesHighlightVisibility),
-                  },
-                  paint: {
-                    'fill-color': COLORS.highlightFeatures,
-                    'fill-opacity': [
-                      'case',
-                      [
-                        'any',
-                        ...preHighlightFeatures.map((id) => {
-                          return ['in', id, ['get', 'featureList']];
-                        }),
-                      ],
-                      0.5 * FeaturesHighlightOpacity,
-                      0,
-                    ],
-                  },
-                },
-                {
-                  type: 'fill',
-                  'source-layer': 'layer0',
-                  layout: {
-                    visibility: getLayerVisibility(FeaturesHighlightVisibility),
+                    visibility: getLayerVisibility(restLayerSettings[id]?.visibility || 1),
                   },
                   paint: {
                     'fill-color': COLORS.highlightFeatures,
                     'fill-opacity': [
                       'case',
-                      [
-                        'any',
-                        ...postHighlightFeatures.map((id) => {
-                          return ['in', id, ['get', 'featureList']];
-                        }),
-                      ],
-                      0.5 * FeaturesOpacity,
+                      ['any', ['in', id, ['get', 'featureList']]],
+                      0.5 * restLayerSettings[id]?.opacity || 1,
                       0,
                     ],
                   },
-                },
+                })),
+                ...postHighlightFeatures.map((id) => ({
+                  type: 'fill',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(restLayerSettings[id]?.visibility || 1),
+                  },
+                  paint: {
+                    'fill-color': COLORS.highlightFeatures,
+                    'fill-opacity': [
+                      'case',
+                      ['any', ['in', id, ['get', 'featureList']]],
+                      0.5 * restLayerSettings[id]?.opacity || 1,
+                      0,
+                    ],
+                  },
+                })),
               ]
             : []),
 

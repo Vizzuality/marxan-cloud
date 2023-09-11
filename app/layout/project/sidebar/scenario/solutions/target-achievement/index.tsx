@@ -1,4 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+
+import { useRouter } from 'next/router';
+
+import { useAppDispatch } from 'store/hooks';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
@@ -11,10 +16,31 @@ import Toolbar from './toolbar';
 
 export const SolutionsTargetAchievements = (): JSX.Element => {
   const [search, setSearch] = useState<string>(null);
+  const { query } = useRouter();
+  const { sid } = query as { sid: string };
+
+  const dispatch = useAppDispatch();
+  const scenarioSlice = useMemo(() => getScenarioEditSlice(sid), [sid]);
+  const { setLayerSettings } = scenarioSlice.actions;
 
   const onSearch = useCallback((s: typeof search) => {
     setSearch(s);
   }, []);
+
+  useEffect(() => {
+    dispatch(
+      setLayerSettings({
+        id: 'solution',
+        settings: { visibility: true },
+      })
+    );
+    dispatch(
+      setLayerSettings({
+        id: 'frequency',
+        settings: { visibility: true },
+      })
+    );
+  }, [dispatch, setLayerSettings]);
 
   return (
     <div className="relative flex flex-grow flex-col overflow-hidden">

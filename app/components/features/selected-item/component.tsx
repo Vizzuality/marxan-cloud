@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo, useState, ReactNode } from 'react';
 
+import { HiEye, HiEyeOff } from 'react-icons/hi';
+
 import { useFeatureFlags } from 'hooks/feature-flags';
 
 import Button from 'components/button';
@@ -14,11 +16,9 @@ import STRAT_1_IMG from 'images/info-buttons/img_strat_1.png';
 import STRAT_2_IMG from 'images/info-buttons/img_strat_2.png';
 import STRAT_3_IMG from 'images/info-buttons/img_strat_3.png';
 
-import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import REMOVE_SVG from 'svgs/ui/remove.svg?sprite';
-import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
 export interface ItemProps {
@@ -132,12 +132,7 @@ export const Item: React.FC<ItemProps> = ({
         [className]: !!className,
       })}
     >
-      <header
-        className={cn({
-          'border-l-4 px-4 py-2': true,
-          'border-yellow-500': true,
-        })}
-      >
+      <header className="border-l-4 border-yellow-400 px-4 py-2">
         <div className="flex items-start justify-between">
           <h2 className="font-heading text-sm">{name}</h2>
 
@@ -181,7 +176,12 @@ export const Item: React.FC<ItemProps> = ({
                   'text-gray-400': !isShown,
                 })}
               >
-                <Icon className="h-4 w-4" icon={isShown ? SHOW_SVG : HIDE_SVG} />
+                {isShown ? (
+                  <HiEye className="h-4 w-4 text-blue-400" />
+                ) : (
+                  <HiEyeOff className="h-4 w-4" />
+                )}
+                {/* <Icon className="h-4 w-4" icon={isShown ? SHOW_SVG : HIDE_SVG} /> */}
               </button>
             </Tooltip>
 

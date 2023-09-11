@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
+import React, { ComponentProps, useCallback, useEffect, useState, useMemo, useRef } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -7,6 +7,8 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import { sortBy } from 'lodash';
+import { FiLayers } from 'react-icons/fi';
 
 import { useAccessToken } from 'hooks/auth';
 import { useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
@@ -17,12 +19,12 @@ import {
   useWDPAPreviewLayer,
   usePUGridLayer,
   useFeaturePreviewLayers,
-  useLegend,
+  // useLegend,
   useBBOX,
   useTargetedPreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
+import { useCostSurfaceRange, useScenario, useScenarioPU } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 import { useWDPACategories } from 'hooks/wdpa';
 
@@ -33,7 +35,9 @@ import FitBoundsControl from 'components/map/controls/fit-bounds';
 import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
 import Legend from 'components/map/legend';
+import LegendGroup from 'components/map/legend/group';
 import LegendItem from 'components/map/legend/item';
+import { LegendItemType } from 'components/map/legend/types';
 import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
@@ -41,7 +45,10 @@ import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import { TABS } from 'layout/project/navigation/constants';
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 import { MapProps } from 'types/map';
+import { cn } from 'utils/cn';
 import { centerMap } from 'utils/map';
+
+import { useScenarioLegend } from './legend/hooks';
 
 export const ScenariosEditMap = (): JSX.Element => {
   const [open, setOpen] = useState(true);
@@ -72,11 +79,18 @@ export const ScenariosEditMap = (): JSX.Element => {
 
   const dispatch = useAppDispatch();
 
+  useScenarioPU(sid, {
+    onSuccess: ({ included, excluded, available }) => {
+      dispatch(setPuIncludedValue(included));
+      dispatch(setPuExcludedValue(excluded));
+      dispatch(setPuAvailableValue(available));
+    },
+  });
+
   const {
     cache,
 
     // WDPA
-    wdpaCategories,
     wdpaThreshold,
 
     // Features
@@ -85,6 +99,8 @@ export const ScenariosEditMap = (): JSX.Element => {
     selectedFeatures,
     preHighlightFeatures,
     postHighlightFeatures,
+
+    selectedCostSurface,
 
     // Adjust planning units
     clicking,
@@ -102,6 +118,7 @@ export const ScenariosEditMap = (): JSX.Element => {
     // Settings
     layerSettings,
   } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const legendConfig = useScenarioLegend();
 
   const { data } = useProject(pid);
   const { bbox } = data;
@@ -188,141 +205,23 @@ export const ScenariosEditMap = (): JSX.Element => {
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState<MapProps['bounds']>(null);
 
-  const include = useMemo(() => {
-    if (tab === TABS['scenario-protected-areas']) {
-      return 'protection';
-    }
-
-    if (tab === TABS['scenario-cost-surface']) {
-      return 'cost';
-    }
-
-    if (tab === TABS['scenario-gap-analysis']) {
-      return 'features';
-    }
-
-    if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
-      return 'protection,features';
-    }
-
-    if (tab === TABS['scenario-solutions']) {
-      return 'results';
-    }
-
-    if (tab === TABS['scenario-target-achievement']) {
-      return 'features,results';
-    }
-
-    return 'protection';
-  }, [tab]);
-
   const sublayers = useMemo(() => {
-    if (tab === TABS['scenario-protected-areas']) {
-      return ['wdpa-percentage'];
-    }
-
-    if (tab === TABS['scenario-cost-surface']) {
-      return ['cost'];
-    }
-
-    if (tab === TABS['scenario-planning-unit-status']) {
-      return ['wdpa-percentage', 'lock-available', 'lock-in', 'lock-out'];
-    }
-
-    if ([TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab)) {
-      return ['wdpa-percentage', 'features', 'features-preview'];
-    }
-
-    if (tab === TABS['scenario-gap-analysis']) {
-      return ['features'];
-    }
-
-    if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
-      return ['wdpa-percentage', 'features'];
-    }
-
-    if (tab === TABS['scenario-target-achievement']) {
-      return ['features'];
-    }
-
-    if ([TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab)) {
-      return ['frequency', 'solution'];
-    }
-
-    return [];
-  }, [tab]);
-
-  const layers = useMemo(() => {
-    const protectedCategories = protectedAreas || [];
-
-    if (tab === TABS['scenario-cost-surface']) {
-      return ['cost', 'pugrid'];
-    }
-    if (tab === TABS['scenario-planning-unit-status']) {
-      return [
-        ...(protectedCategories.length ? ['wdpa-percentage'] : []),
-        'lock-in',
-        'lock-out',
-        'lock-available',
-        'pugrid',
-      ];
-    }
-
-    if (tab === TABS['scenario-protected-areas'] && !!protectedCategories.length) {
-      return ['wdpa-percentage', 'wdpa-preview', 'pugrid'];
-    }
-
-    if ([TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab)) {
-      return [
-        ...(protectedCategories.length ? ['wdpa-percentage'] : []),
-        ...(preHighlightFeatures.length ? ['features-highlight'] : []),
-        !!previewFeatureIsSelected && 'features-preview',
-        'pugrid',
-      ];
-    }
-
-    if (tab === TABS['scenario-gap-analysis']) {
-      return ['features', 'pugrid'];
-    }
-
-    if ([TABS['scenario-advanced-settings'], TABS['scenario-blm-calibration']].includes(tab)) {
-      return ['wdpa-percentage', 'features'];
-    }
-
-    if (tab === TABS['scenario-target-achievement']) {
-      return ['pugrid', 'features', 'features-highlight'];
-    }
-
-    if (tab === TABS['scenario-solutions']) {
-      return ['frequency', 'solution', 'pugrid'];
-    }
-
-    if (
-      [TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab) &&
-      !postHighlightFeatures.length
-    ) {
-      return ['features'];
-    }
-
-    if (
-      [TABS['scenario-solutions'], TABS['scenario-target-achievement']].includes(tab) &&
-      !!postHighlightFeatures.length
-    ) {
-      return ['features', 'features-highlight'];
-    }
-
-    return ['pugrid'];
-  }, [
-    tab,
-    protectedAreas,
-    previewFeatureIsSelected,
-    preHighlightFeatures.length,
-    postHighlightFeatures.length,
-  ]);
+    return [
+      ...(layerSettings['wdpa-percentage']?.visibility ? ['wdpa-percentage'] : []),
+      ...(layerSettings['features']?.visibility ? ['features'] : []),
+      ...(preHighlightFeatures?.length || postHighlightFeatures?.length ? ['features'] : []),
+      ...(selectedCostSurface ? ['cost'] : []),
+      ...(layerSettings['lock-in']?.visibility ? ['lock-in'] : []),
+      ...(layerSettings['lock-out']?.visibility ? ['lock-out'] : []),
+      ...(layerSettings['lock-available']?.visibility ? ['lock-available'] : []),
+      ...(layerSettings['frequency']?.visibility ? ['frequency'] : []),
+      ...(layerSettings['solution']?.visibility ? ['solution'] : []),
+    ];
+  }, [layerSettings, selectedCostSurface, preHighlightFeatures, postHighlightFeatures]);
 
   const featuresIds = useMemo(() => {
     if (allGapAnalysisData) {
-      return allGapAnalysisData.map((g) => g.featureId);
+      return allGapAnalysisData?.map((g) => g.featureId);
     }
     return [];
   }, [allGapAnalysisData]);
@@ -334,33 +233,33 @@ export const ScenariosEditMap = (): JSX.Element => {
   }, [postHighlightFeatures, selectedSolution, bestSolution]);
 
   const WDPApreviewLayer = useWDPAPreviewLayer({
-    ...wdpaCategories,
-    pid: `${pid}`,
+    WDPACategories: protectedAreasData?.map(({ id }) => id),
+    pid,
     cache,
-    active: tab === TABS['scenario-protected-areas'],
+    active: true,
     bbox,
     options: {
-      ...layerSettings['wdpa-preview'],
+      layerSettings,
     },
   });
 
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
     cache,
-    active: tab === TABS['scenario-features'],
+    active: selectedFeatures.length > 0,
     bbox,
     options: {
       featuresRecipe,
       featureHoverId,
       selectedFeatures,
-      ...layerSettings['features-preview'],
+      layerSettings,
     },
   });
 
   const TargetedPreviewLayers = useTargetedPreviewLayers({
     features: targetedFeaturesData,
     cache,
-    active: tab === TABS['scenario-features-targets-spf'],
+    active: targetedFeaturesData.length > 0,
     bbox,
     options: {
       featuresRecipe,
@@ -373,8 +272,8 @@ export const ScenariosEditMap = (): JSX.Element => {
   const PUGridLayer = usePUGridLayer({
     cache,
     active: true,
-    sid: sid ? `${sid}` : null,
-    include,
+    sid,
+    include: 'protection,cost,features,results',
     sublayers,
     options: {
       wdpaIucnCategories: protectedAreas,
@@ -386,22 +285,24 @@ export const ScenariosEditMap = (): JSX.Element => {
       puIncludedValue: [...puIncludedValue, ...puTmpIncludedValue],
       puExcludedValue: [...puExcludedValue, ...puTmpExcludedValue],
       puAvailableValue: [...puAvailableValue, ...puTmpAvailableValue],
-      features: featuresIds,
+      // features: [TABS['scenario-target-achievement'], TABS['scenario-gap-analysis']].includes(tab)
+      //   ? []
+      //   : featuresIds,
       preHighlightFeatures,
       postHighlightFeatures: postHighlightedFeaturesIds,
-      cost: costSurfaceRangeData,
+      // cost: costSurfaceRangeData,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
-        pugrid: layerSettings.pugrid,
-        'wdpa-percentage': layerSettings['wdpa-percentage'],
-        features: layerSettings.features,
-        'features-highlight': layerSettings['features-highlight'],
-        cost: layerSettings.cost,
-        'lock-in': layerSettings['lock-in'],
-        'lock-out': layerSettings['lock-out'],
-        'lock-available': layerSettings['lock-available'],
-        frequency: layerSettings.frequency,
-        solution: layerSettings.solution,
+        // pugrid: layerSettings.pugrid,
+        // 'wdpa-percentage': layerSettings['wdpa-percentage'],
+        // features: layerSettings.features,
+        // 'cost-surface': layerSettings[selectedCostSurface],
+        // 'lock-in': layerSettings['lock-in'],
+        // 'lock-out': layerSettings['lock-out'],
+        // 'lock-available': layerSettings['lock-available'],
+        // frequency: layerSettings.frequency,
+        // solution: layerSettings.solution,
+        ...layerSettings,
       },
     },
   });
@@ -415,23 +316,23 @@ export const ScenariosEditMap = (): JSX.Element => {
     ...TargetedPreviewLayers,
   ].filter((l) => !!l);
 
-  const LEGEND = useLegend({
-    layers,
-    options: {
-      wdpaIucnCategories: protectedAreas,
-      wdpaThreshold:
-        tab === TABS['scenario-protected-areas'] ? wdpaThreshold : scenarioData?.wdpaThreshold,
-      cost: costSurfaceRangeData,
-      items: selectedPreviewFeatures,
-      puAction,
-      puIncludedValue: [...puIncludedValue, ...puTmpIncludedValue],
-      puExcludedValue: [...puExcludedValue, ...puTmpExcludedValue],
-      puAvailableValue: [...puAvailableValue, ...puTmpAvailableValue],
-      runId: selectedSolution?.runId || bestSolution?.runId,
-      numberOfRuns: scenarioData?.numberOfRuns || 0,
-      layerSettings,
-    },
-  });
+  // const LEGEND = useLegend({
+  //   layers,
+  //   options: {
+  //     wdpaIucnCategories: protectedAreas,
+  //     wdpaThreshold:
+  //       tab === TABS['scenario-protected-areas'] ? wdpaThreshold : scenarioData?.wdpaThreshold,
+  //     cost: costSurfaceRangeData,
+  //     items: selectedPreviewFeatures,
+  //     puAction,
+  //     puIncludedValue: [...puIncludedValue, ...puTmpIncludedValue],
+  //     puExcludedValue: [...puExcludedValue, ...puTmpExcludedValue],
+  //     puAvailableValue: [...puAvailableValue, ...puTmpAvailableValue],
+  //     runId: selectedSolution?.runId || bestSolution?.runId,
+  //     numberOfRuns: scenarioData?.numberOfRuns || 0,
+  //     layerSettings,
+  //   },
+  // });
 
   useEffect(() => {
     setBounds({
@@ -610,7 +511,9 @@ export const ScenariosEditMap = (): JSX.Element => {
       dispatch(
         setLayerSettings({
           id,
-          settings: { opacity },
+          settings: {
+            opacity,
+          },
         })
       );
     },
@@ -629,6 +532,39 @@ export const ScenariosEditMap = (): JSX.Element => {
     },
     [setLayerSettings, dispatch, layerSettings]
   );
+
+  const renderLegendItems = ({
+    type,
+    intersections,
+    items,
+  }: {
+    type?: LegendItemType;
+    intersections?: ComponentProps<typeof LegendTypeMatrix>['intersections'];
+    items?:
+      | ComponentProps<typeof LegendTypeBasic>['items']
+      | ComponentProps<typeof LegendTypeChoropleth>['items']
+      | ComponentProps<typeof LegendTypeGradient>['items']
+      | ComponentProps<typeof LegendTypeMatrix>['items'];
+  }) => {
+    switch (type) {
+      case 'basic':
+        return <LegendTypeBasic className="text-sm text-gray-300" items={items} />;
+      case 'choropleth':
+        return <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />;
+      case 'gradient':
+        return <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />;
+      case 'matrix':
+        return (
+          <LegendTypeMatrix
+            className="text-sm text-white"
+            intersections={intersections}
+            items={items}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="relative h-full w-full overflow-hidden">
@@ -690,39 +626,68 @@ export const ScenariosEditMap = (): JSX.Element => {
         />
       </Controls>
 
-      {/* Legend */}
-
-      <div className="absolute bottom-16 right-5 w-full max-w-xs">
-        <Legend open={open} className="w-full" maxHeight={325} onChangeOpen={() => setOpen(!open)}>
-          {LEGEND.map((i) => {
-            const { type, items, intersections, id } = i;
-
+      <div className="absolute bottom-16 right-5 flex w-full max-w-xs flex-col items-end space-y-2">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className={cn({
+            'rounded-full bg-gray-800 p-5 shadow-xl': true,
+            'bg-blue-400': open,
+          })}
+        >
+          <FiLayers
+            className={cn({
+              'h-6 w-6 text-white': true,
+              'text-gray-700': open,
+            })}
+          />
+        </button>
+        <Legend open={open} className="max-h-[50svh] w-full" onChangeOpen={() => setOpen(!open)}>
+          {legendConfig.map((c) => {
             return (
-              <LegendItem
-                sortable={false}
-                key={i.id}
-                settingsManager={i.settingsManager}
-                onChangeOpacity={(opacity) => onChangeOpacity(opacity, id)}
-                onChangeVisibility={() => onChangeVisibility(id)}
-                {...i}
+              <LegendGroup
+                key={c.name}
+                title={c.name}
+                defaultOpen
+                disabled={!c.layers?.length && !c.subgroups?.[0]?.layers?.length}
               >
-                {type === 'matrix' && (
-                  <LegendTypeMatrix
-                    className="text-sm text-white"
-                    intersections={intersections}
-                    items={items}
-                  />
-                )}
-                {type === 'basic' && (
-                  <LegendTypeBasic className="text-sm text-gray-400" items={items} />
-                )}
-                {type === 'choropleth' && (
-                  <LegendTypeChoropleth className="text-sm text-gray-400" items={items} />
-                )}
-                {type === 'gradient' && (
-                  <LegendTypeGradient className={{ box: 'text-sm text-gray-400' }} items={items} />
-                )}
-              </LegendItem>
+                {c.layers?.map((layer) => {
+                  if (layer) {
+                    return (
+                      <LegendItem
+                        key={layer.id}
+                        onChangeOpacity={(opacity) => onChangeOpacity(opacity, layer.id)}
+                        settings={layerSettings[layer.id]}
+                        {...layer}
+                      >
+                        {renderLegendItems(layer)}
+                      </LegendItem>
+                    );
+                  }
+                })}
+                {c.subgroups?.map((subgroup) => {
+                  return (
+                    <LegendGroup key={subgroup.name} title={subgroup.name} className="pl-5">
+                      <div className="divide-y divide-dashed divide-gray-400">
+                        {subgroup.layers?.map((layer) => {
+                          if (layer) {
+                            return (
+                              <LegendItem
+                                key={layer.id}
+                                onChangeOpacity={(opacity) => onChangeOpacity(opacity, layer.id)}
+                                settings={layerSettings[layer.id]}
+                                {...layer}
+                              >
+                                {renderLegendItems(layer as any)}
+                              </LegendItem>
+                            );
+                          }
+                        })}
+                      </div>
+                    </LegendGroup>
+                  );
+                })}
+              </LegendGroup>
             );
           })}
         </Legend>

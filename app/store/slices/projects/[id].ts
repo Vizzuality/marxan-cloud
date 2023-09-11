@@ -19,7 +19,12 @@ const initialState: ProjectShowStateProps = {
   search: '',
   filters: {},
   sort: '-lastModifiedAt',
-  layerSettings: {},
+  layerSettings: {
+    pugrid: {
+      visibility: true,
+      opacity: 1,
+    },
+  },
   selectedFeatures: [],
   selectedCostSurface: null,
   selectedWDPAs: [],
@@ -71,7 +76,7 @@ const projectsDetailSlice = createSlice({
       state.selectedFeatures = action.payload;
     },
     // COST SURFACE
-    setSelectedCostSurface: (
+    setSelectedCostSurfaces: (
       state,
       action: PayloadAction<ProjectShowStateProps['selectedCostSurface']>
     ) => {
@@ -90,7 +95,7 @@ export const {
   setSort,
   setLayerSettings,
   setSelectedFeatures,
-  setSelectedCostSurface,
+  setSelectedCostSurfaces,
   setSelectedWDPAs,
   setSidebarVisibility,
 } = projectsDetailSlice.actions;

@@ -20,6 +20,7 @@ import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
+import { CostSurface } from 'types/api/cost-surface';
 import { Job } from 'types/api/job';
 import { Project } from 'types/api/project';
 import { Scenario } from 'types/api/scenario';
@@ -611,13 +612,14 @@ export function useUploadPA({
   return useMutation(uploadPAShapefile);
 }
 
-export function useCostSurfaceRange(id) {
+export function useCostSurfaceRange(id: Scenario['id']) {
   const { data: session } = useSession();
 
   const query = useQuery(
     ['scenarios-cost-surface', id],
     async () =>
-      SCENARIOS.request({
+      // ! this endpoint is deprecated: https://marxan23.northeurope.cloudapp.azure.com/swagger#/Scenario/ScenariosController_getCostRange
+      SCENARIOS.request<{ min: number; max: number }>({
         method: 'GET',
         url: `/${id}/cost-surface`,
         headers: {

@@ -25,7 +25,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
   best = false,
   values,
 }: SelectedSolutionProps) => {
-  const { runId, scoreValue, costValue, missingValues, planningUnits } = values;
+  const { runId, scoreValue, costValue, missingValues, planningUnits } = values || {};
 
   return (
     <div className="w-full">

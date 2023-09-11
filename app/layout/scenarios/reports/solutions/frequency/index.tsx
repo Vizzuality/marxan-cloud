@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useScenario } from 'hooks/scenarios';
 
-import LegendItem from 'components/map/legend/item/component';
-import LegendTypeGradient from 'components/map/legend/types/gradient/component';
+import LegendItem from 'components/map/legend/item';
+import LegendTypeGradient from 'components/map/legend/types/gradient';
 import FrequencyReportMap from 'layout/scenarios/reports/solutions/frequency/map';
 
 export const FrequencyPage = (): JSX.Element => {
@@ -18,9 +18,7 @@ export const FrequencyPage = (): JSX.Element => {
   const LEGEND = useMemo(() => {
     return {
       ...LEGEND_LAYERS.frequency({
-        options: {
-          numberOfRuns: scenarioQuery.data?.numberOfRuns,
-        },
+        numberOfRuns: scenarioQuery.data?.numberOfRuns,
       }),
       name: `Frequency (${scenarioQuery.data?.numberOfRuns})`,
       settingsManager: null,

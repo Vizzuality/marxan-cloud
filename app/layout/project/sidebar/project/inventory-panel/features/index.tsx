@@ -3,9 +3,15 @@ import { useCallback, useState, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects/[id]';
+import {
+  setSelectedFeatures as setVisibleFeatures,
+  setLayerSettings,
+} from 'store/slices/projects/[id]';
+
+import chroma from 'chroma-js';
 
 import { useAllFeatures } from 'hooks/features';
+import { COLORS } from 'hooks/map/constants';
 
 import ActionsMenu from 'layout/project/sidebar/project/inventory-panel/features/actions-menu';
 import FeaturesBulkActionMenu from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu';
@@ -28,9 +34,11 @@ const FEATURES_TABLE_COLUMNS = [
 const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
 
-  const { selectedFeatures: visibleFeatures, search } = useAppSelector(
-    (state) => state['/projects/[id]']
-  );
+  const {
+    selectedFeatures: visibleFeatures,
+    search,
+    layerSettings,
+  } = useAppSelector((state) => state['/projects/[id]']);
 
   const [filters, setFilters] = useState<Parameters<typeof useAllFeatures>[1]>({
     sort: FEATURES_TABLE_COLUMNS[0].name,
@@ -46,14 +54,23 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
       search,
     },
     {
-      select: ({ data }) =>
-        data?.map((feature) => ({
-          id: feature.id,
-          name: feature.featureClassName,
-          scenarios: feature.scenarioUsageCount,
-          tag: feature.tag,
-          isCustom: feature.isCustom,
-        })),
+      select: ({ data }) => {
+        return data?.map((feature, index) => {
+          const color =
+            data.length > COLORS['features-preview'].ramp.length
+              ? chroma.scale(COLORS['features-preview'].ramp).colors(data.length)[index]
+              : COLORS['features-preview'].ramp[index];
+
+          return {
+            id: feature.id,
+            name: feature.featureClassName,
+            scenarios: feature.scenarioUsageCount,
+            tag: feature.tag,
+            isCustom: feature.isCustom,
+            color,
+          };
+        });
+      },
       placeholderData: { data: [] },
       keepPreviousData: true,
     }
@@ -96,22 +113,36 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
   const toggleSeeOnMap = useCallback(
     (featureId: Feature['id']) => {
       const newSelectedFeatures = [...visibleFeatures];
-      if (!newSelectedFeatures.includes(featureId)) {
+      const isIncluded = newSelectedFeatures.includes(featureId);
+      if (!isIncluded) {
         newSelectedFeatures.push(featureId);
       } else {
         const i = newSelectedFeatures.indexOf(featureId);
         newSelectedFeatures.splice(i, 1);
       }
       dispatch(setVisibleFeatures(newSelectedFeatures));
+
+      const selectedFeature = allFeaturesQuery.data.find(({ id }) => featureId === id);
+      const { color } = selectedFeature || {};
+
+      dispatch(
+        setLayerSettings({
+          id: featureId,
+          settings: {
+            visibility: !isIncluded,
+            color,
+          },
+        })
+      );
     },
-    [dispatch, visibleFeatures]
+    [dispatch, visibleFeatures, allFeaturesQuery.data]
   );
 
   const displayBulkActions = selectedFeaturesIds.length > 0;
 
   const data: DataItem[] = allFeaturesQuery.data?.map((feature) => ({
     ...feature,
-    isVisibleOnMap: visibleFeatures.includes(feature.id),
+    isVisibleOnMap: layerSettings[feature.id]?.visibility ?? false,
   }));
 
   return (

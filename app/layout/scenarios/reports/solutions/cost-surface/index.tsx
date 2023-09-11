@@ -2,11 +2,11 @@ import React, { useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { LEGEND_LAYERS } from 'hooks/map/constants';
+import { COLORS } from 'hooks/map/constants';
 import { useCostSurfaceRange } from 'hooks/scenarios';
 
-import LegendItem from 'components/map/legend/item/component';
-import LegendTypeGradient from 'components/map/legend/types/gradient/component';
+import LegendItem from 'components/map/legend/item';
+import LegendTypeGradient from 'components/map/legend/types/gradient';
 import CostSurfaceReportMap from 'layout/scenarios/reports/solutions/cost-surface/map';
 
 export const CostSurfaceReport = (): JSX.Element => {
@@ -16,9 +16,22 @@ export const CostSurfaceReport = (): JSX.Element => {
 
   const LEGEND = useMemo(() => {
     return {
-      ...LEGEND_LAYERS.cost({ cost: costSurfaceQuery.data }),
       name: 'Cost layer',
       settingsManager: null,
+      items: [
+        {
+          color: COLORS.cost[0],
+          value: `${
+            costSurfaceQuery.data?.min === costSurfaceQuery.data?.max
+              ? 0
+              : costSurfaceQuery.data?.min
+          }`,
+        },
+        {
+          color: COLORS.cost[1],
+          value: `${costSurfaceQuery.data?.max}`,
+        },
+      ],
     };
   }, [costSurfaceQuery.data]);
 
@@ -26,7 +39,7 @@ export const CostSurfaceReport = (): JSX.Element => {
     <div className="flex space-x-6 bg-gray-100 px-10 py-3">
       <CostSurfaceReportMap id="report-map-cost-surface" />
       <div className="w-2/6 py-5">
-        <LegendItem {...LEGEND} key="cost" theme="light" className="text-left font-semibold" />
+        <LegendItem {...LEGEND} id="cost" theme="light" className="text-left font-semibold" />
         <LegendTypeGradient
           className={{ box: 'w-full text-sm', bar: 'h-3' }}
           items={LEGEND.items}

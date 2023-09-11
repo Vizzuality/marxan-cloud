@@ -9,4 +9,8 @@ export interface Feature {
   alias: string;
   scenarioUsageCount: number;
   tag?: string;
+  amountRange: {
+    min: number;
+    max: number;
+  };
 }

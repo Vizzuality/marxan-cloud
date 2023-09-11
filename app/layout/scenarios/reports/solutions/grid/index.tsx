@@ -2,13 +2,13 @@ import React, { useMemo } from 'react';
 
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 
-import LegendItem from 'components/map/legend/item/component';
+import LegendItem from 'components/map/legend/item';
 import GridReportMap from 'layout/scenarios/reports/solutions/grid/map';
 
 export const PlanningUnitGridPage = (): JSX.Element => {
   const LEGEND = useMemo(() => {
     return {
-      ...LEGEND_LAYERS.pugrid(),
+      ...LEGEND_LAYERS.pugrid({}),
       name: 'Planning Unit Grid',
       settingsManager: null,
     };

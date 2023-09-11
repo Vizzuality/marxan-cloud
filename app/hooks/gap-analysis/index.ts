@@ -3,10 +3,12 @@ import { useMemo, useRef } from 'react';
 import { useInfiniteQuery, useQuery } from 'react-query';
 
 import { format } from 'd3';
+import { sortBy } from 'lodash';
 import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
 
 import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
+import { Scenario } from 'types/api/scenario';
 
 import SCENARIOS from 'services/scenarios';
 
@@ -14,10 +16,10 @@ import { UseFeaturesOptionsProps } from './types';
 
 type AllItemProps = RawItemProps;
 
-export function useAllGapAnalysis(sId, queryOptions) {
+export function useAllGapAnalysis(sId: Scenario['id'], queryOptions) {
   const { data: session } = useSession();
 
-  const query = useQuery(
+  return useQuery(
     'all-gap-analysis',
     async () =>
       SCENARIOS.request({
@@ -26,30 +28,17 @@ export function useAllGapAnalysis(sId, queryOptions) {
         params: {
           disablePagination: true,
           fields: 'featureId',
-          omitFields: 'featureClassName,tag',
         },
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
       }).then((response) => {
-        return response.data;
+        return response.data?.data;
       }),
     {
-      placeholderData: {
-        data: [],
-      },
       ...queryOptions,
     }
   );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
 }
 
 export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
@@ -119,34 +108,37 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
               data: { data: pageData },
             } = p;
 
-            return pageData.map((d): AllItemProps => {
-              const {
-                id,
-                name,
-                featureClassName,
-                met,
-                metArea,
-                coverageTarget,
-                coverageTargetArea,
-                onTarget,
-              } = d;
+            return sortBy(
+              pageData.map((d): AllItemProps => {
+                const {
+                  id,
+                  name,
+                  featureClassName,
+                  met,
+                  metArea,
+                  coverageTarget,
+                  coverageTargetArea,
+                  onTarget,
+                } = d;
 
-              return {
-                id,
-                name: name || featureClassName || 'Metadata name',
-                onTarget,
-                current: {
-                  percent: met / 100,
-                  value: format('.3s')(metArea / 1000000),
-                  unit: 'km2',
-                },
-                target: {
-                  percent: coverageTarget / 100,
-                  value: format('.3s')(coverageTargetArea / 1000000),
-                  unit: 'km2',
-                },
-              };
-            });
+                return {
+                  id,
+                  name: name || featureClassName || 'Metadata name',
+                  onTarget,
+                  current: {
+                    percent: met / 100,
+                    value: format('.3s')(metArea / 1000000),
+                    unit: 'km2',
+                  },
+                  target: {
+                    percent: coverageTarget / 100,
+                    value: format('.3s')(coverageTargetArea / 1000000),
+                    unit: 'km2',
+                  },
+                };
+              }),
+              ['name']
+            );
           })
         )
       : [];

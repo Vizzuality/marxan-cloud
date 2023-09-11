@@ -20,7 +20,7 @@ export const TargetAchievementList = ({ search }: { search?: string }): JSX.Elem
   const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setPostHighlightFeatures } = scenarioSlice.actions;
+  const { setPostHighlightFeatures, setLayerSettings } = scenarioSlice.actions;
   const dispatch = useAppDispatch();
 
   const { selectedSolution, postHighlightFeatures } = useAppSelector(
@@ -61,8 +61,17 @@ export const TargetAchievementList = ({ search }: { search?: string }): JSX.Elem
         newHighlightFeatures.splice(i, 1);
       }
       dispatch(setPostHighlightFeatures(newHighlightFeatures));
+
+      dispatch(
+        setLayerSettings({
+          id,
+          settings: {
+            visibility: true,
+          },
+        })
+      );
     },
-    [dispatch, setPostHighlightFeatures, postHighlightFeatures]
+    [dispatch, setPostHighlightFeatures, setLayerSettings, postHighlightFeatures]
   );
 
   const isHighlighted = useCallback(

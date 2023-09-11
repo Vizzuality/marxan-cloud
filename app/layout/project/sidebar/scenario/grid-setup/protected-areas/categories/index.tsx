@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import intersection from 'lodash/intersection';
@@ -24,6 +24,7 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import { ScrollArea } from 'components/scroll-area';
 import Section from 'layout/section';
+import { WDPA } from 'types/api/wdpa';
 
 import ProtectedAreasSelected from '../pa-selected';
 
@@ -32,16 +33,18 @@ import ProtectedAreaUploader from './pa-uploader';
 export const WDPACategories = ({ onContinue }): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
+  const formRef = useRef<FormProps<{ wdpaIucnCategories: WDPA['id'][] }>['form']>(null);
 
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
+  const scenarioSlice = useMemo(() => getScenarioEditSlice(sid), [sid]);
+  const { setWDPACategories, setWDPAThreshold, setLayerSettings } = scenarioSlice.actions;
   const dispatch = useAppDispatch();
 
   const editable = useCanEditScenario(pid, sid);
   const { data: projectData } = useProject(pid);
+  const { layerSettings } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const {
     data: scenarioData,
@@ -161,14 +164,18 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
     return PROJECT_PA_OPTIONS.concat(WDPA_OPTIONS);
   }, [wdpaData, WDPA_OPTIONS, PROJECT_PA_OPTIONS]);
 
+  const selectedAreas = useMemo(
+    () => wdpaData?.filter((pa) => pa.selected || layerSettings[pa.id]?.visibility) || [],
+    [wdpaData]
+  );
+
   const INITIAL_VALUES = useMemo(() => {
-    const selectedAreas = wdpaData?.filter((pa) => pa.selected) || [];
     const areas = selectedAreas.map((i) => i.id) || [];
 
     return {
       wdpaIucnCategories: areas,
     };
-  }, [wdpaData]);
+  }, [selectedAreas]);
 
   useEffect(() => {
     if (scenarioData?.wdpaThreshold) {
@@ -179,6 +186,19 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
   useEffect(() => {
     dispatch(setWDPACategories(INITIAL_VALUES));
   }, [dispatch, setWDPACategories, INITIAL_VALUES]);
+
+  const { wdpaIucnCategories = [] } = formRef.current?.getState().values || {};
+
+  useEffect(() => {
+    wdpaData?.forEach(({ id }) => {
+      dispatch(
+        setLayerSettings({
+          id,
+          settings: { visibility: wdpaIucnCategories.includes(id) },
+        })
+      );
+    });
+  }, [wdpaData, wdpaIucnCategories, dispatch, setLayerSettings]);
 
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
     return (
@@ -217,6 +237,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
         initialValues={INITIAL_VALUES}
       >
         {({ form, values, handleSubmit }) => {
+          formRef.current = form;
           dispatch(setWDPACategories(values));
 
           const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
@@ -269,7 +290,10 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
                                       <li>III: Natural Monument or Feature.</li>
                                       <li>IV: Habitat/Species Management Area.</li>
                                       <li>V: Protected Landscape/Seascape.</li>
-                                    <li>VI: Protected area with sustainable use of natural resources.</li> {/* eslint-disable-line*/}
+                                      <li>
+                                        VI: Protected area with sustainable use of natural
+                                        resources.
+                                      </li>
                                     </ul>
                                   </div>
                                 </span>

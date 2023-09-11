@@ -23,9 +23,11 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setPreHighlightFeatures } = scenarioSlice.actions;
+  const { setPreHighlightFeatures, setLayerSettings } = scenarioSlice.actions;
   const dispatch = useDispatch();
-  const { preHighlightFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { preHighlightFeatures, layerSettings } = useSelector(
+    (state) => state[`/scenarios/${sid}/edit`]
+  );
 
   const {
     data: allFeaturesData,
@@ -52,8 +54,17 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
         newHighlightFeatures.splice(i, 1);
       }
       dispatch(setPreHighlightFeatures(newHighlightFeatures));
+
+      dispatch(
+        setLayerSettings({
+          id,
+          settings: {
+            visibility: layerSettings[id]?.visibility || 1,
+          },
+        })
+      );
     },
-    [dispatch, setPreHighlightFeatures, preHighlightFeatures]
+    [dispatch, setPreHighlightFeatures, setLayerSettings, layerSettings, preHighlightFeatures]
   );
 
   const isHighlighted = useCallback(
