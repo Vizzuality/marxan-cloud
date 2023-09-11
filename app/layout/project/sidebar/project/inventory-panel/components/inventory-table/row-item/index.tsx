@@ -20,7 +20,7 @@ const RowItem = ({
   const { id, name, scenarios, tag, isVisibleOnMap, isCustom } = item;
 
   return (
-    <tr key={id} className="align-top">
+    <tr key={id} className="flex w-full align-top">
       <td className="pb-2 pr-1 pt-5">
         <Checkbox
           id={`select-${id}`}
@@ -32,7 +32,12 @@ const RowItem = ({
           disabled={!isCustom}
         />
       </td>
-      <td className="px-1 pb-2 pt-5">
+      <td
+        className={cn({
+          'flex flex-col px-1 pb-2 pt-5': true,
+          'w-52': tag,
+        })}
+      >
         <span className="inline-flex">{name}</span>
         <div className="mt-1.5 text-xs text-gray-300">
           Currently in use in
@@ -42,16 +47,16 @@ const RowItem = ({
           scenarios.
         </div>
       </td>
-      <td className="px-6 pb-2 pt-5 text-xs">
-        {tag && (
+      {tag && (
+        <td className="w-28 px-6 pb-2 pt-5 text-xs">
           <div className="flex justify-center">
             <span className="whitespace-nowrap rounded-full bg-yellow-600 bg-opacity-10 px-2 py-1 text-yellow-600">
               {tag}
             </span>
           </div>
-        )}
-      </td>
-      <td className="pb-2 pl-1 pr-2 pt-5">
+        </td>
+      )}
+      <td className="w-22 ml-auto pb-2 pl-1 pr-2 pt-5">
         <div className="flex gap-6">
           <button type="button" onClick={() => onToggleSeeOnMap(id)}>
             <Icon

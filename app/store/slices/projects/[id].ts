@@ -6,6 +6,7 @@ interface ProjectShowStateProps {
   sort: string;
   layerSettings: Record<string, any>;
   selectedFeatures: string[];
+  selectedCostSurface: string | null;
   isSidebarOpen: boolean;
 }
 
@@ -15,6 +16,7 @@ const initialState: ProjectShowStateProps = {
   sort: '-lastModifiedAt',
   layerSettings: {},
   selectedFeatures: [],
+  selectedCostSurface: null,
   isSidebarOpen: true,
 } satisfies ProjectShowStateProps;
 
@@ -62,6 +64,13 @@ const projectsDetailSlice = createSlice({
     ) => {
       state.selectedFeatures = action.payload;
     },
+    // COST SURFACE
+    setSelectedCostSurface: (
+      state,
+      action: PayloadAction<ProjectShowStateProps['selectedCostSurface']>
+    ) => {
+      state.selectedCostSurface = action.payload;
+    },
   },
 });
 
@@ -71,6 +80,7 @@ export const {
   setSort,
   setLayerSettings,
   setSelectedFeatures,
+  setSelectedCostSurface,
   setSidebarVisibility,
 } = projectsDetailSlice.actions;
 

@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useQueryClient } from 'react-query';
+import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import { AxiosError, isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 
-import { useUploadFeaturesShapefile } from 'hooks/features';
+import { useUploadProjectCostSurface } from 'hooks/cost-surface';
+import { useDownloadShapefileTemplate } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -19,32 +20,40 @@ import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
-import Uploader from 'components/uploader';
-import { FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE } from 'constants/file-uploader-size-limits';
-import UploadFeaturesInfoButtonContent from 'layout/info/upload-features';
+import Modal from 'components/modal';
+import { COST_SURFACE_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import UploadCostSurfacesInfoButtonContent from 'layout/info/upload-cost-surface';
+import { CostSurface } from 'types/api/cost-surface';
 import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-export const ScenariosFeaturesAddUploader = (): JSX.Element => {
-  const formRef = useRef(null);
-  const queryClient = useQueryClient();
+export type FormValues = {
+  name: CostSurface['name'];
+  file: File;
+};
 
-  const [opened, setOpened] = useState(false);
+export const CostSurfaceUploadModal = ({
+  isOpen = false,
+  onDismiss,
+}: {
+  isOpen?: boolean;
+  onDismiss: () => void;
+}): JSX.Element => {
+  const formRef = useRef<FormProps<FormValues>['form']>(null);
+
   const [loading, setLoading] = useState(false);
-  const [successFile, setSuccessFile] = useState<{ name: string }>(null);
+  const [successFile, setSuccessFile] = useState<{ name: FormValues['name'] }>(null);
 
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
 
-  const uploadFeaturesShapefileMutation = useUploadFeaturesShapefile({
-    requestConfig: {
-      method: 'POST',
-    },
-  });
+  const uploadProjectCostSurfaceMutation = useUploadProjectCostSurface();
+
+  const downloadShapefileTemplateMutation = useDownloadShapefileTemplate();
 
   useEffect(() => {
     return () => {
@@ -52,14 +61,10 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
     };
   }, []);
 
-  const onOpen = useCallback(() => {
-    setOpened(true);
-  }, []);
-
   const onClose = useCallback(() => {
-    setOpened(false);
+    onDismiss();
     setSuccessFile(null);
-  }, []);
+  }, [onDismiss]);
 
   const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     const f = acceptedFiles[0];
@@ -77,9 +82,7 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
       return error.code === 'file-too-large'
         ? {
             ...error,
-            message: `File is larger than ${bytesToMegabytes(
-              FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE
-            )} MB`,
+            message: `File is larger than ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB`,
           }
         : error;
     });
@@ -101,42 +104,48 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
   };
 
   const onUploadSubmit = useCallback(
-    (values) => {
+    (values: FormValues) => {
       setLoading(true);
       const { file, name } = values;
 
       const data = new FormData();
+
       data.append('file', file);
       data.append('name', name);
 
-      uploadFeaturesShapefileMutation.mutate(
+      uploadProjectCostSurfaceMutation.mutate(
         { data, id: `${pid}` },
         {
-          onSuccess: async () => {
+          onSuccess: () => {
             setSuccessFile({ ...successFile });
             onClose();
             addToast(
-              'success-upload-feature-shapefile',
+              'success-upload-cost-surface-file',
               <>
                 <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Shapefile uploaded</p>
+                <p className="text-sm">File uploaded</p>
               </>,
               {
                 level: 'success',
               }
             );
-
-            await queryClient.invalidateQueries(['all-paginated-features', pid]);
           },
-          onError: ({ response }) => {
-            const { errors } = response.data;
+          onError: (error: AxiosError | Error) => {
+            let errors: { status: number; title: string }[] = [];
+
+            if (isAxiosError(error)) {
+              errors = [...error.response.data.errors];
+            } else {
+              // ? in case of unknown error (not request error), display generic error message
+              errors = [{ status: 500, title: 'Something went wrong' }];
+            }
 
             setSuccessFile(null);
 
             addToast(
-              'error-upload-feature-shapefile',
+              'error-upload-cost-surface-csv',
               <>
-                <h2 className="font-medium">Error!</h2>
+                <h2 className="font-medium">Error</h2>
                 <ul className="text-sm">
                   {errors.map((e) => (
                     <li key={`${e.status}`}>{e.title}</li>
@@ -154,25 +163,42 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
         }
       );
     },
-    [pid, addToast, onClose, uploadFeaturesShapefileMutation, queryClient, successFile]
+    [pid, addToast, onClose, uploadProjectCostSurfaceMutation, successFile]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
-    maxSize: FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE,
+    maxSize: COST_SURFACE_UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
 
+  const onDownloadTemplate = useCallback(() => {
+    downloadShapefileTemplateMutation.mutate(
+      { pid },
+      {
+        onError: () => {
+          addToast(
+            'download-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">Template not downloaded</ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
+  }, [pid, downloadShapefileTemplateMutation, addToast]);
+
   return (
-    <Uploader
-      id="upload-features"
-      caption="Upload your own features"
-      open={opened}
-      onOpen={onOpen}
-      onClose={onClose}
-    >
-      <FormRFF
+    <Modal id="cost-surfaces-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
+      <FormRFF<FormValues>
+        initialValues={{
+          name: '',
+        }}
         ref={formRef}
         onSubmit={onUploadSubmit}
         render={({ form, handleSubmit }) => {
@@ -182,16 +208,27 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
             <form onSubmit={handleSubmit}>
               <div className="space-y-5 p-9">
                 <div className="mb-5 flex items-center space-x-3">
-                  <h4 className="font-heading text-lg text-black">Upload shapefile</h4>
+                  <h4 className="font-heading text-lg text-black">Upload cost surface</h4>
                   <InfoButton size="base" theme="primary">
-                    <UploadFeaturesInfoButtonContent />
+                    <UploadCostSurfacesInfoButtonContent />
                   </InfoButton>
                 </div>
+
+                <p className="!mt-4 text-sm text-gray-400">
+                  Please download and fill in the{' '}
+                  <button
+                    className="text-primary-500 underline hover:no-underline"
+                    onClick={onDownloadTemplate}
+                  >
+                    cost surface template
+                  </button>{' '}
+                  before upload.
+                </p>
 
                 <div>
                   <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
                     {(fprops) => (
-                      <Field id="form-name" {...fprops}>
+                      <Field id="name" {...fprops}>
                         <Label theme="light" className="mb-3 uppercase">
                           Name
                         </Label>
@@ -203,7 +240,7 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
 
                 {!successFile && (
                   <div>
-                    <Label theme="light" className="mb-3 uppercase">
+                    <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
                       File
                     </Label>
                     <FieldRFF name="file" validate={composeValidators([{ presence: true }])}>
@@ -213,7 +250,7 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
                             {...props}
                             {...getRootProps()}
                             className={cn({
-                              'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                              'relative w-full cursor-pointer rounded-lg border-[1.5px] border-dashed border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
                                 true,
                               'bg-gray-500': isDragActive,
                               'border-green-800': isDragAccept,
@@ -230,7 +267,7 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
                             </p>
 
                             <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
-                              FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE
+                              COST_SURFACE_UPLOADER_MAX_SIZE
                             )} MB`}</p>
 
                             <Loading
@@ -314,8 +351,8 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
         className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-white bg-opacity-90"
         iconClassName="w-5 h-5 text-primary-500"
       />
-    </Uploader>
+    </Modal>
   );
 };
 
-export default ScenariosFeaturesAddUploader;
+export default CostSurfaceUploadModal;

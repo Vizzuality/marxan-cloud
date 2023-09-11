@@ -6,23 +6,16 @@ import { cn } from 'utils/cn';
 
 import { HeaderItem } from './types';
 
-const HeaderItem = ({
-  className,
-  text,
-  name,
-  columns,
-  sorting,
-  onClick,
-}: HeaderItem): JSX.Element => {
+const HeaderItem = ({ className, text, name, sorting, onClick }: HeaderItem): JSX.Element => {
   const sortingMatches = /^(-?)(.+)$/.exec(sorting);
   const sortField = sortingMatches[2];
   const sortOrder = sortingMatches[1] === '-' ? 'desc' : 'asc';
 
-  const isActive = columns[name] === sortField;
+  const isActive = name === sortField;
 
   const handleClick = useCallback(() => {
-    onClick(columns[name]);
-  }, [onClick, columns, name]);
+    onClick(name);
+  }, [onClick, name]);
 
   return (
     <button

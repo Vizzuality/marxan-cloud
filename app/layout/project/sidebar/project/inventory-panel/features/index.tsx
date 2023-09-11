@@ -7,17 +7,23 @@ import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects
 
 import { useAllFeatures } from 'hooks/features';
 
+import ActionsMenu from 'layout/project/sidebar/project/inventory-panel/features/actions-menu';
+import FeaturesBulkActionMenu from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu';
 import { Feature } from 'types/api/feature';
 
 import InventoryTable, { type DataItem } from '../components/inventory-table';
 
-import ActionsMenu from './actions-menu';
-import FeaturesBulkActionMenu from './bulk-action-menu';
-
-const FEATURES_TABLE_COLUMNS = {
-  name: 'featureClassName',
-  tag: 'tag',
-};
+const FEATURES_TABLE_COLUMNS = [
+  {
+    name: 'featureClassName',
+    text: 'Name',
+  },
+  {
+    name: 'tag',
+    text: 'Type',
+    className: 'flex flex-1 justify-start py-2 pl-14',
+  },
+];
 
 const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -27,7 +33,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
   );
 
   const [filters, setFilters] = useState<Parameters<typeof useAllFeatures>[1]>({
-    sort: 'featureClassName',
+    sort: FEATURES_TABLE_COLUMNS[0].name,
   });
   const [selectedFeaturesIds, setSelectedFeaturesIds] = useState<Feature['id'][]>([]);
   const { query } = useRouter();

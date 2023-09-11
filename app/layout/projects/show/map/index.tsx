@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import pick from 'lodash/pick';
 
 import { useAccessToken } from 'hooks/auth';
+import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useAllFeatures } from 'hooks/features';
 import {
   useLegend,
@@ -52,6 +53,7 @@ export const ProjectMap = (): JSX.Element => {
     isSidebarOpen,
     layerSettings,
     selectedFeatures: selectedFeaturesIds,
+    selectedCostSurface: selectedCostSurfaceId,
   } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
@@ -106,19 +108,19 @@ export const ProjectMap = (): JSX.Element => {
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
     sid: sid ? `${sid}` : null,
-    include: 'results',
-    sublayers: [...(sid1 && !sid2 ? ['frequency'] : [])],
+    include: 'results,cost',
+    sublayers: [
+      ...(sid1 && !sid2 ? ['frequency'] : []),
+      ...(!!selectedCostSurfaceId ? ['cost'] : []),
+    ],
     options: {
+      cost: { min: 1, max: 100 },
       settings: {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
         features: layerSettings.features,
         cost: layerSettings.cost,
-        'lock-in': layerSettings['lock-in'],
-        'lock-out': layerSettings['lock-out'],
-        'lock-available': layerSettings['lock-available'],
         frequency: layerSettings.frequency,
-        solution: layerSettings.solution,
       },
     },
   });
@@ -152,6 +154,22 @@ export const ProjectMap = (): JSX.Element => {
       });
   }, [selectedFeaturesIds, selectedFeaturesData]);
 
+  const allProjectCostSurfacesQuery = useProjectCostSurfaces(
+    pid,
+    {},
+    {
+      select: (data) =>
+        data
+          ?.map((cs) => ({
+            id: cs.id,
+            name: cs.name,
+          }))
+          .find((cs) => cs.id === selectedCostSurfaceId),
+      keepPreviousData: true,
+      placeholderData: [],
+    }
+  );
+
   const LAYERS = [PUGridLayer, PUCompareLayer, PlanningAreaLayer, ...FeaturePreviewLayers].filter(
     (l) => !!l
   );
@@ -159,6 +177,7 @@ export const ProjectMap = (): JSX.Element => {
   const LEGEND = useLegend({
     layers: [
       ...(!!selectedFeaturesData?.length ? ['features-preview'] : []),
+      ...(!!selectedCostSurfaceId ? ['cost'] : []),
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
 
       ...(!!sid1 && !!sid2 ? ['compare'] : []),
@@ -168,6 +187,7 @@ export const ProjectMap = (): JSX.Element => {
     ],
     options: {
       layerSettings,
+      cost: { name: allProjectCostSurfacesQuery.data?.name, min: 1, max: 100 },
       items: selectedPreviewFeatures,
     },
   });
