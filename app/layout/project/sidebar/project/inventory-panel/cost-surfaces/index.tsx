@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedCostSurface as setVisibleCostSurface } from 'store/slices/projects/[id]';
+import { setSelectedCostSurfaces as setVisibleCostSurface } from 'store/slices/projects/[id]';
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 
@@ -22,7 +22,7 @@ const COST_SURFACE_TABLE_COLUMNS = [
 
 const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { selectedCostSurface: visibleCostSurface, search } = useAppSelector(
+  const { selectedCostSurfaces: visibleCostSurface, search } = useAppSelector(
     (state) => state['/projects/[id]']
   );
 

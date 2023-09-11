@@ -9,7 +9,7 @@ interface ProjectShowStateProps {
   filters: Record<string, unknown> | [];
   sort: string;
   layerSettings: Record<string, any>;
-  selectedCostSurface: CostSurface['id'];
+  selectedCostSurfaces: CostSurface['id'];
   selectedFeatures: Feature['id'][];
   selectedWDPAs: WDPA['id'][];
   isSidebarOpen: boolean;
@@ -21,7 +21,7 @@ const initialState: ProjectShowStateProps = {
   sort: '-lastModifiedAt',
   layerSettings: {},
   selectedFeatures: [],
-  selectedCostSurface: null,
+  selectedCostSurfaces: null,
   selectedWDPAs: [],
   isSidebarOpen: true,
 } satisfies ProjectShowStateProps;
@@ -71,11 +71,11 @@ const projectsDetailSlice = createSlice({
       state.selectedFeatures = action.payload;
     },
     // COST SURFACE
-    setSelectedCostSurface: (
+    setSelectedCostSurfaces: (
       state,
-      action: PayloadAction<ProjectShowStateProps['selectedCostSurface']>
+      action: PayloadAction<ProjectShowStateProps['selectedCostSurfaces']>
     ) => {
-      state.selectedCostSurface = action.payload;
+      state.selectedCostSurfaces = action.payload;
     },
     // WDPAs
     setSelectedWDPAs: (state, action: PayloadAction<ProjectShowStateProps['selectedWDPAs']>) => {
@@ -90,7 +90,7 @@ export const {
   setSort,
   setLayerSettings,
   setSelectedFeatures,
-  setSelectedCostSurface,
+  setSelectedCostSurfaces,
   setSelectedWDPAs,
   setSidebarVisibility,
 } = projectsDetailSlice.actions;

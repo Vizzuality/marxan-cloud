@@ -89,8 +89,7 @@ export interface UseFeaturePreviewLayers {
     featuresRecipe?: Record<string, any>[];
     featureHoverId?: string;
     selectedFeatures?: Array<string>;
-    opacity?: number;
-    visibility?: boolean;
+    layerSettings?: Record<string, { opacity?: number; visibility?: boolean }>;
   };
 }
 export interface UseTargetedPreviewLayers {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -9,6 +9,7 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import pick from 'lodash/pick';
+import { FiLayers } from 'react-icons/fi';
 
 import { useAccessToken } from 'hooks/auth';
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
@@ -35,6 +36,7 @@ import FitBoundsControl from 'components/map/controls/fit-bounds';
 import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
 import Legend from 'components/map/legend';
+import LegendGroup from 'components/map/legend/group';
 import LegendItem from 'components/map/legend/item';
 import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
@@ -46,22 +48,27 @@ import { cn } from 'utils/cn';
 
 import PRINT_SVG from 'svgs/ui/print.svg?sprite';
 
+// import InventoryLegend from './legend';
+import { useInventoryLegend } from './legend/hooks';
+
+const minZoom = 2;
+const maxZoom = 20;
+
 export const ProjectMap = (): JSX.Element => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [sid1, setSid1] = useState<Scenario['id']>(null);
   const [sid2, setSid2] = useState<Scenario['id']>(null);
   const {
     isSidebarOpen,
     layerSettings,
     selectedFeatures: selectedFeaturesIds,
-    selectedCostSurface: selectedCostSurfaceId,
+    selectedCostSurfaces: selectedCostSurfaceIds,
     selectedWDPAs: selectedWDPAsIds,
   } = useAppSelector((state) => state['/projects/[id]']);
+  const legendConfig = useInventoryLegend();
 
   const accessToken = useAccessToken();
 
-  const minZoom = 2;
-  const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
   const [mapInteractive, setMapInteractive] = useState(false);
@@ -113,7 +120,7 @@ export const ProjectMap = (): JSX.Element => {
     include: 'results,cost',
     sublayers: [
       ...(sid1 && !sid2 ? ['frequency'] : []),
-      ...(!!selectedCostSurfaceId ? ['cost'] : []),
+      ...(!!selectedCostSurfaceIds ? ['cost'] : []),
     ],
     options: {
       cost: { min: 1, max: 100 },
@@ -142,7 +149,7 @@ export const ProjectMap = (): JSX.Element => {
     bbox,
     options: {
       selectedFeatures: selectedFeaturesIds,
-      ...layerSettings['features-preview'],
+      layerSettings,
     },
   });
 
@@ -176,7 +183,7 @@ export const ProjectMap = (): JSX.Element => {
             id: cs.id,
             name: cs.name,
           }))
-          .find((cs) => cs.id === selectedCostSurfaceId),
+          .find((cs) => selectedCostSurfaceIds.includes(cs.id)),
       keepPreviousData: true,
       placeholderData: [],
     }
@@ -193,7 +200,7 @@ export const ProjectMap = (): JSX.Element => {
   const LEGEND = useLegend({
     layers: [
       ...(!!selectedFeaturesData?.length ? ['features-preview'] : []),
-      ...(!!selectedCostSurfaceId ? ['cost'] : []),
+      ...(!!selectedCostSurfaceIds ? ['cost'] : []),
       ...(!!selectedWDPAsIds?.length ? ['wdpa-preview'] : []),
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
 
@@ -336,7 +343,7 @@ export const ProjectMap = (): JSX.Element => {
   );
 
   const onChangeVisibility = useCallback(
-    (lid) => {
+    (lid: string) => {
       const { visibility = true } = layerSettings[lid] || {};
       dispatch(
         setLayerSettings({
@@ -394,6 +401,41 @@ export const ProjectMap = (): JSX.Element => {
       }
     );
   }, [pid, sid1, sid2, projectName, downloadScenarioComparisonReportMutation, addToast]);
+
+  const legendMaxHeight = typeof window === 'undefined' ? 0 : window.innerHeight * 0.65;
+
+  const renderLegendItems = ({
+    type,
+    intersections,
+    items,
+  }: {
+    type: 'matrix' | 'basic' | 'choropleth' | 'gradient';
+    intersections?: ComponentProps<typeof LegendTypeMatrix>['intersections'];
+    items:
+      | ComponentProps<typeof LegendTypeBasic>['items']
+      | ComponentProps<typeof LegendTypeChoropleth>['items']
+      | ComponentProps<typeof LegendTypeGradient>['items']
+      | ComponentProps<typeof LegendTypeMatrix>['items'];
+  }) => {
+    switch (type) {
+      case 'basic':
+        return <LegendTypeBasic className="text-sm text-gray-300" items={items} />;
+      case 'choropleth':
+        return <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />;
+      case 'gradient':
+        return <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />;
+      case 'matrix':
+        return (
+          <LegendTypeMatrix
+            className="text-sm text-white"
+            intersections={intersections}
+            items={items}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -495,45 +537,69 @@ export const ProjectMap = (): JSX.Element => {
             </button>
           )}
           {/* Legend */}
-          <div className="absolute bottom-16 right-5 w-full max-w-xs">
+          <div className="absolute bottom-16 right-5 flex w-full max-w-xs flex-col items-end space-y-2">
+            <button
+              type="button"
+              onClick={() => setOpen(!open)}
+              className={cn({
+                'rounded-full bg-gray-800 p-5 shadow-xl': true,
+                'bg-blue-400': open,
+              })}
+            >
+              <FiLayers
+                className={cn({
+                  'h-6 w-6 text-white': true,
+                  'text-gray-700': open,
+                })}
+              />
+            </button>
             <Legend
               open={open}
               className="w-full"
-              maxHeight={300}
+              maxHeight={legendMaxHeight}
               onChangeOpen={() => setOpen(!open)}
             >
-              {LEGEND.map((i) => {
-                const { type, items, intersections } = i;
-
+              {legendConfig.map((c) => {
                 return (
-                  <LegendItem
-                    sortable={false}
-                    key={i.id}
-                    settingsManager={i.settingsManager}
-                    onChangeOpacity={(opacity) => onChangeOpacity(opacity, i.id)}
-                    onChangeVisibility={() => onChangeVisibility(i.id)}
-                    {...i}
+                  <LegendGroup
+                    key={c.name}
+                    title={c.name}
+                    defaultOpen={Boolean(
+                      c.layers?.length || (c.subgroups?.length && c.subgroups?.[0]?.layers?.length)
+                    )}
+                    disabled={!c.layers?.length && !c.subgroups?.[0]?.layers?.length}
                   >
-                    {type === 'matrix' && (
-                      <LegendTypeMatrix
-                        className="text-sm text-white"
-                        intersections={intersections}
-                        items={items}
-                      />
-                    )}
-                    {type === 'basic' && (
-                      <LegendTypeBasic className="text-sm text-gray-300" items={items} />
-                    )}
-                    {type === 'choropleth' && (
-                      <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />
-                    )}
-                    {type === 'gradient' && (
-                      <LegendTypeGradient
-                        className={{ box: 'text-sm text-gray-300' }}
-                        items={items}
-                      />
-                    )}
-                  </LegendItem>
+                    {c.layers?.map((layer) => (
+                      <LegendItem
+                        key={layer.id}
+                        onChangeOpacity={(opacity) => onChangeOpacity(opacity, layer.id)}
+                        onChangeVisibility={() => onChangeVisibility(layer.id)}
+                        settings={layerSettings[layer.id]}
+                        {...layer}
+                      >
+                        {renderLegendItems(layer)}
+                      </LegendItem>
+                    ))}
+                    {c.subgroups?.map((subgroup) => {
+                      return (
+                        <LegendGroup key={subgroup.name} title={subgroup.name} className="pl-5">
+                          <div className="divide-y divide-dashed divide-gray-400">
+                            {subgroup.layers?.map((layer) => (
+                              <LegendItem
+                                key={layer.id}
+                                onChangeOpacity={(opacity) => onChangeOpacity(opacity, layer.id)}
+                                onChangeVisibility={() => onChangeVisibility(layer.id)}
+                                settings={layerSettings[layer.id]}
+                                {...layer}
+                              >
+                                {renderLegendItems(layer)}
+                              </LegendItem>
+                            ))}
+                          </div>
+                        </LegendGroup>
+                      );
+                    })}
+                  </LegendGroup>
                 );
               })}
             </Legend>

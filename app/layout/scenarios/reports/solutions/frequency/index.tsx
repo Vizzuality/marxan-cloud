@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useScenario } from 'hooks/scenarios';
 
-import LegendItem from 'components/map/legend/item/component';
-import LegendTypeGradient from 'components/map/legend/types/gradient/component';
+import LegendItem from 'components/map/legend/item';
+import LegendTypeGradient from 'components/map/legend/types/gradient';
 import FrequencyReportMap from 'layout/scenarios/reports/solutions/frequency/map';
 
 export const FrequencyPage = (): JSX.Element => {

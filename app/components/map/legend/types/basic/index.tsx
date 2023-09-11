@@ -14,6 +14,8 @@ export const LegendTypeBasic: React.FC<LegendTypeBasicProps> = ({
   className = '',
   items,
 }: LegendTypeBasicProps) => {
+  if (items.length === 0) return null;
+
   return (
     <div
       className={cx({

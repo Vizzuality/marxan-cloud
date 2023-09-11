@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useCostSurfaceRange } from 'hooks/scenarios';
 
-import LegendItem from 'components/map/legend/item/component';
-import LegendTypeGradient from 'components/map/legend/types/gradient/component';
+import LegendItem from 'components/map/legend/item';
+import LegendTypeGradient from 'components/map/legend/types/gradient';
 import CostSurfaceReportMap from 'layout/scenarios/reports/solutions/cost-surface/map';
 
 export const CostSurfaceReport = (): JSX.Element => {

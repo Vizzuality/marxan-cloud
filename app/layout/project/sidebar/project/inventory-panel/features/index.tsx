@@ -3,7 +3,10 @@ import { useCallback, useState, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedFeatures as setVisibleFeatures } from 'store/slices/projects/[id]';
+import {
+  setSelectedFeatures as setVisibleFeatures,
+  setLayerSettings,
+} from 'store/slices/projects/[id]';
 
 import { useAllFeatures } from 'hooks/features';
 
@@ -98,6 +101,15 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
       const newSelectedFeatures = [...visibleFeatures];
       if (!newSelectedFeatures.includes(featureId)) {
         newSelectedFeatures.push(featureId);
+
+        dispatch(
+          setLayerSettings({
+            id: featureId,
+            settings: {
+              visibility: true,
+            },
+          })
+        );
       } else {
         const i = newSelectedFeatures.indexOf(featureId);
         newSelectedFeatures.splice(i, 1);

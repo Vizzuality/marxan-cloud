@@ -613,6 +613,8 @@ export const ScenariosEditMap = (): JSX.Element => {
     [setLayerSettings, dispatch, layerSettings]
   );
 
+  console.log(LEGEND);
+
   return (
     <div className="relative h-full w-full overflow-hidden">
       <Map

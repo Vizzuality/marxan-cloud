@@ -1,6 +1,7 @@
 import React from 'react';
 
 import chroma from 'chroma-js';
+import { FaSquare } from 'react-icons/fa';
 
 import Icon from 'components/icon';
 
@@ -37,6 +38,27 @@ export const COLORS = {
   'wdpa-preview': '#00f',
   features: '#6F53F7',
   highlightFeatures: '#BE6BFF',
+  abundance: {
+    default: '#FFF',
+    ramp: [
+      '#4b5eef',
+      '#f15100',
+      '#31a904',
+      '#2c18bd',
+      '#bf3220',
+      '#9d2e38',
+      '#e5e001',
+      '#f15100',
+      '#f4af00',
+      '#218134',
+      '#775b32',
+      '#cb9c00',
+      '#294635',
+      '#ba5da9',
+      '#5c3b85',
+      '#de4210',
+    ],
+  },
   include: '#03E7D1',
   exclude: '#FF472E',
   available: '#FFCA42',
@@ -187,6 +209,51 @@ export const LEGEND_LAYERS = {
       visibility: true,
     },
   }),
+  'designated-areas': (options: { items: { name: string }[] }) => {
+    const { items } = options;
+
+    return items.map(({ name }) => ({
+      id: `designated-areas-${name}`,
+      name,
+      type: 'basic',
+      icon: (
+        <FaSquare
+          className="h-3 w-3"
+          style={{ color: COLORS['wdpa-preview'], minWidth: 12, minHeight: 12 }}
+        />
+      ),
+      settingsManager: {
+        opacity: true,
+        visibility: true,
+      },
+      items: [],
+    }));
+  },
+
+  'features-preview-new': (options: { items: { id: string; name: string }[] }) => {
+    const { items } = options;
+
+    return items.map(({ name, id }, index) => {
+      const COLOR =
+        items.length > COLORS['features-preview'].ramp.length
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(items.length)[index]
+          : COLORS['features-preview'].ramp[index];
+
+      return {
+        id,
+        name,
+        type: 'basic',
+        icon: (
+          <FaSquare className="h-3 w-3" style={{ color: COLOR, minWidth: 12, minHeight: 12 }} />
+        ),
+        settingsManager: {
+          opacity: true,
+          visibility: true,
+        },
+        items: [],
+      };
+    });
+  },
 
   'features-preview': (options: UseLegend['options']) => {
     const { items } = options;
@@ -244,6 +311,93 @@ export const LEGEND_LAYERS = {
   }),
 
   // ANALYSIS
+  ['features-abundance']: (options: { items: { min: number; max: number; name: string }[] }) => {
+    const { items } = options;
+
+    return items.map(({ name, min, max }, index) => ({
+      id: `features-abundance-${name}`,
+      name,
+      type: 'gradient',
+      settingsManager: {
+        opacity: true,
+        visibility: true,
+      },
+      items: [
+        {
+          color: COLORS.abundance.default,
+          value: `${min === max ? 0 : min}`,
+        },
+        {
+          color: COLORS.abundance.ramp[index],
+          value: `${max}`,
+        },
+      ],
+    }));
+
+    // return {
+    //   id: 'features-abundance',
+    //   name: options.abundance.name,
+    //   type: 'gradient',
+    //   settingsManager: {
+    //     opacity: true,
+    //     visibility: true,
+    //   },
+    //   items: [
+    //     {
+    //       color: COLORS.abundance.default,
+    //       value: `${abundance.min === abundance.max ? 0 : abundance.min}`,
+    //     },
+    //     {
+    //       color: COLORS.abundance[options.abundance.name.index],
+    //       value: `${abundance.max}`,
+    //     },
+    //   ],
+    // };
+  },
+  // !this config aims to replace the original cost config
+  'cost-surface': (options: { items: { min: number; max: number; name: string }[] }) => {
+    const { items } = options;
+
+    return items.map(({ name, min, max }) => ({
+      id: `cost-surface-${name}`,
+      name,
+      type: 'gradient',
+      settingsManager: {
+        opacity: true,
+        visibility: true,
+      },
+      items: [
+        {
+          color: COLORS.cost[0],
+          value: `${min === max ? 0 : min}`,
+        },
+        {
+          color: COLORS.cost[1],
+          value: `${max}`,
+        },
+      ],
+    }));
+
+    // return {
+    //   id: 'cost-surface',
+    //   name: 'Cost Surface',
+    //   type: 'gradient',
+    //   settingsManager: {
+    //     opacity: true,
+    //     visibility: true,
+    //   },
+    //   items: [
+    //     {
+    //       color: COLORS.cost[0],
+    //       value: `${min === max ? 0 : min}`,
+    //     },
+    //     {
+    //       color: COLORS.cost[1],
+    //       value: `${max}`,
+    //     },
+    //   ],
+    // };
+  },
   cost: (options) => {
     const {
       cost = {

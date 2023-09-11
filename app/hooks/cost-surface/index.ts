@@ -48,7 +48,9 @@ export function useProjectCostSurfaces<T = CostSurface[]>(
         },
         params,
       }).then(({ data }) => mockData),
-    enabled: Boolean(pid),
+    // TODO: enable this when the endpoint is ready
+    enabled: false,
+    // enabled: Boolean(pid),
     ...queryOptions,
   });
 }

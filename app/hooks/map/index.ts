@@ -281,7 +281,7 @@ export function useFeaturePreviewLayers({
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
 
-    const { featuresRecipe = [], selectedFeatures = [] } = options;
+    const { featuresRecipe = [], selectedFeatures = [], layerSettings } = options;
 
     const FEATURES = [...features]
       .filter((ft) => selectedFeatures.includes(ft.id as string))
@@ -291,12 +291,13 @@ export function useFeaturePreviewLayers({
         return bIndex - aIndex;
       });
 
-    const { opacity = 1, visibility = true } = options || {};
-
-    const getLayerVisibility = () => {
+    const getLayerVisibility = (
+      visibility: (typeof layerSettings)[string]['visibility']
+    ): 'visible' | 'none' => {
       if (!visibility) {
         return 'none';
       }
+
       return 'visible';
     };
 
@@ -304,6 +305,7 @@ export function useFeaturePreviewLayers({
       const { id } = f;
 
       const F = featuresRecipe.find((fr) => fr.id === id) || f;
+      const settings = layerSettings[id] || {};
 
       const COLOR =
         selectedFeatures.length > COLORS['features-preview'].ramp.length
@@ -337,11 +339,11 @@ export function useFeaturePreviewLayers({
                 ],
               }),
               layout: {
-                visibility: getLayerVisibility(),
+                visibility: getLayerVisibility(settings?.visibility),
               },
               paint: {
                 'fill-color': COLOR,
-                'fill-opacity': opacity,
+                'fill-opacity': settings?.opacity,
               },
             },
             {
@@ -358,11 +360,11 @@ export function useFeaturePreviewLayers({
                 ],
               }),
               layout: {
-                visibility: getLayerVisibility(),
+                visibility: getLayerVisibility(settings?.visibility),
               },
               paint: {
                 'line-color': '#000',
-                'line-opacity': 0.5 * opacity,
+                'line-opacity': 0.5 * settings?.opacity,
               },
             },
           ],
