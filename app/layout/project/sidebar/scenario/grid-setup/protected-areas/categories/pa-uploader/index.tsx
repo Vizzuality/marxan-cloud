@@ -24,7 +24,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
-import { PROTECTED_AREA_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
@@ -89,7 +89,9 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
       return error.code === 'file-too-large'
         ? {
             ...error,
-            message: `File is larger than ${bytesToMegabytes(PROTECTED_AREA_UPLOADER_MAX_SIZE)} MB`,
+            message: `File is larger than ${bytesToMegabytes(
+              PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE
+            )} MB`,
           }
         : error;
     });
@@ -165,7 +167,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
-    maxSize: PROTECTED_AREA_UPLOADER_MAX_SIZE,
+    maxSize: PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
@@ -259,7 +261,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                           </p>
 
                           <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
-                            PROTECTED_AREA_UPLOADER_MAX_SIZE
+                            PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE
                           )} MB`}</p>
 
                           <Loading
