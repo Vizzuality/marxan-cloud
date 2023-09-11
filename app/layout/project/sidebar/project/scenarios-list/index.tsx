@@ -29,6 +29,7 @@ import { ScrollArea } from 'components/scroll-area';
 import HelpBeacon from 'layout/help/beacon';
 import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 import ScenarioToolbar from 'layout/project/sidebar/project/scenarios-list/toolbar';
+import Section from 'layout/section';
 import { cn } from 'utils/cn';
 
 import bgScenariosDashboard from 'images/new-layout/bg-scenarios-dashboard.png';
@@ -350,12 +351,12 @@ export const ScenariosList: React.FC = () => {
           )}
 
           {(hasScenarios || search || hasFilters) && (
-            <div className="flex w-full flex-shrink-0 flex-col items-center justify-center rounded-[20px] bg-gray-700 p-6">
+            <Section className="flex w-full flex-col items-center justify-center space-y-5">
               {hasScenarios && (
                 <Button
                   theme="primary-alt"
                   size="base"
-                  className="mb-5 flex w-full overflow-hidden uppercase"
+                  className="flex w-full overflow-hidden uppercase"
                   disabled={solutionsReportLoader}
                   onClick={onDownloadSolutionsSummary}
                 >
@@ -364,20 +365,20 @@ export const ScenariosList: React.FC = () => {
                     className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
                     iconClassName="w-10 h-10 text-primary-500"
                   />
-                  {scenariosData.length === 1 ? 'Export scenario data' : 'Export scenarios data'}
+                  {`Export scenario${scenariosData.length > 1 ? 's' : ''} data`}
                 </Button>
               )}
               <Button
                 theme="primary"
                 size="base"
-                className="!px-5"
+                className="px-5"
                 disabled={!editable}
                 onClick={() => setModal(true)}
               >
                 <span className="mr-5">Create scenario</span>
                 <Icon icon={PLUS_SVG} className="h-4 w-4" />
               </Button>
-            </div>
+            </Section>
           )}
         </div>
 

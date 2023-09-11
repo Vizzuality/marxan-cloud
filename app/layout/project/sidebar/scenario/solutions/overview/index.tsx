@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { HiOutlineTable } from 'react-icons/hi';
 
 import { useProject } from 'hooks/projects';
 import { useScenario, useDownloadScenarioReport } from 'hooks/scenarios';
@@ -14,14 +15,11 @@ import { useSolution, useBestSolution } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
-import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
 import Section from 'layout/section';
 import SolutionSelected from 'layout/solutions/selected';
 import { formatFileName } from 'utils/units';
-
-import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 
 import SolutionsTableForm from './table/table-form/component';
 
@@ -179,7 +177,7 @@ export const SolutionsOverview = (): JSX.Element => {
               <Button
                 theme="primary-alt"
                 size="base"
-                className="mb-4 flex h-12 overflow-hidden uppercase"
+                className="relative overflow-hidden uppercase"
                 disabled={PDFLoader}
                 onClick={onDownloadReport}
               >
@@ -193,11 +191,11 @@ export const SolutionsOverview = (): JSX.Element => {
               <Button
                 theme="primary"
                 size="base"
-                className="mb-4 flex h-12 uppercase"
+                className="relative uppercase"
                 onClick={() => setShowTable(true)}
               >
                 View solutions table
-                <Icon icon={TABLE_SVG} className="absolute right-8 h-4 w-4" />
+                <HiOutlineTable className="absolute right-8 h-6 w-6" />
               </Button>
 
               <Modal
