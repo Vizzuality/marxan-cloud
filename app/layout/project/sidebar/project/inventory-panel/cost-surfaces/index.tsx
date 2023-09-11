@@ -113,20 +113,22 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
   }));
 
   return (
-    <div className="space-y-6">
-      <InventoryTable
-        loading={allProjectCostSurfacesQuery.isFetching}
-        data={data}
-        noDataMessage={noDataMessage}
-        columns={COST_SURFACE_TABLE_COLUMNS}
-        sorting={filters.sort}
-        selectedIds={selectedCostSurfaceIds}
-        onSortChange={handleSort}
-        onSelectAll={handleSelectAll}
-        onSelectRow={handleSelectCostSurface}
-        onToggleSeeOnMap={toggleSeeOnMap}
-        ActionsComponent={ActionsMenu}
-      />
+    <div className="flex flex-col space-y-6 overflow-hidden">
+      <div className="h-full overflow-hidden">
+        <InventoryTable
+          loading={allProjectCostSurfacesQuery.isFetching}
+          data={data}
+          noDataMessage={noDataMessage}
+          columns={COST_SURFACE_TABLE_COLUMNS}
+          sorting={filters.sort}
+          selectedIds={selectedCostSurfaceIds}
+          onSortChange={handleSort}
+          onSelectAll={handleSelectAll}
+          onSelectRow={handleSelectCostSurface}
+          onToggleSeeOnMap={toggleSeeOnMap}
+          ActionsComponent={ActionsMenu}
+        />
+      </div>
       {displayBulkActions && (
         <CostSurfacesBulkActionMenu selectedCostSurfacesIds={selectedCostSurfaceIds} />
       )}

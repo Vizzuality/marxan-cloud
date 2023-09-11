@@ -6,7 +6,6 @@ import Modal from 'components/modal/component';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/cost-surfaces/modals/delete/index';
 import { CostSurface } from 'types/api/cost-surface';
 
-import EDIT_SVG from 'svgs/ui/edit.svg?sprite';
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
 
 const BUTTON_CLASSES =
