@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { HiArrowUp, HiArrowDown } from 'react-icons/hi';
 
 import { cn } from 'utils/cn';
 
@@ -43,9 +43,19 @@ const HeaderItem = ({
         {text}
       </span>
       {sortOrder === 'asc' && isActive ? (
-        <ArrowDown className={isActive ? 'text-blue-400' : 'text-gray-400'} size={20} />
+        <HiArrowDown
+          className={cn({
+            'h-5 w-5 text-gray-400': true,
+            'text-blue-400': isActive,
+          })}
+        />
       ) : (
-        <ArrowUp className={isActive ? 'text-blue-400' : 'text-gray-400'} size={20} />
+        <HiArrowUp
+          className={cn({
+            'h-5 w-5 text-gray-400': true,
+            'text-blue-400': isActive,
+          })}
+        />
       )}
     </button>
   );

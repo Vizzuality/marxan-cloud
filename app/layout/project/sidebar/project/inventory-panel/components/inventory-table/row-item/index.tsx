@@ -1,4 +1,4 @@
-import { MoreHorizontal } from 'lucide-react';
+import { HiDotsHorizontal } from 'react-icons/hi';
 
 import Checkbox from 'components/forms/checkbox';
 import Icon from 'components/icon';
@@ -66,7 +66,7 @@ const RowItem = ({
             <Popover>
               <PopoverTrigger asChild>
                 <button type="button" className="h-5 w-5">
-                  <MoreHorizontal className="h-4 w-4 text-white" />
+                  <HiDotsHorizontal className="h-4 w-4 text-white" />
                 </button>
               </PopoverTrigger>
               <PopoverContent
