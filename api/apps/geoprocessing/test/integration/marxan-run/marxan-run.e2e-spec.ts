@@ -23,6 +23,7 @@ import { v4 } from 'uuid';
 import { GivenScenarioAndProjectPuData } from '../../steps/given-scenario-pu-data-exists';
 import { bootstrapApplication } from '../../utils';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+
 const TEST_TIMEOUT_MULTIPLIER = 35000;
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
@@ -112,6 +113,7 @@ const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
   const featureId = v4();
+  const costSurfaceId = v4();
   const organizationId = v4();
   const outputsIds: string[] = [];
   const scenarioFeatures: string[] = [];
@@ -221,8 +223,12 @@ const getFixtures = async () => {
         [projectId, 'test_project', organizationId, 'legacy_import'],
       );
       await apiEntityManager.query(
-        `INSERT INTO scenarios (id, name, project_id) VALUES ($1, $2, $3)`,
-        [scenarioId, 'test_scenario', projectId],
+        `INSERT INTO cost_surfaces (id, name, project_id, is_default, min, max) VALUES ($1, $2, $3, $4, $5, $6)`,
+        [costSurfaceId, 'test_cost_surface', projectId, true, 0, 0],
+      );
+      await apiEntityManager.query(
+        `INSERT INTO scenarios (id, name, project_id, cost_surface_id) VALUES ($1, $2, $3, $4)`,
+        [scenarioId, 'test_scenario', projectId, costSurfaceId],
       );
     },
     GivenScenarioPuDataExists: async () => {

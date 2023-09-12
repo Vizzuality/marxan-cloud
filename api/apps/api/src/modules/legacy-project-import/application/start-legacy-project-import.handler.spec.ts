@@ -9,7 +9,7 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { isLeft, isRight, Right } from 'fp-ts/Either';
+import { isLeft, isRight } from 'fp-ts/Either';
 import { DeepPartial } from 'typeorm';
 
 import { v4 } from 'uuid';
@@ -27,6 +27,7 @@ import {
   StartLegacyProjectImportResponse,
 } from './start-legacy-project-import.command';
 import { StartLegacyProjectImportHandler } from './start-legacy-project-import.handler';
+import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -68,6 +69,18 @@ const getFixtures = async () => {
   const saveProjectMock = jest.fn();
   const saveScenarioMock = jest.fn();
   const findRandomOrganizationMock = jest.fn();
+  const createDefaultCostSurfaceForProject = jest.fn(
+    (projectId: string, name: string) => {
+      return {
+        id: v4(),
+        projectId,
+        name: `${name} Default Cost Surface`,
+        min: 0,
+        max: 0,
+        isDefault: true,
+      };
+    },
+  );
 
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
@@ -83,6 +96,10 @@ const getFixtures = async () => {
       {
         provide: getRepositoryToken(Scenario),
         useValue: { save: saveScenarioMock },
+      },
+      {
+        provide: CostSurfaceService,
+        useValue: { createDefaultCostSurfaceForProject },
       },
       {
         provide: getRepositoryToken(Organization),
