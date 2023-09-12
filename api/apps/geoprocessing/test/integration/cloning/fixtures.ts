@@ -22,7 +22,6 @@ import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 export type TestSpecification = {
   id: string;
@@ -102,11 +101,11 @@ export async function GivenProjectExists(
   projectId: string,
   organizationId: string,
   projectData: Record<string, any> = {},
+  costSurfaceId = v4(),
 ) {
   await GivenOrganizationExists(em, organizationId);
-  await GivenDefaultCostSurfaceForProject(em, projectId);
 
-  return em
+  const insertResult = await em
     .createQueryBuilder()
     .insert()
     .into(`projects`)
@@ -118,19 +117,28 @@ export async function GivenProjectExists(
       ...projectData,
     })
     .execute();
+
+  await GivenDefaultCostSurfaceForProject(em, projectId, costSurfaceId);
+
+  return insertResult;
 }
 
 async function GivenDefaultCostSurfaceForProject(
   em: EntityManager,
   projectId: string,
+  id: string,
   name?: string,
 ) {
+  const nameForCostSurface = name || projectId;
   return em
     .createQueryBuilder()
     .insert()
     .into(`cost_surfaces`)
     .values({
-      name: CostSurfaceService.defaultCostSurfaceName(name || projectId),
+      id,
+      name: `${
+        nameForCostSurface ? nameForCostSurface + ' - ' : ''
+      }Default Cost Surface`,
       project_id: projectId,
       min: 0,
       max: 0,
@@ -147,7 +155,14 @@ export async function GivenScenarioExists(
   scenarioData: Record<string, any> = {},
   projectData: Record<string, any> = {},
 ) {
-  await GivenProjectExists(em, projectId, organizationId, projectData);
+  const costSurfaceId = v4();
+  await GivenProjectExists(
+    em,
+    projectId,
+    organizationId,
+    projectData,
+    costSurfaceId,
+  );
 
   return em
     .createQueryBuilder()
@@ -157,6 +172,7 @@ export async function GivenScenarioExists(
       id: scenarioId,
       name: `test scenario - ${scenarioId}`,
       project_id: projectId,
+      cost_surface_id: costSurfaceId,
       ...scenarioData,
     })
     .execute();

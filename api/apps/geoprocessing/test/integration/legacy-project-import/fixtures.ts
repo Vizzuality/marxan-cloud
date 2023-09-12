@@ -1,4 +1,5 @@
 import { EntityManager } from 'typeorm';
+import { v4 } from 'uuid';
 
 export async function GivenProjectAndScenarioShells(
   em: EntityManager,
@@ -16,14 +17,30 @@ export async function GivenProjectAndScenarioShells(
     })
     .execute();
 
+  const projectName = `test project - ${projectId}`;
   await em
     .createQueryBuilder()
     .insert()
     .into('projects')
     .values({
       id: projectId,
-      name: `test project - ${projectId}`,
+      name: projectName,
       organization_id: organizationId,
+    })
+    .execute();
+
+  const costSurfaceId = v4();
+  await em
+    .createQueryBuilder()
+    .insert()
+    .into(`cost_surfaces`)
+    .values({
+      id: costSurfaceId,
+      name: `${projectName} - Default Cost Surface`,
+      project_id: projectId,
+      min: 0,
+      max: 0,
+      is_default: true,
     })
     .execute();
 
@@ -35,6 +52,7 @@ export async function GivenProjectAndScenarioShells(
       id: scenarioId,
       name: `test scenario - ${scenarioId}`,
       project_id: projectId,
+      cost_surface_id: costSurfaceId,
     })
     .execute();
 }
