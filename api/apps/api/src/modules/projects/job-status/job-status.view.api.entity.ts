@@ -181,4 +181,10 @@ const eventToJobStatusMapping: Record<
     ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__clone__submitted__v1__alpha]:
     ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__protectedAreas__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__protectedAreas__finished__v1__alpha]:
+    ApiEventJobStatus.done,
+  [API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha]:
+    ApiEventJobStatus.failure,
 };
