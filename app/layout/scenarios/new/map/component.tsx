@@ -1,6 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useRouter } from 'next/router';
+
+import { useAppSelector } from 'store/hooks';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -11,7 +13,6 @@ import { useProject } from 'hooks/projects';
 
 import Loading from 'components/loading';
 import Map from 'components/map';
-// Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import LoadingControl from 'components/map/controls/loading';
@@ -23,12 +24,14 @@ import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
+import { MapProps } from 'types/map';
+import { centerMap } from 'utils/map';
 
-export interface ScenarioNewMapProps {}
-
-export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
+export const ScenarioNewMap = (): JSX.Element => {
   const [open, setOpen] = useState(true);
   const [mapInteractive, setMapInteractive] = useState(false);
+
+  const mapRef = useRef<mapboxgl.Map | null>(null);
 
   const accessToken = useAccessToken();
 
@@ -46,8 +49,10 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState(null);
+  const [bounds, setBounds] = useState<MapProps['bounds']>(null);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+
+  const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
 
   const PlanningAreaLayer = useProjectPlanningAreaLayer({
     active: true,
@@ -67,6 +72,10 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
       viewportOptions: { transitionDuration: 0 },
     });
   }, [BBOX]);
+
+  useEffect(() => {
+    centerMap({ ref: mapRef.current, isSidebarOpen });
+  }, [isSidebarOpen]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
@@ -123,7 +132,10 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
         mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
         onClick={handleClick}
         onMapViewportChange={handleViewportChange}
-        onMapLoad={() => setMapInteractive(true)}
+        onMapLoad={({ map }) => {
+          mapRef.current = map;
+          setMapInteractive(true);
+        }}
         onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
         transformRequest={handleTransformRequest}
       >
@@ -145,6 +157,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
 
       {/* Controls */}
       <Controls>
+        <LoadingControl loading={!mapTilesLoaded} />
         <ZoomControl
           viewport={{
             ...viewport,
@@ -163,8 +176,6 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
           }}
           onFitBoundsChange={handleFitBoundsChange}
         />
-
-        <LoadingControl loading={!mapTilesLoaded} />
       </Controls>
 
       {/* Legend */}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -28,7 +28,6 @@ import { useWDPACategories } from 'hooks/wdpa';
 
 import Loading from 'components/loading';
 import Map from 'components/map';
-// Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import LoadingControl from 'components/map/controls/loading';
@@ -41,11 +40,17 @@ import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import { TABS } from 'layout/project/navigation/constants';
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
+import { MapProps } from 'types/map';
+import { centerMap } from 'utils/map';
 
 export const ScenariosEditMap = (): JSX.Element => {
   const [open, setOpen] = useState(true);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+
+  const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
 
@@ -181,7 +186,7 @@ export const ScenariosEditMap = (): JSX.Element => {
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState(null);
+  const [bounds, setBounds] = useState<MapProps['bounds']>(null);
 
   const include = useMemo(() => {
     if (tab === TABS['scenario-protected-areas']) {
@@ -437,6 +442,10 @@ export const ScenariosEditMap = (): JSX.Element => {
   }, [BBOX]);
 
   useEffect(() => {
+    centerMap({ ref: mapRef.current, isSidebarOpen });
+  }, [isSidebarOpen]);
+
+  useEffect(() => {
     // ? Previously, with the navigation by tabs, whenever the user clicked to continue, the cache used by the layers on the map
     // ? was updated and the flow continued to the next tab.
     // ? As this flow is gone and the user is free to go wherever they want, we need to update the cache manually when the tab changes.
@@ -635,7 +644,10 @@ export const ScenariosEditMap = (): JSX.Element => {
         mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
         onClick={handleClick}
         onMapViewportChange={handleViewportChange}
-        onMapLoad={() => setMapInteractive(true)}
+        onMapLoad={({ map }) => {
+          mapRef.current = map;
+          setMapInteractive(true);
+        }}
         onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
         transformRequest={handleTransformRequest}
       >
@@ -657,6 +669,7 @@ export const ScenariosEditMap = (): JSX.Element => {
 
       {/* Controls */}
       <Controls>
+        <LoadingControl loading={!mapTilesLoaded} />
         <ZoomControl
           viewport={{
             ...viewport,
@@ -675,7 +688,6 @@ export const ScenariosEditMap = (): JSX.Element => {
           }}
           onFitBoundsChange={handleFitBoundsChange}
         />
-        <LoadingControl loading={!mapTilesLoaded} />
       </Controls>
 
       {/* Legend */}

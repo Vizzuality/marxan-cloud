@@ -8,6 +8,8 @@ import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 
+import { SIDEBAR_WIDTH } from './constants';
+
 export const Sidebar = ({
   children,
   className,
@@ -22,10 +24,13 @@ export const Sidebar = ({
   return (
     <aside
       className={cn({
-        'absolute z-20 flex h-full w-[550px] rounded-r-2xl bg-black transition-transform': true,
+        'absolute z-20 flex h-full rounded-r-2xl bg-black transition-transform': true,
         '-translate-x-full': !isSidebarOpen,
         [className]: !!className,
       })}
+      style={{
+        width: SIDEBAR_WIDTH,
+      }}
     >
       <div className="flex h-full w-full flex-col overflow-hidden px-8 py-6">{children}</div>
       <button

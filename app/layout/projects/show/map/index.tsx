@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -42,7 +42,9 @@ import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import HelpBeacon from 'layout/help/beacon';
 import { Scenario } from 'types/api/scenario';
+import { MapProps } from 'types/map';
 import { cn } from 'utils/cn';
+import { centerMap } from 'utils/map';
 
 import PRINT_SVG from 'svgs/ui/print.svg?sprite';
 
@@ -63,9 +65,11 @@ export const ProjectMap = (): JSX.Element => {
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState(null);
+  const [bounds, setBounds] = useState<MapProps['bounds']>(null);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+
+  const mapRef = useRef<mapboxgl.Map | null>(null);
 
   const { query } = useRouter();
   const { pid, tab } = query as { pid: string; tab: string };
@@ -235,9 +239,16 @@ export const ProjectMap = (): JSX.Element => {
     });
   }, [BBOX]);
 
-  const handleViewportChange = useCallback((vw) => {
-    setViewport(vw);
-  }, []);
+  useEffect(() => {
+    centerMap({ ref: mapRef.current, isSidebarOpen });
+  }, [isSidebarOpen]);
+
+  const handleViewportChange = useCallback(
+    (vw) => {
+      setViewport(vw);
+    },
+    [isSidebarOpen]
+  );
 
   const handleZoomChange = useCallback(
     (zoom) => {
@@ -442,7 +453,10 @@ export const ProjectMap = (): JSX.Element => {
                 mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
                 mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
                 onMapViewportChange={handleViewportChange}
-                onMapLoad={() => setMapInteractive(true)}
+                onMapLoad={({ map }) => {
+                  mapRef.current = map;
+                  setMapInteractive(true);
+                }}
                 onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
                 transformRequest={handleTransformRequest}
                 onClick={(e) => {
@@ -465,6 +479,7 @@ export const ProjectMap = (): JSX.Element => {
           </HelpBeacon>
 
           <Controls>
+            <LoadingControl loading={!mapTilesLoaded} />
             <ZoomControl
               viewport={{
                 ...viewport,
@@ -483,7 +498,6 @@ export const ProjectMap = (): JSX.Element => {
               }}
               onFitBoundsChange={handleFitBoundsChange}
             />
-            <LoadingControl loading={!mapTilesLoaded} />
           </Controls>
           {/* Print */}
           {!tab && sid1 && sid2 && (
