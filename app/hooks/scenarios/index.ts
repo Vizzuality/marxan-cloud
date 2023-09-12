@@ -259,7 +259,7 @@ export function useScenarioLock(sid) {
 
 export function useScenarioLockMe(sid) {
   const { data: scenarioLockData } = useScenarioLock(sid);
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   return useMemo(() => {
     return user.id === scenarioLockData?.userId;
@@ -385,7 +385,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     },
   });
 
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   const { data: statusData = { scenarios: [] } } = useScenariosStatus(pId);
   const { scenarios: statusScenarios = [] } = statusData;

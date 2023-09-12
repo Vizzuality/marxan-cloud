@@ -27,7 +27,7 @@ const toBase64 = (file) =>
   });
 
 export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }: AvatarMeProps) => {
-  const { user } = useMe();
+  const { data: user } = useMe();
   const { addToast } = useToasts();
   const [preview, setPreview] = useState(value);
   const [hover, setHover] = useState(false);

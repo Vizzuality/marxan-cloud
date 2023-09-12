@@ -35,7 +35,7 @@ export const ScenariosBLMCalibration = (): JSX.Element => {
 
   const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
   const editable = useCanEditScenario(pid, sid);
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   const { data: calibrationRange } = useScenarioCalibrationRange(sid);
   const minBlmValue = 0;

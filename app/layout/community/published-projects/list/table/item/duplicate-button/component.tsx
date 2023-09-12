@@ -26,7 +26,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
   name,
   theme = 'dark',
 }: DuplicateButtonProps) => {
-  const { user } = useMe();
+  const { data: user } = useMe();
   const [duplicating, setDuplicating] = useState(false);
 
   const { addToast } = useToasts();
@@ -88,7 +88,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
 
   return (
     <Tooltip
-      disabled={user}
+      disabled={Boolean(user)}
       arrow
       placement="top"
       content={

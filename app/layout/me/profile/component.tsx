@@ -20,7 +20,7 @@ export interface MeProps {}
 
 export const Profile: React.FC<MeProps> = () => {
   const [submitting, setSubmitting] = useState(false);
-  const { user } = useMe();
+  const { data: user } = useMe();
   const mutation = useSaveMe({});
   const { addToast } = useToasts();
 
