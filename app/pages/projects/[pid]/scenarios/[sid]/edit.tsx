@@ -23,8 +23,8 @@ import GridSetupFeatures from 'layout/project/sidebar/scenario/grid-setup/featur
 import GridSetupGAPAnalysis from 'layout/project/sidebar/scenario/grid-setup/gap-analysis';
 import GridSetupPlanningUnits from 'layout/project/sidebar/scenario/grid-setup/planning-unit-status';
 import GridSetupProtectedAreas from 'layout/project/sidebar/scenario/grid-setup/protected-areas';
-import SolutionsTargetAchievements from 'layout/project/sidebar/scenario/solutions/gap-analysis';
 import SolutionsOverview from 'layout/project/sidebar/scenario/solutions/overview';
+import SolutionsTargetAchievements from 'layout/project/sidebar/scenario/solutions/target-achievement';
 import Protected from 'layout/protected';
 import ScenarioLock from 'layout/scenarios/edit/lock';
 import ScenarioEditMap from 'layout/scenarios/edit/map';
