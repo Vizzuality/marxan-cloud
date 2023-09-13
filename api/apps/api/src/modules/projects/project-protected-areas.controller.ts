@@ -33,6 +33,8 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
+import { JSONAPIQueryParams } from "@marxan-api/decorators/json-api-parameters.decorator";
+import { ProtectedAreaResult } from "@marxan-api/modules/protected-areas/protected-area.geo.entity";
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -48,10 +50,11 @@ export class ProjectProtectedAreasController {
     description: 'List all protected areas for a project',
   })
   @ApiOkResponse({
-    type: ProtectedArea,
+    type: ProtectedAreaResult,
     isArray: true,
   })
   @ApiUnauthorizedResponse()
+  @JSONAPIQueryParams()
   @ApiForbiddenResponse()
   @Get(':projectId/protected-areas')
   async findAllProtectedAreasForProject(
