@@ -381,11 +381,13 @@ export class ProtectedAreasCrudService extends AppBaseService<
     });
 
     const serializer = new JSONAPISerializer.Serializer(
-      'protected_areas',
-      this.serializerConfig,
+      'protected_areas', {
+        ...this.serializerConfig,
+        meta: projectProtectedAreas.metadata,
+      }
     );
 
-    return serializer.serialize(result);
+    return serializer.serialize(result, projectProtectedAreas.metadata);
   }
 
   public async updateProtectedAreaName(
