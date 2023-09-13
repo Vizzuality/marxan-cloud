@@ -5,8 +5,6 @@ import { EntityManager } from 'typeorm';
 import { getEntityManagerToken } from '@nestjs/typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { createWorld } from './steps/world';
-import { InitialProjectCostInput } from '@marxan/artifact-cache/surface-cost-job-input';
-import { Job } from 'bullmq';
 
 describe('should process cost surface', () => {
   const projectId: string = v4();
@@ -30,14 +28,5 @@ describe('should process cost surface', () => {
     );
     await world.WhenTheJobIsProcessed(shapefileJobInputJob);
     await world.ThenTheProjectCostSurfaceIsUpdated();
-  });
-  it('no shapefile - initial cost', async () => {
-    const data = {
-      projectId,
-      costSurfaceId,
-    };
-    const job = ({ data } as unknown) as Job<InitialProjectCostInput>;
-    await world.WhenTheJobIsProcessed(job);
-    await world.ThenTheInitialCostIsCalculated();
   });
 });

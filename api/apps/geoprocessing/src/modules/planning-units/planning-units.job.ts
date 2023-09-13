@@ -220,7 +220,7 @@ grid.geom
         await Promise.all(
           chunk(geometryIds, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
             async (ids, chunkIndex) => {
-              return projectsPuRepo.insert(
+              await projectsPuRepo.insert(
                 ids.map((id, index) => ({
                   geomId: id,
                   geomType: job.data.planningUnitGridShape,
@@ -237,8 +237,32 @@ grid.geom
           ),
         );
 
+        /**
+         * @note: Await for all the previous inserts to finish to avoid race conditions
+         * @todo: Could this be a bulk update? (single query vs array of queries)
+         */
+        await Promise.all(
+          chunk(geometryIds, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
+            async (ids) => {
+              ids.map((geometryId: string) => {
+                return em.query(
+                  `
+                 INSERT INTO cost_surface_pu_data (puid, cost, cost_surface_id)
+                 SELECT ppu.id, round(pug.area / 1000000) as area, $1
+                    FROM projects_pu ppu
+                 INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
+                 WHERE ppu.geom_id = $2
+                `,
+                  [job.data.costSurfaceId, geometryId],
+                );
+              });
+            },
+          ),
+        );
+
         return geometries;
       });
+      this.logger.debug(`Finished planning-units processing for ${job.id}`);
     } catch (err) {
       this.logger.error(err);
       throw err;

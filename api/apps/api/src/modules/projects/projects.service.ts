@@ -17,7 +17,6 @@ import {
   GeoFeaturesService,
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
-
 import { ProjectsCrudService } from './projects-crud.service';
 import { JobStatusService } from './job-status';
 import { Project } from './project.api.entity';
@@ -110,10 +109,7 @@ import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
 import stream from 'stream';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
-import {
-  ScenariosService,
-  SubmitProtectedAreaError,
-} from '@marxan-api/modules/scenarios/scenarios.service';
+import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 import {
   OutputProjectSummariesService,
   outputProjectSummaryNotFound,
@@ -125,6 +121,7 @@ import {
   submissionFailed,
 } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
+import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 export { validationFailed } from '../planning-areas';
 
@@ -162,6 +159,7 @@ export class ProjectsService {
     private readonly webshotService: WebshotService,
     @Inject(forwardRef(() => ScenariosService))
     private readonly scenariosService: ScenariosService,
+    private readonly costSurfaceService: CostSurfaceService,
     private readonly outputProjectSummariesService: OutputProjectSummariesService,
     private readonly protectedArea: AddProtectedAreaService,
   ) {}
@@ -361,11 +359,18 @@ export class ProjectsService {
     ) {
       return left(forbiddenError);
     }
-    const project = await this.projectsCrud.create(input, info);
+    const defaultCostSurface = this.costSurfaceService.createDefaultCostSurfaceModel();
+    const project = await this.projectsCrud.create(
+      { ...input, costSurfaces: [defaultCostSurface] } as CreateProjectDTO,
+      info,
+    );
     await this.projectsCrud.assignCreatorRole(
       project.id,
       info.authenticatedUser.id,
     );
+
+    // TODO: How to handle left for Project? How is it handled by the async jobs triggered by actionAfterCreate?
+
     return right(project);
   }
 

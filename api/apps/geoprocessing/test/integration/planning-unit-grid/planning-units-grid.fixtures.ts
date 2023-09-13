@@ -144,5 +144,16 @@ export const getFixtures = async () => {
         -22.6302376121737,
       ]);
     },
+    async ThenThePUCostOfThatPlanningAreaIsCreated(planingAreaId: string) {
+      const costForPlanningArea = await puGeoRepo.query(
+        `select * from cost_surface_pu_data join projects_pu pp on cost_surface_pu_data.puid = pp.id where pp.planning_area_id = $1`,
+        [planingAreaId],
+      );
+      const pusForProject = await projectsPuRepo.query(
+        `select * from projects_pu where planning_area_id = $1`,
+        [planingAreaId],
+      );
+      expect(costForPlanningArea.length).toEqual(pusForProject.length);
+    },
   };
 };

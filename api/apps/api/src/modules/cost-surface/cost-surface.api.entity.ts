@@ -32,7 +32,7 @@ export class CostSurface {
   id!: string;
 
   @ApiProperty({ type: () => Project })
-  @ManyToOne((_type) => Project, (project) => project.costSurface)
+  @ManyToOne((_type) => Project, (project) => project.costSurfaces)
   @JoinColumn({
     name: 'project_id',
   })

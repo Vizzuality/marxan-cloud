@@ -7,8 +7,7 @@ import { Either, left, right } from 'fp-ts/lib/Either';
 import { projectNotEditable } from '@marxan-api/modules/projects/projects.service';
 import { UploadCostSurfaceShapefileDto } from '@marxan-api/modules/cost-surface/dto/upload-cost-surface-shapefile.dto';
 import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
-import { CommandBus } from '@nestjs/cqrs';
-import { UpdateProjectCostSurface } from '@marxan-api/modules/cost-surface/application/update-project-cost-surface.command';
+import { CostSurfaceCalculationPort } from '@marxan-api/modules/cost-surface/ports/project/cost-surface-calculation.port';
 
 export const costSurfaceNotEditableWithinProject = Symbol(
   `cost surface not editable within project`,
@@ -27,8 +26,17 @@ export class CostSurfaceService {
     @InjectRepository(CostSurface)
     private readonly costSurfaceRepository: Repository<CostSurface>,
     private readonly projectAclService: ProjectAclService,
-    private readonly commandBus: CommandBus,
+    private readonly calculateCost: CostSurfaceCalculationPort,
   ) {}
+
+  createDefaultCostSurfaceModel(): CostSurface {
+    return this.costSurfaceRepository.create({
+      name: 'default',
+      min: 1,
+      max: 1,
+      isDefault: true,
+    });
+  }
 
   async uploadCostSurfaceShapefile(
     userId: string,
@@ -59,13 +67,16 @@ export class CostSurfaceService {
       max,
     });
     const costSurface = await this.costSurfaceRepository.save(instance);
-    await this.commandBus.execute(
-      new UpdateProjectCostSurface(projectId, costSurface.id, file),
+    const result = await this.calculateCost.forShapefile(
+      projectId,
+      costSurface.id,
+      file,
     );
+    // TODO: Handle error! Delete cost surface!
     return right(void 0);
   }
 
-  async updateCostSurfaceShapefile(
+  async update(
     userId: string,
     projectId: string,
     costSurfaceId: string,

@@ -111,7 +111,7 @@ export class ProjectCostSurfaceController {
     @Req() req: RequestWithAuthenticatedUser,
     @Body() dto: UpdateCostSurfaceDto,
   ): Promise<JSONAPICostSurface> {
-    const result = await this.costSurfaceService.updateCostSurfaceShapefile(
+    const result = await this.costSurfaceService.update(
       req.user.id,
       projectId,
       costSurfaceId,

@@ -29,7 +29,7 @@ import { GivenProjectsPu } from '../../../geoprocessing/test/steps/given-project
 import * as request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
 
-export const getProjectCostSurfaceControllerFixtures = async () => {
+export const getProjectCostSurfaceFixtures = async () => {
   const app = await bootstrapApplication([
     TypeOrmModule.forFeature(
       [PlanningUnitsGeom, ProjectsPuEntity, ScenariosPuCostDataGeo],
@@ -92,6 +92,18 @@ export const getProjectCostSurfaceControllerFixtures = async () => {
 
       return projectId;
     },
+    WhenCreatingAProject: async (projectName: string) =>
+      await GivenProjectExists(
+        app,
+        token,
+        {
+          name: projectName,
+          countryId: undefined!,
+        },
+        {
+          name: `Organization ${Date.now()}`,
+        },
+      ),
 
     GivenProjectPuData: async (projectId: string) => {
       await GivenProjectsPu(
@@ -210,6 +222,13 @@ export const getProjectCostSurfaceControllerFixtures = async () => {
       expect(error).toContain(
         `Cost Surface with id ${costSurfaceId} cannot be updated: name is already in use in the associated Project`,
       );
+    },
+    ThenADefaultCostSurfaceWasCreated: async (projectId: string) => {
+      const costSurface = await costSurfaceRepo.findOne({
+        where: { projectId, name: 'default', isDefault: true },
+      });
+
+      expect(costSurface).toBeDefined();
     },
   };
 };

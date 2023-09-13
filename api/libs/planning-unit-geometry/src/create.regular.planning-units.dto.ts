@@ -5,7 +5,7 @@ import {
   IsPositive,
   IsUUID,
 } from 'class-validator';
-import { PlanningUnitGridShape } from '../../scenarios-planning-unit/src';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 /**
  * @todo We have this interface partially duplicated in the api service
@@ -38,4 +38,7 @@ export class PlanningUnitsJob {
 
   @IsUUID()
   projectId!: string;
+
+  @IsUUID()
+  costSurfaceId?: string;
 }

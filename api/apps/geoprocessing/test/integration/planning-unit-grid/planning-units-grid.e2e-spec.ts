@@ -15,6 +15,7 @@ test(`uploading shapefile as planning units`, async () => {
   await fixtures.ThenGeoJsonMatchesInput(output);
   await fixtures.ThenPlanningAreaIsCreated(output);
   await fixtures.ThenPlanningAreaBBoxIsValid(output);
+  await fixtures.ThenThePUCostOfThatPlanningAreaIsCreated(output.id);
 });
 
 afterEach(async () => fixtures?.cleanup());

@@ -15,7 +15,6 @@ import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
 import { ScenarioBlm } from '@marxan-api/modules/blm/values/repositories/scenario-blm/scenario-blm.api.entity';
-import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
