@@ -13,6 +13,9 @@ import {
 } from '../ports/cost-surface-events.port';
 import { UpdateCostSurface } from './update-cost-surface.command';
 
+/**
+ * @deprecated: Should be removed once project level implementation is fully validated
+ */
 @CommandHandler(UpdateCostSurface)
 export class UpdateCostSurfaceHandler
   implements IInferredCommandHandler<UpdateCostSurface> {

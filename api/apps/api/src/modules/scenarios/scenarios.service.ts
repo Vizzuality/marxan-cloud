@@ -53,7 +53,6 @@ import {
   ScenarioProtectedArea,
 } from './protected-area';
 import { ProtectedAreasChangeDto } from './dto/protected-area-change.dto';
-import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 import {
   CalibrationRunResult,
   ScenarioCalibrationRepo,
@@ -1143,7 +1142,7 @@ export class ScenariosService {
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
-    return right(await this.costService.getRange(scenarioId));
+    return right(await this.costService.getRangeForScenario(scenarioId));
   }
 
   async resetLockStatus(

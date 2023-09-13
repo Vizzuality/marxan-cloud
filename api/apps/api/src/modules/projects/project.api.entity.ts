@@ -155,12 +155,14 @@ export class Project extends TimeUserEntityMetadata {
   scenarios?: Scenario[];
 
   @ApiPropertyOptional({ type: () => CostSurface })
-  @OneToMany((_type) => CostSurface, (costSurface) => costSurface.project)
+  @OneToMany((_type) => CostSurface, (costSurface) => costSurface.project, {
+    cascade: ['insert', 'update'],
+  })
 
   /**
    * @todo: Make this required when we complete the creation of a default cost surface on project creation
    */
-  costSurface?: CostSurface[];
+  costSurfaces?: CostSurface[];
 
   @ApiProperty({
     type: () => User,

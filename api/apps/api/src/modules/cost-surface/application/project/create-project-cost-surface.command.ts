@@ -7,7 +7,7 @@ import { FromProjectShapefileJobInput } from '@marxan/artifact-cache/surface-cos
  * @todo: Temporal substitute for UpdateCostSurface command, which works at scenario level. It should be
  *        removed and use there once the implementation is fully validated
  */
-export class UpdateProjectCostSurface extends Command<
+export class CreateProjectCostSurface extends Command<
   Either<typeof jobSubmissionFailed, true>
 > {
   constructor(

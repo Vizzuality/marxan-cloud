@@ -1,12 +1,12 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
-import { getProjectCostSurfaceControllerFixtures } from './project-cost-surface.controller.fixtures';
+import { getProjectCostSurfaceFixtures } from './project-cost-surface.fixtures';
 
-let fixtures: FixtureType<typeof getProjectCostSurfaceControllerFixtures>;
+let fixtures: FixtureType<typeof getProjectCostSurfaceFixtures>;
 
 describe('Upload Cost Surface Shapefile', () => {
   beforeEach(async () => {
-    fixtures = await getProjectCostSurfaceControllerFixtures();
+    fixtures = await getProjectCostSurfaceFixtures();
   });
 
   it(`should not create CostSurface API entity if the user doesn't have permissions to edit the project`, async () => {
@@ -32,7 +32,7 @@ describe('Upload Cost Surface Shapefile', () => {
 
 describe('Upload Cost Surface Shapefile', () => {
   beforeEach(async () => {
-    fixtures = await getProjectCostSurfaceControllerFixtures();
+    fixtures = await getProjectCostSurfaceFixtures();
   });
 
   it(`should not update CostSurface API entity if the user doesn't have permissions to edit the project`, async () => {

@@ -14,6 +14,7 @@ import { PuExtractorPort } from '@marxan-geoprocessing/modules/cost-surface/port
 import { PuCostExtractor } from '@marxan-geoprocessing/modules/cost-surface/adapters/pu-cost-extractor';
 import { ShapefileConverterPort } from '@marxan-geoprocessing/modules/cost-surface/ports/shapefile-converter/shapefile-converter.port';
 import { ShapefileConverter } from '@marxan-geoprocessing/modules/cost-surface/adapters/shapefile-converter';
+import { ProjectCostSurfacePersistencePort } from '@marxan-geoprocessing/modules/cost-surface/ports/persistence/project-cost-surface-persistence.port';
 
 /**
  * @todo: Use CostSurfancePersistencePort as provider and inject TypeormProjectCostSurface once the old approach is removed.
@@ -30,7 +31,10 @@ import { ShapefileConverter } from '@marxan-geoprocessing/modules/cost-surface/a
   providers: [
     ProjectCostSurfaceWorker,
     ProjectCostSurfaceProcessor,
-    TypeormProjectCostSurface,
+    {
+      provide: ProjectCostSurfacePersistencePort,
+      useClass: TypeormProjectCostSurface,
+    },
     {
       provide: GetAvailablePlanningUnits,
       useClass: AvailableProjectPlanningUnitsRepository,

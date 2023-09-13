@@ -14,6 +14,8 @@ import {
 } from '../src/modules/planning-units/planning-units.job';
 import { E2E_CONFIG } from './e2e.config';
 import { seedAdminRegions } from './utils/seeds/seed-admin-regions';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
+import { v4 } from 'uuid';
 
 /**
  * @TODO
@@ -24,6 +26,7 @@ describe('planning units jobs (e2e)', () => {
   let data: PlanningUnitsJob;
   let projectsPuRepo: Repository<ProjectsPuEntity>;
   let planningUnitsRepo: Repository<PlanningUnitsGeom>;
+  let costPuDataRepo: Repository<CostSurfacePuDataEntity>;
 
   beforeEach(async () => {
     const sandbox = await Test.createTestingModule({
@@ -34,7 +37,7 @@ describe('planning units jobs (e2e)', () => {
           logging: false,
         }),
         TypeOrmModule.forFeature(
-          [ProjectsPuEntity, PlanningUnitsGeom],
+          [ProjectsPuEntity, PlanningUnitsGeom, CostSurfacePuDataEntity],
           geoprocessingConnections.default,
         ),
       ],
@@ -42,6 +45,7 @@ describe('planning units jobs (e2e)', () => {
     }).compile();
 
     projectsPuRepo = sandbox.get(getRepositoryToken(ProjectsPuEntity));
+    costPuDataRepo = sandbox.get(getRepositoryToken(CostSurfacePuDataEntity));
     planningUnitsRepo = sandbox.get(getRepositoryToken(PlanningUnitsGeom));
     sut = sandbox.get(PlanningUnitsJobProcessor);
 
@@ -69,7 +73,10 @@ describe('planning units jobs (e2e)', () => {
       const createPlanningUnitsDTO = {
         id: '1',
         name: 'create-regular-pu',
-        data,
+        data: {
+          ...data,
+          costSurfaceId: v4(),
+        },
       } as Job<RegularPlanningAreaJob>;
 
       await expect(sut.process(createPlanningUnitsDTO)).resolves.not.toThrow();
@@ -79,8 +86,12 @@ describe('planning units jobs (e2e)', () => {
           projectId: data.projectId,
         },
       });
+      const costPus = await costPuDataRepo.find({
+        where: { puid: In(projectPus.map((pu) => pu.id)) },
+      });
 
       expect(projectPus.length).toBeGreaterThan(0);
+      expect(costPus.length).toEqual(projectPus.length);
     },
     50 * 1000,
   );

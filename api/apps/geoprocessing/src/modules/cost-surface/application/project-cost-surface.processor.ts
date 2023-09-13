@@ -7,17 +7,16 @@ import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
 import { ShapefileConverterPort } from '../ports/shapefile-converter/shapefile-converter.port';
 import {
   FromProjectShapefileJobInput,
-  InitialProjectCostInput,
   ProjectCostSurfaceJobInput,
 } from '@marxan/artifact-cache/surface-cost-job-input';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
-import { TypeormProjectCostSurface } from '@marxan-geoprocessing/modules/cost-surface/adapters/project/typeorm-project-cost-surface';
+import { ProjectCostSurfacePersistencePort } from '@marxan-geoprocessing/modules/cost-surface/ports/persistence/project-cost-surface-persistence.port';
 
 @Injectable()
 export class ProjectCostSurfaceProcessor
   implements WorkerProcessor<ProjectCostSurfaceJobInput, true> {
   constructor(
-    private readonly repo: TypeormProjectCostSurface,
+    private readonly repo: ProjectCostSurfacePersistencePort,
     private readonly puExtractor: PuExtractorPort,
     private readonly availablePlanningUnits: GetAvailablePlanningUnits,
     private readonly shapefileConverter: ShapefileConverterPort,
@@ -44,34 +43,24 @@ export class ProjectCostSurfaceProcessor
     projectPlanningUnits.forEach((record) => {
       projectPlanningUnitsByPuid[record.puid] = record.id;
     });
+
     await this.repo.save(
       costSurfaces.map(
         (record) =>
           ({
-            cost: record.cost,
             puid: projectPlanningUnitsByPuid[record.puid],
+            cost: record.cost,
             costSurfaceId: job.data.costSurfaceId,
           } as CostSurfacePuDataEntity),
       ),
     );
-
-    return true;
-  }
-
-  private async initialCostProcessor({
-    data: { projectId, costSurfaceId },
-  }: Job<InitialProjectCostInput, true>): Promise<true> {
-    await this.repo.generateInitialCostSurface(projectId, costSurfaceId);
+    await this.repo.updateCostSurfaceRange(job.data.costSurfaceId);
     return true;
   }
 
   async process(job: Job<ProjectCostSurfaceJobInput, true>): Promise<true> {
-    const { data } = job;
-    if ((data as FromProjectShapefileJobInput).shapefile)
-      return this.fromShapefileProcessor(
-        job as Job<FromProjectShapefileJobInput, true>,
-      );
-
-    return this.initialCostProcessor(job as Job<InitialProjectCostInput, true>);
+    return this.fromShapefileProcessor(
+      job as Job<FromProjectShapefileJobInput>,
+    );
   }
 }

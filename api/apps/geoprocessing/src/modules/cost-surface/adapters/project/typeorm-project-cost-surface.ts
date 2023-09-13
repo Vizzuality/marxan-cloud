@@ -3,17 +3,22 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { chunk } from 'lodash';
 import { EntityManager } from 'typeorm';
-import { CostSurfacePersistencePort } from '@marxan-geoprocessing/modules/cost-surface/ports/persistence/cost-surface-persistence.port';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ProjectCostSurfacePersistencePort } from '@marxan-geoprocessing/modules/cost-surface/ports/persistence/project-cost-surface-persistence.port';
 
 @Injectable()
-export class TypeormProjectCostSurface implements CostSurfacePersistencePort {
+export class TypeormProjectCostSurface
+  implements ProjectCostSurfacePersistencePort {
   constructor(
-    @InjectEntityManager() private readonly entityManager: EntityManager,
+    @InjectEntityManager(geoprocessingConnections.apiDB)
+    private readonly apiEntityManager: EntityManager,
+    @InjectEntityManager(geoprocessingConnections.default)
+    private readonly geoprocessingEntityManager: EntityManager,
   ) {}
 
   async save(values: CostSurfacePuDataEntity[]): Promise<void> {
-    await this.entityManager.transaction(async (em) => {
+    await this.geoprocessingEntityManager.transaction(async (em) => {
       await Promise.all(
         chunk(values, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
           async (rows) => {
@@ -63,7 +68,7 @@ export class TypeormProjectCostSurface implements CostSurfacePersistencePort {
      * has been created in order to override the rounded values in the initial
      * cost values set here.
      */
-    await this.entityManager.query(
+    await this.geoprocessingEntityManager.query(
       `
         INSERT INTO cost_surface_pu_data (puid, cost, cost_surface_id)
         SELECT ppu.id, round(pug.area / 1000000) as area, $2
@@ -73,5 +78,36 @@ export class TypeormProjectCostSurface implements CostSurfacePersistencePort {
       `,
       [projectId, costSurfaceId],
     );
+  }
+
+  /**
+   * @description: Once the MIN and MAX values are known, we must update these for the relevant cost surface in the API DB.
+   *
+   * @todo: Move CostSurface API entity to libs for type safety
+   */
+  async updateCostSurfaceRange(costSurfaceId: string): Promise<void> {
+    const { min, max } = await this.getCostSurfaceRange(costSurfaceId);
+    await this.apiEntityManager
+      .createQueryBuilder()
+      .update('cost_surfaces')
+      .set({ min, max })
+      .where('id = :costSurfaceId', { costSurfaceId })
+      .execute();
+  }
+
+  async getCostSurfaceRange(
+    costSurfaceId: string,
+  ): Promise<{ min: number; max: number }> {
+    const { min, max } = (
+      await this.geoprocessingEntityManager.query(
+        `
+        SELECT MIN(cspd.cost) as min, MAX(cspd.cost) as max
+        FROM cost_surface_pu_data cspd
+        WHERE cost_surface_id = $1;
+      `,
+        [costSurfaceId],
+      )
+    )[0];
+    return { min: min ?? 1, max: max ?? 1 };
   }
 }

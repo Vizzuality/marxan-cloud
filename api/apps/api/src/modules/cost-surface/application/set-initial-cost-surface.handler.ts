@@ -16,6 +16,9 @@ import {
   SetInitialCostSurfaceError,
 } from './set-initial-cost-surface.command';
 
+/**
+ * @deprecated: Should be removed once project level implementation is fully validated
+ */
 @CommandHandler(SetInitialCostSurface)
 export class SetInitialCostSurfaceHandler
   implements IInferredCommandHandler<SetInitialCostSurface> {

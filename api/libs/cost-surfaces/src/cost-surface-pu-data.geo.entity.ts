@@ -20,7 +20,7 @@ export class CostSurfacePuDataEntity {
     (projectsPu: ProjectsPuEntity) => projectsPu.id,
   )
   @JoinColumn({ name: 'puid' })
-  projectsPu!: ProjectsPuEntity;
+  projectsPu?: ProjectsPuEntity;
 
   @Column({ type: 'uuid', name: 'puid' })
   /**

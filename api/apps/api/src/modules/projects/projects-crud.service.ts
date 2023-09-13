@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { assertDefined, isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommandBus } from '@nestjs/cqrs';
@@ -29,6 +29,8 @@ import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dt
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { PublishedProject } from '../published-project/entities/published-project.api.entity';
+import { CostSurfaceId } from '@marxan-api/modules/projects/planning-unit-grid/project.id';
+import { getDefaultCostSurfaceIdFromProject } from '@marxan-api/modules/projects/get-default-project-cost-surface';
 
 const projectFilterKeyNames = [
   'name',
@@ -182,6 +184,7 @@ export class ProjectsCrudService extends AppBaseService<
       await this.commandBus.execute(
         new SetProjectGridFromShapefile(
           new ProjectId(model.id),
+          new CostSurfaceId(getDefaultCostSurfaceIdFromProject(model)),
           createModel.planningAreaId,
           model.bbox,
         ),
@@ -206,48 +209,7 @@ export class ProjectsCrudService extends AppBaseService<
           planningUnitAreakm2: createModel.planningUnitAreakm2,
           planningUnitGridShape: createModel.planningUnitGridShape,
           projectId: model.id,
-        }),
-        this.planningAreasService.assignProject({
-          projectId: model.id,
-          planningAreaGeometryId: createModel.planningAreaId,
-        }),
-      ]);
-    }
-  }
-
-  async actionAfterUpdate(
-    model: Project,
-    createModel: UpdateProjectDTO,
-    _info?: ProjectsRequest,
-  ): Promise<void> {
-    if (
-      createModel?.planningUnitGridShape ===
-        PlanningUnitGridShape.FromShapefile &&
-      createModel.planningAreaId
-    ) {
-      await this.commandBus.execute(
-        new SetProjectGridFromShapefile(
-          new ProjectId(model.id),
-          createModel.planningAreaId,
-          model.bbox,
-        ),
-      );
-      return;
-    }
-    if (
-      createModel.planningUnitAreakm2 &&
-      createModel?.planningUnitGridShape &&
-      (createModel.countryId ||
-        createModel.adminAreaLevel1Id ||
-        createModel.adminAreaLevel2Id ||
-        createModel.planningAreaId)
-    ) {
-      await Promise.all([
-        this.planningUnitsService.create({
-          ...createModel,
-          planningUnitAreakm2: createModel.planningUnitAreakm2,
-          planningUnitGridShape: createModel.planningUnitGridShape,
-          projectId: model.id,
+          costSurfaceId: getDefaultCostSurfaceIdFromProject(model),
         }),
         this.planningAreasService.assignProject({
           projectId: model.id,
