@@ -22,7 +22,7 @@ import Loading from 'layout/loading';
 import { MediaContextProvider } from 'layout/media';
 import store from 'store';
 
-import 'styles/tailwind.css';
+import 'styles/globals.css';
 
 const MarxanApp = ({ Component, pageProps }: AppProps) => {
   const [routeLoading, setRouteLoading] = useState({

@@ -58,7 +58,7 @@ export const HomeIntro: React.FC = () => {
             </motion.p>
 
             <motion.div
-              className="mt-10 space-y-4 xs:flex xs:space-x-4 xs:space-y-0 md:mb-18 md:mt-18"
+              className="md:mb-18 md:mt-18 mt-10 flex space-y-4 xs:space-x-4 xs:space-y-0"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
