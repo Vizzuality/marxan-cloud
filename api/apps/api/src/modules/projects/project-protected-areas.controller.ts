@@ -3,6 +3,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -28,6 +29,10 @@ import { ProtectedArea } from '@marxan/protected-areas';
 import { ProjectProtectedAreasService } from './project-protected-areas.service';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { assertDefined } from '@marxan/utils';
+import {
+  FetchSpecification,
+  ProcessFetchSpecification,
+} from 'nestjs-base-service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -50,14 +55,22 @@ export class ProjectProtectedAreasController {
   @ApiForbiddenResponse()
   @Get(':projectId/protected-areas')
   async findAllProtectedAreasForProject(
-    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Req() req: RequestWithAuthenticatedUser,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Query('q') protectedAreaNameFilter?: string,
   ): Promise<ProtectedArea[]> {
     assertDefined(req.user);
 
     const result = await this.projectProtectedAreasService.listForProject(
       projectId,
       req.user.id,
+      fetchSpecification,
+      {
+        params: {
+          fullNameAndCategoryFilter: protectedAreaNameFilter,
+        },
+      },
     );
 
     if (isLeft(result)) {

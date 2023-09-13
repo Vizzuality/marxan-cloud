@@ -37,6 +37,7 @@ import { Either, left, right } from 'fp-ts/Either';
 import { UpdateProtectedAreaNameDto } from '@marxan-api/modules/protected-areas/dto/rename.protected-area.dto';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { ProtectedAreasRequestInfo } from '@marxan-api/modules/protected-areas/dto/protected-areas-request-info';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -196,6 +197,43 @@ export class ProtectedAreasCrudService extends AppBaseService<
     };
   }
 
+  async extendFindAllQuery(
+    query: SelectQueryBuilder<ProtectedArea>,
+    fetchSpecification: FetchSpecification,
+    info: ProtectedAreasRequestInfo,
+  ): Promise<SelectQueryBuilder<ProtectedArea>> {
+    const project: ProjectSnapshot | undefined = info?.params?.project;
+
+    if (project) {
+      query.andWhere(`${this.alias}.projectId = :projectId`, {
+        projectId: project.id,
+      });
+
+      const projectGlobalProtectedAreasData = await this.selectionGetService.getGlobalProtectedAreas(
+        project,
+      );
+
+      query.orWhere(`${this.alias}.id in (:...ids)`, {
+        ids: Object.values(projectGlobalProtectedAreasData.areas).flat(),
+      });
+    }
+
+    if (Array.isArray(info?.params?.ids) && info?.params?.ids.length) {
+      query.andWhere('id in (:...ids)', { ids: info?.params?.ids });
+    }
+
+    if (info?.params?.fullNameAndCategoryFilter) {
+      query.andWhere(
+        `(${this.alias}.full_name ilike :fullNameAndCategoryFilter OR ${this.alias}.iucn_cat ilike :fullNameAndCategoryFilter)`,
+        {
+          fullNameAndCategoryFilter: `%${info.params.fullNameAndCategoryFilter}%`,
+        },
+      );
+    }
+
+    return query;
+  }
+
   /**
    * List IUCN categories of protected areas.
    */
@@ -281,7 +319,11 @@ export class ProtectedAreasCrudService extends AppBaseService<
       .getMany();
   }
 
-  async listForProject(project: ProjectSnapshot) {
+  async listForProject(
+    project: ProjectSnapshot,
+    fetchSpecification?: FetchSpecification,
+    info?: ProtectedAreasRequestInfo,
+  ) {
     /**
      * Get a list of protected areas used in project scenarios and assemble this
      * into a map of protected area ids to lists of the scenarios where each
@@ -313,55 +355,35 @@ export class ProtectedAreasCrudService extends AppBaseService<
      * and add a count of the number of scenarios where each protected area is
      * used.
      */
-    const projectGlobalProtectedAreasData = await this.selectionGetService.getGlobalProtectedAreas(
-      project,
+
+    info!.params.project = project;
+
+    const projectProtectedAreas = await this.findAllPaginated(
+      fetchSpecification,
+      info,
     );
 
-    const selectedProjectGlobalProtectedAreasIds = intersection(
-      Object.values(projectGlobalProtectedAreasData.areas).flat(),
-      Object.keys(protectedAreaUsedInProjectScenarios),
-    );
+    const result: any[] = [];
 
-    const projectGlobalProtectedAreas = await this.repository
-      .find({ where: { id: In(selectedProjectGlobalProtectedAreasIds) } })
-      .then((protectedAreas) =>
-        protectedAreas.map((protectedArea) => ({
-          ...protectedArea,
-          scenarioUsageCount:
-            protectedAreaUsedInProjectScenarios[protectedArea.id]?.length ?? 0,
-          isCustom: false,
-        })),
-      );
-
-    const projectCustomProtectedAreas = await this.repository
-      .find({
-        where: {
-          projectId: project.id,
-        },
-        order: {
-          fullName: 'ASC',
-        },
-      })
-      .then((protectedAreas) =>
-        protectedAreas.map((protectedArea) => ({
-          ...protectedArea,
-          scenarioUsageCount:
-            protectedAreaUsedInProjectScenarios[protectedArea.id]?.length ?? 0,
-          isCustom: true,
-        })),
-      );
-
-    const allProjectProtectedAreas = [
-      ...projectGlobalProtectedAreas,
-      ...projectCustomProtectedAreas,
-    ];
+    projectProtectedAreas.data.forEach((protectedArea) => {
+      const scenarioUsageCount: number = protectedAreaUsedInProjectScenarios[
+        protectedArea!.id!
+      ]
+        ? protectedAreaUsedInProjectScenarios[protectedArea!.id!].length
+        : 0;
+      result.push({
+        ...protectedArea,
+        scenarioUsageCount,
+        isCustom: protectedArea!.projectId !== null,
+      });
+    });
 
     const serializer = new JSONAPISerializer.Serializer(
       'protected_areas',
       this.serializerConfig,
     );
 
-    return serializer.serialize(allProjectProtectedAreas);
+    return serializer.serialize(result);
   }
 
   public async updateProtectedAreaName(
