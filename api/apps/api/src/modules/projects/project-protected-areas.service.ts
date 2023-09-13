@@ -12,6 +12,8 @@ import { projectNotFound } from './projects.service';
 import { ProtectedAreasCrudService } from '../protected-areas/protected-areas-crud.service';
 import { GetProjectQuery } from '@marxan/projects';
 import { QueryBus } from '@nestjs/cqrs';
+import { FetchSpecification } from 'nestjs-base-service';
+import { ProtectedAreasRequestInfo } from '@marxan-api/modules/protected-areas/dto/protected-areas-request-info';
 
 @Injectable()
 export class ProjectProtectedAreasService {
@@ -27,6 +29,8 @@ export class ProjectProtectedAreasService {
   async listForProject(
     projectId: string,
     userId: string,
+    fetchSpecification: FetchSpecification,
+    info: ProtectedAreasRequestInfo,
   ): Promise<
     Either<typeof forbiddenError | typeof projectNotFound, ProtectedArea[]>
   > {
@@ -44,6 +48,8 @@ export class ProjectProtectedAreasService {
 
     const projectCustomAreas = await this.protectedAreasCrudService.listForProject(
       projectResponse.right,
+      fetchSpecification,
+      { ...info, params: { ...info.params, project: projectResponse.right } },
     );
 
     return right(projectCustomAreas);
