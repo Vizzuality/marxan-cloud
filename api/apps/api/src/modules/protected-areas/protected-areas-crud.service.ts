@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { In, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, IsNull, Not, Repository, SelectQueryBuilder} from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
 import { ProtectedArea } from '@marxan/protected-areas';
@@ -205,17 +205,19 @@ export class ProtectedAreasCrudService extends AppBaseService<
     const project: ProjectSnapshot | undefined = info?.params?.project;
 
     if (project) {
-      query.andWhere(`${this.alias}.projectId = :projectId`, {
-        projectId: project.id,
-      });
-
       const projectGlobalProtectedAreasData = await this.selectionGetService.getGlobalProtectedAreas(
         project,
       );
 
-      query.orWhere(`${this.alias}.id in (:...ids)`, {
-        ids: Object.values(projectGlobalProtectedAreasData.areas).flat(),
-      });
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where(`${this.alias}.projectId = :projectId`, {
+            projectId: project.id,
+          }).orWhere(`${this.alias}.id in (:...ids)`, {
+            ids: Object.values(projectGlobalProtectedAreasData.areas).flat(),
+          })
+        }),
+      )
     }
 
     if (Array.isArray(info?.params?.ids) && info?.params?.ids.length) {
