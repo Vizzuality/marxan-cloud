@@ -6,19 +6,19 @@ const THEME = {
   dark: {
     base: 'leading-tight text-white bg-transparent border rounded focus:outline-none',
     status: {
-      none: 'border-gray-500',
-      valid: 'border-gray-500',
+      none: 'border-gray-600',
+      valid: 'border-gray-600',
       error: 'border-red-500',
-      disabled: 'border-gray-800 opacity-50',
+      disabled: 'border-gray-900 opacity-50',
     },
   },
   light: {
-    base: 'leading-tight text-gray-800 bg-transparent border rounded focus:outline-none',
+    base: 'leading-tight text-gray-900 bg-transparent border rounded focus:outline-none',
     status: {
-      none: 'border-gray-500',
-      valid: 'border-gray-500',
+      none: 'border-gray-600',
+      valid: 'border-gray-600',
       error: 'border-red-500',
-      disabled: 'border-gray-800 opacity-50',
+      disabled: 'border-gray-900 opacity-50',
     },
   },
 };

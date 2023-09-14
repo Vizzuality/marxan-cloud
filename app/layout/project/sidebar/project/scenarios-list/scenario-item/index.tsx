@@ -132,7 +132,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
       >
         <div
           className={cn({
-            'flex flex-grow flex-col rounded-l-[20px] bg-gray-700 pl-8': true,
+            'flex flex-grow flex-col rounded-l-[20px] bg-gray-800 pl-8': true,
             'rounded-bl-none': settings,
           })}
         >
@@ -142,7 +142,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
                 <div className="flex flex-row items-center">
                   {warnings && (
                     <div className="relative mr-5 flex h-10 w-10 items-center rounded-full border border-solid border-white">
-                      <div className="absolute -right-1 -top-1 h-4 w-4 rounded-full border-4 border-solid border-gray-700 bg-red-500" />
+                      <div className="absolute -right-1 -top-1 h-4 w-4 rounded-full border-4 border-solid border-gray-800 bg-red-500" />
                       <Icon className="h-10 w-10" icon={WARNING_SVG} />
                     </div>
                   )}
@@ -153,13 +153,13 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
                         arrow
                         placement="top"
                         content={
-                          <div className="rounded bg-white p-2 text-center text-xs text-gray-500">
+                          <div className="rounded bg-white p-2 text-center text-xs text-gray-600">
                             <div>{lock.displayName || lock.email}</div>
                             <div>is editing this scenario</div>
                           </div>
                         }
                       >
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-500">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-600">
                           <Icon className="relative w-3 text-white" icon={LOCK_SVG} />
                         </div>
                       </Tooltip>
@@ -201,7 +201,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
                       className={cn({
                         'h-5 w-5 transition-colors': true,
                         'text-primary-500': settings,
-                        'text-gray-400': !settings,
+                        'text-gray-600': !settings,
                       })}
                       icon={TOGGLE_SCENARIO_SVG}
                     />
@@ -212,7 +212,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
               {status !== 'run-running' && (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-gray-500">
+                    <button className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-gray-700">
                       <Icon
                         icon={DOTS_SVG}
                         className={cn({
@@ -224,27 +224,27 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
                   <PopoverContent
                     side="right"
                     sideOffset={20}
-                    className="w-32 rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-xs"
+                    className="w-32 rounded-2xl !border-none bg-gray-800 !p-0 font-sans text-xs"
                     collisionPadding={50}
                   >
                     <button
-                      className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
+                      className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-700"
                       disabled={!editable}
                       onClick={onDuplicate}
                     >
                       <Icon
-                        className="h-5 w-5 text-gray-500 transition-colors group-hover:text-white"
+                        className="h-5 w-5 text-gray-600 transition-colors group-hover:text-white"
                         icon={DUPLICATE_SVG}
                       />
                       <p>Duplicate</p>
                     </button>
                     <button
-                      className="group flex w-full cursor-pointer items-center space-x-3 rounded-b-2xl px-2.5 py-2 hover:bg-gray-500"
+                      className="group flex w-full cursor-pointer items-center space-x-3 rounded-b-2xl px-2.5 py-2 hover:bg-gray-700"
                       disabled={!editable}
                       onClick={onDelete}
                     >
                       <Icon
-                        className="h-5 w-5 text-gray-500 transition-colors group-hover:text-white"
+                        className="h-5 w-5 text-gray-600 transition-colors group-hover:text-white"
                         icon={DELETE_SVG}
                       />
                       <p>Delete</p>
@@ -267,7 +267,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
           type="button"
           onClick={onEdit}
           className={cn({
-            'flex-column flex h-full items-center rounded-r-[20px] bg-gray-700 px-8': true,
+            'flex-column flex h-full items-center rounded-r-[20px] bg-gray-800 px-8': true,
             'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:bg-primary-300 focus:text-black focus:outline-none':
               true,
             'rounded-br-none': settings,

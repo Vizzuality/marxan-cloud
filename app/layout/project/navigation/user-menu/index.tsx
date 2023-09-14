@@ -31,7 +31,7 @@ import {
   ITEM_DESCRIPTION_COMMON_CLASSES,
 } from './constants';
 
-const BUTTON_CLASSES = 'flex items-center space-x-2 rounded-xl text-gray-500 hover:text-white';
+const BUTTON_CLASSES = 'flex items-center space-x-2 rounded-xl text-gray-600 hover:text-white';
 
 export const UserMenu = (): JSX.Element => {
   const { data: session } = useSession();
@@ -69,7 +69,7 @@ export const UserMenu = (): JSX.Element => {
   }, [active, onActive, plausible, user.id, user.email]);
 
   return (
-    <div className="flex flex-col divide-y divide-gray-100 text-gray-500">
+    <div className="flex flex-col divide-y divide-gray-200 text-gray-600">
       <div className="mb-3 flex space-x-4">
         <div>
           <Avatar
@@ -83,7 +83,7 @@ export const UserMenu = (): JSX.Element => {
         <div className="flex flex-col space-y-2">
           <div className="">
             <h2>{user.displayName}</h2>
-            <h3 className="text-sm text-gray-400">{user.email}</h3>
+            <h3 className="text-sm text-gray-600">{user.email}</h3>
           </div>
           <div className="flex space-x-2">
             <Button href="/me" theme="transparent-black" size="s" className={BUTTON_CLASSES}>
@@ -112,7 +112,7 @@ export const UserMenu = (): JSX.Element => {
                 'group items-start space-x-5 bg-transparent': true,
               })}
             >
-              <div className="rounded-xl bg-gray-50 p-2 group-hover:bg-blue-400">
+              <div className="rounded-xl bg-gray-100 p-2 group-hover:bg-blue-400">
                 <Icon icon={PROJECT_DASHBOARD_SVG} className="h-5 w-5 transition-none" />
               </div>
               <div className="space-y-1">
@@ -138,7 +138,7 @@ export const UserMenu = (): JSX.Element => {
               </div>
               <Switch
                 onCheckedChange={onToggleHelpGuide}
-                className="bg-gray-500 data-[state=checked]:bg-blue-500"
+                className="bg-gray-600 data-[state=checked]:bg-blue-500"
                 checked={active}
               />
             </div>

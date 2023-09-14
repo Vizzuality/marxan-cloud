@@ -176,9 +176,9 @@ export const UploadPUMethod = (): JSX.Element => {
       <div
         {...getRootProps()}
         className={cn({
-          'relative flex w-full cursor-pointer rounded-xl border border-dashed p-8 hover:bg-gray-500':
+          'relative flex w-full cursor-pointer rounded-xl border border-dashed p-8 hover:bg-gray-600':
             true,
-          'bg-gray-500': isDragActive,
+          'bg-gray-600': isDragActive,
           'border-green-800': isDragAccept,
           'border-red-800': isDragReject,
         })}
@@ -186,27 +186,27 @@ export const UploadPUMethod = (): JSX.Element => {
         <input {...getInputProps()} />
 
         <div className="flex w-full flex-col items-center justify-center space-y-4">
-          <HiOutlineArrowUpOnSquareStack className="h-6 w-6 stroke-current text-gray-400" />
+          <HiOutlineArrowUpOnSquareStack className="h-6 w-6 stroke-current text-gray-100" />
 
           <p className="text-center text-sm font-medium text-white">
             Drag and drop your polygon data file <br /> or click here to upload
           </p>
 
-          <p className="text-xs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
+          <p className="text-xs text-gray-100">{`Recommended file size < ${bytesToMegabytes(
             PLANNING_UNIT_UPLOADER_MAX_SIZE
           )} MB`}</p>
         </div>
         <Loading
           visible={loading}
-          className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center rounded-xl bg-gray-600 bg-opacity-90"
+          className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center rounded-xl bg-gray-700 bg-opacity-90"
           iconClassName="w-10 h-5 text-primary-500"
         />
       </div>
 
-      <p className="mt-2.5 flex items-center space-x-2 text-xs text-gray-300">
-        <span className="text-xs text-gray-400">Supported formats and size</span>
+      <p className="mt-2.5 flex items-center space-x-2 text-xs text-gray-400">
+        <span className="text-xs text-gray-600">Supported formats and size</span>
 
-        <InfoButton theme="primary" className="bg-gray-300">
+        <InfoButton theme="primary" className="bg-gray-400">
           <div className="text-sm">
             <h3 className="font-semibold">List of supported file formats:</h3>
             <ul className="mt-2 list-outside list-disc space-y-1 pl-4">

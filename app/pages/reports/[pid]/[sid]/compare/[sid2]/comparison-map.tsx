@@ -78,7 +78,7 @@ const ComparisonScreenshot = (): JSX.Element => {
 
                 <div className="flex items-center space-x-6 text-lg">
                   <h2>{scenario1Query.data?.name}</h2>
-                  <div className="h-5 w-[3px] bg-gray-100" />
+                  <div className="h-5 w-[3px] bg-gray-200" />
                   <h2>{scenario2Query.data?.name}</h2>
                 </div>
               </div>
@@ -88,12 +88,12 @@ const ComparisonScreenshot = (): JSX.Element => {
                   <p className="font-medium uppercase">Created by:</p>
                   <p className="capitalize">{projectOwner?.displayName || projectOwner?.email}</p>
                 </div>
-                <div className="h-5 w-[2px] bg-gray-100" />
+                <div className="h-5 w-[2px] bg-gray-200" />
                 <div className="flex space-x-2">
                   <p className="font-medium uppercase">Marxan platform version:</p>
                   <p> V.0.0.1</p>
                 </div>
-                <div className="h-5 w-[2px] bg-gray-100" />
+                <div className="h-5 w-[2px] bg-gray-200" />
                 <div className="flex space-x-2">
                   <p className="font-medium uppercase">Date:</p>
                   <p>{format(new Date().getTime(), 'MM/dd/yyyy')}</p>
@@ -106,7 +106,7 @@ const ComparisonScreenshot = (): JSX.Element => {
           <ScreenshotMap id="comparison-map-1" />
         </div>
         {reportDataIsFetched && (
-          <div className="flex items-start justify-between space-x-14 bg-gray-50 px-16 py-7">
+          <div className="flex items-start justify-between space-x-14 bg-gray-100 px-16 py-7">
             <div className="flex flex-col space-y-8 text-sm text-black">
               <p className="font-semibold"> Solutions Distribution:</p>
               <ul className="flex w-full flex-col space-y-2">
@@ -152,7 +152,7 @@ const ComparisonScreenshot = (): JSX.Element => {
                       className="absolute flex h-px items-center space-x-1 leading-none"
                       style={{ bottom: `${(100 / 11) * 2}%` }}
                     >
-                      <span className="relative top-px block h-px w-1 bg-gray-300" />
+                      <span className="relative top-px block h-px w-1 bg-gray-400" />
                       <span className="relative block -rotate-45 transform">
                         <span>10</span>
                       </span>
@@ -161,7 +161,7 @@ const ComparisonScreenshot = (): JSX.Element => {
                       className="absolute flex h-px items-center space-x-1 leading-none"
                       style={{ bottom: `${(100 / 11) * 6}%` }}
                     >
-                      <span className="relative top-px block h-px w-1 bg-gray-300" />
+                      <span className="relative top-px block h-px w-1 bg-gray-400" />
                       <span className="relative block -rotate-45 transform">
                         <span>50</span>
                       </span>
@@ -170,7 +170,7 @@ const ComparisonScreenshot = (): JSX.Element => {
                       className="absolute flex h-px items-center space-x-1 leading-none"
                       style={{ bottom: '100%' }}
                     >
-                      <span className="relative top-px block h-px w-1 bg-gray-300" />
+                      <span className="relative top-px block h-px w-1 bg-gray-400" />
                       <span className="relative block -rotate-45 transform">
                         <span>100</span>
                       </span>
@@ -182,7 +182,7 @@ const ComparisonScreenshot = (): JSX.Element => {
                       className="absolute flex h-px transform items-center space-x-1 leading-none"
                       style={{ bottom: `${100 - (100 / 11) * 2}%` }}
                     >
-                      <span className="relative top-px block h-px w-1 bg-gray-300" />
+                      <span className="relative top-px block h-px w-1 bg-gray-400" />
                       <span className="relative block -rotate-180 transform">
                         <span className="relative block rotate-45 transform">10</span>
                       </span>
@@ -191,7 +191,7 @@ const ComparisonScreenshot = (): JSX.Element => {
                       className="absolute flex h-px transform items-center space-x-1 leading-none"
                       style={{ bottom: `${100 - (100 / 11) * 6}%` }}
                     >
-                      <span className="relative top-px block h-px w-1 bg-gray-300" />
+                      <span className="relative top-px block h-px w-1 bg-gray-400" />
                       <span className="relative block -rotate-180 transform">
                         <span className="relative block rotate-45 transform">50</span>
                       </span>
@@ -200,7 +200,7 @@ const ComparisonScreenshot = (): JSX.Element => {
                       className="absolute flex h-px transform items-center space-x-1 leading-none"
                       style={{ bottom: '0%' }}
                     >
-                      <span className="relative top-px block h-px w-1 bg-gray-300" />
+                      <span className="relative top-px block h-px w-1 bg-gray-400" />
                       <span className="relative block -rotate-180 transform">
                         <span className="relative block rotate-45 transform">100</span>
                       </span>

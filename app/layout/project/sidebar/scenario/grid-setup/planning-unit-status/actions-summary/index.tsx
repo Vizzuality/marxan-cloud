@@ -179,14 +179,14 @@ export const ActionsSummary = ({
   );
 
   return (
-    <div className="flex flex-col divide-y-2 divide-gray-500">
+    <div className="flex flex-col divide-y-2 divide-gray-700">
       {/* // ? Included areas  */}
       <div className="flex flex-col space-y-3 py-3">
         <div className="flex">
           <span className="flex flex-1 items-center space-x-2">
             <Icon
               icon={HEXAGON_SVG}
-              className="fill-none h-5 w-5 stroke-current stroke-[1.5px] text-green-300"
+              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-green-300"
             />
             <span className="text-sm text-white">Included areas</span>
           </span>
@@ -225,7 +225,7 @@ export const ActionsSummary = ({
           <span className="flex flex-1 items-center space-x-2">
             <Icon
               icon={HEXAGON_SVG}
-              className="fill-none h-5 w-5 stroke-current stroke-[1.5px] text-red-600"
+              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-red-600"
             />
             <span className="text-sm text-white">Excluded areas</span>
           </span>
@@ -264,7 +264,7 @@ export const ActionsSummary = ({
           <span className="flex flex-1 items-center space-x-2">
             <Icon
               icon={HEXAGON_SVG}
-              className="fill-none h-5 w-5 stroke-current stroke-[1.5px] text-yellow-300"
+              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-yellow-300"
             />
             <span className="text-sm text-white">Available areas</span>
           </span>

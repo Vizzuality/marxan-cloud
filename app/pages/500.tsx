@@ -16,7 +16,7 @@ const ErrorPage: React.FC = () => {
 
         <div className="flex h-full flex-col md:flex-grow">
           <div className="flex h-full items-center justify-center bg-white py-10">
-            <h1 className="font-heading text-2xl text-gray-500">
+            <h1 className="font-heading text-2xl text-gray-600">
               500 - Server-side error occurred
             </h1>
           </div>

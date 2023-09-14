@@ -158,7 +158,7 @@ const ProjectTitle = (): JSX.Element => {
                               {...input}
                               id="form-title-show-project-input"
                               className={cn({
-                                'absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent px-1.5 font-heading text-3xl focus:bg-primary-300 focus:text-gray-500 focus:outline-none':
+                                'absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent px-1.5 font-heading text-3xl focus:bg-primary-300 focus:text-gray-600 focus:outline-none':
                                   true,
                               })}
                               disabled={!editting}
@@ -183,7 +183,7 @@ const ProjectTitle = (): JSX.Element => {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: -10, opacity: 0 }}
                           className={cn({
-                            'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-400 transition-colors hover:border-gray-300 focus:outline-none':
+                            'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-600 transition-colors hover:border-gray-400 focus:outline-none':
                               true,
                             'bg-white': editting,
                             'bg-transparent': !editting,
@@ -208,7 +208,7 @@ const ProjectTitle = (): JSX.Element => {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: -10, opacity: 0 }}
                           className={cn({
-                            'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-500 px-2 transition-colors hover:border-gray-300 focus:outline-none':
+                            'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-600 px-2 transition-colors hover:border-gray-400 focus:outline-none':
                               true,
                             'bg-white': editting,
                           })}
@@ -230,7 +230,7 @@ const ProjectTitle = (): JSX.Element => {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: -10, opacity: 0 }}
                           className={cn({
-                            'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-500 px-2 transition-colors hover:border-gray-300 focus:outline-none':
+                            'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-600 px-2 transition-colors hover:border-gray-400 focus:outline-none':
                               true,
                             'bg-white': editting,
                           })}
@@ -265,7 +265,7 @@ const ProjectTitle = (): JSX.Element => {
                               {...input}
                               ref={textRefArea}
                               id="form-description-show-project-input"
-                              className="absolute left-0 top-0 z-50 h-full w-full overflow-ellipsis border-none bg-transparent font-heading text-sm font-normal text-opacity-0 opacity-0 transition-colors focus:bg-primary-300 focus:text-gray-500 focus:opacity-100 focus:outline-none"
+                              className="absolute left-0 top-0 z-50 h-full w-full overflow-ellipsis border-none bg-transparent font-heading text-sm font-normal text-opacity-0 opacity-0 transition-colors focus:bg-primary-300 focus:text-gray-600 focus:opacity-100 focus:outline-none"
                               disabled={!editting}
                               value={`${input.value}`}
                               onChange={(v) => {

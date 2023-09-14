@@ -2,9 +2,8 @@ import React, { useCallback } from 'react';
 
 import { ViewportProps } from 'react-map-gl';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ZOOM_IN_SVG from 'svgs/map/zoom-in.svg?sprite';
 import ZOOM_OUT_SVG from 'svgs/map/zoom-out.svg?sprite';
@@ -38,16 +37,16 @@ export const ZoomControl = ({ className, viewport, onZoomChange }: ZoomControlPr
 
   return (
     <div
-      className={cx({
+      className={cn({
         'inline-flex flex-col': true,
         [className]: !!className,
       })}
     >
       <button
         aria-label="zoom-in"
-        className={cx({
-          'mb-0.5 rounded-t-4xl bg-black p-0.5 text-white focus:outline-none': true,
-          'hover:bg-gray-700 active:bg-gray-600': zoom !== maxZoom,
+        className={cn({
+          'mb-0.5 rounded-t-full bg-black p-0.5 text-white focus:outline-none': true,
+          'hover:bg-gray-800 active:bg-gray-700': zoom !== maxZoom,
           'cursor-default opacity-50': zoom === maxZoom,
         })}
         type="button"
@@ -58,9 +57,9 @@ export const ZoomControl = ({ className, viewport, onZoomChange }: ZoomControlPr
       </button>
       <button
         aria-label="zoom-out"
-        className={cx({
-          'rounded-b-4xl bg-black p-0.5 text-white focus:outline-none': true,
-          'hover:bg-gray-700 active:bg-gray-600': zoom !== minZoom,
+        className={cn({
+          'rounded-b-full bg-black p-0.5 text-white focus:outline-none': true,
+          'hover:bg-gray-800 active:bg-gray-700': zoom !== minZoom,
           'cursor-default opacity-50': zoom === minZoom,
         })}
         type="button"

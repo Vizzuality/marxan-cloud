@@ -174,7 +174,7 @@ const EditBulkModal = ({
                         <div className="space-y-2">
                           <input
                             {...fprops.input}
-                            className="h-10 w-full rounded-md border border-gray-300 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="h-10 w-full rounded-md border border-gray-400 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                             placeholder="Type to pick or create tag..."
                             value={fprops.input.value}
                             onFocus={() => {
@@ -185,15 +185,15 @@ const EditBulkModal = ({
                             onKeyDown={handleKeyPress}
                           />
                           {!tagsMenuOpen && (
-                            <p className="mt-1 font-sans text-xxs text-gray-300">
+                            <p className="mt-1 font-sans text-xxs text-gray-400">
                               * Changes to selected features will automatically update related
                               scenarios.
                             </p>
                           )}
 
                           {tagsMenuOpen && (
-                            <div className="w-full space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
-                              <div className="text-sm text-gray-800">Recent:</div>
+                            <div className="w-full space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-900 shadow-md">
+                              <div className="text-sm text-gray-900">Recent:</div>
                               <div className="flex flex-wrap gap-2.5">
                                 {tagsQuery.data?.map((tag) => (
                                   <button
@@ -204,7 +204,7 @@ const EditBulkModal = ({
                                       setTagIsDone(true);
                                     }}
                                   >
-                                    <p className="text-sm text-gray-800">{tag}</p>
+                                    <p className="text-sm text-gray-900">{tag}</p>
                                   </button>
                                 ))}
                               </div>
@@ -216,10 +216,10 @@ const EditBulkModal = ({
                       {values.tag && tagIsDone && (
                         <div className="flex items-center space-x-1">
                           <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5 hover:bg-yellow-600">
-                            <p className="text-sm text-gray-800">{values.tag}</p>
+                            <p className="text-sm text-gray-900">{values.tag}</p>
                           </div>
                           <button
-                            className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 hover:bg-gray-500"
+                            className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-400 hover:bg-gray-600"
                             onClick={() => {
                               form.change('tag', null);
                               setTagIsDone(false);
@@ -227,7 +227,7 @@ const EditBulkModal = ({
                           >
                             <Icon
                               icon={CLOSE_SVG}
-                              className="h-2 w-2 text-gray-400  group-hover:text-white"
+                              className="h-2 w-2 text-gray-100  group-hover:text-white"
                             />
                           </button>
                         </div>

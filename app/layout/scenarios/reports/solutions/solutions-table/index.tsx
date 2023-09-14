@@ -31,7 +31,7 @@ export const SolutionsTablePage = (): JSX.Element => {
             <th>Missing values</th>
           </tr>
         </thead>
-        <tbody className="[&>*:nth-child(even)]:bg-gray-50 [&>*]:h-10">
+        <tbody className="[&>*:nth-child(even)]:bg-gray-100 [&>*]:h-10">
           {solutionsQuery.data.map((solution) => {
             return (
               <tr key={solution.id}>

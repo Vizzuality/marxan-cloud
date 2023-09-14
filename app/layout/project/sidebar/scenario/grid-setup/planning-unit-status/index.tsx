@@ -66,7 +66,7 @@ export const GridSetupPlanningUnits = (): JSX.Element => {
           <span className="text-xs font-semibold text-blue-400">Grid Setup</span>
           <div className="flex items-center space-x-2">
             <h3 className="text-lg font-medium">Planning Unit Status</h3>
-            <InfoButton theme="primary" className="bg-gray-300">
+            <InfoButton theme="primary" className="bg-gray-500">
               <>
                 <h4 className="mb-2.5 font-heading text-lg">
                   Locked-in and locked-out planning units
@@ -102,7 +102,7 @@ export const GridSetupPlanningUnits = (): JSX.Element => {
           </div>
         </div>
 
-        <div className="mt-2.5 flex w-full items-center justify-between border-b border-gray-500">
+        <div className="mt-2.5 flex w-full items-center justify-between border-b border-gray-700">
           <Tabs type={puAction as PUAction} onChange={onChangeTab} />
         </div>
 

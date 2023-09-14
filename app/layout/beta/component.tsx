@@ -22,7 +22,7 @@ export const HomeBeta: React.FC<HomeBetaProps> = () => {
     <>
       <div className="relative z-10 w-full bg-yellow-500">
         <Wrapper>
-          <div className="flex items-center space-x-5 py-2 text-sm text-gray-700">
+          <div className="flex items-center space-x-5 py-2 text-sm text-gray-800">
             <p>
               We note that this is <strong>a temporary site</strong> and your account and personal
               information <strong>will not be stored</strong> beyond the Beta stage, nor shared
@@ -46,7 +46,7 @@ export const HomeBeta: React.FC<HomeBetaProps> = () => {
           setCookie('beta', 'true', { path: '/' });
         }}
       >
-        <div className="space-y-2.5 overflow-y-auto overflow-x-hidden p-10 pb-2.5 text-gray-700">
+        <div className="space-y-2.5 overflow-y-auto overflow-x-hidden p-10 pb-2.5 text-gray-800">
           <h2 className="mb-5 text-2xl">Welcome to the Marxan Planning Platform (MaPP) - Beta!</h2>
           <p>
             While we put the finishing touches on development, we invite you to come inside and see

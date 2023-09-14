@@ -43,7 +43,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                 <div className="w-7/12 pr-12">
                   <h2 className="mb-12 mt-5 text-left font-heading text-4xl font-medium">{name}</h2>
 
-                  <p className="mb-10 text-sm leading-normal text-gray-400">{description}</p>
+                  <p className="mb-10 text-sm leading-normal text-gray-100">{description}</p>
 
                   <div className="mb-10 flex flex-row items-center">
                     <DuplicateButton exportId={exportId} name={name} theme="dark" />
@@ -159,7 +159,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
         </div>
       </Wrapper>
       <Loading
-        className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-50 bg-opacity-90"
+        className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-100 bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
         visible={publishedProjectIsFetching && !publishedProjectIsFetched}
       />

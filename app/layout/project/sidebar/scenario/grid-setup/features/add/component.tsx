@@ -27,7 +27,7 @@ export const ScenariosSidebarEditFeatures = ({ onContinue }): JSX.Element => {
               <span className="text-xs font-semibold text-blue-400">Grid Setup</span>
               <div className="flex items-center space-x-2">
                 <h3 className="text-lg font-medium">Features</h3>
-                <InfoButton theme="primary" className="bg-gray-300">
+                <InfoButton theme="primary" className="bg-gray-400">
                   <>
                     <h4 className="mb-2.5 font-heading text-lg">What are features?</h4>
                     <div className="space-y-2">

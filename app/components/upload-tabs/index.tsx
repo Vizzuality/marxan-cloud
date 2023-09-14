@@ -7,7 +7,7 @@ import { cn } from 'utils/cn';
 const BUTTON_COMMON_CLASSES =
   'relative py-2 transition after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-0 after:-translate-x-1/2 after:transform after:bg-primary-500 after:transition-all focus:outline-none text-black/85';
 const BUTTON_ACTIVE_CLASSES = 'after:w-full';
-const BUTTON_INACTIVE_CLASSES = 'text-gray-300';
+const BUTTON_INACTIVE_CLASSES = 'text-gray-400';
 
 type UploadFeatureMode = 'shapefile' | 'csv';
 
@@ -21,7 +21,7 @@ export const UploadFeatureTabs = ({
   const { CSVUpload } = useFeatureFlags();
 
   return (
-    <div className="flex w-full space-x-4 border-b border-gray-300 text-xs font-medium text-black">
+    <div className="flex w-full space-x-4 border-b border-gray-400 text-xs font-medium text-black">
       <button
         type="button"
         className={cn({

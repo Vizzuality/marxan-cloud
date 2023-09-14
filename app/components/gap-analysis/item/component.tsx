@@ -87,7 +87,7 @@ export const Item: React.FC<ItemProps> = ({
     >
       <div className="flex justify-between">
         <Tooltip
-          content={<div className="rounded bg-white p-2 text-gray-500">{name}</div>}
+          content={<div className="rounded bg-white p-2 text-gray-600">{name}</div>}
           placement="top-start"
           delay={[400, null]}
           offset={[-10, -34]}
@@ -114,19 +114,19 @@ export const Item: React.FC<ItemProps> = ({
           </span>
         </div>
         <div>
-          <div className="w- with-stripes mr-3 inline-block h-3 w-3 rounded-sm bg-gradient-repeat-to-br from-gray-100 to-gray-800 align-middle" />
+          <div className="w- with-stripes mr-3 inline-block h-3 w-3 rounded-sm bg-gradient-repeat-to-br from-gray-200 to-gray-900 align-middle" />
           <span className="text-sm">
             Target: {percentFormatter.format(target.percent)} ({target.value} {target.unit})
           </span>
         </div>
       </div>
-      <div ref={chartRef} className="relative mt-4 h-2.5 rounded-sm bg-gray-600">
+      <div ref={chartRef} className="relative mt-4 h-2.5 rounded-sm bg-gray-700">
         <div
           className="absolute h-full rounded-sm bg-purple-700"
           style={{ width: `${current.percent * 100}%` }}
         />
         <div
-          className="with-stripes absolute left-1 top-1/2 h-1.5 -translate-y-1/2 transform rounded-md border border-black bg-gradient-repeat-to-br from-gray-100 to-gray-800"
+          className="with-stripes absolute left-1 top-1/2 h-1.5 -translate-y-1/2 transform rounded-md border border-black bg-gradient-repeat-to-br from-gray-200 to-gray-900"
           style={{ width: `${target.percent * 100}%` }}
         />
 

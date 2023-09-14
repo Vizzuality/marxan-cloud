@@ -207,23 +207,23 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data, selected, onChange }: 
                     <div className="flex flex-col rounded-md bg-white p-2">
                       <div className="flex justify-between space-x-2 text-xs">
                         <div>
-                          <span className="text-gray-600">Boundary Length:</span>
+                          <span className="text-gray-700">Boundary Length:</span>
                         </div>
-                        <div className="text-xs text-gray-700">
+                        <div className="text-xs text-gray-800">
                           {`${blmFormat(boundaryLength)}`}
                         </div>
                       </div>
                       <div className="flex justify-between space-x-2 text-xs">
                         <div>
-                          <span className="text-gray-600">Cost:</span>
+                          <span className="text-gray-700">Cost:</span>
                         </div>
-                        <div className="text-xs text-gray-700">{`${blmFormat(cost)}`}</div>
+                        <div className="text-xs text-gray-800">{`${blmFormat(cost)}`}</div>
                       </div>
                       <div className="flex justify-between space-x-2 text-xs">
                         <div>
-                          <span className="text-gray-600">BLM:</span>
+                          <span className="text-gray-700">BLM:</span>
                         </div>
-                        <div className="text-xs text-gray-700">{`${blmFormat(blmValue)}`}</div>
+                        <div className="text-xs text-gray-800">{`${blmFormat(blmValue)}`}</div>
                       </div>
                     </div>
                   }

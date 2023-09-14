@@ -23,7 +23,7 @@ export const HomeSupport: React.FC<HomeSupportProps> = () => {
   });
 
   return (
-    <div id="home-support-section" className="bg-gray-700">
+    <div id="home-support-section" className="bg-gray-800">
       <div className="relative mx-auto w-full max-w-5xl py-24 md:py-44">
         <Wrapper>
           <motion.div

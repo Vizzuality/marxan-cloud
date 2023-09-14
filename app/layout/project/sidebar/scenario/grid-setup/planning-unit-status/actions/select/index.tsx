@@ -28,7 +28,7 @@ export const SelectPUMethod = (): JSX.Element => {
   }, []);
 
   return (
-    <span className="text-sm text-gray-400">
+    <span className="text-sm text-gray-100">
       Select cells on the map to include them on the analysis
     </span>
   );

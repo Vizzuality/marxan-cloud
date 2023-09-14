@@ -51,7 +51,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
         type="button"
         aria-label="dot-element"
         onClick={() => slider.current.prev()}
-        className="absolute -left-36 top-12 flex h-16 w-16 items-center justify-center rounded-full border border-gray-500 opacity-30 hover:opacity-90"
+        className="absolute -left-36 top-12 flex h-16 w-16 items-center justify-center rounded-full border border-gray-600 opacity-30 hover:opacity-90"
       >
         <Icon className="h-3 w-3 text-black" icon={ARROW_LEFT_SVG} />
       </button>
@@ -107,7 +107,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
               className={cx({
                 'relative w-20': true,
                 'h-1 bg-blue-500': slide === i,
-                'h-0.5 bg-gray-300': slide !== i,
+                'h-0.5 bg-gray-400': slide !== i,
               })}
             >
               <div className="absolute left-0 top-1/2 h-3 w-full -translate-y-1/2 transform bg-transparent" />
@@ -119,7 +119,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
         type="button"
         aria-label="dot-element"
         onClick={() => slider.current.next()}
-        className="absolute -right-36 top-12 flex h-16 w-16 items-center justify-center rounded-full border border-gray-500 opacity-30 hover:opacity-90"
+        className="absolute -right-36 top-12 flex h-16 w-16 items-center justify-center rounded-full border border-gray-600 opacity-30 hover:opacity-90"
       >
         <Icon className="h-3 w-3 text-black" icon={ARROW_RIGHT_SVG} />
       </button>

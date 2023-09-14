@@ -24,7 +24,7 @@ export const DifferentSolutionsPage = (): JSX.Element => {
     <div className="flex flex-col space-y-3">
       {mostDifSolutionsQuery.data.slice(2, 5)?.map((solution) => {
         return (
-          <div key={solution.id} className="flex space-x-6 bg-gray-50 px-5 py-3">
+          <div key={solution.id} className="flex space-x-6 bg-gray-100 px-5 py-3">
             <DifferentSolutionReportMap id="report-map-3" runId={solution.runId} />
             <div className="flex flex-col space-y-4">
               <div className="flex items-center space-x-6">

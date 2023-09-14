@@ -12,8 +12,8 @@ export const Me: React.FC<MeProps> = () => {
       <div className="bg-white p-14 md:w-1/3">
         <Profile />
       </div>
-      <div className="bg-gray-100 py-24 md:w-2/3">
-        <div className="border-b border-gray-200 px-36 py-14">
+      <div className="bg-gray-200 py-24 md:w-2/3">
+        <div className="border-b border-gray-300 px-36 py-14">
           <ChangePassword />
         </div>
         <div className="px-36 py-14">

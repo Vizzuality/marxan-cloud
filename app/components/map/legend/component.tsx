@@ -53,7 +53,7 @@ export const Legend: React.FC<LegendProps> = ({
         className="relative flex w-full items-center space-x-2 px-5 py-3 font-heading text-xs uppercase text-white focus:outline-none"
         onClick={onToggleOpen}
       >
-        <Icon icon={LEGEND_SVG} className="h-4 w-4 text-gray-300" />
+        <Icon icon={LEGEND_SVG} className="h-4 w-4 text-gray-400" />
         <span>Legend</span>
 
         <Icon
@@ -76,7 +76,7 @@ export const Legend: React.FC<LegendProps> = ({
         >
           <div className="pointer-events-none absolute left-0 top-0 z-10 h-3 w-full bg-gradient-to-b from-black via-black" />
           <div className="overflow-y-auto overflow-x-hidden">
-            <div className="divide-y divide-gray-600 divide-opacity-50 py-2">
+            <div className="divide-y divide-gray-700 divide-opacity-50 py-2">
               {!!sortable && (
                 <SortableList sortable={sortable} onChangeOrder={onChangeOrder}>
                   {children}

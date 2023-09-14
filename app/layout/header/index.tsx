@@ -55,7 +55,7 @@ export const Header = ({
           [className]: true,
           'z-10 row-auto w-full': true,
           'bg-black text-white': theme === 'dark',
-          'bg-primary-50 text-gray-800': theme === 'light',
+          'bg-primary-50 text-gray-900': theme === 'light',
           'py-1.5': maintenance,
         })}
       >
@@ -79,10 +79,10 @@ export const Header = ({
                           className={cn({
                             [ICON_COMMON_CLASSES]: true,
                             'h-6 w-6': true,
-                            'text-white group-hover:text-gray-300': (
+                            'text-white group-hover:text-gray-400': (
                               ['dark', 'transparent'] as HeaderProps['theme'][]
                             ).includes(theme),
-                            'group-hover:text-gray-300': theme === 'light',
+                            'group-hover:text-gray-400': theme === 'light',
                           })}
                           icon={MENU_SVG}
                         />
@@ -90,7 +90,7 @@ export const Header = ({
                     </PopoverTrigger>
                     <PopoverContent
                       side="left"
-                      className="min-w-[410px] rounded-b-4xl rounded-tl-xl rounded-tr-4xl bg-white p-4"
+                      className="rounded-b-4xl rounded-tr-4xl min-w-[410px] rounded-tl-xl bg-white p-4"
                       collisionPadding={48}
                     >
                       <UserMenu />

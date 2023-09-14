@@ -15,7 +15,7 @@ export const PUStatusReport = (): JSX.Element => {
   const PU_LEGEND_CONTAINER_CLASSES = 'flex items-center space-x-2 whitespace-nowrap';
   const PU_LEGEND_BOX_CLASSES = 'h-3.5 w-3.5 border-[3px]';
   return (
-    <div className="flex space-x-6 bg-gray-50 px-10 py-3">
+    <div className="flex space-x-6 bg-gray-100 px-10 py-3">
       <PUStatusReportMap id="report-map-cost-surface" />
       <div className="flex w-2/6 flex-col space-y-3 py-5 text-sm">
         <p className="font-semibold">Locked in/out areas</p>

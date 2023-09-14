@@ -59,7 +59,7 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
       <LegendTypeGradient
         className={{
           bar: 'h-3 rounded-lg',
-          labels: 'text-sm text-gray-300',
+          labels: 'text-sm text-gray-400',
         }}
         items={values}
       />

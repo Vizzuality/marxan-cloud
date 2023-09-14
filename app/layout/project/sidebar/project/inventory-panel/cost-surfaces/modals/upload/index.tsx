@@ -214,7 +214,7 @@ export const CostSurfaceUploadModal = ({
                   </InfoButton>
                 </div>
 
-                <p className="!mt-4 text-sm text-gray-400">
+                <p className="!mt-4 text-sm text-gray-100">
                   Please download and fill in the{' '}
                   <button
                     className="text-primary-500 underline hover:no-underline"
@@ -250,9 +250,9 @@ export const CostSurfaceUploadModal = ({
                             {...props}
                             {...getRootProps()}
                             className={cn({
-                              'relative w-full cursor-pointer rounded-lg border-[1.5px] border-dashed border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                              'relative w-full cursor-pointer rounded-lg border-[1.5px] border-dashed border-gray-400 bg-gray-200 bg-opacity-20 py-10 hover:bg-gray-200':
                                 true,
-                              'bg-gray-500': isDragActive,
+                              'bg-gray-600': isDragActive,
                               'border-green-800': isDragAccept,
                               'border-red-800':
                                 isDragReject || (props?.meta?.error && props?.meta?.touched),
@@ -260,25 +260,25 @@ export const CostSurfaceUploadModal = ({
                           >
                             <input {...getInputProps()} />
 
-                            <p className="text-center text-sm text-gray-500">
+                            <p className="text-center text-sm text-gray-600">
                               Drag and drop your polygon data file
                               <br />
                               or <b>click here</b> to upload
                             </p>
 
-                            <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
+                            <p className="mt-2 text-center text-xxs text-gray-100">{`Recommended file size < ${bytesToMegabytes(
                               COST_SURFACE_UPLOADER_MAX_SIZE
                             )} MB`}</p>
 
                             <Loading
                               visible={loading}
-                              className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-600 bg-opacity-90"
+                              className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
                               iconClassName="w-5 h-5 text-primary-500"
                             />
                           </div>
 
                           <div className="mt-2.5 flex items-center space-x-3">
-                            <h5 className="text-xs text-gray-400">Supported formats</h5>
+                            <h5 className="text-xs text-gray-600">Supported formats</h5>
                             <InfoButton size="s" theme="secondary">
                               <span className="text-xs">
                                 {' '}
@@ -309,7 +309,7 @@ export const CostSurfaceUploadModal = ({
                       <h5 className="text-xs uppercase text-black">Uploaded file:</h5>
                       <div className="flex items-center space-x-2">
                         <label
-                          className="rounded-3xl bg-gray-400 bg-opacity-10 px-3 py-1"
+                          className="rounded-3xl bg-gray-100 bg-opacity-10 px-3 py-1"
                           htmlFor="cancel-shapefile-btn"
                         >
                           <p className="text-sm text-black">{successFile.name}</p>

@@ -77,16 +77,16 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
 
   return (
     <div className="relative flex flex-grow flex-col">
-      <div className="absolute -top-1 left-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
+      <div className="absolute -top-1 left-0 z-10 h-6 w-full bg-gradient-to-b from-gray-800 via-gray-800" />
 
       <div
         ref={scrollRef}
         className={cn({
-          'divide-y divide-dashed divide-black divide-opacity-20 bg-gray-700': true,
+          'divide-y divide-dashed divide-black divide-opacity-20 bg-gray-800': true,
         })}
       >
         {allFeaturesIsFetching && !allFeaturesIsFetched && (
-          <div className="absolute left-0 top-0 z-10 flex h-full w-full flex-col items-center justify-center bg-gray-700 bg-opacity-90">
+          <div className="absolute left-0 top-0 z-10 flex h-full w-full flex-col items-center justify-center bg-gray-800 bg-opacity-90">
             <Loading
               visible
               className="z-40 flex w-full items-center justify-center "
@@ -120,7 +120,7 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
         </ul>
       </div>
 
-      <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
+      <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-800 via-gray-800" />
 
       <div
         className={cx({
@@ -129,8 +129,8 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
             true,
         })}
       >
-        <div className="bg-gray-700 py-1">Loading more...</div>
-        <div className="h-6 w-full bg-gray-700" />
+        <div className="bg-gray-800 py-1">Loading more...</div>
+        <div className="h-6 w-full bg-gray-800" />
       </div>
     </div>
   );

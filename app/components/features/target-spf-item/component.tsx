@@ -55,8 +55,8 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
       className={cx({
         'relative mb-2 border-transparent py-2 pl-5 text-xs text-white': true,
         [className]: !!className,
-        'bg-gray-700': !isAllTargets,
-        'rounded-lg border bg-gray-500': isAllTargets,
+        'bg-gray-800': !isAllTargets,
+        'rounded-lg border bg-gray-600': isAllTargets,
       })}
     >
       <div
@@ -79,7 +79,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             <Tooltip
               arrow
               placement="top"
-              content={<div className="rounded bg-white p-2 text-gray-500">See on map</div>}
+              content={<div className="rounded bg-white p-2 text-gray-600">See on map</div>}
             >
               <button
                 aria-label="manage-see-on-map"
@@ -87,7 +87,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
                 onClick={onSeeOnMap}
                 className={cx({
                   'flex h-5 w-5 items-center justify-center text-white': true,
-                  'text-gray-300': !isShown,
+                  'text-gray-400': !isShown,
                 })}
               >
                 <Icon className="h-4 w-4" icon={isShown ? SHOW_SVG : HIDE_SVG} />
@@ -98,7 +98,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             <Tooltip
               arrow
               placement="top"
-              content={<div className="rounded bg-white p-2 text-gray-500">Remove</div>}
+              content={<div className="rounded bg-white p-2 text-gray-600">Remove</div>}
             >
               <button
                 aria-label="manage-see-on-map"
@@ -130,12 +130,12 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
               if (onChangeTarget) onChangeTarget(+(sliderValue * 100).toFixed(0));
             }}
           />
-          <div className="flex w-full justify-between text-gray-400">
+          <div className="flex w-full justify-between text-gray-100">
             <span>0%</span>
             <span>100%</span>
           </div>
         </div>
-        <div className="flex w-24 flex-col justify-between border-l border-gray-500 px-4">
+        <div className="flex w-24 flex-col justify-between border-l border-gray-600 px-4">
           <span className="whitespace-nowrap">{isAllTargets ? 'ALL SPF' : 'SPF'}</span>
           <div className="mb-6 w-10">
             <Input

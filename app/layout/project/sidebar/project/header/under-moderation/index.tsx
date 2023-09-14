@@ -28,7 +28,7 @@ const UnderModeration: React.FC = () => {
           maxWidth={350}
           content={
             <div
-              className="space-y-2 rounded bg-white p-4 text-sm text-gray-500"
+              className="space-y-2 rounded bg-white p-4 text-sm text-gray-600"
               style={{
                 boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
               }}

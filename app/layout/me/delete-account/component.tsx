@@ -53,7 +53,7 @@ export const DeleteAccount: React.FC<DeleteAccountProps> = () => {
 
   return (
     <div className="relative w-full max-w-2xl">
-      <h2 className="mb-5 font-heading text-lg font-medium text-gray-600">Delete account</h2>
+      <h2 className="mb-5 font-heading text-lg font-medium text-gray-700">Delete account</h2>
 
       <div className="inline-flex flex-col space-y-5 rounded-3xl bg-white px-10 py-8">
         <div>

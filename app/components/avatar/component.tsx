@@ -30,7 +30,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   return (
     <div
       className={cn({
-        'relative z-0 flex items-center justify-center rounded-full border-2 border-gray-700 bg-transparent bg-cover bg-center bg-no-repeat hover:z-10 focus:outline-none':
+        'relative z-0 flex items-center justify-center rounded-full border-2 border-gray-800 bg-transparent bg-cover bg-center bg-no-repeat hover:z-10 focus:outline-none':
           true,
         'text-white': contrast > 2.5,
         'text-black': contrast < 2.5,

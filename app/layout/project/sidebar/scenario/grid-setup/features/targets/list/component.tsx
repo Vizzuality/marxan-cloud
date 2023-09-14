@@ -261,7 +261,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
         >
           <Loading
             visible={submitting || targetedFeaturesIsFetching}
-            className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
+            className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
             iconClassName="w-10 h-10 text-white"
           />
 
@@ -269,7 +269,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
 
           {!!targetedFeaturesData && !!targetedFeaturesData.length && (
             <div className="relative flex flex-grow flex-col overflow-hidden">
-              <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
+              <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-800 via-gray-800" />
               <div className="relative h-full overflow-y-auto overflow-x-visible px-0.5">
                 <FieldRFF name="features">
                   {({ input }) => (
@@ -342,7 +342,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
                   )}
                 </FieldRFF>
               </div>
-              <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
+              <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-800 via-gray-800" />
             </div>
           )}
 

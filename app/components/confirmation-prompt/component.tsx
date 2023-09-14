@@ -27,14 +27,14 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
   <Modal open={open} title={title} size="narrow" dismissable={dismissible} onDismiss={onDismiss}>
     <div className="px-8 py-4">
       <header>
-        <div className="leading-1 mt-8 font-heading text-xl font-medium text-gray-800 sm:mt-0 sm:pr-32">
+        <div className="leading-1 mt-8 font-heading text-xl font-medium text-gray-900 sm:mt-0 sm:pr-32">
           {title}
         </div>
         <p
           className={classnames({
             'my-4 text-sm sm:pr-32': true,
             'text-black underline': !!danger,
-            'text-gray-400': !danger,
+            'text-gray-100': !danger,
           })}
         >
           {description}

@@ -47,7 +47,7 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
                 <button
                   aria-label="remove"
                   type="button"
-                  className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-400 bg-transparent transition hover:bg-gray-400"
+                  className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-600 bg-transparent transition hover:bg-gray-600"
                   onClick={() => {
                     form.mutators.removeWDPAFilter(wdpa.value, wdpaIucnCategories);
                   }}

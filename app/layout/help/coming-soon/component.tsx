@@ -6,11 +6,11 @@ import Tooltip from 'components/tooltip';
 
 const THEME = {
   dark: {
-    base: 'px-4 py-1.5 text-xs text-white bg-gray-500 rounded',
-    arrow: 'bg-gray-500',
+    base: 'px-4 py-1.5 text-xs text-white bg-gray-600 rounded',
+    arrow: 'bg-gray-600',
   },
   light: {
-    base: 'px-4 py-1.5 text-xs text-gray-500 bg-white rounded',
+    base: 'px-4 py-1.5 text-xs text-gray-600 bg-white rounded',
     arrow: 'bg-white',
   },
 };

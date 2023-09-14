@@ -105,7 +105,7 @@ export const Item: React.FC<ItemProps> = ({
         role="presentation"
         style={style}
         className={cx({
-          'relative flex cursor-pointer flex-col rounded-[40px] bg-gray-800 px-7 py-8 text-left text-white':
+          'relative flex cursor-pointer flex-col rounded-[40px] bg-gray-900 px-7 py-8 text-left text-white':
             true,
           [className]: !!className,
         })}
@@ -126,7 +126,7 @@ export const Item: React.FC<ItemProps> = ({
                   'rounded-3xl px-2.5 py-1 text-sm opacity-0 transition-opacity': true,
                   'opacity-100': !!ROLES[projectRole],
                   'bg-yellow-500 bg-opacity-20': isOwner,
-                  'border border-gray-500': !isOwner,
+                  'border border-gray-600': !isOwner,
                 })}
               >
                 <p

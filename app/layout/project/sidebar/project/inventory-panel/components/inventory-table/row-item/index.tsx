@@ -39,7 +39,7 @@ const RowItem = ({
         })}
       >
         <span className="inline-flex">{name}</span>
-        <div className="mt-1.5 text-xs text-gray-300">
+        <div className="mt-1.5 text-xs text-gray-400">
           Currently in use in
           <span className="rounded bg-blue-500 bg-opacity-10 px-1 text-blue-500">
             {scenarios}
@@ -61,7 +61,7 @@ const RowItem = ({
           <button type="button" onClick={() => onToggleSeeOnMap(id)}>
             <Icon
               className={cn({
-                'h-5 w-5 text-gray-400': true,
+                'h-5 w-5 text-gray-600': true,
                 'text-blue-400': isVisibleOnMap,
               })}
               icon={isVisibleOnMap ? SHOW_SVG : HIDE_SVG}

@@ -36,7 +36,7 @@ export const Search = ({ theme = 'dark', size = 'base', ...rest }: SearchProps) 
 
   return (
     <div
-      className={cn('relative flex w-full border-b border-gray-600', {
+      className={cn('relative flex w-full border-b border-gray-700', {
         [THEME[theme]]: true,
         [SIZES[size]]: true,
       })}
@@ -55,7 +55,7 @@ export const Search = ({ theme = 'dark', size = 'base', ...rest }: SearchProps) 
         placeholder={placeholder}
         type="search"
         className={cn(
-          'w-full truncate bg-transparent px-9 font-sans leading-4 placeholder-gray-300 placeholder-opacity-50 focus:outline-none',
+          'w-full truncate bg-transparent px-9 font-sans leading-4 placeholder-gray-400 placeholder-opacity-50 focus:outline-none',
           {
             [THEME[theme]]: true,
             [SIZES[size]]: true,

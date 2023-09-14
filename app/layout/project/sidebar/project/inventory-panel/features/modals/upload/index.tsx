@@ -283,7 +283,7 @@ export const FeatureUploadModal = ({
 
                 <UploadTabs mode={uploadMode} onChange={(mode) => saveUploadMode(mode)} />
                 {uploadMode === 'csv' && (
-                  <p className="!mt-4 text-sm text-gray-400">
+                  <p className="!mt-4 text-sm text-gray-100">
                     Please download and fill in the{' '}
                     <button
                       className="text-primary-500 underline hover:no-underline"
@@ -326,7 +326,7 @@ export const FeatureUploadModal = ({
                             <div className="space-y-2">
                               <input
                                 {...fprops.input}
-                                className="h-10 w-full rounded-md border border-gray-500 px-3 text-gray-800 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="h-10 w-full rounded-md border border-gray-600 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 placeholder="Type to pick or create tag..."
                                 value={fprops.input.value}
                                 onFocus={() => setTagsMenuOpen(true)}
@@ -335,8 +335,8 @@ export const FeatureUploadModal = ({
                               />
 
                               {tagsMenuOpen && (
-                                <div className="w-full space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-800 shadow-md">
-                                  <div className="text-sm text-gray-800">Recent:</div>
+                                <div className="w-full space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-900 shadow-md">
+                                  <div className="text-sm text-gray-900">Recent:</div>
                                   <div className="flex flex-wrap gap-2.5">
                                     {tagsQuery.data?.map((tag) => (
                                       <button
@@ -347,7 +347,7 @@ export const FeatureUploadModal = ({
                                           setTagIsDone(true);
                                         }}
                                       >
-                                        <p className="text-sm text-gray-800">{tag}</p>
+                                        <p className="text-sm text-gray-900">{tag}</p>
                                       </button>
                                     ))}
                                   </div>
@@ -359,10 +359,10 @@ export const FeatureUploadModal = ({
                           {values.tag && tagIsDone && (
                             <div className="flex items-center space-x-1">
                               <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5 hover:bg-yellow-600">
-                                <p className="text-sm text-gray-800">{values.tag}</p>
+                                <p className="text-sm text-gray-900">{values.tag}</p>
                               </div>
                               <button
-                                className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-300 hover:bg-gray-500"
+                                className="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-400 hover:bg-gray-600"
                                 onClick={() => {
                                   form.change('tag', null);
                                   setTagIsDone(false);
@@ -370,7 +370,7 @@ export const FeatureUploadModal = ({
                               >
                                 <Icon
                                   icon={CLOSE_SVG}
-                                  className="h-2 w-2 text-gray-400  group-hover:text-white"
+                                  className="h-2 w-2 text-gray-100  group-hover:text-white"
                                 />
                               </button>
                             </div>
@@ -393,9 +393,9 @@ export const FeatureUploadModal = ({
                             {...props}
                             {...getRootProps()}
                             className={cn({
-                              'relative w-full cursor-pointer rounded-lg border-[1.5px] border-dashed border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                              'relative w-full cursor-pointer rounded-lg border-[1.5px] border-dashed border-gray-400 bg-gray-200 bg-opacity-20 py-10 hover:bg-gray-200':
                                 true,
-                              'bg-gray-500': isDragActive,
+                              'bg-gray-600': isDragActive,
                               'border-green-800': isDragAccept,
                               'border-red-800':
                                 isDragReject || (props?.meta?.error && props?.meta?.touched),
@@ -403,26 +403,26 @@ export const FeatureUploadModal = ({
                           >
                             <input {...getInputProps()} />
 
-                            <p className="text-center text-sm text-gray-500">
+                            <p className="text-center text-sm text-gray-600">
                               Drag and drop your{' '}
                               {uploadMode === 'shapefile' ? 'polygon data file' : 'feature file'}
                               <br />
                               or <b>click here</b> to upload
                             </p>
 
-                            <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
+                            <p className="mt-2 text-center text-xxs text-gray-100">{`Recommended file size < ${bytesToMegabytes(
                               UPLOADER_MAX_SIZE
                             )} MB`}</p>
 
                             <Loading
                               visible={loading}
-                              className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-600 bg-opacity-90"
+                              className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
                               iconClassName="w-5 h-5 text-primary-500"
                             />
                           </div>
 
                           <div className="mt-2.5 flex items-center space-x-3">
-                            <h5 className="text-xs text-gray-400">Supported formats</h5>
+                            <h5 className="text-xs text-gray-600">Supported formats</h5>
                             <InfoButton size="s" theme="secondary">
                               <span className="text-xs">
                                 {' '}
@@ -453,7 +453,7 @@ export const FeatureUploadModal = ({
                       <h5 className="text-xs uppercase text-black">Uploaded file:</h5>
                       <div className="flex items-center space-x-2">
                         <label
-                          className="rounded-3xl bg-gray-400 bg-opacity-10 px-3 py-1"
+                          className="rounded-3xl bg-gray-100 bg-opacity-10 px-3 py-1"
                           htmlFor="cancel-shapefile-btn"
                         >
                           <p className="text-sm text-black">{successFile.name}</p>

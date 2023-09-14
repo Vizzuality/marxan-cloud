@@ -151,7 +151,7 @@ export const ScenariosSidebarShowSolutions = (): JSX.Element => {
               </header>
 
               <div className="relative flex min-h-0 flex-grow flex-col overflow-hidden">
-                <div className="absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
+                <div className="absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-800 via-gray-800" />
                 <div className="flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
                   {!subtab && <SolutionsDetails key="solutions-overview" />}
 
@@ -177,7 +177,7 @@ export const ScenariosSidebarShowSolutions = (): JSX.Element => {
                     <TargetAchievement key="post-gap-analysis" />
                   )}
                 </div>
-                <div className="absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
+                <div className="absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-800 via-gray-800" />
               </div>
             </Pill>
           </AnimatePresence>

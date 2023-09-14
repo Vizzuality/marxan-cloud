@@ -14,7 +14,7 @@ export const LoadingMore: React.FC<LoadingMoreProps> = ({ visible = false }: Loa
         className={cx({
           'opacity-100': visible,
           'opacity-0': !visible,
-          'pointer-events-none absolute bottom-0 left-0 z-20 w-full bg-gray-400 text-center font-heading text-xs uppercase transition':
+          'pointer-events-none absolute bottom-0 left-0 z-20 w-full bg-gray-100 text-center font-heading text-xs uppercase transition':
             true,
         })}
         transition={{

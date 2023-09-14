@@ -114,7 +114,7 @@ export const Item: React.FC<ItemProps> = ({
     <div
       ref={ref}
       className={cx({
-        'bg-white text-gray-500': true,
+        'bg-white text-gray-600': true,
         [className]: !!className,
         invisible: !inView,
       })}
@@ -140,7 +140,7 @@ export const Item: React.FC<ItemProps> = ({
           <div>
             <div className="mt-3 flex items-center font-heading tracking-wide">
               <Icon icon={SPLIT_SVG} className="h-5 w-5 text-green-300" />
-              <h4 className="ml-2 text-xs uppercase text-gray-500">
+              <h4 className="ml-2 text-xs uppercase text-gray-600">
                 You can <strong>split</strong> this feature into categories
               </h4>
             </div>

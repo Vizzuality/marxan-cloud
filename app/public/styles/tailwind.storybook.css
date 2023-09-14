@@ -2605,17 +2605,17 @@ input[data-autocompleted] {
   border-color: rgb(0 0 0 / var(--tw-divide-opacity));
 }
 
-.divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+.divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(232 232 232 / var(--tw-divide-opacity));
 }
 
-.divide-gray-500 > :not([hidden]) ~ :not([hidden]) {
+.divide-gray-600 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(54 55 62 / var(--tw-divide-opacity));
 }
 
-.divide-gray-600 > :not([hidden]) ~ :not([hidden]) {
+.divide-gray-700 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(55 57 61 / var(--tw-divide-opacity));
 }
@@ -2851,42 +2851,42 @@ input[data-autocompleted] {
   border-color: rgb(27 114 245 / var(--tw-border-opacity));
 }
 
-.border-gray-100 {
+.border-gray-200 {
   --tw-border-opacity: 1;
   border-color: rgb(232 232 232 / var(--tw-border-opacity));
 }
 
-.border-gray-200 {
+.border-gray-300 {
   --tw-border-opacity: 1;
   border-color: rgb(196 196 196 / var(--tw-border-opacity));
 }
 
-.border-gray-300 {
+.border-gray-400 {
   --tw-border-opacity: 1;
   border-color: rgb(162 162 169 / var(--tw-border-opacity));
 }
 
-.border-gray-400 {
+.border-gray-100 {
   --tw-border-opacity: 1;
   border-color: rgb(95 100 110 / var(--tw-border-opacity));
 }
 
-.border-gray-500 {
+.border-gray-600 {
   --tw-border-opacity: 1;
   border-color: rgb(54 55 62 / var(--tw-border-opacity));
 }
 
-.border-gray-600 {
+.border-gray-700 {
   --tw-border-opacity: 1;
   border-color: rgb(55 57 61 / var(--tw-border-opacity));
 }
 
-.border-gray-700 {
+.border-gray-800 {
   --tw-border-opacity: 1;
   border-color: rgb(21 21 21 / var(--tw-border-opacity));
 }
 
-.border-gray-800 {
+.border-gray-900 {
   --tw-border-opacity: 1;
   border-color: rgb(17 17 17 / var(--tw-border-opacity));
 }
@@ -2978,47 +2978,47 @@ input[data-autocompleted] {
   background-color: rgb(27 114 245 / var(--tw-bg-opacity));
 }
 
-.bg-gray-100 {
+.bg-gray-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(232 232 232 / var(--tw-bg-opacity));
 }
 
-.bg-gray-200 {
+.bg-gray-300 {
   --tw-bg-opacity: 1;
   background-color: rgb(196 196 196 / var(--tw-bg-opacity));
 }
 
-.bg-gray-300 {
+.bg-gray-400 {
   --tw-bg-opacity: 1;
   background-color: rgb(162 162 169 / var(--tw-bg-opacity));
 }
 
-.bg-gray-400 {
+.bg-gray-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(95 100 110 / var(--tw-bg-opacity));
 }
 
-.bg-gray-50 {
+.bg-gray-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(242 242 242 / var(--tw-bg-opacity));
 }
 
-.bg-gray-500 {
+.bg-gray-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(54 55 62 / var(--tw-bg-opacity));
 }
 
-.bg-gray-600 {
+.bg-gray-700 {
   --tw-bg-opacity: 1;
   background-color: rgb(55 57 61 / var(--tw-bg-opacity));
 }
 
-.bg-gray-700 {
+.bg-gray-800 {
   --tw-bg-opacity: 1;
   background-color: rgb(21 21 21 / var(--tw-bg-opacity));
 }
 
-.bg-gray-800 {
+.bg-gray-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(17 17 17 / var(--tw-bg-opacity));
 }
@@ -3189,7 +3189,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-gray-100 {
+.from-gray-200 {
   --tw-gradient-from: #E8E8E8 var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(232 232 232 / 0)  var(--tw-gradient-from-position);
@@ -3197,7 +3197,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-gray-700 {
+.from-gray-800 {
   --tw-gradient-from: #151515 var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(21 21 21 / 0)  var(--tw-gradient-from-position);
@@ -3284,14 +3284,14 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), #000 var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
-.via-gray-200 {
+.via-gray-300 {
   --tw-gradient-via-position:  ;
   --tw-gradient-to: rgb(196 196 196 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
   --tw-gradient-stops: var(--tw-gradient-from), #C4C4C4 var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
-.via-gray-700 {
+.via-gray-800 {
   --tw-gradient-via-position:  ;
   --tw-gradient-to: rgb(21 21 21 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
@@ -3325,7 +3325,7 @@ input[data-autocompleted] {
   --tw-gradient-to-position:  ;
 }
 
-.to-gray-800 {
+.to-gray-900 {
   --tw-gradient-to: #111111 var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
@@ -4082,37 +4082,37 @@ input[data-autocompleted] {
   color: rgb(1 173 241 / var(--tw-text-opacity));
 }
 
-.text-gray-200 {
+.text-gray-300 {
   --tw-text-opacity: 1;
   color: rgb(196 196 196 / var(--tw-text-opacity));
 }
 
-.text-gray-300 {
+.text-gray-400 {
   --tw-text-opacity: 1;
   color: rgb(162 162 169 / var(--tw-text-opacity));
 }
 
-.text-gray-400 {
+.text-gray-100 {
   --tw-text-opacity: 1;
   color: rgb(95 100 110 / var(--tw-text-opacity));
 }
 
-.text-gray-500 {
+.text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(54 55 62 / var(--tw-text-opacity));
 }
 
-.text-gray-600 {
+.text-gray-700 {
   --tw-text-opacity: 1;
   color: rgb(55 57 61 / var(--tw-text-opacity));
 }
 
-.text-gray-700 {
+.text-gray-800 {
   --tw-text-opacity: 1;
   color: rgb(21 21 21 / var(--tw-text-opacity));
 }
 
-.text-gray-800 {
+.text-gray-900 {
   --tw-text-opacity: 1;
   color: rgb(17 17 17 / var(--tw-text-opacity));
 }
@@ -4212,17 +4212,17 @@ input[data-autocompleted] {
           text-decoration-line: line-through;
 }
 
-.placeholder-gray-300::-moz-placeholder {
+.placeholder-gray-400::-moz-placeholder {
   --tw-placeholder-opacity: 1;
   color: rgb(162 162 169 / var(--tw-placeholder-opacity));
 }
 
-.placeholder-gray-300:-ms-input-placeholder {
+.placeholder-gray-400:-ms-input-placeholder {
   --tw-placeholder-opacity: 1;
   color: rgb(162 162 169 / var(--tw-placeholder-opacity));
 }
 
-.placeholder-gray-300::placeholder {
+.placeholder-gray-400::placeholder {
   --tw-placeholder-opacity: 1;
   color: rgb(162 162 169 / var(--tw-placeholder-opacity));
 }
@@ -4334,12 +4334,12 @@ input[data-autocompleted] {
   --tw-ring-inset: inset;
 }
 
-.ring-gray-400 {
+.ring-gray-100 {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(95 100 110 / var(--tw-ring-opacity));
 }
 
-.ring-gray-500 {
+.ring-gray-600 {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(54 55 62 / var(--tw-ring-opacity));
 }
@@ -4363,7 +4363,7 @@ input[data-autocompleted] {
   --tw-ring-offset-width: 8px;
 }
 
-.ring-offset-gray-700 {
+.ring-offset-gray-800 {
   --tw-ring-offset-color: #151515;
 }
 
@@ -5372,17 +5372,17 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   border-width: 2px;
 }
 
-.hover\:border-gray-100:hover {
+.hover\:border-gray-200:hover {
   --tw-border-opacity: 1;
   border-color: rgb(232 232 232 / var(--tw-border-opacity));
 }
 
-.hover\:border-gray-300:hover {
+.hover\:border-gray-400:hover {
   --tw-border-opacity: 1;
   border-color: rgb(162 162 169 / var(--tw-border-opacity));
 }
 
-.hover\:border-gray-400:hover {
+.hover\:border-gray-100:hover {
   --tw-border-opacity: 1;
   border-color: rgb(95 100 110 / var(--tw-border-opacity));
 }
@@ -5417,27 +5417,27 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   background-color: rgb(0 0 0 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-gray-100:hover {
+.hover\:bg-gray-200:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(232 232 232 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-gray-400:hover {
+.hover\:bg-gray-100:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(95 100 110 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-gray-500:hover {
+.hover\:bg-gray-600:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(54 55 62 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-gray-700:hover {
+.hover\:bg-gray-800:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(21 21 21 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-gray-800:hover {
+.hover\:bg-gray-900:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(17 17 17 / var(--tw-bg-opacity));
 }
@@ -5475,7 +5475,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
-.hover\:text-gray-400:hover {
+.hover\:text-gray-100:hover {
   --tw-text-opacity: 1;
   color: rgb(95 100 110 / var(--tw-text-opacity));
 }
@@ -5557,12 +5557,12 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
 }
 
-.focus\:bg-gray-100:focus {
+.focus\:bg-gray-200:focus {
   --tw-bg-opacity: 1;
   background-color: rgb(232 232 232 / var(--tw-bg-opacity));
 }
 
-.focus\:bg-gray-700:focus {
+.focus\:bg-gray-800:focus {
   --tw-bg-opacity: 1;
   background-color: rgb(21 21 21 / var(--tw-bg-opacity));
 }
@@ -5581,7 +5581,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
-.focus\:text-gray-500:focus {
+.focus\:text-gray-600:focus {
   --tw-text-opacity: 1;
   color: rgb(54 55 62 / var(--tw-text-opacity));
 }
@@ -5595,12 +5595,12 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   outline-offset: 2px;
 }
 
-.active\:border-gray-200:active {
+.active\:border-gray-300:active {
   --tw-border-opacity: 1;
   border-color: rgb(196 196 196 / var(--tw-border-opacity));
 }
 
-.active\:border-gray-300:active {
+.active\:border-gray-400:active {
   --tw-border-opacity: 1;
   border-color: rgb(162 162 169 / var(--tw-border-opacity));
 }
@@ -5615,12 +5615,12 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   border-color: rgb(242 92 71 / var(--tw-border-opacity));
 }
 
-.active\:bg-gray-300:active {
+.active\:bg-gray-400:active {
   --tw-bg-opacity: 1;
   background-color: rgb(162 162 169 / var(--tw-bg-opacity));
 }
 
-.active\:bg-gray-600:active {
+.active\:bg-gray-700:active {
   --tw-bg-opacity: 1;
   background-color: rgb(55 57 61 / var(--tw-bg-opacity));
 }
@@ -5649,7 +5649,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.group:hover .group-hover\:border-gray-700 {
+.group:hover .group-hover\:border-gray-800 {
   --tw-border-opacity: 1;
   border-color: rgb(21 21 21 / var(--tw-border-opacity));
 }
@@ -5668,7 +5668,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
-.group:hover .group-hover\:text-gray-600 {
+.group:hover .group-hover\:text-gray-700 {
   --tw-text-opacity: 1;
   color: rgb(55 57 61 / var(--tw-text-opacity));
 }

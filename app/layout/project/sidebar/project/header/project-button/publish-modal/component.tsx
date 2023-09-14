@@ -270,7 +270,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
                           {!user.avatarDataUrl && (user.displayName || '').slice(0, 2)}
                         </Avatar>
                         <div>
-                          <span className="text-gray-700">{user.displayName}</span>
+                          <span className="text-gray-800">{user.displayName}</span>
                         </div>
                       </div>
                     </div>

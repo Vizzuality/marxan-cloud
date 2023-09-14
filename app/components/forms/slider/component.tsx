@@ -14,17 +14,17 @@ const THEME = {
   dark: {
     base: 'relative w-full h-12 pt-8 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-white rounded',
-    track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
+    track: 'w-full h-1.5 bg-gray-400 rounded opacity-20',
   },
   light: {
     base: 'relative w-full h-12 pt-8 touch-action-none',
-    filledTrack: 'absolute left-0 h-1.5 bg-gray-800 rounded',
-    track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
+    filledTrack: 'absolute left-0 h-1.5 bg-gray-900 rounded',
+    track: 'w-full h-1.5 bg-gray-400 rounded opacity-20',
   },
   'dark-small': {
     base: 'relative w-full h-12 pt-8 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-black rounded',
-    track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
+    track: 'w-full h-1.5 bg-gray-400 rounded opacity-20',
   },
 };
 

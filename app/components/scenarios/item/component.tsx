@@ -68,7 +68,7 @@ const SCENARIO_STATES = {
   },
   draft: {
     text: 'Edited',
-    styles: 'text-gray-400',
+    styles: 'text-gray-100',
   },
 };
 
@@ -189,7 +189,7 @@ export const Item: React.FC<ItemProps> = ({
       >
         <div
           className={cx({
-            'flex flex-grow flex-col rounded-l-3xl bg-gray-700 pl-8': true,
+            'flex flex-grow flex-col rounded-l-3xl bg-gray-800 pl-8': true,
             'rounded-bl-none': settings,
           })}
         >
@@ -199,7 +199,7 @@ export const Item: React.FC<ItemProps> = ({
                 <div className="flex flex-row items-center">
                   {warnings && (
                     <div className="relative mr-5 flex h-10 w-10 items-center rounded-full border border-solid border-white">
-                      <div className="absolute -right-1 -top-1 h-4 w-4 rounded-full border-4 border-solid border-gray-700 bg-red-500" />
+                      <div className="absolute -right-1 -top-1 h-4 w-4 rounded-full border-4 border-solid border-gray-800 bg-red-500" />
                       <Icon className="h-10 w-10" icon={WARNING_SVG} />
                     </div>
                   )}
@@ -210,13 +210,13 @@ export const Item: React.FC<ItemProps> = ({
                         arrow
                         placement="top"
                         content={
-                          <div className="rounded bg-white p-2 text-center text-xs text-gray-500">
+                          <div className="rounded bg-white p-2 text-center text-xs text-gray-600">
                             <div>{lock.displayName || lock.email}</div>
                             <div>is editing this scenario</div>
                           </div>
                         }
                       >
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-500">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-600">
                           <Icon className="relative w-3 text-white" icon={LOCK_SVG} />
                         </div>
                       </Tooltip>
@@ -279,7 +279,7 @@ export const Item: React.FC<ItemProps> = ({
           type="button"
           onClick={onEdit}
           className={cx({
-            'flex-column flex h-full items-center rounded-r-3xl bg-gray-700 px-8': true,
+            'flex-column flex h-full items-center rounded-r-3xl bg-gray-800 px-8': true,
             'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:bg-primary-300 focus:text-black focus:outline-none':
               true,
             'rounded-br-none': settings,

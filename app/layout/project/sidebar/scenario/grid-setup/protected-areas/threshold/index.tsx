@@ -210,7 +210,7 @@ export const WDPAThreshold = ({ onGoBack }): JSX.Element => {
           >
             <Loading
               visible={submitting}
-              className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
+              className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
               iconClassName="w-10 h-10 text-white"
             />
 
@@ -250,7 +250,7 @@ export const WDPAThreshold = ({ onGoBack }): JSX.Element => {
                             </InfoButton>
                           </div>
 
-                          <p className="mb-3 text-sm text-gray-300">
+                          <p className="mb-3 text-sm text-gray-400">
                             Refers to what percentage of a planning unit must be covered by a
                             protected area to be considered “protected”.
                           </p>

@@ -13,20 +13,20 @@ export const ConfirmSignUp: React.FC<ConfirmSignUpProps> = ({ setConfirm }: Conf
   return (
     <Wrapper>
       <div className="my-auto flex flex-col items-center justify-center space-y-12">
-        <h2 className="text-center font-heading text-lg font-medium text-gray-600">
+        <h2 className="text-center font-heading text-lg font-medium text-gray-700">
           Check your email
         </h2>
 
         <Icon icon={CHECK_EMAIL_SVG} className="w-28" />
 
         <div className="w-72">
-          <p className="text-center font-heading text-lg text-gray-600">
+          <p className="text-center font-heading text-lg text-gray-700">
             We have sent a link to your email to confirm your account...
           </p>
         </div>
 
-        <div className="flex w-72 space-x-4 border-t border-gray-200 pt-10">
-          <p className="text-center font-heading text-base text-gray-300">
+        <div className="flex w-72 space-x-4 border-t border-gray-300 pt-10">
+          <p className="text-center font-heading text-base text-gray-400">
             Did not receive the email? Check your spam filter, or{' '}
             <span
               role="presentation"

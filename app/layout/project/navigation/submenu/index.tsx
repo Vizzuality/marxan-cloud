@@ -1,9 +1,8 @@
 import Link from 'next/link';
 
-import { cn } from 'utils/cn';
-
 import Icon, { IconProps } from 'components/icon';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import { MenuTooltip, TOOLTIP_OFFSET } from '../';
 
@@ -16,7 +15,7 @@ export interface SubMenuItem {
 
 export const SubMenu = ({ items }: { items: SubMenuItem[] }): JSX.Element => {
   return (
-    <ul className="space-y-5 rounded-xl border border-gray-400 py-4">
+    <ul className="space-y-5 rounded-xl border border-gray-600 py-4">
       {items.map((item) => (
         <Tooltip
           key={item.route}

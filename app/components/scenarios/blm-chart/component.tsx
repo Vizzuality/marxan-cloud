@@ -188,7 +188,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                 yScale(yDomain[1]) + 0.3 * (yScale(yDomain[0]) - yScale(yDomain[1]))
               })`}
             >
-              <text textAnchor="end" className="text-right text-xs uppercase text-gray-600">
+              <text textAnchor="end" className="text-right text-xs uppercase text-gray-700">
                 <tspan x={Y_AXIS_WIDTH} y="0">
                   Boundary
                 </tspan>
@@ -220,7 +220,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                 yScale(yDomain[0]) + X_AXIS_HEIGHT
               })`}
             >
-              <text x="0" y="0" textAnchor="middle" className="text-xs uppercase text-gray-600">
+              <text x="0" y="0" textAnchor="middle" className="text-xs uppercase text-gray-700">
                 Cost
               </text>
             </g>
@@ -282,7 +282,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                     <div
                       className={classnames({
                         'h-full w-full rounded-2xl bg-white bg-contain': true,
-                        'border-2 border-gray-800': !isBlm,
+                        'border-2 border-gray-900': !isBlm,
                         'border-2 border-primary-500': isBlm,
                       })}
                       style={{ backgroundImage: `url(${thumbnail})` }}

@@ -15,7 +15,7 @@ export const Footer: React.FC<FooterProps> = () => {
     <>
       <div className="bg-primary-500">
         <Wrapper>
-          <div className="mx-auto flex w-full max-w-5xl flex-col space-y-18 py-24 font-heading">
+          <div className="space-y-18 mx-auto flex w-full max-w-5xl flex-col py-24 font-heading">
             <div className="text-3xl text-black md:text-6xl">
               <p>Want to know more</p>
               <p>about Marxan?</p>
@@ -39,7 +39,7 @@ export const Footer: React.FC<FooterProps> = () => {
         </Wrapper>
       </div>
 
-      <div className="bg-gray-700 py-24">
+      <div className="bg-gray-800 py-24">
         <Wrapper>
           <div className="mx-auto grid w-full max-w-5xl grid-cols-1 justify-between gap-36 pb-16 md:grid-cols-2">
             <div className="space-y-12">

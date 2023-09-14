@@ -46,5 +46,5 @@ export const MENU_ITEM_BUTTON_COMMON_CLASSES = 'flex p-[10px]';
 export const MENU_ITEM_BUTTON_DISABLED_CLASSES = 'cursor-default opacity-50';
 
 export const ICON_COMMON_CLASSES =
-  'h-5 w-5 text-gray-400 group-hover:text-white group-[.bg-primary-400]:text-gray-500';
-export const ICON_DISABLED_CLASSES = 'group-hover:text-gray-400';
+  'h-5 w-5 text-gray-600 group-hover:text-white group-[.bg-primary-400]:text-gray-700';
+export const ICON_DISABLED_CLASSES = 'group-hover:text-gray-100';

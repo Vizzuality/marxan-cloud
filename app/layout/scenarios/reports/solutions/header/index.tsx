@@ -28,7 +28,7 @@ export const ReportHeader = (): JSX.Element => {
     reportDataIsFetched && (
       <header className="flex w-full items-start justify-between pb-4">
         <div className="flex w-full flex-col space-y-6">
-          <div className="border-b border-gray-100 pb-4">
+          <div className="border-b border-gray-200 pb-4">
             <h1 className="text-xl font-medium">{projectQuery.data?.name}</h1>
 
             <div className="flex items-center space-x-6 text-lg">
@@ -41,12 +41,12 @@ export const ReportHeader = (): JSX.Element => {
               <p className="font-medium uppercase">Created by:</p>
               <p className="capitalize">{projectOwner?.displayName || projectOwner?.email}</p>
             </div>
-            <div className="h-5 w-[2px] bg-gray-100" />
+            <div className="h-5 w-[2px] bg-gray-200" />
             <div className="flex space-x-2">
               <p className="font-medium uppercase">Marxan platform version:</p>
               <p> V.0.0.1</p>
             </div>
-            <div className="h-5 w-[2px] bg-gray-100" />
+            <div className="h-5 w-[2px] bg-gray-200" />
             <div className="flex space-x-2">
               <p className="font-medium uppercase">Date:</p>
               <p>{format(new Date().getTime(), 'MM/dd/yyyy')}</p>

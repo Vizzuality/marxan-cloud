@@ -56,11 +56,11 @@ export const ScenariosSidebarEditFeatures = ({ onGoBack }): JSX.Element => {
             </div>
 
             <div className="mt-2 flex items-center space-x-2">
-              <Icon icon={FEATURES_SVG} className="h-4 w-4 text-gray-400" />
+              <Icon icon={FEATURES_SVG} className="h-4 w-4 text-gray-100" />
               <div className="font-heading text-xs uppercase">
                 Features:{' '}
                 {selectedFeaturesData && (
-                  <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>
+                  <span className="ml-1 text-gray-100">{selectedFeaturesData.length}</span>
                 )}
               </div>
             </div>

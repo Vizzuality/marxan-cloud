@@ -11,14 +11,14 @@ const THEME = {
     'text-primary-500 bg-transparent hover:bg-transparent active:bg-transparent border border-primary-500 hover:border-primary-400 active:border-primary-300',
 
   secondary:
-    'text-white bg-gray-500 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300',
+    'text-white bg-gray-700 hover:bg-gray-600 active:bg-gray-400 border border-gray-700 hover:border-gray-600 active:border-gray-400',
   'secondary-alt':
-    'text-gray-300 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
+    'text-gray-400 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-600 hover:border-gray-400 active:border-gray-300',
 
-  tertiary: 'text-black bg-gray-100 hover:bg-gray-400 hover:border-gray-400 hover:text-white',
+  tertiary: 'text-black bg-gray-200 hover:bg-gray-100 hover:border-gray-100 hover:text-white',
 
   white:
-    'text-gray-700 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
+    'text-gray-800 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-100 hover:border-gray-400 active:border-gray-300',
 
   danger:
     'text-red-700 bg-transparent hover:text-white hover:bg-red-700 active:bg-red-600 border border-red-700 hover:border-red-600 active:border-red-500',
@@ -26,13 +26,13 @@ const THEME = {
     'text-white hover:bg-transparent border border-red-500 hover:text-red-500 bg-red-500 active:bg-red-600 hover:border hover:border-red-500 active:text-white active:border-red-600',
 
   spacial:
-    'text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 flex items-center justify-center rounded-[40px] focus:outline-none',
+    'text-white bg-transparent hover:bg-gray-100 active:bg-gray-400 flex items-center justify-center rounded-[40px] focus:outline-none',
 
-  dark: 'text-white bg-gray-600 border border-gray-600 hover:bg-black hover:text-white',
+  dark: 'text-white bg-gray-700 border border-gray-700 hover:bg-black hover:text-white',
   'dark-alt':
-    'text-gray-800 bg-transparent border border-gray-800 hover:border-gray-400 hover:text-gray-400',
+    'text-gray-900 bg-transparent border border-gray-900 hover:border-gray-100 hover:text-gray-100',
 
-  clear: 'text-gray-800 hover:text-gray-400',
+  clear: 'text-gray-900 hover:text-gray-100',
 
   'transparent-black':
     'text-black bg-transparent border border-black hover:bg-black hover:text-white',

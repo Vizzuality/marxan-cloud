@@ -10,9 +10,9 @@ import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
 import TAG_SVG from 'svgs/ui/tag.svg?sprite';
 
 const BUTTON_CLASSES =
-  'flex items-center px-4 py-2 w-full text-sm cursor-pointer bg-gray-700 hover:bg-gray-500 transition transition-colors space-x-2 group';
+  'flex items-center px-4 py-2 w-full text-sm cursor-pointer bg-gray-800 hover:bg-gray-600 transition transition-colors space-x-2 group';
 
-const ICON_CLASSES = 'h-5 w-5 text-gray-400 group-hover:text-white';
+const ICON_CLASSES = 'h-5 w-5 text-gray-100 group-hover:text-white';
 
 const ActionsMenu = ({
   item,
@@ -37,7 +37,7 @@ const ActionsMenu = ({
   }, []);
 
   return (
-    <ul className="rounded-2xl border-gray-500">
+    <ul className="rounded-2xl border-gray-600">
       <li>
         <button
           type="button"

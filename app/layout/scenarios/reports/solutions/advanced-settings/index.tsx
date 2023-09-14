@@ -80,7 +80,7 @@ export const AdvancedSettingsPage = (): JSX.Element => {
       <div className="flex w-5/12 flex-col space-y-2">
         {calibrationResultsQuery.data?.map((cr) => {
           return (
-            <div key={cr.scenarioId} className="flex space-x-3 bg-gray-500">
+            <div key={cr.scenarioId} className="flex space-x-3 bg-gray-600">
               <Image src={cr.pngData} alt="Blm Image" width={115} height={115} />
               <div className="flex flex-col space-y-2 py-2 text-sm">
                 <div>

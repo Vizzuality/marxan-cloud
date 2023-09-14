@@ -20,7 +20,7 @@ export const ResumePage = (): JSX.Element => {
   const TEXT_CLASSES = 'text-sm leading-4';
 
   return (
-    <div className="flex flex-col border-t border-gray-100">
+    <div className="flex flex-col border-t border-gray-200">
       {scenarioQuery.data?.description && (
         <div className="pt-10">
           <div>

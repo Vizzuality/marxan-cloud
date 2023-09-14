@@ -129,7 +129,7 @@ export const Item: React.FC<ItemProps> = ({
   return (
     <div
       className={cx({
-        'bg-gray-700 text-white': true,
+        'bg-gray-800 text-white': true,
         [className]: !!className,
       })}
     >
@@ -147,7 +147,7 @@ export const Item: React.FC<ItemProps> = ({
               <Tooltip
                 arrow
                 placement="top"
-                content={<div className="rounded bg-white p-2 text-gray-500">Split</div>}
+                content={<div className="rounded bg-white p-2 text-gray-600">Split</div>}
               >
                 <button
                   aria-label="manage-see-on-map"
@@ -168,7 +168,7 @@ export const Item: React.FC<ItemProps> = ({
               arrow
               placement="top"
               content={
-                <div className="rounded bg-white p-2 text-gray-500">
+                <div className="rounded bg-white p-2 text-gray-600">
                   {isShown ? 'Remove from map' : 'See on map'}
                 </div>
               }
@@ -179,7 +179,7 @@ export const Item: React.FC<ItemProps> = ({
                 onClick={onSeeOnMap}
                 className={cx({
                   'flex h-5 w-5 items-center justify-center text-white': true,
-                  'text-gray-300': !isShown,
+                  'text-gray-400': !isShown,
                 })}
               >
                 <Icon className="h-4 w-4" icon={isShown ? SHOW_SVG : HIDE_SVG} />
@@ -190,7 +190,7 @@ export const Item: React.FC<ItemProps> = ({
               <Tooltip
                 arrow
                 placement="top"
-                content={<div className="rounded bg-white p-2 text-gray-500">Remove</div>}
+                content={<div className="rounded bg-white p-2 text-gray-600">Remove</div>}
               >
                 <button
                   aria-label="manage-see-on-map"

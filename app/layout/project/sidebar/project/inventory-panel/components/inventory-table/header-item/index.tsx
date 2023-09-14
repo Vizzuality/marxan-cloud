@@ -28,7 +28,7 @@ const HeaderItem = ({ className, text, name, sorting, onClick }: HeaderItem): JS
     >
       <span
         className={cn({
-          'text-xs font-semibold uppercase leading-none text-gray-400': true,
+          'text-xs font-semibold uppercase leading-none text-gray-600': true,
           'text-white': isActive,
           [className]: !!className,
         })}
@@ -38,14 +38,14 @@ const HeaderItem = ({ className, text, name, sorting, onClick }: HeaderItem): JS
       {sortOrder === 'asc' && isActive ? (
         <HiArrowDown
           className={cn({
-            'h-5 w-5 text-gray-400': true,
+            'h-5 w-5 text-gray-600': true,
             'text-blue-400': isActive,
           })}
         />
       ) : (
         <HiArrowUp
           className={cn({
-            'h-5 w-5 text-gray-400': true,
+            'h-5 w-5 text-gray-600': true,
             'text-blue-400': isActive,
           })}
         />

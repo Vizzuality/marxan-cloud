@@ -145,7 +145,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                 <form
                   className={cx({
                     'relative flex flex-grow flex-col overflow-hidden pt-10 text-white': true,
-                    'border-t border-gray-500': editable,
+                    'border-t border-gray-600': editable,
                   })}
                   autoComplete="off"
                   noValidate
@@ -256,7 +256,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
 
                   <Loading
                     visible={submitting}
-                    className="absolute left-0 top-0 z-10 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90 text-white"
+                    className="absolute left-0 top-0 z-10 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90 text-white"
                     iconClassName="w-10 h-10"
                   />
                 </form>

@@ -11,13 +11,13 @@ import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
 import TAG_SVG from 'svgs/ui/tag.svg?sprite';
 
 const BUTTON_CLASSES =
-  'enabled:group flex w-full cursor-pointer items-center space-x-2 bg-gray-700 px-4 py-2 text-sm transition-colors enabled:hover:bg-gray-500';
+  'enabled:group flex w-full cursor-pointer items-center space-x-2 bg-gray-800 px-4 py-2 text-sm transition-colors enabled:hover:bg-gray-700';
 
-const BUTTON_DISABLED_CLASSES = 'disabled:cursor-default disabled:text-gray-400';
+const BUTTON_DISABLED_CLASSES = 'disabled:cursor-default disabled:text-gray-600';
 
-const ICON_CLASSES = 'h-5 w-5 text-gray-400 group-hover:text-white';
+const ICON_CLASSES = 'h-5 w-5 text-gray-100 group-hover:text-white';
 
-const ICON_DISABLED_CLASSES = 'text-gray-500';
+const ICON_DISABLED_CLASSES = 'text-gray-700';
 
 const ActionsMenu = ({ item }: { item: DataItem }): JSX.Element => {
   const isDeletable = !item.isCustom || !item.scenarios;
@@ -32,7 +32,7 @@ const ActionsMenu = ({ item }: { item: DataItem }): JSX.Element => {
   }, []);
 
   return (
-    <ul className="rounded-2xl border-gray-500">
+    <ul className="rounded-2xl border-gray-600">
       <li>
         <button
           type="button"
