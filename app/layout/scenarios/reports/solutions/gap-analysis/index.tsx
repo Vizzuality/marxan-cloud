@@ -44,7 +44,7 @@ export const GapAnalysisPage = (): JSX.Element => {
                       className={cn({
                         'flex w-9 items-center justify-center rounded-2xl bg-opacity-10': true,
                         'bg-green-500 text-green-500': feature.onTarget,
-                        'bg-red-500 text-red-500': !feature.onTarget,
+                        'bg-red-600 text-red-600': !feature.onTarget,
                       })}
                     >
                       {feature.onTarget ? 'Yes' : 'No'}

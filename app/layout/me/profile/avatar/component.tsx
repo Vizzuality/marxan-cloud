@@ -130,7 +130,7 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }: AvatarMeP
             <button
               aria-label="remove"
               type="button"
-              className="absolute right-1 top-1 -translate-y-1/2 translate-x-1/2 transform rounded-full bg-red-500 p-1"
+              className="absolute right-1 top-1 -translate-y-1/2 translate-x-1/2 transform rounded-full bg-red-600 p-1"
               onClickCapture={onRemove}
             >
               <Icon icon={CLOSE_SVG} className="h-2 w-2 text-white" />

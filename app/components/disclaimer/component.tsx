@@ -8,7 +8,7 @@ import WARNING_SVG from 'svgs/notifications/warning.svg?sprite';
 
 const TYPE = {
   warning: 'text-yellow-400',
-  blocked: 'text-red-500',
+  blocked: 'text-red-600',
   invalidated: 'text-white',
 };
 

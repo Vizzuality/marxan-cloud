@@ -20,7 +20,7 @@ const SCENARIO_STATES = {
   },
   'run-failure': {
     text: 'Fail Running Scenario',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'run-done': {
     text: 'Run Scenario',
@@ -32,7 +32,7 @@ const SCENARIO_STATES = {
   },
   'calibration-failure': {
     text: 'Fail Running Calibration',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'pa-running': {
     text: 'Running PA percentage',
@@ -40,7 +40,7 @@ const SCENARIO_STATES = {
   },
   'pa-failure': {
     text: 'Fail PA percentage',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'pu-running': {
     text: 'Running PU inclusion',
@@ -48,7 +48,7 @@ const SCENARIO_STATES = {
   },
   'pu-failure': {
     text: 'Fail PU inclusion',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'features-running': {
     text: 'Running Features',
@@ -56,7 +56,7 @@ const SCENARIO_STATES = {
   },
   'features-failure': {
     text: 'Fail Features',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'clone-running': {
     text: 'Running cloning',
@@ -64,7 +64,7 @@ const SCENARIO_STATES = {
   },
   'clone-failure': {
     text: 'Fail cloning scenario',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   draft: {
     text: 'Edited',
@@ -199,7 +199,7 @@ export const Item: React.FC<ItemProps> = ({
                 <div className="flex flex-row items-center">
                   {warnings && (
                     <div className="relative mr-5 flex h-10 w-10 items-center rounded-full border border-solid border-white">
-                      <div className="absolute -right-1 -top-1 h-4 w-4 rounded-full border-4 border-solid border-gray-800 bg-red-500" />
+                      <div className="absolute -right-1 -top-1 h-4 w-4 rounded-full border-4 border-solid border-gray-800 bg-red-600" />
                       <Icon className="h-10 w-10" icon={WARNING_SVG} />
                     </div>
                   )}

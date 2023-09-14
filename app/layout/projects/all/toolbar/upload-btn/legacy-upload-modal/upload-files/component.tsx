@@ -273,7 +273,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                 {importLegacyErrors && !!importLegacyErrors.length && (
                   <div className="mb-6 flex flex-col space-y-2">
                     {importLegacyErrors.map((e) => (
-                      <p key={e} className="text-xs text-red-500">
+                      <p key={e} className="text-xs text-red-600">
                         {e}
                       </p>
                     ))}

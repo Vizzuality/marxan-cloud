@@ -8,7 +8,7 @@ const THEME = {
     status: {
       none: 'border-gray-900',
       valid: 'border-gray-900',
-      error: 'border-red-500',
+      error: 'border-red-600',
       disabled: 'border-gray-900 opacity-50',
     },
   },
@@ -17,7 +17,7 @@ const THEME = {
     status: {
       none: 'border-gray-900',
       valid: 'border-gray-900',
-      error: 'border-red-500 focus:border-red-500',
+      error: 'border-red-600 focus:border-red-600',
       disabled: 'border-gray-900 opacity-50',
     },
   },

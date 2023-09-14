@@ -132,14 +132,14 @@ export const Item: React.FC<ItemProps> = ({
 
         {!onTarget && (
           <div
-            className="absolute top-1/2 h-4 w-px -translate-y-1/2 transform bg-red-500"
+            className="absolute top-1/2 h-4 w-px -translate-y-1/2 transform bg-red-600"
             style={{
               left: `${current.percent * 100}%`,
             }}
           >
             <div
               className={classnames({
-                'absolute left-1/2 top-full mt-2.5 -translate-y-1/2 transform whitespace-nowrap text-xs text-red-500':
+                'absolute left-1/2 top-full mt-2.5 -translate-y-1/2 transform whitespace-nowrap text-xs text-red-600':
                   true,
                 ...metStyles,
               })}

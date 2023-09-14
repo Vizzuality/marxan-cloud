@@ -180,7 +180,7 @@ export const UploadPUMethod = (): JSX.Element => {
             true,
           'bg-gray-600': isDragActive,
           'border-green-800': isDragAccept,
-          'border-red-800': isDragReject,
+          'border-red-900': isDragReject,
         })}
       >
         <input {...getInputProps()} />

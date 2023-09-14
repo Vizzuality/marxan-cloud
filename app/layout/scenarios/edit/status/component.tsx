@@ -137,7 +137,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
           <div className="w-full max-w-md space-y-5 p-10 text-center">
             <Icon
               icon={CLOSE_SVG}
-              className="m-auto text-red-500"
+              className="m-auto text-red-600"
               style={{ width: 20, height: 20 }}
             />
 

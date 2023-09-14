@@ -33,8 +33,8 @@ const THEME: ToastTheme = {
   },
   error: {
     icon: ERROR_SVG,
-    bg: 'from-red-400 to-red-700',
-    hoverBg: 'from-red-100 to-red-400',
+    bg: 'from-red-1000 to-red-800',
+    hoverBg: 'from-red-200 to-red-1000',
   },
 };
 

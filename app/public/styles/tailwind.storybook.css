@@ -2911,17 +2911,17 @@ input[data-autocompleted] {
   border-color: rgb(103 75 253 / var(--tw-border-opacity));
 }
 
-.border-red-500 {
+.border-red-600 {
   --tw-border-opacity: 1;
   border-color: rgb(242 92 71 / var(--tw-border-opacity));
 }
 
-.border-red-700 {
+.border-red-800 {
   --tw-border-opacity: 1;
   border-color: rgb(207 42 20 / var(--tw-border-opacity));
 }
 
-.border-red-800 {
+.border-red-900 {
   --tw-border-opacity: 1;
   border-color: rgb(194 23 1 / var(--tw-border-opacity));
 }
@@ -3068,17 +3068,17 @@ input[data-autocompleted] {
   background-color: rgb(103 75 253 / var(--tw-bg-opacity));
 }
 
-.bg-red-100 {
+.bg-red-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(255 175 164 / var(--tw-bg-opacity));
 }
 
-.bg-red-500 {
+.bg-red-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(242 92 71 / var(--tw-bg-opacity));
 }
 
-.bg-red-700 {
+.bg-red-800 {
   --tw-bg-opacity: 1;
   background-color: rgb(207 42 20 / var(--tw-bg-opacity));
 }
@@ -3237,7 +3237,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-red-100 {
+.from-red-200 {
   --tw-gradient-from: #FFAFA4 var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(255 175 164 / 0)  var(--tw-gradient-from-position);
@@ -3245,7 +3245,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-red-400 {
+.from-red-1000 {
   --tw-gradient-from: #FF6D59 var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(255 109 89 / 0)  var(--tw-gradient-from-position);
@@ -3345,12 +3345,12 @@ input[data-autocompleted] {
   --tw-gradient-to-position:  ;
 }
 
-.to-red-400 {
+.to-red-1000 {
   --tw-gradient-to: #FF6D59 var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
 
-.to-red-700 {
+.to-red-800 {
   --tw-gradient-to: #CF2A14 var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
@@ -4142,12 +4142,12 @@ input[data-autocompleted] {
   color: rgb(153 98 253 / var(--tw-text-opacity));
 }
 
-.text-red-500 {
+.text-red-600 {
   --tw-text-opacity: 1;
   color: rgb(242 92 71 / var(--tw-text-opacity));
 }
 
-.text-red-700 {
+.text-red-800 {
   --tw-text-opacity: 1;
   color: rgb(207 42 20 / var(--tw-text-opacity));
 }
@@ -4354,7 +4354,7 @@ input[data-autocompleted] {
   --tw-ring-color: rgb(0 191 255 / var(--tw-ring-opacity));
 }
 
-.ring-red-500 {
+.ring-red-600 {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(242 92 71 / var(--tw-ring-opacity));
 }
@@ -5397,12 +5397,12 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   border-color: rgb(0 191 255 / var(--tw-border-opacity));
 }
 
-.hover\:border-red-600:hover {
+.hover\:border-red-700:hover {
   --tw-border-opacity: 1;
   border-color: rgb(255 71 46 / var(--tw-border-opacity));
 }
 
-.hover\:border-red-700:hover {
+.hover\:border-red-800:hover {
   --tw-border-opacity: 1;
   border-color: rgb(207 42 20 / var(--tw-border-opacity));
 }
@@ -5452,7 +5452,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   background-color: rgb(0 191 255 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-red-700:hover {
+.hover\:bg-red-800:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(207 42 20 / var(--tw-bg-opacity));
 }
@@ -5485,7 +5485,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   color: rgb(51 204 255 / var(--tw-text-opacity));
 }
 
-.hover\:text-red-700:hover {
+.hover\:text-red-800:hover {
   --tw-text-opacity: 1;
   color: rgb(207 42 20 / var(--tw-text-opacity));
 }
@@ -5547,7 +5547,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   border-color: rgb(0 191 255 / var(--tw-border-opacity));
 }
 
-.focus\:border-red-500:focus {
+.focus\:border-red-600:focus {
   --tw-border-opacity: 1;
   border-color: rgb(242 92 71 / var(--tw-border-opacity));
 }
@@ -5610,7 +5610,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   border-color: rgb(51 204 255 / var(--tw-border-opacity));
 }
 
-.active\:border-red-500:active {
+.active\:border-red-600:active {
   --tw-border-opacity: 1;
   border-color: rgb(242 92 71 / var(--tw-border-opacity));
 }
@@ -5630,7 +5630,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   background-color: rgb(51 204 255 / var(--tw-bg-opacity));
 }
 
-.active\:bg-red-600:active {
+.active\:bg-red-700:active {
   --tw-bg-opacity: 1;
   background-color: rgb(255 71 46 / var(--tw-bg-opacity));
 }

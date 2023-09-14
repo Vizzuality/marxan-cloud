@@ -214,7 +214,7 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
 
       <div className="mt-5 space-y-1">
         {JOBS_RUNNING && (
-          <p className="text-center text-xs text-red-500">
+          <p className="text-center text-xs text-red-600">
             {`You can't generate a new export
               while there are running jobs.`}
           </p>

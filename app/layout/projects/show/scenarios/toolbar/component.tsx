@@ -83,7 +83,7 @@ export const ProjectScenariosToolbar: React.FC<ProjectScenariosToolbarProps> = (
           Filters
           {!!FILTERS_LENGTH && (
             <span
-              className="absolute left-0 top-0 rounded-full bg-red-500 px-1 py-0.5 text-xxs leading-none text-white"
+              className="absolute left-0 top-0 rounded-full bg-red-600 px-1 py-0.5 text-xxs leading-none text-white"
               style={{ fontFamily: 'Arial' }}
             >
               {FILTERS_LENGTH}

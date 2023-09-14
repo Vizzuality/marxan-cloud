@@ -43,7 +43,7 @@ const UnderModeration: React.FC = () => {
         >
           <motion.div
             key="under-moderation"
-            className="inline-flex items-center justify-start space-x-2.5 rounded-lg bg-red-500 px-2.5 py-2"
+            className="inline-flex items-center justify-start space-x-2.5 rounded-lg bg-red-600 px-2.5 py-2"
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -10, opacity: 0 }}

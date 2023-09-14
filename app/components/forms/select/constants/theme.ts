@@ -55,7 +55,7 @@ export default {
   },
   states: {
     none: '',
-    error: 'ring-red-500',
+    error: 'ring-red-600',
     valid: '',
   },
   sizes: {

@@ -142,7 +142,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
                 <div className="flex flex-row items-center">
                   {warnings && (
                     <div className="relative mr-5 flex h-10 w-10 items-center rounded-full border border-solid border-white">
-                      <div className="absolute -right-1 -top-1 h-4 w-4 rounded-full border-4 border-solid border-gray-800 bg-red-500" />
+                      <div className="absolute -right-1 -top-1 h-4 w-4 rounded-full border-4 border-solid border-gray-800 bg-red-600" />
                       <Icon className="h-10 w-10" icon={WARNING_SVG} />
                     </div>
                   )}

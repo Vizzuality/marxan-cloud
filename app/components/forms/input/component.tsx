@@ -12,7 +12,7 @@ const THEME = {
     status: {
       none: 'border-gray-700',
       valid: 'border-gray-700',
-      error: 'border-red-500',
+      error: 'border-red-600',
       disabled: 'border-gray-600 opacity-50',
     },
     icon: 'text-white',
@@ -26,7 +26,7 @@ const THEME = {
     status: {
       none: 'border-gray-900',
       valid: 'border-gray-900',
-      error: 'border-red-500',
+      error: 'border-red-600',
       disabled: 'border-gray-900 opacity-50',
     },
     icon: 'text-gray-900 text-opacity-50',

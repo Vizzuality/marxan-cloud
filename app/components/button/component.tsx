@@ -21,9 +21,9 @@ const THEME = {
     'text-gray-800 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-100 hover:border-gray-400 active:border-gray-300',
 
   danger:
-    'text-red-700 bg-transparent hover:text-white hover:bg-red-700 active:bg-red-600 border border-red-700 hover:border-red-600 active:border-red-500',
+    'text-red-800 bg-transparent hover:text-white hover:bg-red-800 active:bg-red-700 border border-red-800 hover:border-red-700 active:border-red-600',
   'danger-alt':
-    'text-white hover:bg-transparent border border-red-500 hover:text-red-500 bg-red-500 active:bg-red-600 hover:border hover:border-red-500 active:text-white active:border-red-600',
+    'text-white hover:bg-transparent border border-red-600 hover:text-red-600 bg-red-600 active:bg-red-700 hover:border hover:border-red-600 active:text-white active:border-red-700',
 
   spacial:
     'text-white bg-transparent hover:bg-gray-100 active:bg-gray-400 flex items-center justify-center rounded-[40px] focus:outline-none',

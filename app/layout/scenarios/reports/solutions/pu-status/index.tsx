@@ -41,9 +41,9 @@ export const PUStatusReport = (): JSX.Element => {
         </div>
 
         <div className={PU_LEGEND_CONTAINER_CLASSES}>
-          <div className={`${PU_LEGEND_BOX_CLASSES} border-red-500`} />
+          <div className={`${PU_LEGEND_BOX_CLASSES} border-red-600`} />
           <p>Excluded areas </p>
-          <div className="rounded-xl bg-red-500 px-2">{PUDataQuery.data?.excluded.length} PU</div>
+          <div className="rounded-xl bg-red-600 px-2">{PUDataQuery.data?.excluded.length} PU</div>
         </div>
       </div>
     </div>

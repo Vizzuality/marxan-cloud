@@ -193,7 +193,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onDismiss }: UploadMod
                                 true,
                               'bg-gray-600': isDragActive,
                               'border-green-800': isDragAccept,
-                              'border-red-800':
+                              'border-red-900':
                                 isDragReject || (props?.meta?.error && props?.meta?.touched),
                             })}
                           >
