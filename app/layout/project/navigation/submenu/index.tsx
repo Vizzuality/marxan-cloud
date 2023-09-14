@@ -28,7 +28,7 @@ export const SubMenu = ({ items }: { items: SubMenuItem[] }): JSX.Element => {
               href={item.route}
               className={cn({
                 'flex px-[10px]': true,
-                'relative overflow-hidden before:absolute before:-left-[1px] before:block before:h-full before:w-[3px] before:rounded-sm before:bg-blue-400 before:drop-shadow-blue after:absolute after:-right-[1px] after:block after:h-full after:w-[3px] after:rounded-sm after:bg-blue-400 after:drop-shadow-blue':
+                'relative overflow-hidden before:absolute before:-left-[1px] before:block before:h-full before:w-[3px] before:rounded-sm before:bg-blue-500 before:drop-shadow-blue after:absolute after:-right-[1px] after:block after:h-full after:w-[3px] after:rounded-sm after:bg-blue-500 after:drop-shadow-blue':
                   item.selected,
               })}
             >

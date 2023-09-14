@@ -112,13 +112,13 @@ export const UserMenu = (): JSX.Element => {
                 'group items-start space-x-5 bg-transparent': true,
               })}
             >
-              <div className="rounded-xl bg-gray-100 p-2 group-hover:bg-blue-400">
+              <div className="rounded-xl bg-gray-100 p-2 group-hover:bg-blue-500">
                 <Icon icon={PROJECT_DASHBOARD_SVG} className="h-5 w-5 transition-none" />
               </div>
               <div className="space-y-1">
                 <h4 className={ITEM_TITLE_COMMON_CLASSES}>
                   <span>Projects dashboard</span>
-                  <span className="block rounded-[4px] border border-blue-300 bg-blue-100 px-1 text-xs font-semibold">
+                  <span className="block rounded-[4px] border border-blue-300 bg-blue-200 px-1 text-xs font-semibold">
                     {totalProjects}
                   </span>
                 </h4>
@@ -138,7 +138,7 @@ export const UserMenu = (): JSX.Element => {
               </div>
               <Switch
                 onCheckedChange={onToggleHelpGuide}
-                className="bg-gray-600 data-[state=checked]:bg-blue-500"
+                className="bg-gray-600 data-[state=checked]:bg-blue-600"
                 checked={active}
               />
             </div>
@@ -170,7 +170,7 @@ export const UserMenu = (): JSX.Element => {
               href="/community/projects"
               className="flex items-center space-x-2 rounded-3xl bg-black/40 bg-[url('/images/bg-community-projects.png')] bg-right-bottom p-4 hover:bg-blend-darken"
             >
-              <div className="rounded-xl bg-blue-400 p-2 text-white">
+              <div className="rounded-xl bg-blue-500 p-2 text-white">
                 <Icon icon={COMMUNITY_SVG} className="h-5 w-5" />
               </div>
               <h4

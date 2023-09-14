@@ -25,7 +25,7 @@ const RowItem = ({
         <Checkbox
           id={`select-${id}`}
           theme="light"
-          className="block h-4 w-4 checked:bg-blue-400"
+          className="block h-4 w-4 checked:bg-blue-500"
           onChange={onSelectRow}
           value={id}
           checked={isCustom && selectedIds.includes(id)}
@@ -41,7 +41,7 @@ const RowItem = ({
         <span className="inline-flex">{name}</span>
         <div className="mt-1.5 text-xs text-gray-400">
           Currently in use in
-          <span className="rounded bg-blue-500 bg-opacity-10 px-1 text-blue-500">
+          <span className="rounded bg-blue-600 bg-opacity-10 px-1 text-blue-600">
             {scenarios}
           </span>{' '}
           scenarios.
@@ -62,7 +62,7 @@ const RowItem = ({
             <Icon
               className={cn({
                 'h-5 w-5 text-gray-600': true,
-                'text-blue-400': isVisibleOnMap,
+                'text-blue-500': isVisibleOnMap,
               })}
               icon={isVisibleOnMap ? SHOW_SVG : HIDE_SVG}
             />

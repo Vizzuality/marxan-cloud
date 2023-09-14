@@ -45,26 +45,26 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
           )}
           {best && (
             <div className="flex items-center">
-              <p className="text-sm text-blue-400">Best solution</p>
-              <Icon icon={STAR_SVG} className="ml-3 h-3 w-3 text-blue-400" />
+              <p className="text-sm text-blue-500">Best solution</p>
+              <Icon icon={STAR_SVG} className="ml-3 h-3 w-3 text-blue-500" />
             </div>
           )}
         </div>
       </div>
       <div className="grid grid-cols-2 gap-x-5 gap-y-6 pr-32 pt-5 text-sm text-white">
-        <div className="flex space-x-2 border-l-2 border-blue-700 pl-2.5 text-white">
+        <div className="flex space-x-2 border-l-2 border-blue-800 pl-2.5 text-white">
           <p>Score:</p>
           <p className="text-left font-semibold">{scoreValue}</p>
         </div>
-        <div className="flex space-x-2 border-l-2 border-blue-700 pl-2.5 text-white">
+        <div className="flex space-x-2 border-l-2 border-blue-800 pl-2.5 text-white">
           <p>Cost:</p>
           <p className="text-left font-semibold">{costValue}</p>
         </div>
-        <div className="flex space-x-2 border-l-2 border-blue-700 pl-2.5 text-white">
+        <div className="flex space-x-2 border-l-2 border-blue-800 pl-2.5 text-white">
           <p>Missing:</p>
           <p className="text-left font-semibold">{missingValues}</p>
         </div>
-        <div className="flex space-x-2 border-l-2 border-blue-700 pl-2.5 text-white">
+        <div className="flex space-x-2 border-l-2 border-blue-800 pl-2.5 text-white">
           <p>Planning:</p>
           <p className="text-left font-semibold">{planningUnits}</p>
         </div>

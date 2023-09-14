@@ -65,7 +65,7 @@ const InventoryPanel = (): JSX.Element => {
     <Section className="relative flex flex-col space-y-2 overflow-hidden">
       <header className="flex items-center justify-between">
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-blue-400">Inventory Panel</span>
+          <span className="text-xs font-semibold text-blue-500">Inventory Panel</span>
           <h3 className="flex items-center space-x-2">
             <span className="text-lg font-medium">{title}</span>
             {/* Not all panels have an InfoComponent */}

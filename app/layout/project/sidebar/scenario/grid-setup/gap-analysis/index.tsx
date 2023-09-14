@@ -26,7 +26,7 @@ export const GridSetupGAPAnalysis = (): JSX.Element => {
     >
       <Section className="flex flex-col space-y-2 overflow-hidden">
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-blue-400">Grid Setup</span>
+          <span className="text-xs font-semibold text-blue-500">Grid Setup</span>
           <div className="flex items-center space-x-2">
             <h3 className="text-lg font-medium">Gap Analysis</h3>
             <InfoButton theme="primary" className="bg-gray-400">

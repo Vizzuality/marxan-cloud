@@ -38,7 +38,7 @@ export const CommunityInfo: React.FC<CommunityInfoProps> = () => {
             <div className="flex w-96 flex-col">
               <h4 className="mb-2">Reach out with comments or suggestions.</h4>
               <a
-                className="text-left text-blue-500 hover:underline"
+                className="text-left text-blue-600 hover:underline"
                 href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
                 rel="noopener noreferrer"
                 target="_blank"
@@ -51,7 +51,7 @@ export const CommunityInfo: React.FC<CommunityInfoProps> = () => {
             <div className="flex w-96 flex-col">
               <h4 className="mb-2">Follow us on twitter and join in the conversation.</h4>
               <a
-                className="text-left text-blue-500 hover:underline"
+                className="text-left text-blue-600 hover:underline"
                 href="https://twitter.com/marxan_planning?"
                 rel="noopener noreferrer"
                 target="_blank"

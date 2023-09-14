@@ -27,7 +27,7 @@ export const SolutionsTargetAchievements = (): JSX.Element => {
       >
         <Section className="flex w-full flex-col overflow-hidden">
           <div className="space-y-1">
-            <span className="text-xs font-semibold text-blue-400">Solutions</span>
+            <span className="text-xs font-semibold text-blue-500">Solutions</span>
             <div className="flex items-center space-x-2">
               <h3 className="text-lg font-medium">Target Achievement</h3>
               <InfoButton theme="primary" className="bg-gray-400">

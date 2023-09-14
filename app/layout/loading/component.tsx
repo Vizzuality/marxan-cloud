@@ -27,7 +27,7 @@ export const Loading: React.FC<LoadingProps> = ({ loading }: LoadingProps) => {
         >
           <div
             className={cx({
-              'absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-purple-600 to-blue-500 transition-transform':
+              'absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-purple-600 to-blue-600 transition-transform':
                 true,
             })}
             style={{

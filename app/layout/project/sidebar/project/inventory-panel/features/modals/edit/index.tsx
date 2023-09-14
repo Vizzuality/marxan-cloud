@@ -176,7 +176,7 @@ const EditModal = ({
 
                       <input
                         {...fprops.input}
-                        className="h-10 w-full rounded-md border border-gray-400 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="h-10 w-full rounded-md border border-gray-400 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-600"
                         placeholder="Type name..."
                         defaultValue={fprops.input.value}
                       />
@@ -199,7 +199,7 @@ const EditModal = ({
                         <div className="space-y-2">
                           <input
                             {...fprops.input}
-                            className="h-10 w-full rounded-md border border-gray-400 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className="h-10 w-full rounded-md border border-gray-400 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-600"
                             placeholder="Type to pick or create tag..."
                             value={fprops.input.value}
                             onFocus={() => {

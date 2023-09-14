@@ -115,7 +115,7 @@ export const ScenariosAdvancedSettings = (): JSX.Element => {
       <Section className="h-full w-full overflow-hidden">
         <div className="flex h-full flex-col space-y-1">
           <div className="space-y-1">
-            <span className="text-xs font-semibold text-blue-400">Advanced Settings</span>
+            <span className="text-xs font-semibold text-blue-500">Advanced Settings</span>
             <div className="flex items-center space-x-2">
               <h3 className="text-lg font-medium">Overview</h3>
             </div>

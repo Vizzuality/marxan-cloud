@@ -9,7 +9,7 @@ export const SCENARIO_STATES = {
   },
   'run-done': {
     text: 'Run Scenario',
-    styles: 'text-blue-500',
+    styles: 'text-blue-600',
   },
   'calibration-running': {
     text: 'Running Calibration',

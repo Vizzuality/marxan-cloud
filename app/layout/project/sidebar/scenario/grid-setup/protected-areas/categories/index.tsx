@@ -193,7 +193,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
   return (
     <Section className="flex h-full flex-col overflow-hidden">
       <div className="space-y-1">
-        <span className="text-xs font-semibold text-blue-400">Grid Setup</span>
+        <span className="text-xs font-semibold text-blue-500">Grid Setup</span>
         <h3 className="flex items-center space-x-2">
           <span className="text-lg font-medium">Protected Areas</span>
         </h3>

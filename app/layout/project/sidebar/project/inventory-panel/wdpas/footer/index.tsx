@@ -9,7 +9,7 @@ const ProtectedAreasFooter = (): JSX.Element => {
       <p className="mt-7">
         Available at:{' '}
         <a
-          className="text-blue-400"
+          className="text-blue-500"
           href="https://www.protectedplanet.net/"
           target="_blank"
           rel="noopener noreferrer"

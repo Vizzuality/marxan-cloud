@@ -43,7 +43,7 @@ const InventoryTable = ({
                 <Checkbox
                   id="select-all"
                   theme="light"
-                  className="block h-4 w-4 checked:bg-blue-400"
+                  className="block h-4 w-4 checked:bg-blue-500"
                   onChange={onSelectAll}
                   disabled={noDataCustom}
                 />

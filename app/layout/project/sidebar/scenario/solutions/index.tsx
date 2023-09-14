@@ -68,7 +68,7 @@ export const ScenariosSidebarShowSolutions = (): JSX.Element => {
           <span>Run number {s.runId}</span>
 
           {s.id === bestSolutionData?.id && (
-            <Icon icon={STAR_SVG} className="ml-3 h-2.5 w-2.5 text-blue-400" />
+            <Icon icon={STAR_SVG} className="ml-3 h-2.5 w-2.5 text-blue-500" />
           )}
         </div>
       ),

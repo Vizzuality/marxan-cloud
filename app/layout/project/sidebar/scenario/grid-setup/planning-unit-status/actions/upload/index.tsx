@@ -223,10 +223,10 @@ export const UploadPUMethod = (): JSX.Element => {
           <div className="flex w-full cursor-pointer items-center space-x-8 py-5">
             <div className="flex items-center space-x-2 ">
               <label
-                className="rounded-3xl bg-blue-500 bg-opacity-10 px-2.5 py-px"
+                className="rounded-3xl bg-blue-600 bg-opacity-10 px-2.5 py-px"
                 htmlFor="cancel-shapefile-btn"
               >
-                <p className="text-sm text-blue-500">{successFile.name}</p>
+                <p className="text-sm text-blue-600">{successFile.name}</p>
               </label>
               <button
                 id="cancel-shapefile-btn"

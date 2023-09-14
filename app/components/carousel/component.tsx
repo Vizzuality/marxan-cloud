@@ -106,7 +106,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
               }}
               className={cx({
                 'relative w-20': true,
-                'h-1 bg-blue-500': slide === i,
+                'h-1 bg-blue-600': slide === i,
                 'h-0.5 bg-gray-400': slide !== i,
               })}
             >

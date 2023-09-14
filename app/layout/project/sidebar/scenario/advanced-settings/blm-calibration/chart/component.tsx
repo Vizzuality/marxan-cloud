@@ -231,9 +231,9 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data, selected, onChange }: 
                   <div
                     aria-hidden="true"
                     className={classnames({
-                      'h-3 w-3 cursor-pointer rounded-full border-2 border-blue-500 bg-black hover:border-2 hover:bg-primary-500':
+                      'h-3 w-3 cursor-pointer rounded-full border-2 border-blue-600 bg-black hover:border-2 hover:bg-primary-500':
                         true,
-                      'bg-blue-500': blmValue === selected,
+                      'bg-blue-600': blmValue === selected,
                     })}
                     onClick={() => {
                       onChange(blmValue);

@@ -124,7 +124,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                 <img src={input.value.logoDataUrl} alt={input.value.name} className="max-w-full" />
               </div>
               <label
-                className="rounded-3xl bg-blue-100 bg-opacity-10 px-3 py-1"
+                className="rounded-3xl bg-blue-200 bg-opacity-10 px-3 py-1"
                 htmlFor="cancel-shapefile-btn"
               >
                 <p className="text-sm text-primary-500">{input.value.name}</p>

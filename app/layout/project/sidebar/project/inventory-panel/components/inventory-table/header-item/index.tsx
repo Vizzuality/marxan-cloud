@@ -39,14 +39,14 @@ const HeaderItem = ({ className, text, name, sorting, onClick }: HeaderItem): JS
         <HiArrowDown
           className={cn({
             'h-5 w-5 text-gray-600': true,
-            'text-blue-400': isActive,
+            'text-blue-500': isActive,
           })}
         />
       ) : (
         <HiArrowUp
           className={cn({
             'h-5 w-5 text-gray-600': true,
-            'text-blue-400': isActive,
+            'text-blue-500': isActive,
           })}
         />
       )}

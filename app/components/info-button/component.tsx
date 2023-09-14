@@ -9,7 +9,7 @@ import INFO_SVG from 'svgs/ui/info.svg?sprite';
 
 const THEME = {
   primary: {
-    button: 'bg-blue-400',
+    button: 'bg-blue-500',
     icon: 'text-gray-900',
   },
   secondary: {

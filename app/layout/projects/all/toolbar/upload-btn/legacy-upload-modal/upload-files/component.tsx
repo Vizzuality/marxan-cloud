@@ -332,7 +332,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                   >
                     Back
                   </Button>
-                  <div className="before:absolute before:bg-blue-500 after:flex after:bg-blue-300" />
+                  <div className="before:absolute before:bg-blue-600 after:flex after:bg-blue-300" />
 
                   <Button theme="primary" size="xl" type="submit">
                     Save

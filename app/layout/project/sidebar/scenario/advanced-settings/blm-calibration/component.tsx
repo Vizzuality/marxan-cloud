@@ -111,7 +111,7 @@ export const ScenariosBLMCalibration = (): JSX.Element => {
     >
       <Section className="flex w-full flex-col overflow-hidden">
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-blue-400">Advanced Settings</span>
+          <span className="text-xs font-semibold text-blue-500">Advanced Settings</span>
           <div className="flex items-center space-x-2">
             <h3 className="text-lg font-medium">BLM Calibration</h3>
           </div>

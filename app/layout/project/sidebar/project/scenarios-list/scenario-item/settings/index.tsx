@@ -46,25 +46,25 @@ const ScenarioSettings = ({ id }: { id: Scenario['id'] }): JSX.Element => {
     <dl className="grid w-full grid-cols-2 flex-col gap-x-10 gap-y-2 rounded-b-3xl bg-gray-800 px-8 pb-4 pt-6 text-xs">
       <div className="flex space-x-2">
         <dt>Protected areas:</dt>
-        <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-sm text-blue-400">
+        <dd className="rounded bg-blue-500 bg-opacity-30 px-1.5 text-sm text-blue-500">
           {protectedAreas?.length || '-'}
         </dd>
       </div>
       <div className="flex space-x-2">
         <dt>Features:</dt>
-        <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-sm text-blue-400">
+        <dd className="rounded bg-blue-500 bg-opacity-30 px-1.5 text-sm text-blue-500">
           {selectedFeaturesData?.length || '-'}
         </dd>
       </div>
       <div className="flex space-x-2">
         <dt>Runs:</dt>
-        <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-sm text-blue-400">
+        <dd className="rounded bg-blue-500 bg-opacity-30 px-1.5 text-sm text-blue-500">
           {scenarioData?.numberOfRuns || '-'}
         </dd>
       </div>
       <div className="flex space-x-2">
         <dt>BLM:</dt>
-        <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-sm text-blue-400">
+        <dd className="rounded bg-blue-500 bg-opacity-30 px-1.5 text-sm text-blue-500">
           {scenarioData?.boundaryLengthModifier || '-'}
         </dd>
       </div>

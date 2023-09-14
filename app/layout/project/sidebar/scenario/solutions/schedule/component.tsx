@@ -54,7 +54,7 @@ export const ScenariosSolutionsSchedule: React.FC<ScenariosSolutionsScheduleProp
             <div className="flex flex-col justify-center">
               Schedule scenario
               {numberOfSchedules > 0 && (
-                <span className="text-xxs text-blue-400">
+                <span className="text-xxs text-blue-500">
                   {`${numberOfSchedules} schedule${numberOfSchedules > 1 ? 's' : ''}`}
                 </span>
               )}

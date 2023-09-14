@@ -197,7 +197,7 @@ export const GridSetupCostSurface = (): JSX.Element => {
     >
       <Section>
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-blue-400">Grid Setup</span>
+          <span className="text-xs font-semibold text-blue-500">Grid Setup</span>
           <div className="flex items-center space-x-2">
             <h3 className="text-lg font-medium">Cost surface</h3>
             <InfoButton theme="primary" className="bg-gray-400">
@@ -386,7 +386,7 @@ export const GridSetupCostSurface = (): JSX.Element => {
                     <div className="flex w-full cursor-pointer flex-col space-y-6">
                       <div className="flex items-center space-x-2">
                         <label
-                          className="rounded-3xl bg-blue-100 bg-opacity-10 px-3 py-1"
+                          className="rounded-3xl bg-blue-200 bg-opacity-10 px-3 py-1"
                           htmlFor="cancel-shapefile-btn"
                         >
                           <p className="text-sm text-primary-500">{successFile.name}</p>

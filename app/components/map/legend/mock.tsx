@@ -97,7 +97,7 @@ const ITEMS = [
   {
     id: 'YYY',
     name: 'All features',
-    icon: <div className="mt-1 h-3 w-3 rounded bg-blue-500" />,
+    icon: <div className="mt-1 h-3 w-3 rounded bg-blue-600" />,
     description:
       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus minus eligendi doloremque unde, atque maxime.',
   },

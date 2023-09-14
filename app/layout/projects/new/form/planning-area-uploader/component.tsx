@@ -171,7 +171,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
           <div className="flex w-full cursor-pointer flex-col space-y-6">
             <div className="flex items-center space-x-2">
               <label
-                className="rounded-3xl bg-blue-100 bg-opacity-10 px-3 py-1"
+                className="rounded-3xl bg-blue-200 bg-opacity-10 px-3 py-1"
                 htmlFor="cancel-shapefile-btn"
               >
                 <p className="text-sm text-primary-500">{successFile.name}</p>

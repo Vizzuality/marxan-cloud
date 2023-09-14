@@ -2831,17 +2831,17 @@ input[data-autocompleted] {
   border-color: rgb(30 199 255 / var(--tw-border-opacity));
 }
 
-.border-blue-500 {
+.border-blue-600 {
   --tw-border-opacity: 1;
   border-color: rgb(1 173 241 / var(--tw-border-opacity));
 }
 
-.border-blue-700 {
+.border-blue-800 {
   --tw-border-opacity: 1;
   border-color: rgb(27 114 245 / var(--tw-border-opacity));
 }
 
-.border-blue-800 {
+.border-blue-900 {
   --tw-border-opacity: 1;
   border-color: rgb(1 94 235 / var(--tw-border-opacity));
 }
@@ -2981,36 +2981,36 @@ input[data-autocompleted] {
   background-color: rgb(0 0 0 / 0.4);
 }
 
-.bg-blue-100 {
+.bg-blue-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(153 230 255 / var(--tw-bg-opacity));
 }
 
-.bg-blue-400 {
+.bg-blue-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(0 191 255 / var(--tw-bg-opacity));
 }
 
-.bg-blue-400\/25 {
+.bg-blue-500\/25 {
   background-color: rgb(0 191 255 / 0.25);
-}
-
-.bg-blue-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(1 173 241 / var(--tw-bg-opacity));
 }
 
 .bg-blue-600 {
   --tw-bg-opacity: 1;
-  background-color: rgb(55 135 255 / var(--tw-bg-opacity));
+  background-color: rgb(1 173 241 / var(--tw-bg-opacity));
 }
 
 .bg-blue-700 {
   --tw-bg-opacity: 1;
-  background-color: rgb(27 114 245 / var(--tw-bg-opacity));
+  background-color: rgb(55 135 255 / var(--tw-bg-opacity));
 }
 
 .bg-blue-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(27 114 245 / var(--tw-bg-opacity));
+}
+
+.bg-blue-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(1 94 235 / var(--tw-bg-opacity));
 }
@@ -3239,7 +3239,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-blue-100 {
+.from-blue-200 {
   --tw-gradient-from: #99E6FF var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(153 230 255 / 0)  var(--tw-gradient-from-position);
@@ -3247,7 +3247,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-blue-400 {
+.from-blue-500 {
   --tw-gradient-from: #00BFFF var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(0 191 255 / 0)  var(--tw-gradient-from-position);
@@ -3381,17 +3381,17 @@ input[data-autocompleted] {
   --tw-gradient-to-position:  ;
 }
 
-.to-blue-400 {
+.to-blue-500 {
   --tw-gradient-to: #00BFFF var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
 
-.to-blue-500 {
+.to-blue-600 {
   --tw-gradient-to: #01ADF1 var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
 
-.to-blue-700 {
+.to-blue-800 {
   --tw-gradient-to: #1B72F5 var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
@@ -4180,12 +4180,12 @@ input[data-autocompleted] {
   color: rgb(30 199 255 / var(--tw-text-opacity));
 }
 
-.text-blue-400 {
+.text-blue-500 {
   --tw-text-opacity: 1;
   color: rgb(0 191 255 / var(--tw-text-opacity));
 }
 
-.text-blue-500 {
+.text-blue-600 {
   --tw-text-opacity: 1;
   color: rgb(1 173 241 / var(--tw-text-opacity));
 }
@@ -5513,13 +5513,13 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   border-radius: 0.125rem;
 }
 
-.before\:bg-blue-400::before {
+.before\:bg-blue-500::before {
   content: var(--tw-content);
   --tw-bg-opacity: 1;
   background-color: rgb(0 191 255 / var(--tw-bg-opacity));
 }
 
-.before\:bg-blue-500::before {
+.before\:bg-blue-600::before {
   content: var(--tw-content);
   --tw-bg-opacity: 1;
   background-color: rgb(1 173 241 / var(--tw-bg-opacity));
@@ -5708,7 +5708,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   background-color: rgb(30 199 255 / var(--tw-bg-opacity));
 }
 
-.after\:bg-blue-400::after {
+.after\:bg-blue-500::after {
   content: var(--tw-content);
   --tw-bg-opacity: 1;
   background-color: rgb(0 191 255 / var(--tw-bg-opacity));
@@ -5795,7 +5795,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   border-color: transparent;
 }
 
-.checked\:bg-blue-400:checked {
+.checked\:bg-blue-500:checked {
   --tw-bg-opacity: 1;
   background-color: rgb(0 191 255 / var(--tw-bg-opacity));
 }
@@ -6074,7 +6074,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
-.focus\:ring-blue-500:focus {
+.focus\:ring-blue-600:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(1 173 241 / var(--tw-ring-opacity));
 }
@@ -6184,7 +6184,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   border-color: rgb(53 55 62 / var(--tw-border-opacity));
 }
 
-.group:hover .group-hover\:bg-blue-400 {
+.group:hover .group-hover\:bg-blue-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(0 191 255 / var(--tw-bg-opacity));
 }
@@ -6258,7 +6258,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.data-\[state\=checked\]\:bg-blue-500[data-state=checked] {
+.data-\[state\=checked\]\:bg-blue-600[data-state=checked] {
   --tw-bg-opacity: 1;
   background-color: rgb(1 173 241 / var(--tw-bg-opacity));
 }
