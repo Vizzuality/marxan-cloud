@@ -253,7 +253,7 @@ export const CostSurfaceUploadModal = ({
                               'relative w-full cursor-pointer rounded-lg border-[1.5px] border-dashed border-gray-400 bg-gray-200 bg-opacity-20 py-10 hover:bg-gray-200':
                                 true,
                               'bg-gray-600': isDragActive,
-                              'border-green-800': isDragAccept,
+                              'border-green-900': isDragAccept,
                               'border-red-900':
                                 isDragReject || (props?.meta?.error && props?.meta?.touched),
                             })}

@@ -216,7 +216,7 @@ const ProjectTitle = (): JSX.Element => {
                           <Icon
                             icon={CHECKED_SVG}
                             className={cn({
-                              'h-4 w-4 text-green-500 transition-colors': true,
+                              'h-4 w-4 text-green-600 transition-colors': true,
                             })}
                           />
                         </motion.button>

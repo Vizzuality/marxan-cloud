@@ -336,7 +336,7 @@ export const Item: React.FC<ItemProps> = ({
           {intersectFeaturesSelected.map((f) => {
             return (
               <li key={`${f.value}`} className="relative mt-0.5 flex items-center py-2 pr-2.5">
-                <div className="absolute left-0 top-0 block h-full w-px bg-gradient-to-b from-green-300 to-yellow-400" />
+                <div className="absolute left-0 top-0 block h-full w-px bg-gradient-to-b from-green-400 to-yellow-400" />
                 <div className="relative flex font-heading text-xs">
                   <div className="ml-2.5 inline-block max-w-sm">
                     {name} in {f.label}

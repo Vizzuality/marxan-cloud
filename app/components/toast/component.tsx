@@ -23,8 +23,8 @@ const THEME: ToastTheme = {
   },
   success: {
     icon: SUCCESS_SVG,
-    bg: 'from-green-400 to-green-700',
-    hoverBg: 'from-green-100 to-green-400',
+    bg: 'from-green-500 to-green-800',
+    hoverBg: 'from-green-200 to-green-500',
   },
   warning: {
     icon: WARNING_SVG,

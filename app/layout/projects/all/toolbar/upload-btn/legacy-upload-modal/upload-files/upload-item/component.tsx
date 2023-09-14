@@ -158,7 +158,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: U
               'relative w-full cursor-pointer border border-dotted border-gray-400 bg-gray-200 bg-opacity-20 py-10 hover:bg-gray-200':
                 true,
               'bg-gray-600': isDragActive,
-              'border-green-800': isDragAccept,
+              'border-green-900': isDragAccept,
               'border-red-900': isDragReject || (fprops?.meta?.error && fprops?.meta?.touched),
             })}
           >

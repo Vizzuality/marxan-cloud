@@ -24,7 +24,7 @@ const SCENARIO_STATES = {
   },
   'run-done': {
     text: 'Run Scenario',
-    styles: 'text-green-500',
+    styles: 'text-green-600',
   },
   'calibration-running': {
     text: 'Running Calibration',

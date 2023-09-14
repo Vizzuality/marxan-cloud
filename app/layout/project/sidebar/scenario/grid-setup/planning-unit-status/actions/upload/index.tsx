@@ -179,7 +179,7 @@ export const UploadPUMethod = (): JSX.Element => {
           'relative flex w-full cursor-pointer rounded-xl border border-dashed p-8 hover:bg-gray-600':
             true,
           'bg-gray-600': isDragActive,
-          'border-green-800': isDragAccept,
+          'border-green-900': isDragAccept,
           'border-red-900': isDragReject,
         })}
       >

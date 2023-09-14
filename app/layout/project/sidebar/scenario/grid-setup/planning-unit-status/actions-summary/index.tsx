@@ -186,13 +186,13 @@ export const ActionsSummary = ({
           <span className="flex flex-1 items-center space-x-2">
             <Icon
               icon={HEXAGON_SVG}
-              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-green-300"
+              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-green-400"
             />
             <span className="text-sm text-white">Included areas</span>
           </span>
           <span
             className={cn('flex flex-1 items-center justify-center text-sm text-white', {
-              'text-green-300': puAction === 'include',
+              'text-green-400': puAction === 'include',
             })}
           >
             {puTmpIncludedValue.length + puIncludedValue.length} PU

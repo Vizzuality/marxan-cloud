@@ -2886,12 +2886,12 @@ input[data-autocompleted] {
   border-color: rgb(21 21 21 / var(--tw-border-opacity));
 }
 
-.border-green-500 {
+.border-green-600 {
   --tw-border-opacity: 1;
   border-color: rgb(3 214 194 / var(--tw-border-opacity));
 }
 
-.border-green-800 {
+.border-green-900 {
   --tw-border-opacity: 1;
   border-color: rgb(2 159 144 / var(--tw-border-opacity));
 }
@@ -3064,12 +3064,12 @@ input[data-autocompleted] {
   background-color: rgb(21 21 21 / var(--tw-bg-opacity));
 }
 
-.bg-green-300 {
+.bg-green-400 {
   --tw-bg-opacity: 1;
   background-color: rgb(3 231 209 / var(--tw-bg-opacity));
 }
 
-.bg-green-500 {
+.bg-green-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(3 214 194 / var(--tw-bg-opacity));
 }
@@ -3271,7 +3271,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-green-100 {
+.from-green-200 {
   --tw-gradient-from: #8CF9EF var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(140 249 239 / 0)  var(--tw-gradient-from-position);
@@ -3279,7 +3279,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-green-300 {
+.from-green-400 {
   --tw-gradient-from: #03E7D1 var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(3 231 209 / 0)  var(--tw-gradient-from-position);
@@ -3287,7 +3287,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-green-400 {
+.from-green-500 {
   --tw-gradient-from: #03E4CE var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(3 228 206 / 0)  var(--tw-gradient-from-position);
@@ -3401,12 +3401,12 @@ input[data-autocompleted] {
   --tw-gradient-to-position:  ;
 }
 
-.to-green-400 {
+.to-green-500 {
   --tw-gradient-to: #03E4CE var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
 
-.to-green-700 {
+.to-green-800 {
   --tw-gradient-to: #02AD9D var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
@@ -4225,12 +4225,12 @@ input[data-autocompleted] {
   color: rgb(21 21 21 / var(--tw-text-opacity));
 }
 
-.text-green-300 {
+.text-green-400 {
   --tw-text-opacity: 1;
   color: rgb(3 231 209 / var(--tw-text-opacity));
 }
 
-.text-green-500 {
+.text-green-600 {
   --tw-text-opacity: 1;
   color: rgb(3 214 194 / var(--tw-text-opacity));
 }

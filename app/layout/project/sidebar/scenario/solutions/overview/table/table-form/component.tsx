@@ -170,7 +170,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
                 <Checkbox
                   theme="light"
                   id="checkbox-5-dif-solutions"
-                  className="form-checkbox-dark block h-4 w-4 text-green-300"
+                  className="form-checkbox-dark block h-4 w-4 text-green-400"
                   onChange={(event) => setMostDifSolutions(event.target.checked)}
                 />
                 <Label
