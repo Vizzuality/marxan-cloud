@@ -78,7 +78,7 @@ export const Item: React.FC<ItemProps> = ({
         'relative overflow-hidden border-l-4 px-4 pb-4 pt-1 text-white transition-opacity duration-300':
           true,
         'opacity-20': muted,
-        'border-purple-700': true,
+        'border-purple-800': true,
         'pb-8': !onTarget,
         [className]: className !== undefined && className !== null,
       })}
@@ -108,7 +108,7 @@ export const Item: React.FC<ItemProps> = ({
       </div>
       <div className="flex justify-start">
         <div className="mr-5">
-          <div className="mr-3 inline-block h-3 w-3 rounded-sm bg-purple-700 align-middle" />
+          <div className="mr-3 inline-block h-3 w-3 rounded-sm bg-purple-800 align-middle" />
           <span className="text-sm">
             Current: {percentFormatter.format(current.percent)} ({current.value} {current.unit})
           </span>
@@ -122,7 +122,7 @@ export const Item: React.FC<ItemProps> = ({
       </div>
       <div ref={chartRef} className="relative mt-4 h-2.5 rounded-sm bg-gray-700">
         <div
-          className="absolute h-full rounded-sm bg-purple-700"
+          className="absolute h-full rounded-sm bg-purple-800"
           style={{ width: `${current.percent * 100}%` }}
         />
         <div

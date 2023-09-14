@@ -106,7 +106,7 @@ function buildChildren({ theme, children }) {
   if (theme === 'spacial') {
     return (
       <>
-        <div className="absolute bottom-0 left-0 right-0 top-0 z-0 rounded-[40px] bg-gradient-to-r from-purple-500 to-blue-500">
+        <div className="absolute bottom-0 left-0 right-0 top-0 z-0 rounded-[40px] bg-gradient-to-r from-purple-600 to-blue-500">
           <div className="relative h-full w-full border-2 border-transparent">
             <div className="absolute h-full w-full rounded-[40px] bg-black transition-colors group-hover:bg-transparent" />
           </div>

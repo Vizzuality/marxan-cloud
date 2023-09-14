@@ -90,7 +90,7 @@ const ITEMS = [
   {
     id: 'XXX',
     name: 'Included areas',
-    icon: <Icon icon={HEXAGON_SVG} className="mt-1 h-3.5 w-3.5 text-purple-500" />,
+    icon: <Icon icon={HEXAGON_SVG} className="mt-1 h-3.5 w-3.5 text-purple-600" />,
     description:
       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus minus eligendi doloremque unde, atque maxime dolore officiis quia architecto fugiat, dolorem animi vel! Velit minus facere maxime consequuntur iure. Nisi!',
   },
@@ -104,7 +104,7 @@ const ITEMS = [
   {
     id: 'ZZZ',
     name: 'Protected areas',
-    icon: <div className="mt-1 h-3 w-3 rounded bg-pink-500" />,
+    icon: <div className="mt-1 h-3 w-3 rounded bg-pink-600" />,
     description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit.',
   },
   {
