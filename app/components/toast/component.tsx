@@ -28,8 +28,8 @@ const THEME: ToastTheme = {
   },
   warning: {
     icon: WARNING_SVG,
-    bg: 'from-yellow-400 to-yellow-700',
-    hoverBg: 'from-yellow-100 to-yellow-400',
+    bg: 'from-yellow-500 to-yellow-800',
+    hoverBg: 'from-yellow-200 to-yellow-500',
   },
   error: {
     icon: ERROR_SVG,

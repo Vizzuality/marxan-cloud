@@ -341,7 +341,7 @@ export const FeatureUploadModal = ({
                                     {tagsQuery.data?.map((tag) => (
                                       <button
                                         key={tag}
-                                        className="inline-block rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5"
+                                        className="inline-block rounded-2xl border border-yellow-700 bg-yellow-500/50 px-3 py-0.5"
                                         onClick={() => {
                                           form.change('tag', tag);
                                           setTagIsDone(true);
@@ -358,7 +358,7 @@ export const FeatureUploadModal = ({
 
                           {values.tag && tagIsDone && (
                             <div className="flex items-center space-x-1">
-                              <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-600 bg-yellow-400/50 px-3 py-0.5 hover:bg-yellow-600">
+                              <div className="inline-block items-center space-x-2 rounded-2xl border border-yellow-700 bg-yellow-500/50 px-3 py-0.5 hover:bg-yellow-700">
                                 <p className="text-sm text-gray-900">{values.tag}</p>
                               </div>
                               <button

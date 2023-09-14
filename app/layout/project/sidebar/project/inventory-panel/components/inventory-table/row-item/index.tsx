@@ -50,7 +50,7 @@ const RowItem = ({
       {tag && (
         <td className="w-28 px-6 pb-2 pt-5 text-xs">
           <div className="flex justify-center">
-            <span className="whitespace-nowrap rounded-full bg-yellow-600 bg-opacity-10 px-2 py-1 text-yellow-600">
+            <span className="whitespace-nowrap rounded-full bg-yellow-700 bg-opacity-10 px-2 py-1 text-yellow-700">
               {tag}
             </span>
           </div>

@@ -264,13 +264,13 @@ export const ActionsSummary = ({
           <span className="flex flex-1 items-center space-x-2">
             <Icon
               icon={HEXAGON_SVG}
-              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-yellow-300"
+              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-yellow-400"
             />
             <span className="text-sm text-white">Available areas</span>
           </span>
           <span
             className={cn('flex flex-1 items-center justify-center text-sm text-white', {
-              'text-yellow-300': puAction === 'available',
+              'text-yellow-400': puAction === 'available',
             })}
           >
             {puTmpAvailableValue.length + puAvailableValue.length} PU

@@ -34,7 +34,7 @@ export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
           className={cx({
             'h-full rounded-md': true,
             'bg-green-500': STRENGTH === 'strong',
-            'bg-yellow-700': STRENGTH === 'medium',
+            'bg-yellow-800': STRENGTH === 'medium',
             'bg-red-600': STRENGTH === 'weak',
           })}
           style={{

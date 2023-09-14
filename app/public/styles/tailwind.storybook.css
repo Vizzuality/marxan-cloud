@@ -2935,7 +2935,7 @@ input[data-autocompleted] {
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
 }
 
-.border-yellow-400 {
+.border-yellow-500 {
   --tw-border-opacity: 1;
   border-color: rgb(255 196 83 / var(--tw-border-opacity));
 }
@@ -3092,27 +3092,27 @@ input[data-autocompleted] {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
-.bg-yellow-200 {
+.bg-yellow-300 {
   --tw-bg-opacity: 1;
   background-color: rgb(255 215 128 / var(--tw-bg-opacity));
 }
 
-.bg-yellow-300 {
+.bg-yellow-400 {
   --tw-bg-opacity: 1;
   background-color: rgb(255 202 66 / var(--tw-bg-opacity));
 }
 
-.bg-yellow-400 {
+.bg-yellow-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(255 196 83 / var(--tw-bg-opacity));
 }
 
-.bg-yellow-500 {
+.bg-yellow-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(253 185 68 / var(--tw-bg-opacity));
 }
 
-.bg-yellow-700 {
+.bg-yellow-800 {
   --tw-bg-opacity: 1;
   background-color: rgb(247 150 24 / var(--tw-bg-opacity));
 }
@@ -3261,7 +3261,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-yellow-100 {
+.from-yellow-200 {
   --tw-gradient-from: #FFDD8D var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(255 221 141 / 0)  var(--tw-gradient-from-position);
@@ -3269,7 +3269,7 @@ input[data-autocompleted] {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
-.from-yellow-400 {
+.from-yellow-500 {
   --tw-gradient-from: #FFC453 var(--tw-gradient-from-position);
   --tw-gradient-from-position:  ;
   --tw-gradient-to: rgb(255 196 83 / 0)  var(--tw-gradient-from-position);
@@ -3355,17 +3355,17 @@ input[data-autocompleted] {
   --tw-gradient-to-position:  ;
 }
 
-.to-yellow-300 {
+.to-yellow-400 {
   --tw-gradient-to: #FFCA42 var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
 
-.to-yellow-400 {
+.to-yellow-500 {
   --tw-gradient-to: #FFC453 var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
 
-.to-yellow-700 {
+.to-yellow-800 {
   --tw-gradient-to: #F79618 var(--tw-gradient-to-position);
   --tw-gradient-to-position:  ;
 }
@@ -4157,22 +4157,22 @@ input[data-autocompleted] {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.text-yellow-200 {
+.text-yellow-300 {
   --tw-text-opacity: 1;
   color: rgb(255 215 128 / var(--tw-text-opacity));
 }
 
-.text-yellow-300 {
+.text-yellow-400 {
   --tw-text-opacity: 1;
   color: rgb(255 202 66 / var(--tw-text-opacity));
 }
 
-.text-yellow-400 {
+.text-yellow-500 {
   --tw-text-opacity: 1;
   color: rgb(255 196 83 / var(--tw-text-opacity));
 }
 
-.text-yellow-500 {
+.text-yellow-600 {
   --tw-text-opacity: 1;
   color: rgb(253 185 68 / var(--tw-text-opacity));
 }

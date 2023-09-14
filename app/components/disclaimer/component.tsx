@@ -7,7 +7,7 @@ import Icon from 'components/icon';
 import WARNING_SVG from 'svgs/notifications/warning.svg?sprite';
 
 const TYPE = {
-  warning: 'text-yellow-400',
+  warning: 'text-yellow-500',
   blocked: 'text-red-600',
   invalidated: 'text-white',
 };

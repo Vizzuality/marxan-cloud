@@ -28,9 +28,9 @@ export const PUStatusReport = (): JSX.Element => {
           <p>Planning unit grid </p>
         </div>
         <div className={PU_LEGEND_CONTAINER_CLASSES}>
-          <div className={`${PU_LEGEND_BOX_CLASSES} border-yellow-500`} />
+          <div className={`${PU_LEGEND_BOX_CLASSES} border-yellow-600`} />
           <p>Available areas </p>
-          <div className="rounded-xl bg-yellow-500 px-2">
+          <div className="rounded-xl bg-yellow-600 px-2">
             {PUDataQuery.data?.available.length} PU
           </div>
         </div>
