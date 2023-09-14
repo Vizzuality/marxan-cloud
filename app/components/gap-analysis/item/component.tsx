@@ -99,7 +99,7 @@ export const Item: React.FC<ItemProps> = ({
 
         <button
           type="button"
-          className="flex flex-shrink-0 items-center justify-between rounded-4xl border border-transparent px-2 py-1 text-xs focus:border-white"
+          className="flex flex-shrink-0 items-center justify-between rounded-[40px] border border-transparent px-2 py-1 text-xs focus:border-white"
           onClick={onHighlight}
         >
           {highlighted ? 'Lowlight on map' : 'Highlight on map'}

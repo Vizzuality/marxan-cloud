@@ -44,7 +44,7 @@ export const Search = ({ theme = 'dark', size = 'base', ...rest }: SearchProps) 
       <Icon
         icon={SEARCH_SVG}
         className={cn({
-          'absolute left-1 top-1/2 h-4.5 w-4.5 -translate-y-1/2 transform': true,
+          'absolute left-1 top-1/2 h-4 w-4 -translate-y-1/2 transform': true,
           [THEME[theme]]: true,
         })}
       />

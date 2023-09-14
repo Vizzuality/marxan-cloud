@@ -105,7 +105,7 @@ export const Item: React.FC<ItemProps> = ({
         role="presentation"
         style={style}
         className={cx({
-          'relative flex cursor-pointer flex-col rounded-4xl bg-gray-800 px-7 py-8 text-left text-white':
+          'relative flex cursor-pointer flex-col rounded-[40px] bg-gray-800 px-7 py-8 text-left text-white':
             true,
           [className]: !!className,
         })}

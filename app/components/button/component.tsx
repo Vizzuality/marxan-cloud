@@ -26,7 +26,7 @@ const THEME = {
     'text-white hover:bg-transparent border border-red-500 hover:text-red-500 bg-red-500 active:bg-red-600 hover:border hover:border-red-500 active:text-white active:border-red-600',
 
   spacial:
-    'text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 flex items-center justify-center rounded-4xl focus:outline-none',
+    'text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 flex items-center justify-center rounded-[40px] focus:outline-none',
 
   dark: 'text-white bg-gray-600 border border-gray-600 hover:bg-black hover:text-white',
   'dark-alt':
@@ -93,7 +93,7 @@ const hasHref = (props: ButtonProps | AnchorProps): props is AnchorProps => 'hre
 
 function buildClassName({ className, disabled, size, theme }) {
   return cn({
-    'group relative flex items-center justify-center rounded-4xl transition-colors focus:outline-none':
+    'group relative flex items-center justify-center rounded-[40px] transition-colors focus:outline-none':
       true,
     [THEME[theme]]: true,
     [SIZE[size]]: true,
@@ -106,9 +106,9 @@ function buildChildren({ theme, children }) {
   if (theme === 'spacial') {
     return (
       <>
-        <div className="absolute bottom-0 left-0 right-0 top-0 z-0 rounded-4xl bg-gradient-to-r from-purple-500 to-blue-500">
+        <div className="absolute bottom-0 left-0 right-0 top-0 z-0 rounded-[40px] bg-gradient-to-r from-purple-500 to-blue-500">
           <div className="relative h-full w-full border-2 border-transparent">
-            <div className="absolute h-full w-full rounded-4xl bg-black transition-colors group-hover:bg-transparent" />
+            <div className="absolute h-full w-full rounded-[40px] bg-black transition-colors group-hover:bg-transparent" />
           </div>
         </div>
         <div className="relative z-20">{children}</div>

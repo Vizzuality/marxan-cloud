@@ -295,7 +295,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -10, opacity: 0 }}
-              className="flex h-full items-center rounded-4xl bg-gray-700 bg-contain bg-right bg-no-repeat pl-20"
+              className="flex h-full items-center rounded-[40px] bg-gray-700 bg-contain bg-right bg-no-repeat pl-20"
               style={{
                 backgroundImage: `url(${bgScenariosDashboard})`,
               }}
