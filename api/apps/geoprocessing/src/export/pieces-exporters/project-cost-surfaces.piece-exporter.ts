@@ -18,7 +18,7 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
-import {ProjectCostSurfacesContent} from "@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces";
+import { ProjectCostSurfacesContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces';
 
 type CreationStatus = ProjectCustomFeature['creation_status'];
 
@@ -38,8 +38,7 @@ type CostSurfaceDataSelectResult = {
 
 @Injectable()
 @PieceExportProvider()
-export class ProjectCostSurfacesPieceExporter
-  implements ExportPieceProcessor {
+export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
   private readonly logger: Logger = new Logger(
     ProjectCostSurfacesPieceExporter.name,
   );
@@ -54,19 +53,14 @@ export class ProjectCostSurfacesPieceExporter
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
-      piece === ClonePiece.ProjectCostSurfaces &&
-      kind === ResourceKind.Project
+      piece === ClonePiece.ProjectCostSurfaces && kind === ResourceKind.Project
     );
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const costSurfaces: ProjectCostSurfacesSelectResult[] = await this.apiEntityManager
       .createQueryBuilder()
-      .select([
-        'cs.id',
-        'cs.name',
-        'cs.is_default',
-      ])
+      .select(['cs.id', 'cs.name', 'cs.is_default'])
       .from('cost_surfaces', 'cs')
       .where('cs.project_id = :projectId', { projectId: input.resourceId })
       .execute();
@@ -76,11 +70,7 @@ export class ProjectCostSurfacesPieceExporter
     if (costSurfacesIds.length > 0) {
       costSurfaceData = await this.geoprocessingEntityManager
         .createQueryBuilder()
-        .select([
-          'scpd.cost_surface_id',
-          'scpd.cost',
-          'scpd.puid',
-        ])
+        .select(['scpd.cost_surface_id', 'scpd.cost', 'scpd.puid'])
         .from('cost_surface_pu_data', 'scpd')
         .where('cost_surface_id IN (:...costSurfacesIds)', {
           costSurfacesIds,
@@ -91,8 +81,7 @@ export class ProjectCostSurfacesPieceExporter
     const fileContent: ProjectCostSurfacesContent = {
       costSurfaces: costSurfaces.map(({ id, ...costSurface }) => ({
         ...costSurface,
-        data: costSurfaceData
-          .filter((data) => data.cost_surface_id === id)
+        data: costSurfaceData.filter((data) => data.cost_surface_id === id),
       })),
     };
 
