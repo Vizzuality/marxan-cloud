@@ -192,7 +192,7 @@ export const UploadPUMethod = (): JSX.Element => {
             Drag and drop your polygon data file <br /> or click here to upload
           </p>
 
-          <p className="text-xs text-gray-100">{`Recommended file size < ${bytesToMegabytes(
+          <p className="text-xs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
             PLANNING_UNIT_UPLOADER_MAX_SIZE
           )} MB`}</p>
         </div>

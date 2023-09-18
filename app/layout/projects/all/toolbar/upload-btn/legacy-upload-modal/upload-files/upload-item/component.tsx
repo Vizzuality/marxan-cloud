@@ -170,7 +170,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: U
               or <b>click here</b> to upload
             </p>
 
-            <p className="mt-2 text-center text-xxs text-gray-100">{`Recommended file size < ${bytesToMegabytes(
+            <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
               f.maxSize
             )} MB`}</p>
           </div>

@@ -290,7 +290,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                       </motion.div>
                     )}
 
-                    <ul className="ml-3 mt-3 flex list-disc flex-col items-start text-center text-xxs leading-5 text-gray-100">
+                    <ul className="ml-3 mt-3 flex list-disc flex-col items-start text-center text-xxs leading-5 text-gray-400">
                       <li>
                         {`Recommended file size < ${bytesToMegabytes(
                           PLANNING_AREA_GRID_UPLOADER_MAX_SIZE

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const defaultTheme = require('tailwindcss/defaultTheme');
 const forms = require('@tailwindcss/forms')({
   strategy: 'class',
 });
@@ -115,7 +116,7 @@ module.exports = {
       },
       fontFamily: {
         heading: 'Poppins',
-        sans: 'Basier Circle',
+        sans: ['Basier Circle', ...defaultTheme.fontFamily.sans],
       },
       fontSize: {
         xxs: ['0.625rem', { lineHeight: '0.75rem' }],

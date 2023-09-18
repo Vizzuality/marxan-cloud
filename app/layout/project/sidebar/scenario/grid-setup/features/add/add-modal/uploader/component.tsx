@@ -229,7 +229,7 @@ export const ScenariosFeaturesAddUploader = (): JSX.Element => {
                               or <b>click here</b> to upload
                             </p>
 
-                            <p className="mt-2 text-center text-xxs text-gray-100">{`Recommended file size < ${bytesToMegabytes(
+                            <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
                               FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE
                             )} MB`}</p>
 

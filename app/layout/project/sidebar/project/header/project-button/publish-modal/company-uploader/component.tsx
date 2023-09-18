@@ -220,7 +220,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                                   or <b>click here</b> to upload
                                 </p>
 
-                                <p className="mt-2 text-center text-xxs text-gray-100">{`Recommended file size < ${bytesToKilobytes(
+                                <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToKilobytes(
                                   COMPANY_LOGO_UPLOADER_MAX_SIZE
                                 )} KB`}</p>
 
