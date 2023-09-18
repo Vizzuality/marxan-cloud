@@ -53,6 +53,6 @@ export const SCENARIO_STATES = {
   },
   draft: {
     text: 'Edited',
-    styles: 'text-gray-100',
+    styles: 'text-gray-600',
   },
 };

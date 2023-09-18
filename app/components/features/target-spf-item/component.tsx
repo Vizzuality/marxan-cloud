@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import cx from 'classnames';
-
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import Slider from 'components/forms/slider';
 import Icon from 'components/icon';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import REMOVE_SVG from 'svgs/ui/remove.svg?sprite';
@@ -52,22 +51,22 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   return (
     <div
       key={id}
-      className={cx({
+      className={cn({
         'relative mb-2 border-transparent py-2 pl-5 text-xs text-white': true,
         [className]: !!className,
         'bg-gray-800': !isAllTargets,
-        'rounded-lg border bg-gray-600': isAllTargets,
+        'rounded-lg border bg-gray-700': isAllTargets,
       })}
     >
       <div
-        className={cx({
+        className={cn({
           'absolute left-0 top-0 h-full w-1 ': true,
           'bg-yellow-500': !isAllTargets,
         })}
       />
       <div className="flex items-start justify-between pb-2 pr-2">
         <span
-          className={cx({
+          className={cn({
             'pr-10 font-heading text-sm font-medium': true,
             'w-4/5': !editable,
           })}
@@ -85,7 +84,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
                 aria-label="manage-see-on-map"
                 type="button"
                 onClick={onSeeOnMap}
-                className={cx({
+                className={cn({
                   'flex h-5 w-5 items-center justify-center text-white': true,
                   'text-gray-400': !isShown,
                 })}

@@ -17,7 +17,7 @@ const THEME = {
     icon: 'text-white',
   },
   tertiary: {
-    button: 'bg-gray-100',
+    button: 'bg-gray-600',
     icon: 'text-white',
   },
 };

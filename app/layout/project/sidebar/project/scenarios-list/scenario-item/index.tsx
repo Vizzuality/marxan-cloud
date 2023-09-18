@@ -159,7 +159,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
                           </div>
                         }
                       >
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-600">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-700">
                           <Icon className="relative w-3 text-white" icon={LOCK_SVG} />
                         </div>
                       </Tooltip>

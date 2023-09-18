@@ -8,14 +8,12 @@ import Wrapper from 'layout/wrapper';
 
 import TWITTER_FILLED_SVG from 'svgs/social/twitter-filled.svg?sprite';
 
-export interface FooterProps {}
-
-export const Footer: React.FC<FooterProps> = () => {
+export const Footer = (): JSX.Element => {
   return (
     <>
       <div className="bg-primary-500">
         <Wrapper>
-          <div className="space-y-18 mx-auto flex w-full max-w-5xl flex-col py-24 font-heading">
+          <div className="mx-auto flex w-full max-w-5xl flex-col space-y-16 py-24 font-heading">
             <div className="text-3xl text-black md:text-6xl">
               <p>Want to know more</p>
               <p>about Marxan?</p>
