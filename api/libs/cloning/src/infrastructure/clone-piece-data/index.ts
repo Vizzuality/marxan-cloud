@@ -21,6 +21,7 @@ import { scenarioOutputFolderRelativePath } from './scenario-output-folder';
 import { scenarioPlanningUnitsDataRelativePath } from './scenario-planning-units-data';
 import { scenarioProtectedAreasRelativePath } from './scenario-protected-areas';
 import { scenarioRunResultsRelativePath } from './scenario-run-results';
+import { projectCostSurfacesRelativePath } from "@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces";
 
 export const exportOnlyClonePieces: ClonePiece[] = [
   ClonePiece.ExportConfig,
@@ -59,6 +60,7 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   [ClonePiece.PlanningAreaCustom]: 1,
   [ClonePiece.PlanningUnitsGrid]: 1,
   [ClonePiece.ProjectCustomProtectedAreas]: 1,
+  [ClonePiece.ProjectCostSurfaces]: 1,
   //
   [ClonePiece.ScenarioMetadata]: 2,
   //
@@ -92,6 +94,7 @@ export class ClonePieceRelativePathResolver {
     [ClonePiece.ProjectMetadata]: () => projectMetadataRelativePath,
     [ClonePiece.ProjectCustomProtectedAreas]: () =>
       projectCustomProtectedAreasRelativePath,
+    [ClonePiece.ProjectCostSurfaces]: () => projectCostSurfacesRelativePath,
     [ClonePiece.ProjectCustomFeatures]: () => projectCustomFeaturesRelativePath,
     [ClonePiece.ProjectPuvsprCalculations]: () =>
       projectPuvsprCalculationsRelativePath,
