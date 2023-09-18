@@ -109,7 +109,10 @@ import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
 import stream from 'stream';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
-import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
+import {
+  ScenariosService,
+  SubmitProtectedAreaError,
+} from '@marxan-api/modules/scenarios/scenarios.service';
 import {
   OutputProjectSummariesService,
   outputProjectSummaryNotFound,
@@ -122,7 +125,6 @@ import {
 } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
-
 export { validationFailed } from '../planning-areas';
 
 export const projectNotFound = Symbol(`project not found`);
