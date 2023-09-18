@@ -1,4 +1,12 @@
-import { useMutation, useQuery, QueryObserverOptions, useQueryClient } from 'react-query';
+import { useMemo } from 'react';
+
+import {
+  useMutation,
+  useQuery,
+  QueryObserverOptions,
+  useQueryClient,
+  useInfiniteQuery,
+} from 'react-query';
 
 import { AxiosRequestConfig } from 'axios';
 import { useSession } from 'next-auth/react';
@@ -81,27 +89,58 @@ export function useSaveScenarioProtectedAreas({
   return useMutation(saveScenarioProtectedAreas);
 }
 
-export function useProjectWDPAs<T = WDPA[]>(
+export function useProjectWDPAs(
   pid: Project['id'],
-  params: { search?: string; sort?: string; filters?: Record<string, unknown> } = {},
-  queryOptions: QueryObserverOptions<WDPA[], Error, T> = {}
+  params: { search?: string; sort?: string } = {}
 ) {
   const { data: session } = useSession();
 
-  return useQuery({
-    queryKey: ['wdpas', pid],
-    queryFn: async () =>
-      API.request<{ data: WDPA[] }>({
-        method: 'GET',
-        url: `/projects/${pid}/protected-areas`,
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-        },
-        params,
-      }).then(({ data }) => data.data),
-    enabled: Boolean(pid),
-    ...queryOptions,
+  const { search, sort } = params;
+
+  const fetchProjectWDPAs = ({ pageParam = 1 }) =>
+    API.request({
+      method: 'GET',
+      url: `/projects/${pid}/protected-areas`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        'page[number]': pageParam,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+      },
+    });
+
+  const query = useInfiniteQuery(['wdpas', pid, JSON.stringify(params)], fetchProjectWDPAs, {
+    retry: false,
+    keepPreviousData: true,
+    getNextPageParam: (lastPage) => {
+      const {
+        data: { meta },
+      } = lastPage;
+      const { page, totalPages } = meta;
+
+      const nextPage = page + 1 > totalPages ? null : page + 1;
+      return nextPage;
+    },
   });
+
+  return useMemo(() => {
+    const { data } = query;
+
+    const { pages } = data || {};
+
+    const parsedData = Array.isArray(pages) && pages.length > 0 ? pages[0].data.data : [];
+
+    return {
+      ...query,
+      data: parsedData,
+    };
+  }, [query]);
 }
 
 export function useEditWDPA({

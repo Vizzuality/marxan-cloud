@@ -40,22 +40,10 @@ const InventoryPanelProtectedAreas = ({
     sort: WDPA_TABLE_COLUMNS[0].name,
   });
 
-  const allProjectWDPAsQuery = useProjectWDPAs(
-    pid,
-    {
-      ...filters,
-      search,
-    },
-    {
-      select: (data) =>
-        data?.map((wdpa) => ({
-          id: wdpa.id,
-          attributes: wdpa.attributes,
-        })),
-      keepPreviousData: true,
-      placeholderData: [],
-    }
-  );
+  const allProjectWDPAsQuery = useProjectWDPAs(pid, {
+    ...filters,
+    search,
+  });
 
   const WDPAIds = allProjectWDPAsQuery.data
     ?.filter((wdpa) => wdpa.attributes.isCustom)
