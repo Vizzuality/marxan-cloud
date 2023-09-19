@@ -23,14 +23,14 @@ import Loading from 'components/loading';
 import Modal from 'components/modal';
 import { PROTECTED_AREA_UPLOADER_SHAPEFILE_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import UploadWDPAsInfoButtonContent from 'layout/info/upload-wdpas';
-import { WDPAAttributes } from 'types/api/wdpa';
+import { WDPA } from 'types/api/wdpa';
 import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export type FormValues = {
-  name: WDPAAttributes['fullName'];
+  name: WDPA['fullName'];
   file: File;
 };
 
@@ -164,7 +164,7 @@ export const WDPAUploadModal = ({
 
       uploadWDPAsShapefileMutation.mutate({ data, id: `${pid}` }, mutationResponse);
     },
-    [pid, addToast, onClose, uploadWDPAsShapefileMutation, successFile]
+    [pid, addToast, onClose, uploadWDPAsShapefileMutation, successFile, queryClient]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({

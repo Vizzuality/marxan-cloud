@@ -47,19 +47,12 @@ const InventoryPanelProtectedAreas = ({
       search,
     },
     {
-      select: (data) =>
-        data?.map((wdpa) => ({
-          id: wdpa.id,
-          attributes: wdpa.attributes,
-        })),
       keepPreviousData: true,
       placeholderData: [],
     }
   );
 
-  const WDPAIds = allProjectWDPAsQuery.data
-    ?.filter((wdpa) => wdpa.attributes.isCustom)
-    .map((wdpa) => wdpa.id);
+  const WDPAIds = allProjectWDPAsQuery.data?.filter((wdpa) => wdpa.isCustom).map((wdpa) => wdpa.id);
 
   const handleSelectAll = useCallback(
     (evt: ChangeEvent<HTMLInputElement>) => {
@@ -112,9 +105,9 @@ const InventoryPanelProtectedAreas = ({
 
   const data: DataItem[] = allProjectWDPAsQuery.data?.map((wdpa) => ({
     ...wdpa,
-    name: wdpa.attributes.isCustom ? wdpa.attributes.fullName : wdpa.attributes.iucnCategory,
-    scenarios: wdpa.attributes.scenarioUsageCount,
-    isCustom: wdpa.attributes.isCustom,
+    name: wdpa.isCustom ? wdpa.fullName : wdpa.iucnCategory,
+    scenarios: wdpa.scenarioUsageCount,
+    isCustom: wdpa.isCustom,
     isVisibleOnMap: visibleWDPAs?.includes(wdpa.id),
   }));
 
