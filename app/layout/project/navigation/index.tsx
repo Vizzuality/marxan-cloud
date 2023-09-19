@@ -7,7 +7,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { TippyProps } from '@tippyjs/react/headless';
+import { usePlausible } from 'next-plausible';
 
+import { useMe } from 'hooks/me';
 import { useRunScenario, useScenario, useScenarioStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -63,7 +65,11 @@ export const Navigation = (): JSX.Element => {
 
   const isProjectRoute = route === '/projects/[pid]';
   const isScenarioRoute = route.startsWith('/projects/[pid]/scenarios/');
+
   const { addToast } = useToasts();
+  const plausible = usePlausible();
+
+  const { data: user } = useMe();
 
   const [submenuState, setSubmenuState] = useState<{ [key in NavigationTreeCategories]: boolean }>({
     user: false,
@@ -122,6 +128,12 @@ export const Navigation = (): JSX.Element => {
               level: 'success',
             }
           );
+          plausible('Run scenario', {
+            props: {
+              userId: `${user.id}`,
+              userEmail: `${user.email}`,
+            },
+          });
         },
         onError: () => {
           addToast(
