@@ -5,7 +5,7 @@ import { AllExceptionsFilter } from './filters/all-exceptions.exception.filter';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
