@@ -4,10 +4,8 @@ import { useMe } from 'hooks/me';
 
 import Wrapper from 'layout/wrapper';
 
-export interface ProjectsWelcomeProps {}
-
-export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
-  const { user } = useMe();
+export const ProjectsWelcome = (): JSX.Element => {
+  const { data: user } = useMe();
   const { email, displayName } = user;
 
   return (

@@ -88,7 +88,7 @@ const MarxanApp = ({ Component, pageProps }: AppProps) => {
                       defaultAutoDismissTime={5000}
                     >
                       <HelpProvider>
-                        <PlausibleProvider domain="marxan.vercel.app">
+                        <PlausibleProvider domain="marxanplanning.org">
                           <Loading {...routeLoading} />
 
                           <div

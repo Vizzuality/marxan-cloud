@@ -181,7 +181,6 @@ export function useWDPAPreviewLayer({
   options,
 }: UseWDPAPreviewLayer) {
   const { opacity = 1, visibility = true } = options || {};
-
   return useMemo(() => {
     if (!active || !bbox) return null;
 

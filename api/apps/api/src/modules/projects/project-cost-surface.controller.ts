@@ -4,14 +4,21 @@ import {
   forwardRef,
   Get,
   Inject,
-  NotImplementedException,
   Param,
+  Patch,
   Post,
   Req,
   UploadedFile,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { projectResource } from '@marxan-api/modules/projects/project.api.entity';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
@@ -30,8 +37,15 @@ import { plainToClass } from 'class-transformer';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
-import { CostSurfaceSerializer } from '@marxan-api/modules/cost-surface/dto/cost-surface.serializer';
 import { UploadCostSurfaceShapefileDto } from '@marxan-api/modules/cost-surface/dto/upload-cost-surface-shapefile.dto';
+import {
+  AsyncJobDto,
+  JsonApiAsyncJobMeta,
+} from '@marxan-api/dto/async-job.dto';
+import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
+import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
+import { CostSurfaceSerializer } from '@marxan-api/modules/cost-surface/dto/cost-surface.serializer';
+import { JSONAPICostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -55,11 +69,9 @@ export class ProjectCostSurfaceController {
     @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: UploadCostSurfaceShapefileDto,
-  ): Promise<NotImplementedException> {
-    /**
-     * @todo: We will have to move ScenarioService.processCostSurfaceShapefile logic to another project-scoped
-     *        service and fire it from here.
-     */
+  ): Promise<JsonApiAsyncJobMeta> {
+    await ensureShapefileHasRequiredFiles(file);
+
     const result = await this.costSurfaceService.uploadCostSurfaceShapefile(
       req.user.id,
       projectId,
@@ -70,6 +82,46 @@ export class ProjectCostSurfaceController {
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
         projectId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    return AsyncJobDto.forProject().asJsonApiMetadata();
+  }
+
+  @ImplementsAcl()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: 'Updates the Cost Surface with the data from the provided DTO',
+  })
+  @ApiParam({
+    name: 'costSurfaceId',
+    description: 'The id of the Cost Surface to be updated',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'The id of the Project that the Cost Surface is associated to',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Patch(`:projectId/cost-surface/:costSurfaceId`)
+  async updateCostSurface(
+    @Param('projectId') projectId: string,
+    @Param('costSurfaceId') costSurfaceId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: UpdateCostSurfaceDto,
+  ): Promise<JSONAPICostSurface> {
+    const result = await this.costSurfaceService.updateCostSurfaceShapefile(
+      req.user.id,
+      projectId,
+      costSurfaceId,
+      dto,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        projectId,
+        costSurfaceId,
         userId: req.user.id,
       });
     }
@@ -82,7 +134,7 @@ export class ProjectCostSurfaceController {
   @Get(`:projectId/cost-surface/:costSurfaceId/cost-range`)
   @ApiOkResponse({ type: CostRangeDto })
   async getCostRange(
-    @Param('scenarioId') scenarioId: string,
+    @Param('projectId') scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<CostRangeDto> {
     const result = await this.scenarioService.getCostRange(

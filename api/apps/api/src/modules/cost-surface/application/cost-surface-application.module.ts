@@ -5,6 +5,9 @@ import { CostSurfaceInfraModule } from '../infra/cost-surface-infra.module';
 import { SetInitialCostSurfaceHandler } from './set-initial-cost-surface.handler';
 import { UpdateCostSurfaceHandler } from './update-cost-surface.handler';
 
+/**
+ * @deprecated
+ */
 @Module({
   imports: [CostSurfaceInfraModule, CostSurfaceAdaptersModule, CqrsModule],
   providers: [SetInitialCostSurfaceHandler, UpdateCostSurfaceHandler],

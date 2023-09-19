@@ -7,25 +7,19 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { HiOutlineTable } from 'react-icons/hi';
 
 import { useProject } from 'hooks/projects';
-import {
-  useScenario,
-  useDownloadScenarioReport,
-  useDownloadSolutionsSummary,
-} from 'hooks/scenarios';
+import { useScenario, useDownloadScenarioReport } from 'hooks/scenarios';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
-import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
 import Section from 'layout/section';
 import SolutionSelected from 'layout/solutions/selected';
 import { formatFileName } from 'utils/units';
-
-import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 
 import SolutionsTableForm from './table/table-form/component';
 
@@ -34,7 +28,6 @@ export const SolutionsOverview = (): JSX.Element => {
   const { pid, sid } = query as { pid: string; sid: string };
 
   const [PDFLoader, setPDFLoader] = useState<boolean>(false);
-  const [solutionsReportLoader, setSolutionsReportLoader] = useState<boolean>(false);
   const [showTable, setShowTable] = useState<boolean>(false);
   const { addToast } = useToasts();
 
@@ -71,8 +64,6 @@ export const SolutionsOverview = (): JSX.Element => {
     runId: `${(selectedSolutionData || bestSolutionData)?.runId}`,
   });
 
-  const downloadSolutionsSummary = useDownloadSolutionsSummary();
-
   const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
 
   const isBestSolution =
@@ -82,31 +73,6 @@ export const SolutionsOverview = (): JSX.Element => {
   const solutionIsLoading =
     (bestSolutionisFetching && !bestSolutionisFetched) ||
     (selectedSolutionisFetching && !selectedSolutionisFetched);
-
-  const onDownloadSolutionsSummary = useCallback(() => {
-    setSolutionsReportLoader(true);
-
-    downloadSolutionsSummary.mutate(
-      { id: pid },
-      {
-        onError: () => {
-          addToast(
-            'download-error',
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <ul className="text-sm">Solutions report not downloaded</ul>
-            </>,
-            {
-              level: 'error',
-            }
-          );
-        },
-        onSettled: () => {
-          setSolutionsReportLoader(false);
-        },
-      }
-    );
-  }, [downloadSolutionsSummary, addToast, pid]);
 
   const onDownloadReport = useCallback(() => {
     setPDFLoader(true);
@@ -211,22 +177,7 @@ export const SolutionsOverview = (): JSX.Element => {
               <Button
                 theme="primary-alt"
                 size="base"
-                className="mb-4 flex h-12 overflow-hidden uppercase"
-                disabled={solutionsReportLoader}
-                onClick={onDownloadSolutionsSummary}
-              >
-                <Loading
-                  visible={solutionsReportLoader}
-                  className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
-                  iconClassName="w-10 h-10 text-primary-500"
-                />
-                Export solutions summary
-              </Button>
-
-              <Button
-                theme="primary-alt"
-                size="base"
-                className="mb-4 flex h-12 overflow-hidden uppercase"
+                className="relative overflow-hidden uppercase"
                 disabled={PDFLoader}
                 onClick={onDownloadReport}
               >
@@ -240,11 +191,11 @@ export const SolutionsOverview = (): JSX.Element => {
               <Button
                 theme="primary"
                 size="base"
-                className="mb-4 flex h-12 uppercase"
+                className="relative uppercase"
                 onClick={() => setShowTable(true)}
               >
                 View solutions table
-                <Icon icon={TABLE_SVG} className="absolute right-8 h-4 w-4" />
+                <HiOutlineTable className="absolute right-8 h-6 w-6" />
               </Button>
 
               <Modal

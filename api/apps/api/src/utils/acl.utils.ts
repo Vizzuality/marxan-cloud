@@ -109,6 +109,10 @@ import {
   customProtectedAreaIsUsedInOneOrMoreScenarios,
   globalProtectedAreaNotDeletable,
 } from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
+import {
+  costSurfaceNameAlreadyExistsForProject,
+  costSurfaceNotFoundForProject,
+} from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -119,6 +123,7 @@ interface ErrorHandlerOptions {
   userId?: string;
   exportId?: string;
   featureClassName?: string;
+  costSurfaceId?: string;
 }
 
 export const mapAclDomainToHttpError = (
@@ -190,7 +195,9 @@ export const mapAclDomainToHttpError = (
     | typeof customProtectedAreaNotEditableByUser
     | typeof customProtectedAreaNotDeletableByUser
     | typeof customProtectedAreaIsUsedInOneOrMoreScenarios
-    | typeof globalProtectedAreaNotDeletable,
+    | typeof globalProtectedAreaNotDeletable
+    | typeof costSurfaceNotFoundForProject
+    | typeof costSurfaceNameAlreadyExistsForProject,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -373,6 +380,14 @@ export const mapAclDomainToHttpError = (
     case tagNotFoundForProject:
       throw new NotFoundException(
         `Tag for Project with id ${options?.projectId} not found`,
+      );
+    case costSurfaceNotFoundForProject:
+      throw new NotFoundException(
+        `Cost Surface for Project with id ${options?.projectId} not found`,
+      );
+    case costSurfaceNameAlreadyExistsForProject:
+      throw new ForbiddenException(
+        `Cost Surface with id ${options?.costSurfaceId} cannot be updated: name is already in use in the associated Project`,
       );
     case scenarioNotCreated:
       throw new NotFoundException(

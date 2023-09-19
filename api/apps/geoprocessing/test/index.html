@@ -86,15 +86,23 @@
             //     'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/120/tiles/{z}/{x}/{y}.mvt',
             //   ],
             // },
-            // 'postgis-tilesFeatures': {
+            'postgis-tilesFeatures': {
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 20,
+              tiles: [
+                'http://localhost:3040/api/v1/geo-features/4a24dc96-cb57-4401-b1eb-b2a53ed186a5/preview/tiles/{z}/{x}/{y}.mvt',
+              ],
+            },
+
+            // 'postgis-tilesScenarioPu': {
             //   type: 'vector',
             //   minzoom: 1,
             //   maxzoom: 20,
             //   tiles: [
-            //     'http://localhost:3040/api/v1/geo-features/1e30e3b4-03b7-4380-9387-fa9b1ef98c53/preview/tiles/{z}/{x}/{y}.mvt',
+            //     `http://localhost:3040/api/v1/scenarios/a9cabc9a-7747-44f1-9905-f3b7b5401036/planning-units/tiles/{z}/{x}/{y}.mvt?include=protection,features`,
             //   ],
             // },
-
             'postgis-tilesScenarioPu': {
               type: 'vector',
               minzoom: 1,
@@ -280,17 +288,17 @@
             //     'line-opacity': 1,
             //   },
             // },
-            // {
-            // id: 'postgis-tiles-layer-features',
-            //   type: 'fill',
-            //   source: 'postgis-tilesFeatures',
-            //   'source-layer': 'layer0',
-            //   paint: {
-            //     'fill-outline-color': 'pink',
-            //     'fill-color': 'pink',
-            //     'fill-opacity': 0.3,
-            //   },
-            // },
+            {
+              id: 'postgis-tiles-layer-features',
+              type: 'fill',
+              source: 'postgis-tilesFeatures',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-outline-color': 'pink',
+                'fill-color': 'pink',
+                'fill-opacity': 0.3,
+              },
+            },
             // {
             //   id: 'postgis-tiles-layer-PU',
             //   type: 'fill',
@@ -348,7 +356,9 @@
         });
         // map.on('click', 'postgis-tiles-layer1', function (e) {
         // console.log(e.features[0].properties)
-        // });
+        map.on('click', 'postgis-tiles-layer-features', function (e) {
+          console.log(e.features[0].properties);
+        });
         // map.on('click', 'postgis-tiles-layer2', function (e) {
         // console.log(e.features[0].properties)
         // });

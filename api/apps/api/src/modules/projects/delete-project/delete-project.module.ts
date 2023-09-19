@@ -22,6 +22,6 @@ import { unusedResourcesCleanupQueueProvider } from '@marxan/unused-resources-cl
     ScheduleCleanupForProjectUnusedResourcesHandler,
     Logger,
   ],
-  exports: [],
+  exports: [DeleteProjectHandler],
 })
 export class DeleteProjectModule {}

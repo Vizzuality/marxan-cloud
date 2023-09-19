@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import pick from 'lodash/pick';
 
 import { useAccessToken } from 'hooks/auth';
+import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useAllFeatures } from 'hooks/features';
 import {
   useLegend,
@@ -19,6 +20,7 @@ import {
   useProjectPlanningAreaLayer,
   useBBOX,
   useFeaturePreviewLayers,
+  useWDPAPreviewLayer,
 } from 'hooks/map';
 import { useDownloadScenarioComparisonReport, useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -40,7 +42,9 @@ import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import HelpBeacon from 'layout/help/beacon';
 import { Scenario } from 'types/api/scenario';
+import { MapProps } from 'types/map';
 import { cn } from 'utils/cn';
+import { centerMap } from 'utils/map';
 
 import PRINT_SVG from 'svgs/ui/print.svg?sprite';
 
@@ -52,6 +56,8 @@ export const ProjectMap = (): JSX.Element => {
     isSidebarOpen,
     layerSettings,
     selectedFeatures: selectedFeaturesIds,
+    selectedCostSurface: selectedCostSurfaceId,
+    selectedWDPAs: selectedWDPAsIds,
   } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
@@ -59,9 +65,11 @@ export const ProjectMap = (): JSX.Element => {
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState(null);
+  const [bounds, setBounds] = useState<MapProps['bounds']>(null);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+
+  const mapRef = useRef<mapboxgl.Map | null>(null);
 
   const { query } = useRouter();
   const { pid, tab } = query as { pid: string; tab: string };
@@ -106,19 +114,19 @@ export const ProjectMap = (): JSX.Element => {
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
     sid: sid ? `${sid}` : null,
-    include: 'results',
-    sublayers: [...(sid1 && !sid2 ? ['frequency'] : [])],
+    include: 'results,cost',
+    sublayers: [
+      ...(sid1 && !sid2 ? ['frequency'] : []),
+      ...(!!selectedCostSurfaceId ? ['cost'] : []),
+    ],
     options: {
+      cost: { min: 1, max: 100 },
       settings: {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
         features: layerSettings.features,
         cost: layerSettings.cost,
-        'lock-in': layerSettings['lock-in'],
-        'lock-out': layerSettings['lock-out'],
-        'lock-available': layerSettings['lock-available'],
         frequency: layerSettings.frequency,
-        solution: layerSettings.solution,
       },
     },
   });
@@ -142,6 +150,16 @@ export const ProjectMap = (): JSX.Element => {
     },
   });
 
+  const WDPAsPreviewLayers = useWDPAPreviewLayer({
+    wdpaIucnCategories: selectedWDPAsIds,
+    pid: `${pid}`,
+    active: true,
+    bbox,
+    options: {
+      ...layerSettings['wdpa-preview'],
+    },
+  });
+
   const selectedPreviewFeatures = useMemo(() => {
     return selectedFeaturesData
       ?.map(({ featureClassName, id }) => ({ name: featureClassName, id }))
@@ -152,13 +170,35 @@ export const ProjectMap = (): JSX.Element => {
       });
   }, [selectedFeaturesIds, selectedFeaturesData]);
 
-  const LAYERS = [PUGridLayer, PUCompareLayer, PlanningAreaLayer, ...FeaturePreviewLayers].filter(
-    (l) => !!l
+  const allProjectCostSurfacesQuery = useProjectCostSurfaces(
+    pid,
+    {},
+    {
+      select: (data) =>
+        data
+          ?.map((cs) => ({
+            id: cs.id,
+            name: cs.name,
+          }))
+          .find((cs) => cs.id === selectedCostSurfaceId),
+      keepPreviousData: true,
+      placeholderData: [],
+    }
   );
+
+  const LAYERS = [
+    PUGridLayer,
+    PUCompareLayer,
+    PlanningAreaLayer,
+    WDPAsPreviewLayers,
+    ...FeaturePreviewLayers,
+  ].filter((l) => !!l);
 
   const LEGEND = useLegend({
     layers: [
       ...(!!selectedFeaturesData?.length ? ['features-preview'] : []),
+      ...(!!selectedCostSurfaceId ? ['cost'] : []),
+      ...(!!selectedWDPAsIds?.length ? ['wdpa-preview'] : []),
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
 
       ...(!!sid1 && !!sid2 ? ['compare'] : []),
@@ -168,6 +208,7 @@ export const ProjectMap = (): JSX.Element => {
     ],
     options: {
       layerSettings,
+      cost: { name: allProjectCostSurfacesQuery.data?.name, min: 1, max: 100 },
       items: selectedPreviewFeatures,
     },
   });
@@ -198,9 +239,16 @@ export const ProjectMap = (): JSX.Element => {
     });
   }, [BBOX]);
 
-  const handleViewportChange = useCallback((vw) => {
-    setViewport(vw);
-  }, []);
+  useEffect(() => {
+    centerMap({ ref: mapRef.current, isSidebarOpen });
+  }, [isSidebarOpen]);
+
+  const handleViewportChange = useCallback(
+    (vw) => {
+      setViewport(vw);
+    },
+    [isSidebarOpen]
+  );
 
   const handleZoomChange = useCallback(
     (zoom) => {
@@ -405,7 +453,10 @@ export const ProjectMap = (): JSX.Element => {
                 mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
                 mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
                 onMapViewportChange={handleViewportChange}
-                onMapLoad={() => setMapInteractive(true)}
+                onMapLoad={({ map }) => {
+                  mapRef.current = map;
+                  setMapInteractive(true);
+                }}
                 onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
                 transformRequest={handleTransformRequest}
                 onClick={(e) => {
@@ -428,6 +479,7 @@ export const ProjectMap = (): JSX.Element => {
           </HelpBeacon>
 
           <Controls>
+            <LoadingControl loading={!mapTilesLoaded} />
             <ZoomControl
               viewport={{
                 ...viewport,
@@ -446,7 +498,6 @@ export const ProjectMap = (): JSX.Element => {
               }}
               onFitBoundsChange={handleFitBoundsChange}
             />
-            <LoadingControl loading={!mapTilesLoaded} />
           </Controls>
           {/* Print */}
           {!tab && sid1 && sid2 && (

@@ -47,7 +47,7 @@ export const GridSetupCostSurface = (): JSX.Element => {
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setJob } = scenarioSlice.actions;
 
-  const { user } = useMe();
+  const { data: user } = useMe();
   const editable = useCanEditScenario(pid, sid);
   const downloadShapefileTemplateMutation = useDownloadShapefileTemplate();
   const uploadMutation = useUploadCostSurface({

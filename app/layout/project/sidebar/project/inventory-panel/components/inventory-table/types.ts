@@ -1,12 +1,15 @@
 import { ChangeEvent } from 'react';
 
+import { WDPAAttributes } from 'types/api/wdpa';
+
 export type DataItem = {
   id: string;
+  attributes?: WDPAAttributes;
   name: string;
   scenarios: number;
-  tag: string;
+  tag?: string;
   isVisibleOnMap: boolean;
-  isCustom: boolean;
+  isCustom?: boolean;
 };
 
 export type InventoryTable = {
@@ -14,8 +17,10 @@ export type InventoryTable = {
   data: DataItem[];
   noDataMessage: string;
   columns: {
-    [key: string]: string;
-  };
+    name: string;
+    text: string;
+    className?: string;
+  }[];
   sorting: string;
   selectedIds: string[];
   onSortChange: (field: string) => void;

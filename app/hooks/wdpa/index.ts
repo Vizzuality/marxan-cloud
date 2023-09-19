@@ -1,31 +1,33 @@
-import { useMemo } from 'react';
+import { useMutation, useQuery, QueryObserverOptions, useQueryClient } from 'react-query';
 
-import { useMutation, useQuery } from 'react-query';
-
+import { AxiosRequestConfig } from 'axios';
 import { useSession } from 'next-auth/react';
 
-import SCENARIOS from 'services/scenarios';
-import WDPA from 'services/wdpa';
+import { Project } from 'types/api/project';
+import { Scenario } from 'types/api/scenario';
+import { WDPA } from 'types/api/wdpa';
 
-import {
-  UseWDPACategoriesProps,
-  UseSaveScenarioProtectedAreasProps,
-  SaveScenarioProtectedAreasProps,
-} from './types';
+import { API } from 'services/api';
+import SCENARIOS from 'services/scenarios';
+import UPLOADS from 'services/uploads';
 
 export function useWDPACategories({
   adminAreaId,
   customAreaId,
   scenarioId,
-}: UseWDPACategoriesProps) {
+}: {
+  adminAreaId?: WDPA['id'];
+  customAreaId?: WDPA['id'];
+  scenarioId: Scenario['id'];
+}) {
   const { data: session } = useSession();
 
   return useQuery(
     ['protected-areas', adminAreaId, customAreaId],
     async () =>
-      WDPA.request({
+      API.request({
         method: 'GET',
-        url: `/${scenarioId}/protected-areas`,
+        url: `scenarios/${scenarioId}/protected-areas`,
         params: {
           ...(adminAreaId && {
             'filter[adminAreaId]': adminAreaId,
@@ -40,7 +42,6 @@ export function useWDPACategories({
       }).then(({ data }) => data),
     {
       enabled: !!adminAreaId || !!customAreaId,
-      select: ({ data }) => data,
     }
   );
 }
@@ -49,10 +50,24 @@ export function useSaveScenarioProtectedAreas({
   requestConfig = {
     method: 'POST',
   },
-}: UseSaveScenarioProtectedAreasProps) {
+}: {
+  requestConfig?: AxiosRequestConfig;
+}) {
   const { data: session } = useSession();
 
-  const saveScenarioProtectedAreas = ({ id, data }: SaveScenarioProtectedAreasProps) => {
+  const saveScenarioProtectedAreas = ({
+    id,
+    data,
+  }: {
+    id: Scenario['id'];
+    data: {
+      areas: {
+        id: string;
+        selected: boolean;
+      }[];
+      threshold: number;
+    };
+  }) => {
     return SCENARIOS.request({
       url: `/${id}/protected-areas`,
       data,
@@ -63,12 +78,80 @@ export function useSaveScenarioProtectedAreas({
     });
   };
 
-  return useMutation(saveScenarioProtectedAreas, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      console.info('Error', error, variables, context);
+  return useMutation(saveScenarioProtectedAreas);
+}
+
+export function useProjectWDPAs<T = WDPA[]>(
+  pid: Project['id'],
+  params: { search?: string; sort?: string; filters?: Record<string, unknown> } = {},
+  queryOptions: QueryObserverOptions<WDPA[], Error, T> = {}
+) {
+  const { data: session } = useSession();
+
+  return useQuery({
+    queryKey: ['wdpas', pid],
+    queryFn: async () =>
+      API.request<{ data: WDPA[] }>({
+        method: 'GET',
+        url: `/projects/${pid}/protected-areas`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        params,
+      }).then(({ data }) => data.data),
+    enabled: Boolean(pid),
+    ...queryOptions,
+  });
+}
+
+export function useEditWDPA({
+  requestConfig = {
+    method: 'PATCH',
+  },
+}) {
+  const { data: session } = useSession();
+
+  const saveProjectWDPA = ({ wdpaId, data }: { wdpaId: string; data: { name: string } }) => {
+    return API.request({
+      method: 'PATCH',
+      url: `/protected-areas/${wdpaId}`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveProjectWDPA);
+}
+
+export function useUploadWDPAsShapefile({
+  requestConfig = {
+    method: 'POST',
+  },
+}: {
+  requestConfig?: AxiosRequestConfig<FormData>;
+}) {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const uploadWDPAShapefile = ({ id, data }: { id: Project['id']; data: FormData }) => {
+    return UPLOADS.request<{ success: true }>({
+      url: `/projects/${id}/protected-areas/shapefile`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    } as typeof requestConfig);
+  };
+
+  return useMutation(uploadWDPAShapefile, {
+    onSuccess: async (data, variables) => {
+      const { id: projectId } = variables;
+      await queryClient.invalidateQueries(['wdpas', projectId]);
     },
   });
 }

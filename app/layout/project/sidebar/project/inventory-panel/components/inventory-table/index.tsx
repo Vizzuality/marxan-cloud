@@ -1,6 +1,7 @@
 import Checkbox from 'components/forms/checkbox';
 import Loading from 'components/loading';
 import { ScrollArea } from 'components/scroll-area';
+import { cn } from 'utils/cn';
 
 import HeaderItem from './header-item';
 import RowItem from './row-item';
@@ -21,9 +22,11 @@ const InventoryTable = ({
 }: InventoryTable): JSX.Element => {
   const noData = !loading && data?.length === 0;
 
+  const noDataCustom = !loading && data?.every((item) => !item.isCustom);
+
   return (
     <>
-      {loading && !data.length && (
+      {loading && !data?.length && (
         <div className="relative min-h-[200px]">
           <Loading
             visible={true}
@@ -42,27 +45,27 @@ const InventoryTable = ({
                   theme="light"
                   className="block h-4 w-4 checked:bg-blue-400"
                   onChange={onSelectAll}
+                  disabled={noDataCustom}
                 />
               </th>
-              <th className="flex-1 pl-2">
-                <HeaderItem
-                  text={'Name'}
-                  name={'name'}
-                  columns={columns}
-                  sorting={sorting}
-                  onClick={onSortChange}
-                />
-              </th>
-              <th className="flex flex-1 justify-start py-2 pl-14">
-                <HeaderItem
-                  className="justify-center"
-                  text={'Type'}
-                  name={'tag'}
-                  columns={columns}
-                  sorting={sorting}
-                  onClick={onSortChange}
-                />
-              </th>
+              {columns.map((column) => {
+                return (
+                  <th
+                    key={column.name}
+                    className={cn({
+                      'flex-1 pl-2': true,
+                      [column.className]: !!column.className,
+                    })}
+                  >
+                    <HeaderItem
+                      text={column.text}
+                      name={column.name}
+                      sorting={sorting}
+                      onClick={onSortChange}
+                    />
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <ScrollArea className="h-full">

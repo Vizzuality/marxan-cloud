@@ -1,5 +1,22 @@
 // These types are here for historical reasons and not related to Artefact Cache
 
+export type FromProjectShapefileJobInput = {
+  costSurfaceId: string;
+  shapefile: Express.Multer.File;
+  projectId: string;
+};
+
+export type InitialProjectCostInput = {
+  projectId: string;
+  costSurfaceId: string;
+};
+
+export type ProjectCostSurfaceJobInput =
+  | FromProjectShapefileJobInput
+  | InitialProjectCostInput;
+/**
+ * @note: we should deprecate all of the below
+ */
 export type ParentJobInput = {
   scenarioId: string;
 };

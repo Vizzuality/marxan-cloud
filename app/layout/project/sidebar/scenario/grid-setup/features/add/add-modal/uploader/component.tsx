@@ -21,7 +21,7 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
 import { FEATURES_UPLOADER_SHAPEFILE_MAX_SIZE } from 'constants/file-uploader-size-limits';
-import UploadFeaturesInfoButtonContent from 'constants/info-button-content/upload-features';
+import UploadFeaturesInfoButtonContent from 'layout/info/upload-features';
 import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 

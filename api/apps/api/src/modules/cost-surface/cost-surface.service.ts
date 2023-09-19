@@ -6,9 +6,19 @@ import { ProjectAclService } from '@marxan-api/modules/access-control/projects-a
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { projectNotEditable } from '@marxan-api/modules/projects/projects.service';
 import { UploadCostSurfaceShapefileDto } from '@marxan-api/modules/cost-surface/dto/upload-cost-surface-shapefile.dto';
+import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { UpdateProjectCostSurface } from '@marxan-api/modules/cost-surface/application/update-project-cost-surface.command';
 
 export const costSurfaceNotEditableWithinProject = Symbol(
   `cost surface not editable within project`,
+);
+
+export const costSurfaceNotFoundForProject = Symbol(
+  `cost surface not found for project`,
+);
+export const costSurfaceNameAlreadyExistsForProject = Symbol(
+  `cost surface already exists for project`,
 );
 
 @Injectable()
@@ -17,14 +27,15 @@ export class CostSurfaceService {
     @InjectRepository(CostSurface)
     private readonly costSurfaceRepository: Repository<CostSurface>,
     private readonly projectAclService: ProjectAclService,
+    private readonly commandBus: CommandBus,
   ) {}
 
   async uploadCostSurfaceShapefile(
     userId: string,
     projectId: string,
-    dto: UploadCostSurfaceShapefileDto,
+    costSurfaceDto: UploadCostSurfaceShapefileDto,
     file: Express.Multer.File,
-  ): Promise<Either<typeof projectNotEditable, CostSurface>> {
+  ): Promise<Either<typeof projectNotEditable, void>> {
     if (
       !(await this.projectAclService.canEditCostSurfaceInProject(
         userId,
@@ -34,22 +45,66 @@ export class CostSurfaceService {
       return left(projectNotEditable);
     }
     /**
-     * @TODO The min and max values are calculated from values on the geo DB AFTER the shapfile has been processed
-     * Since the new cost surface per project functionality is still to be implemented in the geo side, random values are inserted
-     * for now, to be able to create the entity on the API side, since this new cost surface per project is still not used.
-     * It's still to be discussed what will be the approach here, wait synchronously for the execution of the UpdateCostSurface
-     * command, and retrieve the values, or refactor the process in another way
+     * @todo: The min and max values are calculated from values on the geo DB AFTER the shapefile has been processed
+     *        pending to implement a event system so that the consumer knows when the cost surface and operations related to it are
+     *        available
      */
+
     const min = 1;
     const max = 10;
-
     const instance = this.costSurfaceRepository.create({
-      name: dto.name,
+      name: costSurfaceDto?.name ?? 'default',
       projectId,
       min,
       max,
     });
     const costSurface = await this.costSurfaceRepository.save(instance);
+    await this.commandBus.execute(
+      new UpdateProjectCostSurface(projectId, costSurface.id, file),
+    );
+    return right(void 0);
+  }
+
+  async updateCostSurfaceShapefile(
+    userId: string,
+    projectId: string,
+    costSurfaceId: string,
+    dto: UpdateCostSurfaceDto,
+  ): Promise<
+    Either<
+      | typeof projectNotEditable
+      | typeof costSurfaceNotFoundForProject
+      | typeof costSurfaceNameAlreadyExistsForProject,
+      CostSurface
+    >
+  > {
+    if (
+      !(await this.projectAclService.canEditCostSurfaceInProject(
+        userId,
+        projectId,
+      ))
+    ) {
+      return left(projectNotEditable);
+    }
+
+    const sameNameCostSurface = await this.costSurfaceRepository.count({
+      where: { projectId, name: dto.name },
+    });
+    if (sameNameCostSurface) {
+      return left(costSurfaceNameAlreadyExistsForProject);
+    }
+
+    let costSurface = await this.costSurfaceRepository.findOne({
+      where: { id: costSurfaceId },
+    });
+    if (!costSurface) {
+      return left(costSurfaceNotFoundForProject);
+    }
+
+    costSurface.name = dto.name;
+
+    costSurface = await this.costSurfaceRepository.save(costSurface);
+
     return right(costSurface);
   }
 }

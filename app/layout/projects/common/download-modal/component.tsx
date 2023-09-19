@@ -31,7 +31,7 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
   const plausible = usePlausible();
 
   const { data: projectData } = useProject(pid);
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   const { data: scenariosData } = useScenarios(pid, {
     filters: {
