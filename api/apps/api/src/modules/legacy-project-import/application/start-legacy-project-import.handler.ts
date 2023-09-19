@@ -54,7 +54,6 @@ export class StartLegacyProjectImportHandler
 
       const costSurface = await this.costSurfaceService.createDefaultCostSurfaceForProject(
         project.id,
-        name,
       );
 
       const scenarioName = name + ' - scenario';

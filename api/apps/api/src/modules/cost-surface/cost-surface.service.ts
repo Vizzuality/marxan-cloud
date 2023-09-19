@@ -41,12 +41,11 @@ export class CostSurfaceService {
 
   async createDefaultCostSurfaceForProject(
     projectId: string,
-    projectName?: string,
   ): Promise<CostSurface> {
     // Min and max will be updated later asynchronously
     const costSurface = this.costSurfaceRepository.create({
       projectId,
-      name: CostSurfaceService.defaultCostSurfaceName(projectName),
+      name: CostSurfaceService.defaultCostSurfaceName(),
       isDefault: true,
       min: 0,
       max: 0,
@@ -136,7 +135,7 @@ export class CostSurfaceService {
     return right(costSurface);
   }
 
-  static defaultCostSurfaceName(projectName?: string): string {
-    return `${projectName ? projectName + ' - ' : ''}Default Cost Surface`;
+  static defaultCostSurfaceName(): string {
+    return `Default Cost Surface`;
   }
 }
