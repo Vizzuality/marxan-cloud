@@ -69,18 +69,16 @@ const getFixtures = async () => {
   const saveProjectMock = jest.fn();
   const saveScenarioMock = jest.fn();
   const findRandomOrganizationMock = jest.fn();
-  const createDefaultCostSurfaceForProject = jest.fn(
-    (projectId: string, name: string) => {
-      return {
-        id: v4(),
-        projectId,
-        name: `${name} Default Cost Surface`,
-        min: 0,
-        max: 0,
-        isDefault: true,
-      };
-    },
-  );
+  const createDefaultCostSurfaceForProject = jest.fn((projectId: string) => {
+    return {
+      id: v4(),
+      projectId,
+      name: `Default Cost Surface`,
+      min: 0,
+      max: 0,
+      isDefault: true,
+    };
+  });
 
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
