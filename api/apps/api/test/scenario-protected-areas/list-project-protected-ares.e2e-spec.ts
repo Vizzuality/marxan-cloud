@@ -54,3 +54,19 @@ test(`getting list of protected areas with scenario usage count for a project an
   );
   await fixtures.ThenItContainsFilteredProtectedAreas(areas);
 });
+
+test(`getting list of protected areas with scenario usage count for a project and using sort`, async () => {
+  const projectId = fixtures.GivenProjectExists();
+  await fixtures.GivenGlobalProtectedAreaWasCreated(IUCNCategory.III);
+  const scenario: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
+  const areaId = await fixtures.GivenCustomProtectedAreaWasAddedToProject();
+  await fixtures.GivenAreasWereSelectedAsOwner(
+    scenario,
+    IUCNCategory.III,
+    areaId,
+  );
+  const areas = await fixtures.WhenGettingProtectedAreasListForProjectWithSort(
+    projectId, 'name'
+  );
+  await fixtures.ThenItContainsSortedProtectedAreas(areas);
+});

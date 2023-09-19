@@ -116,4 +116,9 @@ export class ProtectedArea extends TimeUserEntityMetadata {
    * If protected area is global or custom for project.
    */
   isCustom?: boolean;
+
+  /**
+   * Name used for project protected areas list (fullname for custom, iucn category for global).
+   */
+  name?: string;
 }
