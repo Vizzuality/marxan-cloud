@@ -50,7 +50,7 @@
     "@tailwindcss/forms": "0.5.3",
     "@tanem/react-nprogress": "^4.0.8",
     "@tippyjs/react": "4.2.6",
-    "@turf/area": "^6.3.0",
+    "@turf/area": "6.5.0",
     "@vizzuality/layer-manager-plugin-mapboxgl": "2.0.3",
     "@vizzuality/layer-manager-provider-carto": "2.0.3",
     "@vizzuality/layer-manager-react": "2.0.3",

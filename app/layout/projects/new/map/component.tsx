@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useAppSelector } from 'store/hooks';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -17,12 +17,13 @@ import {
 
 import Loading from 'components/loading';
 import Map from 'components/map';
-// Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
 import type { NewProjectFields } from 'layout/projects/new/form';
+import { MapProps } from 'types/map';
+import { centerMap } from 'utils/map';
 
 const minZoom = 2;
 const maxZoom = 20;
@@ -41,16 +42,20 @@ export const ProjectNewMap = ({
   region: NewProjectFields['adminAreaLevel1Id'];
   subregion: NewProjectFields['adminAreaLevel2Id'];
 }): JSX.Element => {
-  const { uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId } = useSelector(
+  const { uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId } = useAppSelector(
     (state) => state['/projects/new']
   );
+
+  const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
 
   const BBOX = useBBOX({ bbox });
 
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState(null);
+  const [bounds, setBounds] = useState<MapProps['bounds']>(null);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+
+  const mapRef = useRef<mapboxgl.Map | null>(null);
 
   const accessToken = useAccessToken();
 
@@ -101,6 +106,10 @@ export const ProjectNewMap = ({
     }
   }, [BBOX]);
 
+  useEffect(() => {
+    centerMap({ ref: mapRef.current, isSidebarOpen });
+  }, [isSidebarOpen]);
+
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
   }, []);
@@ -149,7 +158,10 @@ export const ProjectNewMap = ({
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
         mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
         onMapViewportChange={handleViewportChange}
-        onMapLoad={() => setMapInteractive(true)}
+        onMapLoad={({ map }) => {
+          mapRef.current = map;
+          setMapInteractive(true);
+        }}
         onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
         transformRequest={handleTransformRequest}
       >
