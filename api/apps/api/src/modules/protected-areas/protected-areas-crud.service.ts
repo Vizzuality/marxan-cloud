@@ -30,7 +30,7 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IUCNCategory } from '@marxan/iucn';
 import { isDefined } from '@marxan/utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
-import { groupBy, intersection } from 'lodash';
+import _, {groupBy, intersection, isArray} from 'lodash';
 import { ProjectSnapshot } from '@marxan/projects';
 import { SelectionGetService } from '@marxan-api/modules/scenarios/protected-area/getter/selection-get.service';
 import { Either, left, right } from 'fp-ts/Either';
@@ -192,6 +192,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
         'designation',
         'scenarioUsageCount',
         'isCustom',
+        'name',
       ],
       keyForAttribute: 'camelCase',
     };
@@ -209,12 +210,19 @@ export class ProtectedAreasCrudService extends AppBaseService<
         project,
       );
 
+      const uniqueCategoryGlobalProtectedAreasIds: string[] = []
+
+      for (const category of projectGlobalProtectedAreasData.categories) {
+        const wdpaOfCategorySample = await this.repository.findOneOrFail({where: {iucnCategory: category as IUCNCategory}})
+        uniqueCategoryGlobalProtectedAreasIds.push(wdpaOfCategorySample.id)
+      }
+
       query.andWhere(
         new Brackets((qb) => {
           qb.where(`${this.alias}.projectId = :projectId`, {
             projectId: project.id,
           }).orWhere(`${this.alias}.id in (:...ids)`, {
-            ids: Object.values(projectGlobalProtectedAreasData.areas).flat(),
+            ids: uniqueCategoryGlobalProtectedAreasIds,
           })
         }),
       )
@@ -360,34 +368,70 @@ export class ProtectedAreasCrudService extends AppBaseService<
 
     info!.params.project = project;
 
-    const projectProtectedAreas = await this.findAllPaginated(
-      fetchSpecification,
+    /** if the fetchSpecification contains sort or filter with 'name' property, we need to remove it from fetch specification
+     * used for base service findAll method, because 'name' column does not exist in protected_areas table and error will occur
+     * Filtering and sorting by 'name' will be done manually later in this method
+     */
+
+    const editedFetchSpecification = JSON.parse(JSON.stringify(fetchSpecification))
+
+    if(fetchSpecification?.filter?.name) {
+      delete editedFetchSpecification?.filter?.name;
+    }
+
+    if(fetchSpecification?.sort?.includes('name') || fetchSpecification?.sort?.includes('-name')) {
+      editedFetchSpecification?.sort?.splice(editedFetchSpecification?.sort?.indexOf('name'), 1);
+      editedFetchSpecification?.sort?.splice(editedFetchSpecification?.sort?.indexOf('-name'), 1);
+    }
+
+    const projectProtectedAreas = await this.findAll(
+      editedFetchSpecification,
       info,
     );
 
-    const result: any[] = [];
+    let result: any[] = [];
 
-    projectProtectedAreas.data.forEach((protectedArea) => {
+    projectProtectedAreas[0].forEach((protectedArea: any) => {
       const scenarioUsageCount: number = protectedAreaUsedInProjectScenarios[
         protectedArea!.id!
       ]
         ? protectedAreaUsedInProjectScenarios[protectedArea!.id!].length
         : 0;
+      const name = protectedArea.fullName === null ? protectedArea.iucnCategory : protectedArea.fullName;
       result.push({
         ...protectedArea,
         scenarioUsageCount,
         isCustom: protectedArea!.projectId !== null,
+        name
       });
     });
 
-    const serializer = new JSONAPISerializer.Serializer(
-      'protected_areas', {
-        ...this.serializerConfig,
-        meta: projectProtectedAreas.metadata,
+
+    // Applying filtering and sorting manually for 'name' property
+
+    if(fetchSpecification?.filter?.name) {
+      const filterNames: string[] = fetchSpecification?.filter?.name as string[];
+      result = result.filter((pa) => {
+        return filterNames.includes(pa.name)
+      });
+    }
+
+    if (fetchSpecification?.sort?.includes('name') || fetchSpecification?.sort?.includes('-name')) {
+      if(fetchSpecification?.sort?.includes('name')) {
+        result.sort((a, b) => a.name.localeCompare(b.name));
+      } else {
+        result.sort((a, b) => b.name.localeCompare(a.name));
       }
+
+    }
+
+    // Serialising final result
+
+    const serializer = new JSONAPISerializer.Serializer(
+      'protected_areas', this.serializerConfig,
     );
 
-    return serializer.serialize(result, projectProtectedAreas.metadata);
+    return serializer.serialize(result);
   }
 
   public async updateProtectedAreaName(

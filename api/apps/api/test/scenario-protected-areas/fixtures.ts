@@ -104,9 +104,15 @@ export const getFixtures = async () => {
         .get(`/api/v1/projects/${projectId}/protected-areas?q=${search}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .then((response) => response.body),
+
     WhenGettingProtectedAreasListForProjectWithFilter: async (projectId: string, filterColumn: string, filterValue: string) =>
       request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/protected-areas?filter[${filterColumn}]=${filterValue}`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .then((response) => response.body),
+    WhenGettingProtectedAreasListForProjectWithSort: async (projectId: string, sortValue: string) =>
+      request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/protected-areas?sort=${sortValue}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .then((response) => response.body),
     ThenItContainsRelevantWdpa: async (response: any) => {
@@ -146,6 +152,20 @@ export const getFixtures = async () => {
         'III',
       );
       expect(response.data[0].attributes.scenarioUsageCount).toBe(1);
+    },
+
+    ThenItContainsSortedProtectedAreas: async (response: any) => {
+      response.data.sort();
+      expect(response.data).toHaveLength(2);
+      expect(response.data[0].attributes.isCustom).toBe(true);
+      expect(response.data[0].attributes.name).toBe(
+        'custom protected area',
+      );
+      expect(response.data[1].attributes.isCustom).toBe(false);
+      expect(response.data[1].attributes.name).toBe(
+        'III',
+      );
+
     },
 
     GivenCustomProtectedAreaWasAddedToProject: async () => {
