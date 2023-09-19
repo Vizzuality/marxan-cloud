@@ -7,7 +7,7 @@ import { Project } from 'types/api/project';
 import { Scenario } from 'types/api/scenario';
 import { WDPA } from 'types/api/wdpa';
 
-import { API } from 'services/api';
+import { API, JSONAPI } from 'services/api';
 import SCENARIOS from 'services/scenarios';
 import UPLOADS from 'services/uploads';
 
@@ -91,7 +91,7 @@ export function useProjectWDPAs<T = WDPA[]>(
   return useQuery({
     queryKey: ['wdpas', pid],
     queryFn: async () =>
-      API.request<{ data: WDPA[] }>({
+      JSONAPI.request<{ data: WDPA[] }>({
         method: 'GET',
         url: `/projects/${pid}/protected-areas`,
         headers: {

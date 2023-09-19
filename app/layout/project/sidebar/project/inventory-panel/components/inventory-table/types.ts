@@ -1,10 +1,10 @@
 import { ChangeEvent } from 'react';
 
-import { WDPAAttributes } from 'types/api/wdpa';
+import { WDPA } from 'types/api/wdpa';
 
 export type DataItem = {
   id: string;
-  attributes?: WDPAAttributes;
+  attributes?: Omit<WDPA, 'id'>;
   name: string;
   scenarios: number;
   tag?: string;

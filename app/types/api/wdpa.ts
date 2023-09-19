@@ -1,6 +1,8 @@
 import { Job } from './job';
 
-export interface WDPAAttributes {
+export interface WDPA {
+  id: string;
+  type: 'protected_areas';
   countryId: string;
   designation?: string;
   fullName: string;
@@ -11,12 +13,6 @@ export interface WDPAAttributes {
   status?: Job['status'];
   wdpaId: string;
   isCustom?: boolean;
-}
-
-export interface WDPA {
-  id: string;
-  type: string;
-  attributes: WDPAAttributes;
 }
 
 export interface WDPACategory {
