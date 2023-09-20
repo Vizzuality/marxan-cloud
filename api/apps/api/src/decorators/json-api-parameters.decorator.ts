@@ -76,6 +76,33 @@ const disablePaginationQueryParam = ApiQuery({
   required: false,
 });
 
+const protectedAreasFilterQueryParam = ApiQuery({
+  name: 'filter',
+  example: 'filter[name]=II&filter[name]=customAreaName',
+  description: `An array of filters for name property`,
+  type: String,
+  isArray: true,
+  required: false,
+});
+
+const protectedAreasSortQueryParam = ApiQuery({
+  name: 'sort',
+  example: 'sort=name',
+  description:
+    'Sorting protected area by name, can prefixed with a minus (for descending order). ' +
+    'Accepted values: name or -name',
+  type: String,
+  required: false,
+});
+
+const protectedAreasSearchQueryParam = ApiQuery({
+  name: 'q',
+  example: 'q=keyWord',
+  description: 'Search will be performed on name property of protected area.',
+  type: String,
+  required: false,
+});
+
 /**
  * Method decorator: convenience wrapper for OpenAPI annotations common to most
  * JSON:API plural GET endpoints.
@@ -129,4 +156,11 @@ export const JSONAPISingleEntityQueryParams = (fetchConfiguration?: {
     includeQueryParam(fetchConfiguration),
     fieldsQueryParam,
     omitFieldsQueryParam,
+  );
+
+export const JSONAPIProtectedAreasListQueryParams = () =>
+  applyDecorators(
+    protectedAreasFilterQueryParam,
+    protectedAreasSortQueryParam,
+    protectedAreasSearchQueryParam,
   );
