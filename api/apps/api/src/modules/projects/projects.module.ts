@@ -100,7 +100,7 @@ import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface
     ProtectedAreaModule,
     ProtectedAreasCrudModule,
     CostSurfaceModule,
-    ProtectedAreaModule
+    ProtectedAreaModule,
   ],
   providers: [
     ProjectProtectedAreasService,

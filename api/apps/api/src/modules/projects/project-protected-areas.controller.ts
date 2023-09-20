@@ -33,8 +33,8 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { JSONAPIQueryParams } from "@marxan-api/decorators/json-api-parameters.decorator";
-import { ProtectedAreaResult } from "@marxan-api/modules/protected-areas/protected-area.geo.entity";
+import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
+import { ProtectedAreaResult } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
