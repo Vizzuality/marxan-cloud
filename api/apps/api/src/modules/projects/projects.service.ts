@@ -124,7 +124,7 @@ import {
   AddProtectedAreaService,
   submissionFailed,
 } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
-import {ensureShapefileHasRequiredFiles} from "@marxan-api/utils/file-uploads.utils";
+import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 
 export { validationFailed } from '../planning-areas';
 

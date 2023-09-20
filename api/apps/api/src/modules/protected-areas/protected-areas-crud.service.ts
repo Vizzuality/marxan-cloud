@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { Brackets, IsNull, Not, Repository, SelectQueryBuilder} from 'typeorm';
+import { Brackets, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
 import { ProtectedArea } from '@marxan/protected-areas';
@@ -30,7 +30,7 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IUCNCategory } from '@marxan/iucn';
 import { isDefined } from '@marxan/utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
-import _, {groupBy, intersection, isArray} from 'lodash';
+import { groupBy, intersection, isArray } from 'lodash';
 import { ProjectSnapshot } from '@marxan/projects';
 import { SelectionGetService } from '@marxan-api/modules/scenarios/protected-area/getter/selection-get.service';
 import { Either, left, right } from 'fp-ts/Either';
@@ -210,11 +210,13 @@ export class ProtectedAreasCrudService extends AppBaseService<
         project,
       );
 
-      const uniqueCategoryGlobalProtectedAreasIds: string[] = []
+      const uniqueCategoryGlobalProtectedAreasIds: string[] = [];
 
       for (const category of projectGlobalProtectedAreasData.categories) {
-        const wdpaOfCategorySample = await this.repository.findOneOrFail({where: {iucnCategory: category as IUCNCategory}})
-        uniqueCategoryGlobalProtectedAreasIds.push(wdpaOfCategorySample.id)
+        const wdpaOfCategorySample = await this.repository.findOneOrFail({
+          where: { iucnCategory: category as IUCNCategory },
+        });
+        uniqueCategoryGlobalProtectedAreasIds.push(wdpaOfCategorySample.id);
       }
 
       query.andWhere(
@@ -223,9 +225,9 @@ export class ProtectedAreasCrudService extends AppBaseService<
             projectId: project.id,
           }).orWhere(`${this.alias}.id in (:...ids)`, {
             ids: uniqueCategoryGlobalProtectedAreasIds,
-          })
+          });
         }),
-      )
+      );
     }
 
     if (Array.isArray(info?.params?.ids) && info?.params?.ids.length) {
@@ -362,70 +364,43 @@ export class ProtectedAreasCrudService extends AppBaseService<
 
     /**
      * Get a list of all the protected areas that are linked to a given project,
-     * and add a count of the number of scenarios where each protected area is
-     * used.
+     * apply search, filtering and sorting if requested, and add a count of the
+     * number of scenarios where each protected area is used.
      */
 
     info!.params.project = project;
 
-    /** if the fetchSpecification contains sort or filter with 'name' property, we need to remove it from fetch specification
-     * used for base service findAll method, because 'name' column does not exist in protected_areas table and error will occur
-     * Filtering and sorting by 'name' will be done manually later in this method
-     */
+    let projectProtectedAreas = await this.selectionGetService.getForProject(project)
 
-    const editedFetchSpecification = JSON.parse(JSON.stringify(fetchSpecification))
 
-    if(fetchSpecification?.filter?.name) {
-      delete editedFetchSpecification?.filter?.name;
+    if (info?.params?.fullNameAndCategoryFilter) {
+      projectProtectedAreas = this.applySearchToProtectedAreas(projectProtectedAreas, info.params.fullNameAndCategoryFilter)
     }
 
-    if(fetchSpecification?.sort?.includes('name') || fetchSpecification?.sort?.includes('-name')) {
-      editedFetchSpecification?.sort?.splice(editedFetchSpecification?.sort?.indexOf('name'), 1);
-      editedFetchSpecification?.sort?.splice(editedFetchSpecification?.sort?.indexOf('-name'), 1);
+    if (fetchSpecification?.filter?.name) {
+      projectProtectedAreas = this.applyNameFilterToProtectedAreas(projectProtectedAreas, fetchSpecification?.filter?.name as string[])
     }
 
-    const projectProtectedAreas = await this.findAll(
-      editedFetchSpecification,
-      info,
-    );
+    if (
+      fetchSpecification?.sort
+    ) {
+     const order: 'asc' | 'desc' = fetchSpecification?.sort?.includes('-name') ? 'desc' : 'asc'
+      projectProtectedAreas = this.sortProtectedAreasByName(projectProtectedAreas, order)
+    }
 
-    let result: any[] = [];
+    const result: ProtectedArea[] = [];
 
-    projectProtectedAreas[0].forEach((protectedArea: any) => {
+    projectProtectedAreas.forEach((protectedArea: any) => {
       const scenarioUsageCount: number = protectedAreaUsedInProjectScenarios[
         protectedArea!.id!
       ]
         ? protectedAreaUsedInProjectScenarios[protectedArea!.id!].length
         : 0;
-      const name = protectedArea.fullName === null ? protectedArea.iucnCategory : protectedArea.fullName;
       result.push({
         ...protectedArea,
-        scenarioUsageCount,
-        isCustom: protectedArea!.projectId !== null,
-        name
+        scenarioUsageCount: protectedArea.isCustom ? scenarioUsageCount : 1,
       });
     });
-
-
-    // Applying filtering and sorting manually for 'name' property
-
-    if(fetchSpecification?.filter?.name) {
-      const filterNames: string[] = fetchSpecification?.filter?.name as string[];
-      result = result.filter((pa) => {
-        return filterNames.includes(pa.name)
-      });
-    }
-
-    if (fetchSpecification?.sort?.includes('name') || fetchSpecification?.sort?.includes('-name')) {
-      if(fetchSpecification?.sort?.includes('name')) {
-        result.sort((a, b) => a.name.localeCompare(b.name));
-      } else {
-        result.sort((a, b) => b.name.localeCompare(a.name));
-      }
-
-    }
-
-    // Serialising final result
 
     const serializer = new JSONAPISerializer.Serializer(
       'protected_areas', this.serializerConfig,
@@ -521,5 +496,25 @@ export class ProtectedAreasCrudService extends AppBaseService<
     await this.repository.delete(protectedAreaId);
 
     return right(true);
+  }
+
+  private applySearchToProtectedAreas(protectedAreas: Partial<ProtectedArea>[], search: string) {
+    return protectedAreas.filter((protectedArea) => {
+      return protectedArea!.name!.toLowerCase().includes(search.toLowerCase());
+    });
+  }
+
+  private applyNameFilterToProtectedAreas(protectedAreas: Partial<ProtectedArea>[], filterNames: string[]) {
+    return protectedAreas.filter((protectedArea) => {
+      return filterNames.includes(protectedArea!.name!);
+    });
+  }
+
+  private sortProtectedAreasByName(protectedAreas: Partial<ProtectedArea>[], order: 'asc' | 'desc') {
+    if (order === 'asc') {
+      return protectedAreas.sort((a, b) => a!.name!.localeCompare(b!.name!));
+    } else {
+      return protectedAreas.sort((a, b) => b!.name!.localeCompare(a!.name!));
+    }
   }
 }

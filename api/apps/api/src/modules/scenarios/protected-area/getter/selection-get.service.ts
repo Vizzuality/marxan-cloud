@@ -56,6 +56,31 @@ export class SelectionGetService {
     ];
   }
 
+  async getForProject(
+    project: ProjectSnapshot,
+  ): Promise<Partial<ProtectedArea>[]> {
+    const { areas, categories } = await this.getGlobalProtectedAreas(project);
+
+    const projectCustomAreas = await this.repository.find({
+      where: {
+        projectId: project.id,
+      },
+    });
+
+    return [
+      ...categories.map((category) => ({
+        name: category,
+        id: category,
+        isCustom: false,
+      })),
+      ...projectCustomAreas.map((area) => ({
+        name: area.fullName ?? '',
+        id: area.id,
+        isCustom: true,
+      })),
+    ];
+  }
+
   async getGlobalProtectedAreas(
     project: Pick<
       ProjectSnapshot,

@@ -108,9 +108,9 @@ import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { WebshotPdfReportConfig } from '@marxan/webshot/webshot.dto';
 import { ClearLockStatusParams } from '@marxan-api/modules/scenarios/dto/clear-lock-status-param.dto';
-import { CostRangeDto } from "@marxan-api/modules/scenarios/dto/cost-range.dto";
-import { plainToClass } from "class-transformer";
-import { ProjectsService } from "@marxan-api/modules/projects/projects.service";
+import { CostRangeDto } from '@marxan-api/modules/scenarios/dto/cost-range.dto';
+import { plainToClass } from 'class-transformer';
+import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -138,7 +138,7 @@ export class ScenariosController {
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
-    private readonly projectsService: ProjectsService
+    private readonly projectsService: ProjectsService,
   ) {}
 
   @ApiOperation({
@@ -1448,7 +1448,6 @@ export class ScenariosController {
         resourceType: scenarioResource.name.plural,
       });
     }
-
 
     const outcome = await this.projectsService.addProtectedAreaFor(
       scenario.right.projectId,

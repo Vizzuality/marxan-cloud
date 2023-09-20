@@ -35,7 +35,8 @@ test(`getting list of protected areas with scenario usage count for a project an
     areaId,
   );
   const areas = await fixtures.WhenGettingProtectedAreasListForProjectWithSearch(
-    projectId, 'custom'
+    projectId,
+    'custom',
   );
   await fixtures.ThenItContainsSearchedProtectedAreas(areas);
 });
@@ -50,7 +51,9 @@ test(`getting list of protected areas with scenario usage count for a project an
     areaId,
   );
   const areas = await fixtures.WhenGettingProtectedAreasListForProjectWithFilter(
-    projectId, 'iucnCategory', 'III'
+    projectId,
+    'name',
+    'III',
   );
   await fixtures.ThenItContainsFilteredProtectedAreas(areas);
 });
@@ -66,7 +69,8 @@ test(`getting list of protected areas with scenario usage count for a project an
     areaId,
   );
   const areas = await fixtures.WhenGettingProtectedAreasListForProjectWithSort(
-    projectId, 'name'
+    projectId,
+    'name',
   );
   await fixtures.ThenItContainsSortedProtectedAreas(areas);
 });
