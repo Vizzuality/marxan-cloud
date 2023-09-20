@@ -123,7 +123,8 @@ export interface UsePUGridLayer {
     puExcludedValue?: string[];
     puAvailableValue?: string[];
     runId?: number;
-    features?: string[];
+    features?: Feature['id'][];
+    selectedFeatures?: Feature['id'][];
     preHighlightFeatures?: Array<string>;
     postHighlightFeatures?: Array<string>;
     cost?: {
@@ -172,6 +173,10 @@ export interface UsePUGridLayer {
       [key: string]: {
         opacity?: number;
         visibility?: boolean;
+        amountRange?: {
+          min: number;
+          max: number;
+        };
       };
     };
   };

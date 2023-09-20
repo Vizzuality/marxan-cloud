@@ -7,24 +7,20 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-import { sortBy } from 'lodash';
 import { FiLayers } from 'react-icons/fi';
 
 import { useAccessToken } from 'hooks/auth';
 import { useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
-  // usePUGridPreviewLayer,
-  // useAdminPreviewLayer,
   useWDPAPreviewLayer,
   usePUGridLayer,
   useFeaturePreviewLayers,
-  // useLegend,
   useBBOX,
   useTargetedPreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useCostSurfaceRange, useScenario, useScenarioPU } from 'hooks/scenarios';
+import { useScenario, useScenarioPU } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 import { useWDPACategories } from 'hooks/wdpa';
 
@@ -130,59 +126,11 @@ export const ScenariosEditMap = (): JSX.Element => {
   const { data: scenarioData } = useScenario(sid);
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
-
   const { data: targetedFeaturesData } = useTargetedFeatures(sid, {});
-
-  const previewFeatureIsSelected = useMemo(() => {
-    if (tab === TABS['scenario-features']) {
-      return (
-        (selectedFeaturesData || []).filter(({ id }) => selectedFeatures.includes(id)).length > 0
-      );
-    }
-
-    if (tab === TABS['scenario-features-targets-spf']) {
-      return (
-        (targetedFeaturesData || []).filter(({ id }) => selectedFeatures.includes(id)).length > 0
-      );
-    }
-
-    return false;
-  }, [tab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
-
-  const selectedPreviewFeatures = useMemo(() => {
-    if (tab === TABS['scenario-features']) {
-      return (selectedFeaturesData || [])
-        .filter(({ id }) => selectedFeatures.includes(id))
-        .map(({ name, id }) => ({ name, id }))
-        .sort((a, b) => {
-          const aIndex = selectedFeatures.indexOf(a.id as string);
-          const bIndex = selectedFeatures.indexOf(b.id as string);
-          return aIndex - bIndex;
-        });
-    }
-
-    if (tab === TABS['scenario-features-targets-spf']) {
-      return (targetedFeaturesData || [])
-        .filter(({ id }) => selectedFeatures.includes(id))
-        .map(({ name, id }) => ({ name, id }))
-        .sort((a, b) => {
-          const aIndex = selectedFeatures.indexOf(a.id as string);
-          const bIndex = selectedFeatures.indexOf(b.id as string);
-          return aIndex - bIndex;
-        });
-    }
-
-    return [];
-  }, [tab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
-
-  const { data: costSurfaceRangeData } = useCostSurfaceRange(sid);
-
   const { data: allGapAnalysisData } = useAllGapAnalysis(sid, {
     enabled: !!sid,
   });
-
   const { data: projectData } = useProject(pid);
-
   const { data: protectedAreasData } = useWDPACategories({
     adminAreaId:
       projectData?.adminAreaLevel2Id || projectData?.adminAreaLevel1I || projectData?.countryId,
@@ -285,54 +233,34 @@ export const ScenariosEditMap = (): JSX.Element => {
       puIncludedValue: [...puIncludedValue, ...puTmpIncludedValue],
       puExcludedValue: [...puExcludedValue, ...puTmpExcludedValue],
       puAvailableValue: [...puAvailableValue, ...puTmpAvailableValue],
-      // features: [TABS['scenario-target-achievement'], TABS['scenario-gap-analysis']].includes(tab)
-      //   ? []
-      //   : featuresIds,
+      features: [TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab)
+        ? []
+        : featuresIds,
+      selectedFeatures,
       preHighlightFeatures,
       postHighlightFeatures: postHighlightedFeaturesIds,
-      // cost: costSurfaceRangeData,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
-        // pugrid: layerSettings.pugrid,
-        // 'wdpa-percentage': layerSettings['wdpa-percentage'],
-        // features: layerSettings.features,
-        // 'cost-surface': layerSettings[selectedCostSurface],
-        // 'lock-in': layerSettings['lock-in'],
-        // 'lock-out': layerSettings['lock-out'],
-        // 'lock-available': layerSettings['lock-available'],
-        // frequency: layerSettings.frequency,
-        // solution: layerSettings.solution,
+        pugrid: layerSettings.pugrid,
+        'wdpa-percentage': layerSettings['wdpa-percentage'],
+        'features-highlight': layerSettings['features-highlight'],
+        cost: layerSettings.cost,
+        'lock-in': layerSettings['lock-in'],
+        'lock-out': layerSettings['lock-out'],
+        'lock-available': layerSettings['lock-available'],
+        frequency: layerSettings.frequency,
+        solution: layerSettings.solution,
         ...layerSettings,
       },
     },
   });
 
   const LAYERS = [
-    // PUGridPreviewLayer,
-    // AdminPreviewLayer,
     PUGridLayer,
     WDPApreviewLayer,
     ...FeaturePreviewLayers,
     ...TargetedPreviewLayers,
   ].filter((l) => !!l);
-
-  // const LEGEND = useLegend({
-  //   layers,
-  //   options: {
-  //     wdpaIucnCategories: protectedAreas,
-  //     wdpaThreshold:
-  //       tab === TABS['scenario-protected-areas'] ? wdpaThreshold : scenarioData?.wdpaThreshold,
-  //     cost: costSurfaceRangeData,
-  //     items: selectedPreviewFeatures,
-  //     puAction,
-  //     puIncludedValue: [...puIncludedValue, ...puTmpIncludedValue],
-  //     puExcludedValue: [...puExcludedValue, ...puTmpExcludedValue],
-  //     puAvailableValue: [...puAvailableValue, ...puTmpAvailableValue],
-  //     runId: selectedSolution?.runId || bestSolution?.runId,
-  //     numberOfRuns: scenarioData?.numberOfRuns || 0,
-  //     layerSettings,
-  //   },
-  // });
 
   useEffect(() => {
     setBounds({
@@ -491,7 +419,7 @@ export const ScenariosEditMap = (): JSX.Element => {
   );
 
   const handleTransformRequest = useCallback(
-    (url) => {
+    (url: string) => {
       if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
         return {
           url,
@@ -518,19 +446,6 @@ export const ScenariosEditMap = (): JSX.Element => {
       );
     },
     [setLayerSettings, dispatch]
-  );
-
-  const onChangeVisibility = useCallback(
-    (id) => {
-      const { visibility = true } = layerSettings[id] || {};
-      dispatch(
-        setLayerSettings({
-          id,
-          settings: { visibility: !visibility },
-        })
-      );
-    },
-    [setLayerSettings, dispatch, layerSettings]
   );
 
   const renderLegendItems = ({

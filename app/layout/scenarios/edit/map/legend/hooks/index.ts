@@ -154,7 +154,7 @@ export const useFeatureAbundanceLegend = () => {
 
       dispatch(
         setLayerSettings({
-          id: `feature-abundance-${featureId}`,
+          id: featureId,
           settings: {
             visibility: !layerSettings[featureId]?.visibility,
             amountRange,
