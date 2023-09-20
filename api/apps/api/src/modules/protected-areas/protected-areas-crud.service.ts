@@ -198,54 +198,6 @@ export class ProtectedAreasCrudService extends AppBaseService<
     };
   }
 
-  async extendFindAllQuery(
-    query: SelectQueryBuilder<ProtectedArea>,
-    fetchSpecification: FetchSpecification,
-    info: ProtectedAreasRequestInfo,
-  ): Promise<SelectQueryBuilder<ProtectedArea>> {
-    const project: ProjectSnapshot | undefined = info?.params?.project;
-
-    if (project) {
-      const projectGlobalProtectedAreasData = await this.selectionGetService.getGlobalProtectedAreas(
-        project,
-      );
-
-      const uniqueCategoryGlobalProtectedAreasIds: string[] = [];
-
-      for (const category of projectGlobalProtectedAreasData.categories) {
-        const wdpaOfCategorySample = await this.repository.findOneOrFail({
-          where: { iucnCategory: category as IUCNCategory },
-        });
-        uniqueCategoryGlobalProtectedAreasIds.push(wdpaOfCategorySample.id);
-      }
-
-      query.andWhere(
-        new Brackets((qb) => {
-          qb.where(`${this.alias}.projectId = :projectId`, {
-            projectId: project.id,
-          }).orWhere(`${this.alias}.id in (:...ids)`, {
-            ids: uniqueCategoryGlobalProtectedAreasIds,
-          });
-        }),
-      );
-    }
-
-    if (Array.isArray(info?.params?.ids) && info?.params?.ids.length) {
-      query.andWhere('id in (:...ids)', { ids: info?.params?.ids });
-    }
-
-    if (info?.params?.fullNameAndCategoryFilter) {
-      query.andWhere(
-        `(${this.alias}.full_name ilike :fullNameAndCategoryFilter OR ${this.alias}.iucn_cat ilike :fullNameAndCategoryFilter)`,
-        {
-          fullNameAndCategoryFilter: `%${info.params.fullNameAndCategoryFilter}%`,
-        },
-      );
-    }
-
-    return query;
-  }
-
   /**
    * List IUCN categories of protected areas.
    */
@@ -370,22 +322,32 @@ export class ProtectedAreasCrudService extends AppBaseService<
 
     info!.params.project = project;
 
-    let projectProtectedAreas = await this.selectionGetService.getForProject(project)
-
+    let projectProtectedAreas = await this.selectionGetService.getForProject(
+      project,
+    );
 
     if (info?.params?.fullNameAndCategoryFilter) {
-      projectProtectedAreas = this.applySearchToProtectedAreas(projectProtectedAreas, info.params.fullNameAndCategoryFilter)
+      projectProtectedAreas = this.applySearchToProtectedAreas(
+        projectProtectedAreas,
+        info.params.fullNameAndCategoryFilter,
+      );
     }
 
     if (fetchSpecification?.filter?.name) {
-      projectProtectedAreas = this.applyNameFilterToProtectedAreas(projectProtectedAreas, fetchSpecification?.filter?.name as string[])
+      projectProtectedAreas = this.applyNameFilterToProtectedAreas(
+        projectProtectedAreas,
+        fetchSpecification?.filter?.name as string[],
+      );
     }
 
-    if (
-      fetchSpecification?.sort
-    ) {
-     const order: 'asc' | 'desc' = fetchSpecification?.sort?.includes('-name') ? 'desc' : 'asc'
-      projectProtectedAreas = this.sortProtectedAreasByName(projectProtectedAreas, order)
+    if (fetchSpecification?.sort) {
+      const order: 'asc' | 'desc' = fetchSpecification?.sort?.includes('-name')
+        ? 'desc'
+        : 'asc';
+      projectProtectedAreas = this.sortProtectedAreasByName(
+        projectProtectedAreas,
+        order,
+      );
     }
 
     const result: ProtectedArea[] = [];
@@ -403,7 +365,8 @@ export class ProtectedAreasCrudService extends AppBaseService<
     });
 
     const serializer = new JSONAPISerializer.Serializer(
-      'protected_areas', this.serializerConfig,
+      'protected_areas',
+      this.serializerConfig,
     );
 
     return serializer.serialize(result);
@@ -498,19 +461,28 @@ export class ProtectedAreasCrudService extends AppBaseService<
     return right(true);
   }
 
-  private applySearchToProtectedAreas(protectedAreas: Partial<ProtectedArea>[], search: string) {
+  private applySearchToProtectedAreas(
+    protectedAreas: Partial<ProtectedArea>[],
+    search: string,
+  ) {
     return protectedAreas.filter((protectedArea) => {
       return protectedArea!.name!.toLowerCase().includes(search.toLowerCase());
     });
   }
 
-  private applyNameFilterToProtectedAreas(protectedAreas: Partial<ProtectedArea>[], filterNames: string[]) {
+  private applyNameFilterToProtectedAreas(
+    protectedAreas: Partial<ProtectedArea>[],
+    filterNames: string[],
+  ) {
     return protectedAreas.filter((protectedArea) => {
       return filterNames.includes(protectedArea!.name!);
     });
   }
 
-  private sortProtectedAreasByName(protectedAreas: Partial<ProtectedArea>[], order: 'asc' | 'desc') {
+  private sortProtectedAreasByName(
+    protectedAreas: Partial<ProtectedArea>[],
+    order: 'asc' | 'desc',
+  ) {
     if (order === 'asc') {
       return protectedAreas.sort((a, b) => a!.name!.localeCompare(b!.name!));
     } else {

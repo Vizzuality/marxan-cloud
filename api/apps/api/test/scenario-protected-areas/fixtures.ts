@@ -141,9 +141,7 @@ export const getFixtures = async () => {
       response.data.sort();
       expect(response.data).toHaveLength(2);
       expect(response.data[0].attributes.isCustom).toBe(false);
-      expect(response.data[1].attributes.name).toBe(
-        'custom protected area',
-      );
+      expect(response.data[1].attributes.name).toBe('custom protected area');
       expect(response.data[1].attributes.scenarioUsageCount).toBe(1);
       expect(response.data[1].attributes.isCustom).toBe(true);
     },
@@ -151,9 +149,7 @@ export const getFixtures = async () => {
       response.data.sort();
       expect(response.data).toHaveLength(1);
       expect(response.data[0].attributes.isCustom).toBe(true);
-      expect(response.data[0].attributes.name).toBe(
-        'custom protected area',
-      );
+      expect(response.data[0].attributes.name).toBe('custom protected area');
       expect(response.data[0].attributes.scenarioUsageCount).toBe(1);
     },
     ThenItContainsFilteredProtectedAreas: async (response: any) => {
