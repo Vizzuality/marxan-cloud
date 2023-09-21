@@ -16,7 +16,7 @@ import WDPABulkActionMenu from './bulk-action-menu';
 
 const WDPA_TABLE_COLUMNS = [
   {
-    name: 'fullName',
+    name: 'name',
     text: 'Name',
   },
 ];
@@ -105,7 +105,7 @@ const InventoryPanelProtectedAreas = ({
 
   const data: DataItem[] = allProjectWDPAsQuery.data?.map((wdpa) => ({
     ...wdpa,
-    name: wdpa.isCustom ? wdpa.fullName : wdpa.iucnCategory,
+    name: wdpa.name,
     scenarios: wdpa.scenarioUsageCount,
     isCustom: wdpa.isCustom,
     isVisibleOnMap: visibleWDPAs?.includes(wdpa.id),

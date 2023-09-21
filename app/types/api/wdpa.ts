@@ -5,7 +5,7 @@ export interface WDPA {
   type: 'protected_areas';
   countryId: string;
   designation?: string;
-  fullName: string;
+  name: string;
   iucnCategory: string;
   scenarioUsageCount: number;
   shapeLength?: number;

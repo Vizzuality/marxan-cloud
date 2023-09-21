@@ -83,23 +83,33 @@ export function useSaveScenarioProtectedAreas({
 
 export function useProjectWDPAs<T = WDPA[]>(
   pid: Project['id'],
-  params: { search?: string; sort?: string; filters?: Record<string, unknown> } = {},
+  params: { search?: string; sort?: string } = {},
   queryOptions: QueryObserverOptions<WDPA[], Error, T> = {}
 ) {
   const { data: session } = useSession();
 
+  const { search, sort } = params;
+
+  const fetchProjectWDPAs = () =>
+    JSONAPI.request<{ data: WDPA[] }>({
+      method: 'GET',
+      url: `/projects/${pid}/protected-areas`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+      },
+    }).then(({ data }) => data.data);
+
   return useQuery({
-    queryKey: ['wdpas', pid],
-    queryFn: async () =>
-      JSONAPI.request<{ data: WDPA[] }>({
-        method: 'GET',
-        url: `/projects/${pid}/protected-areas`,
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-        },
-        params,
-      }).then(({ data }) => data.data),
-    enabled: Boolean(pid),
+    queryKey: ['wdpas', pid, JSON.stringify(params)],
+    queryFn: fetchProjectWDPAs,
     ...queryOptions,
   });
 }

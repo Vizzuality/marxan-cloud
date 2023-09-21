@@ -14,7 +14,7 @@ import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import { WDPA } from 'types/api/wdpa';
 
-export type FormValues = { fullName: WDPA['fullName'] };
+export type FormValues = { name: WDPA['name'] };
 
 const EditModal = ({
   wdpaId,
@@ -35,12 +35,12 @@ const EditModal = ({
 
   const onEditSubmit = useCallback(
     (values: FormValues) => {
-      const { fullName } = values;
+      const { name } = values;
       editWDPAMutation.mutate(
         {
           wdpaId: wdpaId,
           data: {
-            name: fullName,
+            name,
           },
         },
         {
@@ -79,7 +79,7 @@ const EditModal = ({
   return (
     <FormRFF<FormValues>
       initialValues={{
-        fullName: allProjectWDPAsQuery.data?.[0]?.fullName,
+        name: allProjectWDPAsQuery.data?.find((wdpa) => wdpa.id === wdpaId).name,
       }}
       ref={formRef}
       onSubmit={onEditSubmit}
@@ -92,12 +92,9 @@ const EditModal = ({
               <h2 className="font-heading font-bold text-black">Edit protected area</h2>
 
               <div>
-                <FieldRFF<string>
-                  name="fullName"
-                  validate={composeValidators([{ presence: true }])}
-                >
+                <FieldRFF<string> name="name" validate={composeValidators([{ presence: true }])}>
                   {(fprops) => (
-                    <Field id="fullName" {...fprops}>
+                    <Field id="name" {...fprops}>
                       <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
                         Name
                       </Label>

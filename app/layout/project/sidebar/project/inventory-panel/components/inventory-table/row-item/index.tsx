@@ -67,29 +67,28 @@ const RowItem = ({
               icon={isVisibleOnMap ? SHOW_SVG : HIDE_SVG}
             />
           </button>
-          {isCustom && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className={cn({
-                    'h-5 w-5': true,
-                    invisible: !isCustom,
-                  })}
-                >
-                  <HiDotsHorizontal className="h-4 w-4 text-white" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-auto rounded-2xl border-transparent p-0"
-                side="bottom"
-                sideOffset={5}
-                align="start"
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className={cn({
+                  'h-5 w-5': true,
+                  invisible: !isCustom,
+                })}
               >
-                <ActionsComponent item={item} />
-              </PopoverContent>
-            </Popover>
-          )}
+                <HiDotsHorizontal className="h-4 w-4 text-white" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto rounded-2xl border-transparent p-0"
+              side="bottom"
+              sideOffset={5}
+              align="start"
+            >
+              <ActionsComponent item={item} />
+            </PopoverContent>
+          </Popover>
         </div>
       </td>
     </tr>

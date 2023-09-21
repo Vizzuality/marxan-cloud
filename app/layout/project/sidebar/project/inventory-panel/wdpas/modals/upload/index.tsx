@@ -30,7 +30,7 @@ import { bytesToMegabytes } from 'utils/units';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export type FormValues = {
-  name: WDPA['fullName'];
+  name: WDPA['name'];
   file: File;
 };
 
