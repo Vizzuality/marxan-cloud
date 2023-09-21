@@ -171,7 +171,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
           <div className="flex w-full cursor-pointer flex-col space-y-6">
             <div className="flex items-center space-x-2">
               <label
-                className="rounded-3xl bg-blue-100 bg-opacity-10 px-3 py-1"
+                className="rounded-3xl bg-blue-200 bg-opacity-10 px-3 py-1"
                 htmlFor="cancel-shapefile-btn"
               >
                 <p className="text-sm text-primary-500">{successFile.name}</p>
@@ -213,7 +213,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                         {(props) => (
                           <div>
                             <div className="mb-2.5 flex items-center space-x-3">
-                              <h5 className="text-xs text-gray-400">Supported formats</h5>
+                              <h5 className="text-xs text-gray-600">Supported formats</h5>
                               <InfoButton size="s" theme="secondary">
                                 <span className="text-xs">
                                   {' '}
@@ -233,17 +233,17 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                               {...props}
                               {...getRootProps()}
                               className={cx({
-                                'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                                'relative w-full cursor-pointer border border-dotted border-gray-400 bg-gray-200 bg-opacity-20 py-10 hover:bg-gray-200':
                                   true,
-                                'bg-gray-500': isDragActive,
-                                'border-green-800': isDragAccept,
-                                'border-red-800':
+                                'bg-gray-600': isDragActive,
+                                'border-green-900': isDragAccept,
+                                'border-red-900':
                                   isDragReject || (props?.meta?.error && props?.meta?.touched),
                               })}
                             >
                               <input {...getInputProps()} />
 
-                              <p className="text-center text-sm text-gray-500">
+                              <p className="text-center text-sm text-gray-600">
                                 Drag and drop your planning region shapefile
                                 <br />
                                 or <b>click here</b> to upload
@@ -274,7 +274,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                           <h5 className="text-xs uppercase text-black">Uploaded file:</h5>
                           <div className="flex items-center space-x-2">
                             <label
-                              className="rounded-3xl bg-gray-400 bg-opacity-10 px-3 py-1"
+                              className="rounded-3xl bg-gray-100 bg-opacity-10 px-3 py-1"
                               htmlFor="cancel-shapefile-btn"
                             >
                               <p className="text-sm text-black">{successFile.name}</p>

@@ -26,7 +26,7 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
       <p
         className={classnames({
           'mr-4 text-lg underline': true,
-          'text-gray-600': theme === 'dark',
+          'text-gray-700': theme === 'dark',
           'text-white': theme === 'light',
         })}
       >
@@ -35,7 +35,7 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
       <div
         className={classnames({
           'flex h-7 w-7 items-center justify-center rounded-full border bg-transparent': true,
-          'border-gray-600': theme === 'dark',
+          'border-gray-700': theme === 'dark',
           'border-white': theme === 'light',
         })}
       >
@@ -43,7 +43,7 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
           icon={ARROW_RIGHT_2_SVG}
           className={classnames({
             'h-3 w-3': true,
-            'text-gray-600': theme === 'dark',
+            'text-gray-700': theme === 'dark',
             'text-white': theme === 'light',
           })}
         />

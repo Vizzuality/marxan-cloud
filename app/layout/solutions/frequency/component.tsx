@@ -49,7 +49,7 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
         </div>
         <button
           type="button"
-          className="flex flex-shrink-0 items-center justify-between rounded-4xl border border-transparent px-2 py-1 text-xs text-white focus:border-white"
+          className="flex flex-shrink-0 items-center justify-between rounded-[40px] border border-transparent px-2 py-1 text-xs text-white focus:border-white"
           onClick={onChangeVisibility}
         >
           {visibility ? 'View on map' : 'Hide from map'}
@@ -59,7 +59,7 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
       <LegendTypeGradient
         className={{
           bar: 'h-3 rounded-lg',
-          labels: 'text-sm text-gray-300',
+          labels: 'text-sm text-gray-400',
         }}
         items={values}
       />

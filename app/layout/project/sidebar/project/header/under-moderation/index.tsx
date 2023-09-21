@@ -28,7 +28,7 @@ const UnderModeration: React.FC = () => {
           maxWidth={350}
           content={
             <div
-              className="space-y-2 rounded bg-white p-4 text-sm text-gray-500"
+              className="space-y-2 rounded bg-white p-4 text-sm text-gray-600"
               style={{
                 boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
               }}
@@ -43,7 +43,7 @@ const UnderModeration: React.FC = () => {
         >
           <motion.div
             key="under-moderation"
-            className="inline-flex items-center justify-start space-x-2.5 rounded-lg bg-red-500 px-2.5 py-2"
+            className="inline-flex items-center justify-start space-x-2.5 rounded-lg bg-red-600 px-2.5 py-2"
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -10, opacity: 0 }}

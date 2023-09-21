@@ -13,7 +13,7 @@ const ProjectScenariosType = () => {
   const { pid } = query as { pid: string };
 
   return (
-    <div className="px-10 py-5 text-gray-500">
+    <div className="px-10 py-5 text-gray-600">
       <h2 className="font-heading text-2xl font-medium">Choose scenario type:</h2>
 
       <ul className="-mx-5 my-5 grid grid-cols-3 gap-10">
@@ -22,14 +22,14 @@ const ProjectScenariosType = () => {
             <li
               key={`${s.id}`}
               className={cn({
-                'group cursor-pointer rounded-3xl border-2 border-transparent transition-all hover:border-gray-100 hover:shadow-2xl':
+                'group cursor-pointer rounded-3xl border-2 border-transparent transition-all hover:border-gray-200 hover:shadow-2xl':
                   true,
                 'pointer-events-none opacity-25': s.disabled,
               })}
             >
               <Link href={`/projects/${pid}${s.href}`} legacyBehavior>
                 <div className="h-full p-5">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gray-100 transition-all group-hover:bg-primary-500">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gray-200 transition-all group-hover:bg-primary-500">
                     <Icon icon={s.icon} style={s.iconStyles} />
                   </div>
 
@@ -39,7 +39,7 @@ const ProjectScenariosType = () => {
                   </div>
 
                   {s.disclaimer && (
-                    <div className="mt-20 text-sm text-gray-400">{s.disclaimer}</div>
+                    <div className="mt-20 text-sm text-gray-100">{s.disclaimer}</div>
                   )}
                 </div>
               </Link>

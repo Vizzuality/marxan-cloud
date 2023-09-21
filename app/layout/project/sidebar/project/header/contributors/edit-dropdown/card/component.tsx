@@ -123,7 +123,7 @@ export const UserCard: React.FC<UserCardProps> = ({
   }, [deleteUserMutation, id, name, pid, addToast]);
 
   return (
-    <div className="box-border flex w-full flex-grow items-center justify-between space-x-3 rounded-3xl bg-gray-100 py-3 pl-3 pr-6">
+    <div className="box-border flex w-full flex-grow items-center justify-between space-x-3 rounded-3xl bg-gray-200 py-3 pl-3 pr-6">
       <Avatar
         className="flex-shrink-0 border-none !bg-primary-700 text-sm uppercase"
         bgImage={bgImage}
@@ -151,14 +151,14 @@ export const UserCard: React.FC<UserCardProps> = ({
             />
           )}
           {(!isOwner || (isOwner && id === meData.id)) && (
-            <p className="text-sm text-gray-500">{ROLES[roleName]}</p>
+            <p className="text-sm text-gray-600">{ROLES[roleName]}</p>
           )}
         </div>
       </div>
 
       <Button
         className={cx({
-          'group h-6 flex-shrink-0 bg-gray-600 py-2 text-sm': true,
+          'group h-6 flex-shrink-0 bg-gray-700 py-2 text-sm': true,
           invisible: !isOwner || (isOwner && id === meData.id),
         })}
         theme="secondary-alt"
@@ -166,7 +166,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         disabled={!isOwner}
         onClick={() => setOpen(true)}
       >
-        <span className="text-white group-hover:text-gray-600">Remove</span>
+        <span className="text-white group-hover:text-gray-700">Remove</span>
       </Button>
 
       <ConfirmationPrompt

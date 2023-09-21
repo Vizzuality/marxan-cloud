@@ -129,14 +129,14 @@ export const Item: React.FC<ItemProps> = ({
   return (
     <div
       className={cx({
-        'bg-gray-700 text-white': true,
+        'bg-gray-800 text-white': true,
         [className]: !!className,
       })}
     >
       <header
         className={cx({
           'border-l-4 px-4 py-2': true,
-          'border-yellow-400': true,
+          'border-yellow-500': true,
         })}
       >
         <div className="flex items-start justify-between">
@@ -147,7 +147,7 @@ export const Item: React.FC<ItemProps> = ({
               <Tooltip
                 arrow
                 placement="top"
-                content={<div className="rounded bg-white p-2 text-gray-500">Split</div>}
+                content={<div className="rounded bg-white p-2 text-gray-600">Split</div>}
               >
                 <button
                   aria-label="manage-see-on-map"
@@ -156,7 +156,7 @@ export const Item: React.FC<ItemProps> = ({
                   className={cx({
                     'flex h-5 w-5 items-center justify-center ': true,
                     'text-white': !splitSelected,
-                    'text-yellow-400': !!splitSelected,
+                    'text-yellow-500': !!splitSelected,
                   })}
                 >
                   <Icon icon={SPLIT_SVG} className="h-4 w-4" />
@@ -168,7 +168,7 @@ export const Item: React.FC<ItemProps> = ({
               arrow
               placement="top"
               content={
-                <div className="rounded bg-white p-2 text-gray-500">
+                <div className="rounded bg-white p-2 text-gray-600">
                   {isShown ? 'Remove from map' : 'See on map'}
                 </div>
               }
@@ -179,7 +179,7 @@ export const Item: React.FC<ItemProps> = ({
                 onClick={onSeeOnMap}
                 className={cx({
                   'flex h-5 w-5 items-center justify-center text-white': true,
-                  'text-gray-300': !isShown,
+                  'text-gray-400': !isShown,
                 })}
               >
                 <Icon className="h-4 w-4" icon={isShown ? SHOW_SVG : HIDE_SVG} />
@@ -190,7 +190,7 @@ export const Item: React.FC<ItemProps> = ({
               <Tooltip
                 arrow
                 placement="top"
-                content={<div className="rounded bg-white p-2 text-gray-500">Remove</div>}
+                content={<div className="rounded bg-white p-2 text-gray-600">Remove</div>}
               >
                 <button
                   aria-label="manage-see-on-map"
@@ -247,7 +247,7 @@ export const Item: React.FC<ItemProps> = ({
         {editable && strat && (
           <div>
             <div className="mt-3 flex items-center space-x-2 font-heading tracking-wide">
-              <Icon icon={INTERSECT_SVG} className="h-5 w-5 text-yellow-300" />
+              <Icon icon={INTERSECT_SVG} className="h-5 w-5 text-yellow-400" />
               <h4 className="ml-2 text-xs uppercase text-white">
                 You can <strong>intersect</strong> this feature with others
               </h4>
@@ -309,14 +309,14 @@ export const Item: React.FC<ItemProps> = ({
 
             return (
               <li key={`${f.value}`} className="relative mt-0.5 flex items-center py-2 pr-2.5">
-                <div className="absolute left-0 top-0 block h-full w-px bg-yellow-200" />
+                <div className="absolute left-0 top-0 block h-full w-px bg-yellow-300" />
                 <div className="relative flex font-heading text-xs">
                   <div className="ml-2.5">
                     <Checkbox
                       id={`checkbox-${f.value}`}
                       value={`${f.value}`}
                       checked={checked}
-                      className="form-checkbox-dark block h-4 w-4 text-yellow-200"
+                      className="form-checkbox-dark block h-4 w-4 text-yellow-300"
                       onChange={onSplitFeaturesChanged}
                     />
                   </div>
@@ -336,7 +336,7 @@ export const Item: React.FC<ItemProps> = ({
           {intersectFeaturesSelected.map((f) => {
             return (
               <li key={`${f.value}`} className="relative mt-0.5 flex items-center py-2 pr-2.5">
-                <div className="absolute left-0 top-0 block h-full w-px bg-gradient-to-b from-green-300 to-yellow-300" />
+                <div className="absolute left-0 top-0 block h-full w-px bg-gradient-to-b from-green-400 to-yellow-400" />
                 <div className="relative flex font-heading text-xs">
                   <div className="ml-2.5 inline-block max-w-sm">
                     {name} in {f.label}

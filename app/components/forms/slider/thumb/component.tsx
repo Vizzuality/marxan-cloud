@@ -10,36 +10,36 @@ import { SliderState } from '@react-stately/slider';
 
 const THEME = {
   dark: {
-    thumb: 'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+    thumb: 'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-800 border-2',
     status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
       focused: 'border-white ring-2 ring-primary-500',
-      valid: 'border-green-500',
-      error: 'border-red-500',
+      valid: 'border-green-600',
+      error: 'border-red-600',
       disabled: 'border-white',
     },
   },
   light: {
-    thumb: 'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+    thumb: 'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-800 border-2',
     status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
       focused: 'border-white ring-2 ring-primary-500',
-      valid: 'border-green-500',
-      error: 'border-red-500',
+      valid: 'border-green-600',
+      error: 'border-red-600',
       disabled: 'border-white',
     },
   },
   'dark-small': {
     thumb:
-      'cursor-pointer absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+      'cursor-pointer absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-800 border-2',
     status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
       focused: 'border-white ring-2 ring-primary-500',
-      valid: 'border-green-500',
-      error: 'border-red-500',
+      valid: 'border-green-600',
+      error: 'border-red-600',
       disabled: 'border-white',
     },
   },

@@ -73,7 +73,7 @@ export const SignIn: React.FC<SignInProps> = () => {
             className="relative flex h-full items-center justify-center"
           >
             <div className="w-full max-w-xs">
-              <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-600">
+              <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-700">
                 Start planning!
               </h2>
 
@@ -112,7 +112,7 @@ export const SignIn: React.FC<SignInProps> = () => {
 
                       <Link
                         href="/auth/forgot-password"
-                        className="mt-2 inline-block text-sm text-gray-500 underline"
+                        className="mt-2 inline-block text-sm text-gray-600 underline"
                       >
                         Forgot password?
                       </Link>

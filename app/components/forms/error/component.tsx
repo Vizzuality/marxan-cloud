@@ -14,7 +14,7 @@ export const Error: React.FC<ErrorProps> = ({ children, visible, className }: Er
   return (
     <div
       className={cx({
-        'mb-5 rounded border border-red-500 bg-red-100 px-3 py-1 text-sm text-red-500': true,
+        'mb-5 rounded border border-red-600 bg-red-200 px-3 py-1 text-sm text-red-600': true,
         [className]: !!className,
       })}
     >

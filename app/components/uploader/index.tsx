@@ -26,7 +26,7 @@ export const Uploader = ({
   return (
     <div className="mb-5 mt-3">
       <Button
-        className="dropzone w-full cursor-pointer py-1 hover:bg-gray-500"
+        className="dropzone w-full cursor-pointer py-1 hover:bg-gray-600"
         theme="secondary"
         size="base"
         disabled={disabled}

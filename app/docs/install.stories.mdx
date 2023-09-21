@@ -54,8 +54,8 @@ Once you installed all the dependencies and packages you will be able to run the
 "scripts": {
   "storybook:dev": "yarn storybook:styles:dev && start-storybook -p 6006 -s ./public -c .storybook",
   "storybook:build": "yarn storybook:styles:prod && build-storybook -s ./public -c .storybook",
-  "storybook:styles:dev": "NODE_ENV=development tailwind build ./styles/tailwind.css -o ./public/styles/tailwind.storybook.css",
-  "storybook:styles:prod": "NODE_ENV=production tailwind build ./styles/tailwind.css -o ./public/styles/tailwind.storybook.css"
+  "storybook:styles:dev": "NODE_ENV=development tailwind build ./styles/globals.css -o ./public/styles/tailwind.storybook.css",
+  "storybook:styles:prod": "NODE_ENV=production tailwind build ./styles/globals.css -o ./public/styles/tailwind.storybook.css"
 }
 ```
 

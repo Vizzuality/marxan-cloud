@@ -114,7 +114,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   }, [sid, downloadSolutionsMutation, addToast]);
 
   return (
-    <div className="relative mt-8 flex flex-grow flex-col overflow-hidden text-gray-800">
+    <div className="relative mt-8 flex flex-grow flex-col overflow-hidden text-gray-900">
       <div
         ref={scrollRef}
         className="relative flex flex-grow flex-col overflow-hidden overflow-y-auto overflow-x-hidden"
@@ -170,12 +170,12 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
                 <Checkbox
                   theme="light"
                   id="checkbox-5-dif-solutions"
-                  className="form-checkbox-dark block h-4 w-4 text-green-300"
+                  className="form-checkbox-dark block h-4 w-4 text-green-400"
                   onChange={(event) => setMostDifSolutions(event.target.checked)}
                 />
                 <Label
                   id="checkbox-5-dif-solutions"
-                  className="mx-2 cursor-pointer text-sm text-gray-700 hover:underline"
+                  className="mx-2 cursor-pointer text-sm text-gray-800 hover:underline"
                 >
                   View 5 most different solutions
                 </Label>

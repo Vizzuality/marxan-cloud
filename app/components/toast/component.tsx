@@ -18,23 +18,23 @@ import { ToastProps, ToastTheme } from './types';
 const THEME: ToastTheme = {
   info: {
     icon: INFO_SVG,
-    bg: 'from-blue-400 to-blue-700',
-    hoverBg: 'from-blue-100 to-blue-400',
+    bg: 'from-blue-500 to-blue-800',
+    hoverBg: 'from-blue-200 to-blue-500',
   },
   success: {
     icon: SUCCESS_SVG,
-    bg: 'from-green-400 to-green-700',
-    hoverBg: 'from-green-100 to-green-400',
+    bg: 'from-green-500 to-green-800',
+    hoverBg: 'from-green-200 to-green-500',
   },
   warning: {
     icon: WARNING_SVG,
-    bg: 'from-yellow-400 to-yellow-700',
-    hoverBg: 'from-yellow-100 to-yellow-400',
+    bg: 'from-yellow-500 to-yellow-800',
+    hoverBg: 'from-yellow-200 to-yellow-500',
   },
   error: {
     icon: ERROR_SVG,
-    bg: 'from-red-400 to-red-700',
-    hoverBg: 'from-red-100 to-red-400',
+    bg: 'from-red-1000 to-red-800',
+    hoverBg: 'from-red-200 to-red-1000',
   },
 };
 
@@ -87,7 +87,7 @@ export const Toast: React.FC<ToastProps> = ({
         })}
       >
         <div
-          className="flex w-full rounded-2xl bg-white p-2 text-gray-500 shadow-md transition hover:ring-4 hover:ring-white hover:ring-opacity-40"
+          className="flex w-full rounded-2xl bg-white p-2 text-gray-600 shadow-md transition hover:ring-4 hover:ring-white hover:ring-opacity-40"
           onMouseEnter={() => {
             controls.stop();
           }}

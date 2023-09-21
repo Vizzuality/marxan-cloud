@@ -102,7 +102,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
               className="relative flex h-full items-center justify-center"
             >
               <div className="w-full max-w-xs">
-                <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-600">
+                <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-700">
                   Get Started!
                 </h2>
 

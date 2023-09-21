@@ -120,11 +120,11 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className="flex w-full flex-col space-y-6">
             <div className="flex items-center space-x-2">
-              <div className="bg-gray-50 p-2.5">
+              <div className="bg-gray-100 p-2.5">
                 <img src={input.value.logoDataUrl} alt={input.value.name} className="max-w-full" />
               </div>
               <label
-                className="rounded-3xl bg-blue-100 bg-opacity-10 px-3 py-1"
+                className="rounded-3xl bg-blue-200 bg-opacity-10 px-3 py-1"
                 htmlFor="cancel-shapefile-btn"
               >
                 <p className="text-sm text-primary-500">{input.value.name}</p>
@@ -188,7 +188,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                               </Label>
 
                               <div className="my-2.5 flex items-center space-x-3">
-                                <h5 className="text-xs text-gray-400">Supported formats</h5>
+                                <h5 className="text-xs text-gray-600">Supported formats</h5>
                                 <InfoButton size="s" theme="secondary">
                                   <span className="text-xs">
                                     {' '}
@@ -204,17 +204,17 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                                 {...props}
                                 {...getRootProps()}
                                 className={cx({
-                                  'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                                  'relative w-full cursor-pointer border border-dotted border-gray-400 bg-gray-200 bg-opacity-20 py-10 hover:bg-gray-200':
                                     true,
-                                  'bg-gray-500': isDragActive,
-                                  'border-green-800': isDragAccept,
-                                  'border-red-800':
+                                  'bg-gray-600': isDragActive,
+                                  'border-green-900': isDragAccept,
+                                  'border-red-900':
                                     isDragReject || (props?.meta?.error && props?.meta?.touched),
                                 })}
                               >
                                 <input {...getInputProps()} />
 
-                                <p className="text-center text-sm text-gray-500">
+                                <p className="text-center text-sm text-gray-600">
                                   Drag and drop your image
                                   <br />
                                   or <b>click here</b> to upload
@@ -245,7 +245,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                             <h5 className="text-xs uppercase text-black">Uploaded file:</h5>
                             <div className="flex items-center space-x-2">
                               <label
-                                className="rounded-3xl bg-gray-400 bg-opacity-10 px-3 py-1"
+                                className="rounded-3xl bg-gray-100 bg-opacity-10 px-3 py-1"
                                 htmlFor="cancel-shapefile-btn"
                               >
                                 <p className="text-sm text-black">{successFile.path}</p>

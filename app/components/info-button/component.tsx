@@ -9,15 +9,15 @@ import INFO_SVG from 'svgs/ui/info.svg?sprite';
 
 const THEME = {
   primary: {
-    button: 'bg-blue-400',
-    icon: 'text-gray-800',
+    button: 'bg-blue-500',
+    icon: 'text-gray-900',
   },
   secondary: {
     button: 'bg-black',
     icon: 'text-white',
   },
   tertiary: {
-    button: 'bg-gray-400',
+    button: 'bg-gray-600',
     icon: 'text-white',
   },
 };
@@ -57,7 +57,7 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
     interactive
     content={
       <div
-        className="rounded bg-white p-4 text-gray-500"
+        className="rounded bg-white p-4 text-gray-700"
         style={{
           boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
         }}

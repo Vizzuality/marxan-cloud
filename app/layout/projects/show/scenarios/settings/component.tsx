@@ -41,7 +41,7 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
     return (
       <Loading
         visible
-        className="z-40 flex h-26 w-full items-center justify-center bg-transparent bg-opacity-90"
+        className="h-26 z-40 flex w-full items-center justify-center bg-transparent bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
       />
     );
@@ -53,25 +53,25 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
     <dl className="flex flex-col space-y-2">
       <div className="flex space-x-2 text-sm">
         <dt>Protected areas:</dt>
-        <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-blue-400">
+        <dd className="rounded bg-blue-500 bg-opacity-30 px-1.5 text-blue-500">
           {protectedAreas?.length || '-'}
         </dd>
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>Features:</dt>
-        <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-blue-400">
+        <dd className="rounded bg-blue-500 bg-opacity-30 px-1.5 text-blue-500">
           {selectedFeaturesData?.length || '-'}
         </dd>
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>Runs:</dt>
-        <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-blue-400">
+        <dd className="rounded bg-blue-500 bg-opacity-30 px-1.5 text-blue-500">
           {numberOfRuns || '-'}
         </dd>
       </div>
       <div className="flex space-x-2 text-sm">
         <dt>BLM:</dt>
-        <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-blue-400">
+        <dd className="rounded bg-blue-500 bg-opacity-30 px-1.5 text-blue-500">
           {boundaryLengthModifier || '-'}
         </dd>
       </div>

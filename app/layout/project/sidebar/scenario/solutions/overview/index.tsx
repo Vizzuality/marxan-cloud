@@ -145,7 +145,7 @@ export const SolutionsOverview = (): JSX.Element => {
     >
       <Section className="flex flex-col overflow-hidden">
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-blue-400">Solutions</span>
+          <span className="text-xs font-semibold text-blue-500">Solutions</span>
           <div className="flex items-center space-x-2">
             <h3 className="text-lg font-medium">Overview</h3>
           </div>
@@ -155,7 +155,7 @@ export const SolutionsOverview = (): JSX.Element => {
             <div className="relative flex w-full flex-col space-y-4 text-sm">
               <Loading
                 visible={solutionIsLoading}
-                className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
+                className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
                 iconClassName="w-10 h-10 text-primary-500"
               />
 
@@ -165,7 +165,7 @@ export const SolutionsOverview = (): JSX.Element => {
                 cost, and whether targets have been met.
               </p>
 
-              <div className="w-full border-t border-gray-600 py-6">
+              <div className="w-full border-t border-gray-700 py-6">
                 <SolutionSelected
                   best={isBestSolution}
                   values={selectedSolutionData || bestSolutionData}
@@ -183,7 +183,7 @@ export const SolutionsOverview = (): JSX.Element => {
               >
                 <Loading
                   visible={PDFLoader}
-                  className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
+                  className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-900 bg-opacity-90"
                   iconClassName="w-10 h-10 text-primary-500"
                 />
                 Download report
@@ -212,7 +212,7 @@ export const SolutionsOverview = (): JSX.Element => {
               </Modal>
             </div>
 
-            {/* <div className="w-full p-6 mt-12 border-t border-gray-600">
+            {/* <div className="w-full p-6 mt-12 border-t border-gray-700">
             <SolutionFrequency
               values={frequencyLegendValues}
               onChangeVisibility={() => onChangeVisibility('frequency')}

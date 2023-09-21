@@ -9,7 +9,7 @@ const Section = ({
   return (
     <section
       className={cn({
-        'space-y-2 rounded-[20px] bg-gray-700 p-6': true,
+        'space-y-2 rounded-[20px] bg-gray-800 p-6': true,
         [className]: Boolean(className),
       })}
     >

@@ -23,7 +23,7 @@ export const CostSurfaceReport = (): JSX.Element => {
   }, [costSurfaceQuery.data]);
 
   return (
-    <div className="flex space-x-6 bg-gray-50 px-10 py-3">
+    <div className="flex space-x-6 bg-gray-100 px-10 py-3">
       <CostSurfaceReportMap id="report-map-cost-surface" />
       <div className="w-2/6 py-5">
         <LegendItem {...LEGEND} key="cost" theme="light" className="text-left font-semibold" />

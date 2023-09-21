@@ -273,7 +273,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                 {importLegacyErrors && !!importLegacyErrors.length && (
                   <div className="mb-6 flex flex-col space-y-2">
                     {importLegacyErrors.map((e) => (
-                      <p key={e} className="text-xs text-red-500">
+                      <p key={e} className="text-xs text-red-600">
                         {e}
                       </p>
                     ))}
@@ -332,7 +332,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                   >
                     Back
                   </Button>
-                  <div className="before:absolute before:bg-blue-500 after:flex after:bg-blue-300" />
+                  <div className="before:absolute before:bg-blue-600 after:flex after:bg-blue-300" />
 
                   <Button theme="primary" size="xl" type="submit">
                     Save

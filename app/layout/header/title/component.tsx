@@ -191,7 +191,7 @@ export const Title: React.FC<TitleProps> = () => {
                         placement="bottom"
                         disabled={meta.active}
                         content={
-                          <div className="rounded bg-white px-2 py-1 text-gray-500">
+                          <div className="rounded bg-white px-2 py-1 text-gray-600">
                             <span>Edit name</span>
                           </div>
                         }
@@ -204,7 +204,7 @@ export const Title: React.FC<TitleProps> = () => {
                           <input
                             {...input}
                             className={cx({
-                              'absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent px-1.5 font-heading font-normal focus:bg-primary-300 focus:text-gray-500 focus:outline-none':
+                              'absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent px-1.5 font-heading font-normal focus:bg-primary-300 focus:text-gray-600 focus:outline-none':
                                 true,
                             })}
                             value={`${input.value}`}
@@ -269,7 +269,7 @@ export const Title: React.FC<TitleProps> = () => {
                         placement="bottom"
                         disabled={meta.active}
                         content={
-                          <div className="rounded bg-white px-2 py-1 text-gray-500">
+                          <div className="rounded bg-white px-2 py-1 text-gray-600">
                             <span>Edit name</span>
                           </div>
                         }
@@ -278,7 +278,7 @@ export const Title: React.FC<TitleProps> = () => {
                           <input
                             {...input}
                             id="form-scenario-name"
-                            className="absolute left-0 top-0 h-full w-full overflow-ellipsis border-none bg-transparent px-1 font-sans font-normal leading-4 focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
+                            className="absolute left-0 top-0 h-full w-full overflow-ellipsis border-none bg-transparent px-1 font-sans font-normal leading-4 focus:bg-primary-300 focus:text-gray-600 focus:outline-none"
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();

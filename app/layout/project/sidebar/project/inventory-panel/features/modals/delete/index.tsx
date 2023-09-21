@@ -105,8 +105,8 @@ const DeleteModal = ({
           </span>
         )}
       </p>
-      <div className="flex items-center space-x-1.5 rounded border-l-[5px] border-red-600 bg-red-50/50 px-1.5 py-4">
-        <Icon className="h-10 w-10 text-red-600" icon={ALERT_SVG} />
+      <div className="flex items-center space-x-1.5 rounded border-l-[5px] border-red-700 bg-red-100/50 px-1.5 py-4">
+        <Icon className="h-10 w-10 text-red-700" icon={ALERT_SVG} />
         <p className="font-sans text-xs font-medium text-black">
           A feature can be deleted ONLY if it&apos;s not being used by any scenario
         </p>

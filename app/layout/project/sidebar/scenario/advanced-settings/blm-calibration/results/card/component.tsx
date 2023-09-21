@@ -82,7 +82,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
       <dl
         className={cx({
           'space-y-0.5 p-2': true,
-          'bg-gray-500': !selected,
+          'bg-gray-700': !selected,
           'bg-primary-500': selected,
         })}
       >
@@ -90,7 +90,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
           <dt
             className={cx({
               'text-xs uppercase': true,
-              'text-gray-700': selected,
+              'text-gray-800': selected,
             })}
           >
             BLM
@@ -99,7 +99,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
             className={cx({
               'text-xs': true,
               'text-primary-500': !selected,
-              'text-gray-700': selected,
+              'text-gray-800': selected,
             })}
           >
             {blmFormat(blmValue)}
@@ -109,7 +109,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
           <dt
             className={cx({
               'text-xs uppercase': true,
-              'text-gray-700': selected,
+              'text-gray-800': selected,
             })}
           >
             Cost
@@ -118,7 +118,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
             className={cx({
               'text-xs': true,
               'text-primary-500': !selected,
-              'text-gray-700': selected,
+              'text-gray-800': selected,
             })}
           >
             {cost}
@@ -130,7 +130,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
         {!pngData && (
           <Loading
             visible
-            className="flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
+            className="flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
             iconClassName="w-10 h-10 text-primary-500"
           />
         )}

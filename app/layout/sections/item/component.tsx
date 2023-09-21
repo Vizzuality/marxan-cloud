@@ -45,7 +45,7 @@ export const ScenariosSidebarAnalysisSection: React.FC<ScenariosSidebarAnalysisS
       </h4>
       <p
         className={cx({
-          'mt-1 text-sm text-gray-300': true,
+          'mt-1 text-sm text-gray-400': true,
           'opacity-30': disabled,
         })}
       >

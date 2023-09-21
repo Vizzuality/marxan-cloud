@@ -167,7 +167,7 @@ export const Table2: React.FC<Table2Props> = ({
             const { key: rowKey, ...restRowProps } = row.getRowProps();
 
             return (
-              <div key={rowKey} {...restRowProps} className="border-t border-gray-100 px-10">
+              <div key={rowKey} {...restRowProps} className="border-t border-gray-200 px-10">
                 {row.cells.map((cell) => {
                   const { key: cellKey, ...restCellProps } = cell.getCellProps();
 

@@ -49,7 +49,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
                 className="absolute flex h-px items-center space-x-1 leading-none"
                 style={{ bottom: `${(100 / 11) * 2}%` }}
               >
-                <span className="relative top-px block h-px w-1 bg-gray-300" />
+                <span className="relative top-px block h-px w-1 bg-gray-400" />
                 <span className="relative block -rotate-45 transform">
                   <span>10</span>
                 </span>
@@ -58,7 +58,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
                 className="absolute flex h-px items-center space-x-1 leading-none"
                 style={{ bottom: `${(100 / 11) * 6}%` }}
               >
-                <span className="relative top-px block h-px w-1 bg-gray-300" />
+                <span className="relative top-px block h-px w-1 bg-gray-400" />
                 <span className="relative block -rotate-45 transform">
                   <span>50</span>
                 </span>
@@ -67,7 +67,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
                 className="absolute flex h-px items-center space-x-1 leading-none"
                 style={{ bottom: '100%' }}
               >
-                <span className="relative top-px block h-px w-1 bg-gray-300" />
+                <span className="relative top-px block h-px w-1 bg-gray-400" />
                 <span className="relative block -rotate-45 transform">
                   <span>100</span>
                 </span>
@@ -79,7 +79,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
                 className="absolute flex h-px transform items-center space-x-1 leading-none"
                 style={{ bottom: `${100 - (100 / 11) * 2}%` }}
               >
-                <span className="relative top-px block h-px w-1 bg-gray-300" />
+                <span className="relative top-px block h-px w-1 bg-gray-400" />
                 <span className="relative block -rotate-180 transform">
                   <span className="relative block rotate-45 transform">10</span>
                 </span>
@@ -88,7 +88,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
                 className="absolute flex h-px transform items-center space-x-1 leading-none"
                 style={{ bottom: `${100 - (100 / 11) * 6}%` }}
               >
-                <span className="relative top-px block h-px w-1 bg-gray-300" />
+                <span className="relative top-px block h-px w-1 bg-gray-400" />
                 <span className="relative block -rotate-180 transform">
                   <span className="relative block rotate-45 transform">50</span>
                 </span>
@@ -97,7 +97,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
                 className="absolute flex h-px transform items-center space-x-1 leading-none"
                 style={{ bottom: '0%' }}
               >
-                <span className="relative top-px block h-px w-1 bg-gray-300" />
+                <span className="relative top-px block h-px w-1 bg-gray-400" />
                 <span className="relative block -rotate-180 transform">
                   <span className="relative block rotate-45 transform">100</span>
                 </span>

@@ -93,7 +93,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
       placement="top"
       content={
         <div
-          className="rounded bg-white p-4 text-xs text-gray-500"
+          className="rounded bg-white p-4 text-xs text-gray-600"
           style={{
             boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
             maxWidth: 200,

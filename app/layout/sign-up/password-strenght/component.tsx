@@ -29,13 +29,13 @@ export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
 
   return (
     <div className="mt-1 h-4 space-y-0.5">
-      <div className="h-1 w-full rounded-md bg-gray-100 text-sm">
+      <div className="h-1 w-full rounded-md bg-gray-200 text-sm">
         <div
           className={cx({
             'h-full rounded-md': true,
-            'bg-green-500': STRENGTH === 'strong',
-            'bg-yellow-700': STRENGTH === 'medium',
-            'bg-red-500': STRENGTH === 'weak',
+            'bg-green-600': STRENGTH === 'strong',
+            'bg-yellow-800': STRENGTH === 'medium',
+            'bg-red-600': STRENGTH === 'weak',
           })}
           style={{
             width: `${ENTROPY}%`,
@@ -44,7 +44,7 @@ export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
       </div>
 
       {!!password && (
-        <div className="text-right text-xxs text-gray-500">
+        <div className="text-right text-xxs text-gray-600">
           Strength: <span>{STRENGTH}</span>
         </div>
       )}

@@ -1,9 +1,8 @@
 import Link from 'next/link';
 
-import { cn } from 'utils/cn';
-
 import Icon, { IconProps } from 'components/icon';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import { MenuTooltip, TOOLTIP_OFFSET } from '../';
 
@@ -16,7 +15,7 @@ export interface SubMenuItem {
 
 export const SubMenu = ({ items }: { items: SubMenuItem[] }): JSX.Element => {
   return (
-    <ul className="space-y-5 rounded-xl border border-gray-400 py-4">
+    <ul className="space-y-5 rounded-xl border border-gray-600 py-4">
       {items.map((item) => (
         <Tooltip
           key={item.route}
@@ -29,7 +28,7 @@ export const SubMenu = ({ items }: { items: SubMenuItem[] }): JSX.Element => {
               href={item.route}
               className={cn({
                 'flex px-[10px]': true,
-                'relative overflow-hidden before:absolute before:-left-[1px] before:block before:h-full before:w-[3px] before:rounded-sm before:bg-blue-400 before:drop-shadow-blue after:absolute after:-right-[1px] after:block after:h-full after:w-[3px] after:rounded-sm after:bg-blue-400 after:drop-shadow-blue':
+                'relative overflow-hidden before:absolute before:-left-[1px] before:block before:h-full before:w-[3px] before:rounded-sm before:bg-blue-500 before:drop-shadow-blue after:absolute after:-right-[1px] after:block after:h-full after:w-[3px] after:rounded-sm after:bg-blue-500 after:drop-shadow-blue':
                   item.selected,
               })}
             >

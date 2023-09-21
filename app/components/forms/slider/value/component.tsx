@@ -11,19 +11,19 @@ const THEME = {
     base: 'absolute top-0 transform -translate-x-1/2 text-black',
     output: 'text-sm text-white border border-t-0 border-l-0 border-r-0 border-dashed border-white',
     input:
-      'absolute left-0 top-0 w-full h-full text-sm border-none bg-primary-300 rounded rounded-lg cursor-text text-center font-medium appearance-none bg-transparent text-gray-500 focus:outline-none',
+      'absolute left-0 top-0 w-full h-full text-sm border-none bg-primary-300 rounded rounded-lg cursor-text text-center font-medium appearance-none bg-transparent text-gray-600 focus:outline-none',
   },
   light: {
     base: 'absolute top-0 transform -translate-x-1/2 text-black',
     input:
-      'absolute left-0 top-0 w-full h-full text-sm border-none bg-primary-300 rounded rounded-lg cursor-text text-center font-medium appearance-none bg-transparent text-gray-500 focus:outline-none',
+      'absolute left-0 top-0 w-full h-full text-sm border-none bg-primary-300 rounded rounded-lg cursor-text text-center font-medium appearance-none bg-transparent text-gray-600 focus:outline-none',
     output:
-      'text-sm text-gray-800 border border-t-0 border-l-0 border-r-0 border-dashed border-gray-800',
+      'text-sm text-gray-900 border border-t-0 border-l-0 border-r-0 border-dashed border-gray-900',
   },
   'dark-small': {
     base: 'absolute top-0 transform -translate-x-1/2 text-black',
     input:
-      'absolute left-0 top-0 w-full h-full text-sm border-none bg-primary-300 rounded rounded-lg cursor-text text-center font-medium appearance-none bg-transparent text-gray-500 focus:outline-none',
+      'absolute left-0 top-0 w-full h-full text-sm border-none bg-primary-300 rounded rounded-lg cursor-text text-center font-medium appearance-none bg-transparent text-gray-600 focus:outline-none',
     output: 'text-xs text-black',
   },
 };

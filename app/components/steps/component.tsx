@@ -8,8 +8,8 @@ export interface StepsProps {
 export const Steps: React.FC<StepsProps> = ({ step, length }: StepsProps) => (
   <div className="flex space-x-0.5 text-sm font-medium">
     <span className="text-white">{step}</span>
-    <span className="text-gray-400">/</span>
-    <span className="text-gray-400">{length}</span>
+    <span className="text-gray-100">/</span>
+    <span className="text-gray-100">{length}</span>
   </div>
 );
 

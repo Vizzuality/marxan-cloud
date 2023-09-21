@@ -5,11 +5,11 @@ export const SCENARIO_STATES = {
   },
   'run-failure': {
     text: 'Fail Running Scenario',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'run-done': {
     text: 'Run Scenario',
-    styles: 'text-blue-500',
+    styles: 'text-blue-600',
   },
   'calibration-running': {
     text: 'Running Calibration',
@@ -17,7 +17,7 @@ export const SCENARIO_STATES = {
   },
   'calibration-failure': {
     text: 'Fail Running Calibration',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'pa-running': {
     text: 'Running PA percentage',
@@ -25,7 +25,7 @@ export const SCENARIO_STATES = {
   },
   'pa-failure': {
     text: 'Fail PA percentage',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'pu-running': {
     text: 'Running PU inclusion',
@@ -33,7 +33,7 @@ export const SCENARIO_STATES = {
   },
   'pu-failure': {
     text: 'Fail PU inclusion',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'features-running': {
     text: 'Running Features',
@@ -41,7 +41,7 @@ export const SCENARIO_STATES = {
   },
   'features-failure': {
     text: 'Fail Features',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'clone-running': {
     text: 'Running cloning',
@@ -49,10 +49,10 @@ export const SCENARIO_STATES = {
   },
   'clone-failure': {
     text: 'Fail cloning scenario',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   draft: {
     text: 'Edited',
-    styles: 'text-gray-400',
+    styles: 'text-gray-600',
   },
 };

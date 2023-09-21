@@ -193,7 +193,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
   return (
     <Section className="flex h-full flex-col overflow-hidden">
       <div className="space-y-1">
-        <span className="text-xs font-semibold text-blue-400">Grid Setup</span>
+        <span className="text-xs font-semibold text-blue-500">Grid Setup</span>
         <h3 className="flex items-center space-x-2">
           <span className="text-lg font-medium">Protected Areas</span>
         </h3>
@@ -236,11 +236,11 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
             >
               <Loading
                 visible={submitting}
-                className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
+                className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
                 iconClassName="w-10 h-10 text-white"
               />
 
-              <ScrollArea className="relative h-full pr-3 before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-700 before:via-gray-700 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-700 after:via-gray-700">
+              <ScrollArea className="relative h-full pr-3 before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-800 before:via-gray-800 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-800 after:via-gray-800">
                 <div className="relative flex flex-grow flex-col">
                   <div className="relative overflow-x-visible px-0.5">
                     <div className="py-6">

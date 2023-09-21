@@ -78,7 +78,7 @@ export const Contributors = (): JSX.Element => {
                     type="button"
                     className={cn({
                       'z-50 -ml-3 h-8 w-8 rounded-full': true,
-                      'bg-gray-500': !open,
+                      'bg-gray-600': !open,
                     })}
                     onClick={handleClick}
                   >
@@ -86,9 +86,9 @@ export const Contributors = (): JSX.Element => {
                       size="s"
                       className={cn({
                         'border-none': true,
-                        'bg-gray-500 text-white transition-colors hover:bg-white hover:text-gray-500':
+                        'bg-gray-600 text-white transition-colors hover:bg-white hover:text-gray-600':
                           !open,
-                        'bg-white text-gray-500': open,
+                        'bg-white text-gray-600': open,
                       })}
                     >
                       <Icon icon={ADD_USER_SVG} className="h-4 w-4" />
@@ -99,7 +99,7 @@ export const Contributors = (): JSX.Element => {
                   <PopoverContent
                     side="right"
                     sideOffset={20}
-                    className="!z-50 w-full rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-xs"
+                    className="!z-50 w-full rounded-2xl !border-none bg-gray-800 !p-0 font-sans text-xs"
                     collisionPadding={48}
                     onInteractOutside={() => setOpen(false)}
                   >

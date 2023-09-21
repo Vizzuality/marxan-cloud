@@ -172,7 +172,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
                   aria-label="manage-visibility"
                   type="button"
                   className={cx({
-                    'beacon relative flex h-6 w-6 translate-y-3/4 transform items-center justify-center rounded-full border-2 border-gray-700 bg-primary-500 transition focus:outline-none':
+                    'beacon relative flex h-6 w-6 translate-y-3/4 transform items-center justify-center rounded-full border-2 border-gray-800 bg-primary-500 transition focus:outline-none':
                       true,
                   })}
                   onClick={() => {

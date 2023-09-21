@@ -90,7 +90,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
             className={cn({
               'font-heading text-sm': true,
               'text-white': theme === 'dark' || !theme,
-              'text-gray-700': theme === 'light',
+              'text-gray-800': theme === 'light',
             })}
           >
             {name}
@@ -101,7 +101,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
           <button
             aria-label="drag"
             type="button"
-            className="cursor-pointer text-gray-400 hover:text-white"
+            className="cursor-pointer text-gray-100 hover:text-white"
             {...listeners}
             {...attributes}
           >
@@ -117,7 +117,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                 placement="top"
                 trigger={openOpacity ? 'manual' : 'mouseenter focus'}
                 content={
-                  <div className="rounded bg-white p-2 text-gray-500">
+                  <div className="rounded bg-white p-2 text-gray-600">
                     Opacity ({format(opacity)})
                   </div>
                 }
@@ -135,7 +135,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                       setOpenOpacity(false);
                     }}
                     content={
-                      <div className="w-60 rounded bg-white px-6 pb-4 pt-1.5 text-gray-500">
+                      <div className="w-60 rounded bg-white px-6 pb-4 pt-1.5 text-gray-600">
                         <Slider
                           labelRef={null}
                           theme="dark-small"
@@ -156,7 +156,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                       type="button"
                       className={cn({
                         'flex h-5 w-5 items-center justify-center text-white': true,
-                        'text-gray-300': opacity !== 1,
+                        'text-gray-400': opacity !== 1,
                       })}
                     >
                       <Icon className="h-4 w-4 pt-px" icon={OPACITY_SVG} />
@@ -172,7 +172,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
               <Tooltip
                 arrow
                 placement="top"
-                content={<div className="rounded bg-white p-2 text-gray-500">Visibility</div>}
+                content={<div className="rounded bg-white p-2 text-gray-600">Visibility</div>}
               >
                 <button
                   aria-label="manage-visibility"
@@ -180,7 +180,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                   onClick={onChangeVisibility}
                   className={cn({
                     'flex h-5 w-5 items-center justify-center text-white': true,
-                    'text-gray-300': !visibility,
+                    'text-gray-400': !visibility,
                   })}
                 >
                   <Icon className="h-4 w-4" icon={visibility ? SHOW_SVG : HIDE_SVG} />
@@ -191,7 +191,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
         </div>
       </header>
 
-      <div className="text-sm text-gray-300">{description}</div>
+      <div className="text-sm text-gray-400">{description}</div>
 
       {validChildren && <div className="mt-2.5">{children}</div>}
     </div>

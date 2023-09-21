@@ -714,13 +714,13 @@ export const ScenariosEditMap = (): JSX.Element => {
                   />
                 )}
                 {type === 'basic' && (
-                  <LegendTypeBasic className="text-sm text-gray-300" items={items} />
+                  <LegendTypeBasic className="text-sm text-gray-400" items={items} />
                 )}
                 {type === 'choropleth' && (
-                  <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />
+                  <LegendTypeChoropleth className="text-sm text-gray-400" items={items} />
                 )}
                 {type === 'gradient' && (
-                  <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />
+                  <LegendTypeGradient className={{ box: 'text-sm text-gray-400' }} items={items} />
                 )}
               </LegendItem>
             );

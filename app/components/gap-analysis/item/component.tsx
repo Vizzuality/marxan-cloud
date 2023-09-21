@@ -78,7 +78,7 @@ export const Item: React.FC<ItemProps> = ({
         'relative overflow-hidden border-l-4 px-4 pb-4 pt-1 text-white transition-opacity duration-300':
           true,
         'opacity-20': muted,
-        'border-purple-700': true,
+        'border-purple-800': true,
         'pb-8': !onTarget,
         [className]: className !== undefined && className !== null,
       })}
@@ -87,7 +87,7 @@ export const Item: React.FC<ItemProps> = ({
     >
       <div className="flex justify-between">
         <Tooltip
-          content={<div className="rounded bg-white p-2 text-gray-500">{name}</div>}
+          content={<div className="rounded bg-white p-2 text-gray-600">{name}</div>}
           placement="top-start"
           delay={[400, null]}
           offset={[-10, -34]}
@@ -99,7 +99,7 @@ export const Item: React.FC<ItemProps> = ({
 
         <button
           type="button"
-          className="flex flex-shrink-0 items-center justify-between rounded-4xl border border-transparent px-2 py-1 text-xs focus:border-white"
+          className="flex flex-shrink-0 items-center justify-between rounded-[40px] border border-transparent px-2 py-1 text-xs focus:border-white"
           onClick={onHighlight}
         >
           {highlighted ? 'Lowlight on map' : 'Highlight on map'}
@@ -108,38 +108,38 @@ export const Item: React.FC<ItemProps> = ({
       </div>
       <div className="flex justify-start">
         <div className="mr-5">
-          <div className="mr-3 inline-block h-3 w-3 rounded-sm bg-purple-700 align-middle" />
+          <div className="mr-3 inline-block h-3 w-3 rounded-sm bg-purple-800 align-middle" />
           <span className="text-sm">
             Current: {percentFormatter.format(current.percent)} ({current.value} {current.unit})
           </span>
         </div>
         <div>
-          <div className="w- with-stripes mr-3 inline-block h-3 w-3 rounded-sm bg-gradient-repeat-to-br from-gray-100 to-gray-800 align-middle" />
+          <div className="w- with-stripes mr-3 inline-block h-3 w-3 rounded-sm bg-gradient-repeat-to-br from-gray-200 to-gray-900 align-middle" />
           <span className="text-sm">
             Target: {percentFormatter.format(target.percent)} ({target.value} {target.unit})
           </span>
         </div>
       </div>
-      <div ref={chartRef} className="relative mt-4 h-2.5 rounded-sm bg-gray-600">
+      <div ref={chartRef} className="relative mt-4 h-2.5 rounded-sm bg-gray-700">
         <div
-          className="absolute h-full rounded-sm bg-purple-700"
+          className="absolute h-full rounded-sm bg-purple-800"
           style={{ width: `${current.percent * 100}%` }}
         />
         <div
-          className="with-stripes absolute left-1 top-1/2 h-1.5 -translate-y-1/2 transform rounded-md border border-black bg-gradient-repeat-to-br from-gray-100 to-gray-800"
+          className="with-stripes absolute left-1 top-1/2 h-1.5 -translate-y-1/2 transform rounded-md border border-black bg-gradient-repeat-to-br from-gray-200 to-gray-900"
           style={{ width: `${target.percent * 100}%` }}
         />
 
         {!onTarget && (
           <div
-            className="absolute top-1/2 h-4 w-px -translate-y-1/2 transform bg-red-500"
+            className="absolute top-1/2 h-4 w-px -translate-y-1/2 transform bg-red-600"
             style={{
               left: `${current.percent * 100}%`,
             }}
           >
             <div
               className={classnames({
-                'absolute left-1/2 top-full mt-2.5 -translate-y-1/2 transform whitespace-nowrap text-xs text-red-500':
+                'absolute left-1/2 top-full mt-2.5 -translate-y-1/2 transform whitespace-nowrap text-xs text-red-600':
                   true,
                 ...metStyles,
               })}

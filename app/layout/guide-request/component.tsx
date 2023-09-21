@@ -29,13 +29,13 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }: GuideRe
 
   return (
     <div className="flex flex-col items-center justify-center space-y-6 py-10">
-      <h2 className="text-m text-center font-heading font-medium text-gray-600">
+      <h2 className="text-m text-center font-heading font-medium text-gray-700">
         First things first...
       </h2>
 
       <Icon icon={GUIDE_REQUEST_SVG} className="w-28" />
       <div className="w-72">
-        <p className="text-m text-center font-heading text-gray-600">
+        <p className="text-m text-center font-heading text-gray-700">
           Would you like to get some guidance on Marxan&apos;s workflow?
         </p>
       </div>

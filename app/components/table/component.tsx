@@ -101,7 +101,7 @@ export const Table: React.FC<TableProps> = ({
             <tr
               key={row.id}
               className={cx({
-                'bg-gray-100 bg-opacity-50': !rowIsSelected && (rowIndex + 1) % 2 === 0,
+                'bg-gray-200 bg-opacity-50': !rowIsSelected && (rowIndex + 1) % 2 === 0,
                 'bg-white': !rowIsSelected && (rowIndex + 1) % 2 === 1,
                 'bg-primary-300 bg-opacity-30': rowIsSelected,
               })}

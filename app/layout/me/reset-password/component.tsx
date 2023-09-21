@@ -93,10 +93,10 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
               className="relative flex h-full items-center justify-center"
             >
               <div className="w-full max-w-xs">
-                <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-600">
+                <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-700">
                   Create new password
                 </h2>
-                <p className="mb-12 text-sm text-gray-500">
+                <p className="mb-12 text-sm text-gray-600">
                   Your new password must be different from previous used passwords.
                 </p>
 
@@ -157,10 +157,10 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
         <div className="relative flex h-full items-center justify-center">
           <div className="w-full max-w-xs">
             <div className="pb-5">
-              <h2 className="mb-24 text-center font-heading text-lg font-medium text-gray-600">
+              <h2 className="mb-24 text-center font-heading text-lg font-medium text-gray-700">
                 You&apos;ve changed your password
               </h2>
-              <Icon icon={RECOVER_PASSWORD_SVG} className="mx-auto mb-5 h-56 w-56 text-gray-500" />
+              <Icon icon={RECOVER_PASSWORD_SVG} className="mx-auto mb-5 h-56 w-56 text-gray-600" />
             </div>
             <div className="mt-10">
               <Button
@@ -181,10 +181,10 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
         <div className="relative flex h-full items-center justify-center">
           <div className="w-full max-w-xs">
             <div className="flex flex-col items-center space-y-20 pb-5">
-              <h2 className="text-center font-heading text-lg font-medium text-gray-600">
+              <h2 className="text-center font-heading text-lg font-medium text-gray-700">
                 Sorry, you are not allowed to reset your password.
               </h2>
-              <p className="mb-12 text-sm text-gray-500">Please check your email inbox.</p>
+              <p className="mb-12 text-sm text-gray-600">Please check your email inbox.</p>
             </div>
           </div>
         </div>

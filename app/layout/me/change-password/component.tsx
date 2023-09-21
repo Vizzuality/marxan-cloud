@@ -84,7 +84,7 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex">
           <div className="w-full max-w-xl">
-            <h2 className="mb-5 font-heading text-lg font-medium text-gray-600">Change password</h2>
+            <h2 className="mb-5 font-heading text-lg font-medium text-gray-700">Change password</h2>
             <p className="text-sm">
               Choose a new password. Changing your password will sign you out. You will need to
               enter your new password.

@@ -11,28 +11,28 @@ const THEME = {
     'text-primary-500 bg-transparent hover:bg-transparent active:bg-transparent border border-primary-500 hover:border-primary-400 active:border-primary-300',
 
   secondary:
-    'text-white bg-gray-500 hover:bg-gray-400 active:bg-gray-300 border border-gray-500 hover:border-gray-400 active:border-gray-300',
+    'text-white bg-gray-700 hover:bg-gray-600 active:bg-gray-400 border border-gray-700 hover:border-gray-600 active:border-gray-400',
   'secondary-alt':
-    'text-gray-300 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
+    'text-gray-400 bg-transparent hover:bg-transparent active:bg-transparent border border-gray-600 hover:border-gray-400 active:border-gray-300',
 
-  tertiary: 'text-black bg-gray-100 hover:bg-gray-400 hover:border-gray-400 hover:text-white',
+  tertiary: 'text-black bg-gray-200 hover:bg-gray-100 hover:border-gray-100 hover:text-white',
 
   white:
-    'text-gray-700 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-400 hover:border-gray-300 active:border-gray-200',
+    'text-gray-800 bg-white hover:text-white hover:bg-transparent active:bg-transparent border border-gray-100 hover:border-gray-400 active:border-gray-300',
 
   danger:
-    'text-red-700 bg-transparent hover:text-white hover:bg-red-700 active:bg-red-600 border border-red-700 hover:border-red-600 active:border-red-500',
+    'text-red-800 bg-transparent hover:text-white hover:bg-red-800 active:bg-red-700 border border-red-800 hover:border-red-700 active:border-red-600',
   'danger-alt':
-    'text-white hover:bg-transparent border border-red-500 hover:text-red-500 bg-red-500 active:bg-red-600 hover:border hover:border-red-500 active:text-white active:border-red-600',
+    'text-white hover:bg-transparent border border-red-600 hover:text-red-600 bg-red-600 active:bg-red-700 hover:border hover:border-red-600 active:text-white active:border-red-700',
 
   spacial:
-    'text-white bg-transparent hover:bg-gray-400 active:bg-gray-300 flex items-center justify-center rounded-4xl focus:outline-none',
+    'text-white bg-transparent hover:bg-gray-100 active:bg-gray-400 flex items-center justify-center rounded-[40px] focus:outline-none',
 
-  dark: 'text-white bg-gray-600 border border-gray-600 hover:bg-black hover:text-white',
+  dark: 'text-white bg-gray-700 border border-gray-700 hover:bg-black hover:text-white',
   'dark-alt':
-    'text-gray-800 bg-transparent border border-gray-800 hover:border-gray-400 hover:text-gray-400',
+    'text-gray-900 bg-transparent border border-gray-900 hover:border-gray-100 hover:text-gray-100',
 
-  clear: 'text-gray-800 hover:text-gray-400',
+  clear: 'text-gray-900 hover:text-gray-100',
 
   'transparent-black':
     'text-black bg-transparent border border-black hover:bg-black hover:text-white',
@@ -93,7 +93,7 @@ const hasHref = (props: ButtonProps | AnchorProps): props is AnchorProps => 'hre
 
 function buildClassName({ className, disabled, size, theme }) {
   return cn({
-    'group relative flex items-center justify-center rounded-4xl transition-colors focus:outline-none':
+    'group relative flex items-center justify-center rounded-[40px] transition-colors focus:outline-none':
       true,
     [THEME[theme]]: true,
     [SIZE[size]]: true,
@@ -106,9 +106,9 @@ function buildChildren({ theme, children }) {
   if (theme === 'spacial') {
     return (
       <>
-        <div className="absolute bottom-0 left-0 right-0 top-0 z-0 rounded-4xl bg-gradient-to-r from-purple-500 to-blue-500">
+        <div className="absolute bottom-0 left-0 right-0 top-0 z-0 rounded-[40px] bg-gradient-to-r from-purple-600 to-blue-600">
           <div className="relative h-full w-full border-2 border-transparent">
-            <div className="absolute h-full w-full rounded-4xl bg-black transition-colors group-hover:bg-transparent" />
+            <div className="absolute h-full w-full rounded-[40px] bg-black transition-colors group-hover:bg-transparent" />
           </div>
         </div>
         <div className="relative z-20">{children}</div>

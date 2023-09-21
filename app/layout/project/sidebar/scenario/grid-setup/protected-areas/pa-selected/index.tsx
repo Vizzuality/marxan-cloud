@@ -39,7 +39,7 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
 
           return (
             <div key={`${wdpa.value}`} className="mb-2.5 mr-5 flex">
-              <span className="mr-1 inline-flex h-6 items-center rounded-3xl bg-blue-400 bg-opacity-20 px-2.5 text-sm text-blue-400">
+              <span className="mr-1 inline-flex h-6 items-center rounded-3xl bg-blue-500 bg-opacity-20 px-2.5 text-sm text-blue-500">
                 {wdpa.label.length > 25 ? `${wdpa.label.substring(0, 25 - 3)}...` : wdpa.label}
               </span>
 
@@ -47,7 +47,7 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
                 <button
                   aria-label="remove"
                   type="button"
-                  className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-400 bg-transparent transition hover:bg-gray-400"
+                  className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-600 bg-transparent transition hover:bg-gray-600"
                   onClick={() => {
                     form.mutators.removeWDPAFilter(wdpa.value, wdpaIucnCategories);
                   }}

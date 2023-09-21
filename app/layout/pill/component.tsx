@@ -11,8 +11,8 @@ export const Pill: React.FC<PillProps> = ({ children, selected }: PillProps) => 
   return (
     <div
       className={cx({
-        'rounded-4xl bg-gray-700': true,
-        'ring-1 ring-inset ring-gray-500 ring-offset-8 ring-offset-gray-700': selected,
+        'rounded-[40px] bg-gray-800': true,
+        'ring-1 ring-inset ring-gray-600 ring-offset-8 ring-offset-gray-800': selected,
         'flex flex-grow flex-col overflow-hidden': true,
       })}
     >

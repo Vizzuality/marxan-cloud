@@ -24,7 +24,7 @@ export const DrawPUMethod = (): JSX.Element => {
   }, []);
 
   return (
-    <span className="text-sm text-gray-400">
+    <span className="text-sm text-gray-100">
       Click over the map and draw a shape to include them it the analysis
     </span>
   );

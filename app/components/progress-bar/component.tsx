@@ -18,9 +18,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         className: !!className,
       })}
     >
-      <div className="h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 opacity-30" />
+      <div className="h-0.5 bg-gradient-to-r from-blue-500 to-purple-600 opacity-30" />
       <div
-        className="absolute bottom-0 h-0.5 max-w-full bg-gradient-to-r from-blue-400 to-purple-500"
+        className="absolute bottom-0 h-0.5 max-w-full bg-gradient-to-r from-blue-500 to-purple-600"
         style={{ width: `${progress}%` }}
       />
     </div>

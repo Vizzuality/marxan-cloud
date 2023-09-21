@@ -13,7 +13,7 @@ interface HelpTooltipProps {
 export const HelpTooltip = ({ title, subtitle, content }: HelpTooltipProps) => {
   return (
     <div
-      className="rounded-3xl bg-white px-6 py-5 text-gray-500"
+      className="rounded-3xl bg-white px-6 py-5 text-gray-600"
       style={{
         boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
       }}
@@ -29,7 +29,7 @@ export const HelpTooltip = ({ title, subtitle, content }: HelpTooltipProps) => {
         </div>
       </header>
 
-      <div className="mt-5 text-sm text-gray-400" style={{ maxWidth: 330 }}>
+      <div className="mt-5 text-sm text-gray-100" style={{ maxWidth: 330 }}>
         {content}
       </div>
     </div>

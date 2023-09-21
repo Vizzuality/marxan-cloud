@@ -107,7 +107,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
             true,
         })}
       >
-        <div className="bg-gray-200 py-1">Loading more...</div>
+        <div className="bg-gray-300 py-1">Loading more...</div>
         <div className="h-6 w-full bg-white" />
       </div>
     </div>

@@ -114,7 +114,7 @@ export const Item: React.FC<ItemProps> = ({
     <div
       ref={ref}
       className={cx({
-        'bg-white text-gray-500': true,
+        'bg-white text-gray-600': true,
         [className]: !!className,
         invisible: !inView,
       })}
@@ -130,7 +130,7 @@ export const Item: React.FC<ItemProps> = ({
             id={`checkbox-${id}`}
             value={`${id}`}
             checked={selected}
-            className="form-checkbox-dark mt-1.5 block h-4 w-4 text-green-300"
+            className="form-checkbox-dark mt-1.5 block h-4 w-4 text-green-400"
             onChange={onSelectedChanged}
           />
           <h2 className="mt-1 font-heading text-sm">{name}</h2>
@@ -139,8 +139,8 @@ export const Item: React.FC<ItemProps> = ({
         {selected && (
           <div>
             <div className="mt-3 flex items-center font-heading tracking-wide">
-              <Icon icon={SPLIT_SVG} className="h-5 w-5 text-green-300" />
-              <h4 className="ml-2 text-xs uppercase text-gray-500">
+              <Icon icon={SPLIT_SVG} className="h-5 w-5 text-green-400" />
+              <h4 className="ml-2 text-xs uppercase text-gray-600">
                 You can <strong>split</strong> this feature into categories
               </h4>
             </div>
@@ -170,7 +170,7 @@ export const Item: React.FC<ItemProps> = ({
 
             return (
               <li key={`${f.value}`} className="relative mt-0.5 flex items-center py-2 pr-2.5">
-                <div className="absolute left-0 top-0 block h-full w-px bg-green-300" />
+                <div className="absolute left-0 top-0 block h-full w-px bg-green-400" />
                 <div className="relative flex font-heading text-xs">
                   <div className="ml-2.5">
                     <Checkbox
@@ -178,7 +178,7 @@ export const Item: React.FC<ItemProps> = ({
                       id={`checkbox-${f.value}`}
                       value={`${f.value}`}
                       checked={checked}
-                      className="form-checkbox-dark block h-4 w-4 text-green-300"
+                      className="form-checkbox-dark block h-4 w-4 text-green-400"
                       onChange={onSplitFeaturesChanged}
                     />
                   </div>

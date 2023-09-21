@@ -173,7 +173,7 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
 
       <h1 className="mb-5 text-xl font-medium text-black">{`Download "${name}"`}</h1>
 
-      <div className="mb-5 space-y-1 text-sm text-gray-500">
+      <div className="mb-5 space-y-1 text-sm text-gray-600">
         <p>The last 5 exported .zips will be available for download.</p>
         <p>
           {`
@@ -189,9 +189,9 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
             return (
               <li
                 key={e.exportId}
-                className="flex items-center justify-between border-t border-gray-100 py-2"
+                className="flex items-center justify-between border-t border-gray-200 py-2"
               >
-                <span className="text-sm text-gray-700">
+                <span className="text-sm text-gray-800">
                   {format(new Date(e.createdAt), 'MM/dd/yyyy hh:mm a')}
                 </span>
 
@@ -214,7 +214,7 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
 
       <div className="mt-5 space-y-1">
         {JOBS_RUNNING && (
-          <p className="text-center text-xs text-red-500">
+          <p className="text-center text-xs text-red-600">
             {`You can't generate a new export
               while there are running jobs.`}
           </p>

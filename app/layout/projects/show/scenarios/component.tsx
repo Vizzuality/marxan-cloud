@@ -284,7 +284,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                   true,
               })}
             >
-              <div className="bg-gray-200 py-1">Loading more...</div>
+              <div className="bg-gray-300 py-1">Loading more...</div>
               <div className="h-6 w-full bg-white" />
             </div>
           </div>
@@ -295,7 +295,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -10, opacity: 0 }}
-              className="flex h-full items-center rounded-4xl bg-gray-700 bg-contain bg-right bg-no-repeat pl-20"
+              className="flex h-full items-center rounded-[40px] bg-gray-800 bg-contain bg-right bg-no-repeat pl-20"
               style={{
                 backgroundImage: `url(${bgScenariosDashboard})`,
               }}
@@ -316,7 +316,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                     </span>
                   </InfoButton>
                 </div>
-                <h3 className="mt-1 font-heading text-lg font-medium text-gray-300">
+                <h3 className="mt-1 font-heading text-lg font-medium text-gray-400">
                   Get started by creating a scenario
                 </h3>
 
@@ -338,7 +338,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             <button
               type="button"
               className={cx({
-                'group flex h-16 w-full flex-shrink-0 items-center justify-center space-x-3 rounded-3xl bg-gray-700 px-8 text-sm text-primary-500 transition hover:bg-gray-800':
+                'group flex h-16 w-full flex-shrink-0 items-center justify-center space-x-3 rounded-3xl bg-gray-800 px-8 text-sm text-primary-500 transition hover:bg-gray-900':
                   true,
                 'pointer-events-none opacity-50': !editable,
               })}

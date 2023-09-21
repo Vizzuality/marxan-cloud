@@ -9,7 +9,7 @@ import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 
-const ICON_RIGHT_CLASS = 'h-3 w-3 flex-shrink-0 text-gray-400';
+const ICON_RIGHT_CLASS = 'h-3 w-3 flex-shrink-0 text-gray-600';
 
 export const Breadcrumbs = ({ className }: { className?: string }): JSX.Element => {
   const { query } = useRouter();

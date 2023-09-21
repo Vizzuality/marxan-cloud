@@ -83,10 +83,10 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = () => {
               className="relative flex h-full items-center justify-center"
             >
               <div className="w-full max-w-xs">
-                <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-600">
+                <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-700">
                   Forgot Password
                 </h2>
-                <p className="mb-5 text-sm text-gray-500">
+                <p className="mb-5 text-sm text-gray-600">
                   Enter the email associated with your account and we’ll send and email with
                   instructions to reset your password.
                 </p>
@@ -133,19 +133,19 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = () => {
 
       {submitted && (
         <div className="relative flex h-full items-center justify-center">
-          <div className="w-full max-w-xs divide-y-2 divide-gray-100">
+          <div className="w-full max-w-xs divide-y-2 divide-gray-200">
             <div className="pb-5">
-              <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-600">
+              <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-700">
                 Check your email
               </h2>
-              <Icon icon={CHECK_EMAIL_SVG} className="mx-auto mb-5 h-16 w-16 text-gray-500" />
-              <p className="mx-auto text-center text-sm text-gray-400" style={{ maxWidth: 300 }}>
+              <Icon icon={CHECK_EMAIL_SVG} className="mx-auto mb-5 h-16 w-16 text-gray-600" />
+              <p className="mx-auto text-center text-sm text-gray-100" style={{ maxWidth: 300 }}>
                 We have sent password recovery instructions to your email...
               </p>
             </div>
             <div className="pt-5">
               <p
-                className="mx-auto mb-5 text-center text-sm text-gray-400"
+                className="mx-auto mb-5 text-center text-sm text-gray-100"
                 style={{ maxWidth: 300 }}
               >
                 Did not receive the email? Check your spam filter, or{' '}
@@ -158,7 +158,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = () => {
                 </span>
               </p>
               <p
-                className="mx-auto mb-5 text-center text-sm text-gray-400"
+                className="mx-auto mb-5 text-center text-sm text-gray-100"
                 style={{ maxWidth: 300 }}
               >
                 Please note that if you have not activated your account yet, by following the link

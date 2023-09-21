@@ -134,7 +134,7 @@ export const Modal: React.FC<ModalProps> = ({
                       <button
                         type="button"
                         onClick={onDismiss}
-                        className="absolute -top-4 right-4 flex items-center px-4 py-4 text-sm text-gray-300 hover:text-black focus:text-black"
+                        className="absolute -top-4 right-4 flex items-center px-4 py-4 text-sm text-gray-400 hover:text-black focus:text-black"
                       >
                         <span className="text-xs">Close</span>
                         <Icon icon={CLOSE_SVG} className="ml-2 inline-block h-3 w-3 text-black" />

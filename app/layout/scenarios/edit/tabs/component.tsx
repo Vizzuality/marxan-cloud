@@ -105,7 +105,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
       >
         <div
           className={cx({
-            'rounded-4xl bg-gray-700': true,
+            'rounded-[40px] bg-gray-800': true,
             'flex flex-grow flex-col': true,
           })}
         >

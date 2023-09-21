@@ -296,13 +296,13 @@ export const ScenariosList: React.FC = () => {
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -10, opacity: 0 }}
-                className="flex flex-col items-center space-y-9 rounded-3xl bg-gray-700 bg-cover bg-right bg-no-repeat py-10"
+                className="flex flex-col items-center space-y-9 rounded-3xl bg-gray-800 bg-cover bg-right bg-no-repeat py-10"
                 style={{
                   backgroundImage: `url(${bgScenariosDashboard})`,
                 }}
               >
                 <div className="mx-12 mt-48 flex flex-col items-center">
-                  <p className="mt-1 text-center font-sans text-xs font-medium text-gray-300">
+                  <p className="mt-1 text-center font-sans text-xs font-medium text-gray-400">
                     Before we can show you any results, we&lsquo;ll need you to{' '}
                     <span className="text-white">
                       upload some features, protected areas or cost surface
@@ -312,17 +312,17 @@ export const ScenariosList: React.FC = () => {
                 </div>
                 <div className="mx-10 flex flex-wrap justify-center gap-2">
                   <Link href={`/projects/${pid}/?tab=protected-areas`}>
-                    <div className="inline-block rounded-xl bg-gray-500 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-400">
+                    <div className="inline-block rounded-xl bg-gray-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-100">
                       Upload Protected Areas
                     </div>
                   </Link>
                   <Link href={`/projects/${pid}/?tab=cost-surface`}>
-                    <div className="inline-block rounded-xl bg-gray-500 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-400">
+                    <div className="inline-block rounded-xl bg-gray-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-100">
                       Upload Cost Surface
                     </div>
                   </Link>
                   <Link href={`/projects/${pid}/?tab=features`}>
-                    <div className="inline-block rounded-xl bg-gray-500 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-400">
+                    <div className="inline-block rounded-xl bg-gray-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-100">
                       Upload Features
                     </div>
                   </Link>
@@ -334,7 +334,7 @@ export const ScenariosList: React.FC = () => {
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -10, opacity: 0 }}
-                className="h-fit flex items-center justify-center rounded-3xl bg-gray-700 py-6"
+                className="flex h-fit items-center justify-center rounded-3xl bg-gray-800 py-6"
               >
                 <Button
                   theme="primary"
@@ -362,7 +362,7 @@ export const ScenariosList: React.FC = () => {
                 >
                   <Loading
                     visible={solutionsReportLoader}
-                    className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
+                    className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-900 bg-opacity-90"
                     iconClassName="w-10 h-10 text-primary-500"
                   />
                   {`Export scenario${scenariosData.length > 1 ? 's' : ''} data`}

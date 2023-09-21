@@ -76,7 +76,7 @@ export const Profile: React.FC<MeProps> = () => {
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex">
           <div className="w-full max-w-xs">
-            <h2 className="mb-9 font-heading text-5xl font-medium text-gray-600">My Profile</h2>
+            <h2 className="mb-9 font-heading text-5xl font-medium text-gray-700">My Profile</h2>
 
             <Loading
               visible={submitting}

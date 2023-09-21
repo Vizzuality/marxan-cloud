@@ -45,10 +45,10 @@ export const HomeFeaturesItem: React.FC<HomeFeaturesItemProps> = ({
     >
       <div key={`${id}`}>
         <Icon icon={icon} className="h-16 w-16" />
-        <h2 className="mb-2.5 mt-2.5 font-heading text-2xl font-medium text-gray-800 md:mb-10 md:mt-6">
+        <h2 className="mb-2.5 mt-2.5 font-heading text-2xl font-medium text-gray-900 md:mb-10 md:mt-6">
           {name}
         </h2>
-        <p className="text-gray-400">{description}</p>
+        <p className="text-gray-600">{description}</p>
       </div>
     </motion.div>
   );

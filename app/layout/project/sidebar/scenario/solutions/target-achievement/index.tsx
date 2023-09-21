@@ -27,10 +27,10 @@ export const SolutionsTargetAchievements = (): JSX.Element => {
       >
         <Section className="flex w-full flex-col overflow-hidden">
           <div className="space-y-1">
-            <span className="text-xs font-semibold text-blue-400">Solutions</span>
+            <span className="text-xs font-semibold text-blue-500">Solutions</span>
             <div className="flex items-center space-x-2">
               <h3 className="text-lg font-medium">Target Achievement</h3>
-              <InfoButton theme="primary" className="bg-gray-300">
+              <InfoButton theme="primary" className="bg-gray-400">
                 <div>
                   <h4 className="mb-2.5 font-heading text-lg">
                     What is the Solutions Target Achievement?
@@ -54,7 +54,7 @@ export const SolutionsTargetAchievements = (): JSX.Element => {
 
           <div className="flex w-full flex-grow flex-col space-y-2 overflow-hidden">
             <Toolbar search={search} onSearch={onSearch} />
-            <div className="relative flex h-full flex-grow flex-col overflow-hidden before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-700 before:via-gray-700 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-700 after:via-gray-700">
+            <div className="relative flex h-full flex-grow flex-col overflow-hidden before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-800 before:via-gray-800 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-800 after:via-gray-800">
               <ScrollArea className="h-full pr-3">
                 <List search={search} />
               </ScrollArea>

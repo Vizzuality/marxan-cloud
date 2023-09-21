@@ -16,14 +16,14 @@ export const DocumentationLink = () => {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <div className="border-b border-gray-500 px-1 pb-5">
+      <div className="border-b border-gray-600 px-1 pb-5">
         <Icon
           className="h-6 w-6 flex-shrink-0"
           icon={isHover ? DOCUMENTATION_HOVER_SVG : DOCUMENTATION_SVG}
         />
       </div>
       {isHover && (
-        <div className="absolute right-12 top-2 z-60 rounded-xl bg-white px-2 py-px text-black">
+        <div className="z-60 absolute right-12 top-2 rounded-xl bg-white px-2 py-px text-black">
           <p className="whitespace-nowrap font-sans text-sm">Marxan&apos;s documentation</p>
         </div>
       )}

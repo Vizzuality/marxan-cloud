@@ -23,7 +23,7 @@ const AdminPage: React.FC = () => {
       <Protected>
         <MetaIcons />
 
-        <main className="min-h-screen bg-gray-50 text-black">
+        <main className="min-h-screen bg-gray-100 text-black">
           <Header size="base" />
 
           <Wrapper>
@@ -34,7 +34,7 @@ const AdminPage: React.FC = () => {
                 href="/admin/published-projects"
                 className="group block space-y-3 rounded-xl bg-white p-8 leading-none"
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 text-gray-500 transition-all group-hover:bg-primary-500">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-200 text-gray-600 transition-all group-hover:bg-primary-500">
                   <Icon icon={PUBLISHED_PROJECTS_SVG} className="h-7 w-7" />
                 </div>
                 <div className="font-heading text-xl font-medium">Published Projects</div>
@@ -43,7 +43,7 @@ const AdminPage: React.FC = () => {
                 href="/admin/users"
                 className="group block space-y-3 rounded-xl bg-white p-8 leading-none"
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 text-gray-500 transition-all group-hover:bg-primary-500">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-200 text-gray-600 transition-all group-hover:bg-primary-500">
                   <Icon icon={USERS_SVG} className="h-7 w-7" />
                 </div>
                 <div className="font-heading text-xl font-medium">Users</div>

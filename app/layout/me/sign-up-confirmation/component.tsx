@@ -47,7 +47,7 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
         <div className="relative flex h-full items-center justify-center">
           <div className="w-full max-w-xs">
             <div className="pb-5">
-              <h2 className="mb-24 text-center font-heading text-lg font-medium text-gray-600">
+              <h2 className="mb-24 text-center font-heading text-lg font-medium text-gray-700">
                 Welcome to Marxan!
                 <br />
                 You&apos;ve created an account
@@ -72,10 +72,10 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
         <div className="relative flex h-full items-center justify-center">
           <div className="w-full max-w-xs">
             <div className="flex flex-col items-center space-y-20 pb-5">
-              <h2 className="text-center font-heading text-lg font-medium text-gray-600">
+              <h2 className="text-center font-heading text-lg font-medium text-gray-700">
                 Sorry, it seems that you have not created an account.
               </h2>
-              <p className="mb-12 text-sm text-gray-500">
+              <p className="mb-12 text-sm text-gray-600">
                 You can{' '}
                 <Link href="/auth/sign-up" className="text-black underline hover:no-underline">
                   create an account.
