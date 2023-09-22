@@ -120,16 +120,16 @@ export const useAdvancedSettingsItems = (): SubMenuItem[] => {
 
   return [
     {
-      name: 'Advanced Settings',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-advanced-settings']}`,
-      icon: OVERVIEW_SVG,
-      selected: isScenarioRoute && tab === TABS['scenario-advanced-settings'],
-    },
-    {
       name: 'BLM Calibration',
       route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-blm-calibration']}`,
       icon: BLM_CALIBRATION_SVG,
       selected: isScenarioRoute && tab === TABS['scenario-blm-calibration'],
+    },
+    {
+      name: 'Advanced Settings',
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-advanced-settings']}`,
+      icon: OVERVIEW_SVG,
+      selected: isScenarioRoute && tab === TABS['scenario-advanced-settings'],
     },
   ];
 };
