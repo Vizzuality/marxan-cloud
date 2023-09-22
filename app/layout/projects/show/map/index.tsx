@@ -40,7 +40,6 @@ import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
-import HelpBeacon from 'layout/help/beacon';
 import { Scenario } from 'types/api/scenario';
 import { MapProps } from 'types/map';
 import { cn } from 'utils/cn';
@@ -421,63 +420,38 @@ export const ProjectMap = (): JSX.Element => {
             className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-90"
             iconClassName="w-10 h-10 text-primary-500"
           />
-
-          <HelpBeacon
-            id="project-map"
-            title="Map view"
-            subtitle="Visualize all elements"
-            content={
-              <div className="space-y-2">
-                <p>
-                  On this map you will be able to visualize all the spatial components of the
-                  conservation plan.
-                </p>
-                <p>
-                  You will be able to visualize your planning region, your features and, once you
-                  have run Marxan, you will also be able to visualize the results here.
-                </p>
-              </div>
-            }
-            modifiers={['flip']}
-            tooltipPlacement="left"
-          >
-            <div className="h-full w-full">
-              <Map
-                key={accessToken}
-                bounds={bounds}
-                width="100%"
-                height="100%"
-                minZoom={minZoom}
-                maxZoom={maxZoom}
-                viewport={viewport}
-                mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
-                mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
-                onMapViewportChange={handleViewportChange}
-                onMapLoad={({ map }) => {
-                  mapRef.current = map;
-                  setMapInteractive(true);
-                }}
-                onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
-                transformRequest={handleTransformRequest}
-                onClick={(e) => {
-                  if (e && e.features) {
-                    console.info(e.features);
-                  }
-                }}
-              >
-                {(map) => {
-                  return (
-                    <LayerManager map={map} plugin={PluginMapboxGl}>
-                      {LAYERS.map((l) => (
-                        <Layer key={l.id} {...l} />
-                      ))}
-                    </LayerManager>
-                  );
-                }}
-              </Map>
-            </div>
-          </HelpBeacon>
-
+          <div className="h-full w-full">
+            <Map
+              key={accessToken}
+              bounds={bounds}
+              width="100%"
+              height="100%"
+              minZoom={minZoom}
+              maxZoom={maxZoom}
+              viewport={viewport}
+              mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
+              mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
+              onMapViewportChange={handleViewportChange}
+              onMapLoad={() => setMapInteractive(true)}
+              onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
+              transformRequest={handleTransformRequest}
+              onClick={(e) => {
+                if (e && e.features) {
+                  console.info(e.features);
+                }
+              }}
+            >
+              {(map) => {
+                return (
+                  <LayerManager map={map} plugin={PluginMapboxGl}>
+                    {LAYERS.map((l) => (
+                      <Layer key={l.id} {...l} />
+                    ))}
+                  </LayerManager>
+                );
+              }}
+            </Map>
+          </div>
           <Controls>
             <LoadingControl loading={!mapTilesLoaded} />
             <ZoomControl

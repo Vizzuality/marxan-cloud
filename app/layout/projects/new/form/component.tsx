@@ -205,31 +205,32 @@ const ProjectForm = ({ onFormUpdate }: ProjectFormProps): JSX.Element => {
         onFormUpdate(values);
 
         return (
-          <form
-            onSubmit={handleSubmit}
-            autoComplete="off"
-            className="flex h-full w-full flex-col justify-between overflow-hidden"
+          <HelpBeacon
+            id="project-new-overview"
+            title="Basic information"
+            subtitle="New project overview"
+            content={
+              <div className="space-y-2 text-gray-700">
+                <p>
+                  To create a new project you need to add a name, a description, a planning region
+                  and a planning grid.
+                </p>
+                <p>
+                  You will be able to create a planning region and grid from scratch following some
+                  simple steps or you can upload your own file.
+                </p>
+              </div>
+            }
+            modifiers={['flip']}
+            tooltipPlacement="right"
+            placement="top-end"
           >
-            <div className="h-full overflow-hidden">
-              <HelpBeacon
-                id="project-new-overview"
-                title="Basic information"
-                subtitle="New project overview"
-                content={
-                  <div className="space-y-2">
-                    <p>
-                      To create a new project you need to add a name, a description, a planning
-                      region and a planning grid.
-                    </p>
-                    <p>
-                      You will be able to create a planning region and grid from scratch following
-                      some simple steps or you can upload your own file.
-                    </p>
-                  </div>
-                }
-                modifiers={['flip']}
-                tooltipPlacement="right"
-              >
+            <form
+              onSubmit={handleSubmit}
+              autoComplete="off"
+              className="flex h-full w-full flex-col justify-between overflow-hidden"
+            >
+              <div className="h-full overflow-hidden">
                 <div className="flex h-full flex-col overflow-hidden">
                   <ScrollArea className="relative before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-black before:via-black after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-black after:via-black">
                     <div className="w-[calc(100%-25px)] py-5 pr-3">
@@ -413,9 +414,9 @@ const ProjectForm = ({ onFormUpdate }: ProjectFormProps): JSX.Element => {
                     </Button>
                   </div>
                 </div>
-              </HelpBeacon>
-            </div>
-          </form>
+              </div>
+            </form>
+          </HelpBeacon>
         );
       }}
     </FormRFF>
