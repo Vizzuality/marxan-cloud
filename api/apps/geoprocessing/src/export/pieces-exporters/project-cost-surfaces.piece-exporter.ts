@@ -33,7 +33,7 @@ type ProjectCostSurfacesSelectResult = {
 type CostSurfaceDataSelectResult = {
   cost_surface_id: string;
   cost: number;
-  puid: number;
+  project_pu_id: number;
 };
 
 @Injectable()
@@ -67,6 +67,7 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
 
     const costSurfacesIds = costSurfaces.map((costSurface) => costSurface.id);
     let costSurfaceData: CostSurfaceDataSelectResult[] = [];
+    let projectPusMap: Record<string, number> = {};
     if (costSurfacesIds.length > 0) {
       costSurfaceData = await this.geoprocessingEntityManager
         .createQueryBuilder()
@@ -76,12 +77,18 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
           costSurfacesIds,
         })
         .execute();
+
+      projectPusMap = await this.getProjectPusMap(input.resourceId);
     }
 
     const fileContent: ProjectCostSurfacesContent = {
       costSurfaces: costSurfaces.map(({ id, ...costSurface }) => ({
         ...costSurface,
-        data: costSurfaceData.filter((data) => data.cost_surface_id === id),
+        data: costSurfaceData.filter((data : CostSurfaceDataSelectResult) => data.cost_surface_id === id)
+          .map(({ cost_surface_id, project_pu_id, ...data }) => {
+            const puid = projectPusMap[project_pu_id];
+            return { puid, ...data };
+          }),
       })),
     };
 
@@ -105,5 +112,26 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
       ...input,
       uris: [new ComponentLocation(outputFile.right, relativePath)],
     };
+  }
+
+  private async getProjectPusMap(
+    projectId: string,
+  ): Promise<Record<string, number>> {
+    const projectPus: {
+      id: string;
+      puid: number;
+    }[] = await this.geoprocessingEntityManager
+      .createQueryBuilder()
+      .select(['id', 'puid'])
+      .from(ProjectsPuEntity, 'ppus')
+      .where('ppus.project_id = :projectId', { projectId })
+      .execute();
+
+    const projectPuIdByPuid: Record<string, number> = {};
+    projectPus.forEach(({ puid, id }) => {
+      projectPuIdByPuid[id] = puid;
+    });
+
+    return projectPuIdByPuid;
   }
 }
