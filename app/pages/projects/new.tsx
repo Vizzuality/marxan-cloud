@@ -42,7 +42,7 @@ const NewProjectsPage = (): JSX.Element => {
           </div>
         </Sidebar>
 
-        <HelpBeacon
+        {/* <HelpBeacon
           id="project-new-map"
           title="MAP VIEW"
           subtitle="New planning area and grid"
@@ -60,19 +60,19 @@ const NewProjectsPage = (): JSX.Element => {
           }
           modifiers={['flip']}
           tooltipPlacement="right"
-        >
-          <div className="h-full w-full">
-            <ProjectNewMap
-              bbox={bbox}
-              country={formValues?.countryId}
-              region={formValues?.adminAreaLevel1Id}
-              subregion={formValues?.adminAreaLevel2Id}
-              planningUnitGridShape={formValues?.planningUnitGridShape}
-              planningUnitAreakm2={formValues?.planningUnitAreakm2}
-              PAOptionSelected={formValues?.PAOptionSelected}
-            />
-          </div>
-        </HelpBeacon>
+        > */}
+        <div className="h-full w-full">
+          <ProjectNewMap
+            bbox={bbox}
+            country={formValues?.countryId}
+            region={formValues?.adminAreaLevel1Id}
+            subregion={formValues?.adminAreaLevel2Id}
+            planningUnitGridShape={formValues?.planningUnitGridShape}
+            planningUnitAreakm2={formValues?.planningUnitAreakm2}
+            PAOptionSelected={formValues?.PAOptionSelected}
+          />
+        </div>
+        {/* </HelpBeacon> */}
       </ProjectLayout>
     </Protected>
   );
