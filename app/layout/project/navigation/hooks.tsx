@@ -16,22 +16,18 @@ import type { SubMenuItem } from './submenu';
 const SCENARIO_ROUTE = '/projects/[pid]/scenarios/';
 
 export const useInventoryItems = (): SubMenuItem[] => {
-  const { showPA, showCS } = useFeatureFlags();
+  const { showCS } = useFeatureFlags();
   const { query, route } = useRouter();
   const { pid, tab } = query as { pid: string; tab: string };
   const isProjectRoute = route.startsWith('/projects/[pid]');
 
   return [
-    ...(showPA
-      ? [
-          {
-            name: 'Protected areas',
-            route: `/projects/${pid}?tab=${TABS['project-protected-areas']}`,
-            icon: PROTECTED_AREA_SVG,
-            selected: isProjectRoute && tab === TABS['project-protected-areas'],
-          },
-        ]
-      : []),
+    {
+      name: 'Protected areas',
+      route: `/projects/${pid}?tab=${TABS['project-protected-areas']}`,
+      icon: PROTECTED_AREA_SVG,
+      selected: isProjectRoute && tab === TABS['project-protected-areas'],
+    },
     ...(showCS
       ? [
           {
