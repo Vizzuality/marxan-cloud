@@ -219,11 +219,8 @@ export function useSaveProject({
   };
 
   return useMutation(saveProject, {
-    onSuccess: (data: any, variables, context) => {
-      const { id } = data;
+    onSuccess: () => {
       queryClient.invalidateQueries('projects');
-      queryClient.invalidateQueries(['project', id]);
-      console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
