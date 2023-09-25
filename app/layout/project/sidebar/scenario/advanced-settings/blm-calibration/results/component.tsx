@@ -2,8 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { useCanEditScenario } from 'hooks/permissions';
@@ -17,6 +15,7 @@ import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+import { cn } from 'utils/cn';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 import { blmFormat } from 'utils/units';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
@@ -143,7 +142,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
             {({ form, values, handleSubmit }) => {
               return (
                 <form
-                  className={cx({
+                  className={cn({
                     'relative flex flex-grow flex-col overflow-hidden pt-10 text-white': true,
                     'border-t border-gray-600': editable,
                   })}

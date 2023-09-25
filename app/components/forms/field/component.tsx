@@ -1,5 +1,6 @@
 import React from 'react';
-import cx from 'classnames';
+
+import { cn } from 'utils/cn';
 
 export interface FieldProps {
   id: string;
@@ -41,7 +42,7 @@ export const Field: React.FC<FieldProps> = ({
 
   return (
     <div
-      className={cx({
+      className={cn({
         [className]: !!className,
       })}
     >

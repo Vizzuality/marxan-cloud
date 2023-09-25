@@ -12,8 +12,6 @@ import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 import { useResizeDetector } from 'react-resize-detector';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import type { Placement } from '@popperjs/core';
@@ -24,6 +22,7 @@ import { useHelp } from 'hooks/help';
 import Tooltip from 'components/tooltip';
 import HelpSpotlight from 'layout/help/spotlight';
 import HelpTooltip from 'layout/help/tooltip';
+import { cn } from 'utils/cn';
 
 const flipModifier = {
   name: 'flip',
@@ -156,7 +155,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 ref={(el) => setBeaconRef(el)}
-                className={cx({
+                className={cn({
                   'z-30': !beaconClassName,
                   [beaconClassName]: !!beaconClassName,
                   'pointer-events-auto visible': active,
@@ -171,7 +170,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
                 <button
                   aria-label="manage-visibility"
                   type="button"
-                  className={cx({
+                  className={cn({
                     'beacon relative flex h-6 w-6 translate-y-3/4 transform items-center justify-center rounded-full border-2 border-gray-800 bg-primary-500 transition focus:outline-none':
                       true,
                   })}

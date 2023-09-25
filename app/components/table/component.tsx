@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import ARROW_UP_SVG from 'svgs/ui/arrow-up.svg?sprite';
@@ -54,7 +53,7 @@ export const Table: React.FC<TableProps> = ({
 
   return (
     <table
-      className={cx({
+      className={cn({
         'w-full': true,
         [className]: !!className,
       })}
@@ -70,7 +69,7 @@ export const Table: React.FC<TableProps> = ({
             return (
               <th
                 key={`header-${header.id}`}
-                className={cx({
+                className={cn({
                   'cursor-pointer px-4 text-left font-heading text-sm font-medium': true,
                   'pl-10 pr-0': firstHeader,
                   'pl-0 pr-10': lastHeader,
@@ -100,7 +99,7 @@ export const Table: React.FC<TableProps> = ({
           return (
             <tr
               key={row.id}
-              className={cx({
+              className={cn({
                 'bg-gray-200 bg-opacity-50': !rowIsSelected && (rowIndex + 1) % 2 === 0,
                 'bg-white': !rowIsSelected && (rowIndex + 1) % 2 === 1,
                 'bg-primary-300 bg-opacity-30': rowIsSelected,
@@ -120,7 +119,7 @@ export const Table: React.FC<TableProps> = ({
                 return (
                   <td
                     key={`td-${headerId}-${value}`}
-                    className={cx({
+                    className={cn({
                       'px-4 py-2': true,
                       'pl-10 pr-0': firstColumn,
                       'pl-0 pr-8': lastColumn,

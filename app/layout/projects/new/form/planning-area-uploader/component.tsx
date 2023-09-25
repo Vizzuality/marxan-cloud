@@ -4,8 +4,6 @@ import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import cx from 'classnames';
-
 import {
   setBbox,
   setUploadingPlanningArea,
@@ -26,6 +24,7 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
 import { PLANNING_AREA_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
@@ -232,7 +231,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                             <div
                               {...props}
                               {...getRootProps()}
-                              className={cx({
+                              className={cn({
                                 'relative w-full cursor-pointer border border-dotted border-gray-400 bg-gray-200 bg-opacity-20 py-10 hover:bg-gray-200':
                                   true,
                                 'bg-gray-600': isDragActive,

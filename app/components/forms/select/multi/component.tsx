@@ -3,8 +3,6 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 
-import cx from 'classnames';
-
 // Downshift;
 import { useSelect, useMultipleSelection } from 'downshift';
 
@@ -19,6 +17,7 @@ import THEME from 'components/forms/select/constants/theme';
 import Menu from 'components/forms/select/menu';
 import Toggle from 'components/forms/select/toggle';
 import { SelectProps, SelectOptionProps } from 'components/forms/select/types';
+import { cn } from 'utils/cn';
 
 export const MultiSelect: React.FC<SelectProps> = ({
   theme = 'dark',
@@ -210,7 +209,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
 
   return (
     <div
-      className={cx({
+      className={cn({
         'c-multi-select': true,
         'w-full overflow-hidden leading-tight': true,
         'pointer-events-none opacity-50': disabled,
@@ -239,7 +238,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
       {/* Menu */}
       {createPortal(
         <div
-          className={cx({
+          className={cn({
             'c-multi-select-dropdown': true,
             'z-50': true,
             // The content of `<Menu />` must always be in the DOM so that Downshift can get the ref
@@ -276,7 +275,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
 
             <ul
               {...getMenuProps({ onFocus, onBlur })}
-              className={cx({
+              className={cn({
                 'overflow-y-auto overflow-x-hidden py-1 focus:outline-none': true,
               })}
               style={{
@@ -285,7 +284,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
             >
               {getOptions.map((option, index) => (
                 <li
-                  className={cx({
+                  className={cn({
                     'relative mt-0.5 cursor-pointer px-4 py-1': true,
                     [THEME[theme].item.base]: highlightedIndex !== index,
                     [THEME[theme].item.disabled]: option.disabled,
@@ -297,7 +296,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
                   {...getItemProps({ item: option, index, disabled: option.disabled })}
                 >
                   <span
-                    className={cx({
+                    className={cn({
                       'ml-6': !!option.checkbox,
                     })}
                   >

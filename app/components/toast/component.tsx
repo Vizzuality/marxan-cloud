@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import cx from 'classnames';
-
 import { motion, useAnimation } from 'framer-motion';
 import type { ResolvedValues } from 'framer-motion';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ERROR_SVG from 'svgs/notifications/error.svg?sprite';
 import INFO_SVG from 'svgs/notifications/info.svg?sprite';
@@ -82,7 +81,7 @@ export const Toast: React.FC<ToastProps> = ({
       }}
     >
       <div
-        className={cx({
+        className={cn({
           'pointer-events-auto mb-2 w-full': true,
         })}
       >
@@ -100,19 +99,19 @@ export const Toast: React.FC<ToastProps> = ({
         >
           <div className="flex flex-grow">
             <div
-              className={cx({
+              className={cn({
                 'relative flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl shadow-md':
                   true,
               })}
             >
               <div
-                className={cx({
+                className={cn({
                   'absolute left-0 top-0 z-0 h-full w-full bg-gradient-to-b': true,
                   [THEME[level]?.hoverBg]: true,
                 })}
               />
               <motion.div
-                className={cx({
+                className={cn({
                   'absolute left-0 top-0 z-10 h-full w-full bg-gradient-to-b': true,
                   [THEME[level]?.bg]: true,
                 })}

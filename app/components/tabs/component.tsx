@@ -1,8 +1,8 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import { motion } from 'framer-motion';
+
+import { cn } from 'utils/cn';
 
 export interface TabsProps {
   items: {
@@ -26,7 +26,7 @@ export const Tabs: React.FC<TabsProps> = ({ items = [], selected, onSelected }: 
             aria-label="select-tab"
             type="button"
             disabled={tab.status === 'disabled'}
-            className={cx({
+            className={cn({
               'relative py-4 text-sm text-white focus:outline-none': true,
               'text-opacity-50': tab.status !== 'disabled',
               'hover:text-opacity-75': tab.id !== selected && tab.status !== 'disabled',

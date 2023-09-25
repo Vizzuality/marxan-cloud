@@ -1,7 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { useDebouncedCallback } from 'use-debounce';
@@ -17,6 +15,7 @@ import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Search from 'components/search';
+import { cn } from 'utils/cn';
 
 import UserCard from './card';
 
@@ -127,7 +126,7 @@ export const EditContributorsDropdown: React.FC = () => {
                 <div className="text-sm">{SEARCH_RESULT.displayName || SEARCH_RESULT.email}</div>
 
                 <Button
-                  className={cx({
+                  className={cn({
                     'group h-6 flex-shrink-0 py-2  text-sm': true,
                   })}
                   theme="primary"

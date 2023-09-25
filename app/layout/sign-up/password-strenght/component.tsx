@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 
-import cx from 'classnames';
-
 import stringEntropy from 'fast-password-entropy';
+
+import { cn } from 'utils/cn';
 
 export interface PaasswordStrengthProps {
   password: string;
@@ -31,7 +31,7 @@ export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
     <div className="mt-1 h-4 space-y-0.5">
       <div className="h-1 w-full rounded-md bg-gray-200 text-sm">
         <div
-          className={cx({
+          className={cn({
             'h-full rounded-md': true,
             'bg-green-600': STRENGTH === 'strong',
             'bg-yellow-800': STRENGTH === 'medium',

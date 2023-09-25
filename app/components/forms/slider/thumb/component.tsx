@@ -1,12 +1,12 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import { useFocusRing } from '@react-aria/focus';
 import { useSliderThumb } from '@react-aria/slider';
 import { mergeProps } from '@react-aria/utils';
 import { VisuallyHidden } from '@react-aria/visually-hidden';
 import { SliderState } from '@react-stately/slider';
+
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: {
@@ -98,7 +98,7 @@ export const Thumb: React.FC<ThumbProps> = ({
   return (
     <div
       {...thumbProps}
-      className={cx({
+      className={cn({
         [THEME[theme].thumb]: true,
         [THEME[theme].status[status]]: true,
       })}

@@ -3,8 +3,6 @@ import React, { Fragment, useCallback, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useSelector } from 'react-redux';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -33,6 +31,7 @@ import NoResults from 'layout/project/sidebar/project/inventory-panel/components
 import ScenarioSettings from 'layout/projects/show/scenarios/settings';
 import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
 import ScenarioTypes from 'layout/projects/show/scenarios/types';
+import { cn } from 'utils/cn';
 
 import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 
@@ -255,7 +254,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                       })}
                     >
                       <div
-                        className={cx({
+                        className={cn({
                           'mt-3': i !== 0,
                         })}
                       >
@@ -278,7 +277,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-black via-black" />
 
             <div
-              className={cx({
+              className={cn({
                 'opacity-100': scenariosIsFetchingNextPage,
                 'pointer-events-none absolute bottom-0 left-0 z-20 w-full text-center font-heading text-xs uppercase opacity-0 transition':
                   true,
@@ -337,7 +336,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
           {(hasScenarios || search || hasFilters) && (
             <button
               type="button"
-              className={cx({
+              className={cn({
                 'group flex h-16 w-full flex-shrink-0 items-center justify-center space-x-3 rounded-3xl bg-gray-800 px-8 text-sm text-primary-500 transition hover:bg-gray-900':
                   true,
                 'pointer-events-none opacity-50': !editable,

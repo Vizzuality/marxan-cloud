@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-import cx from 'classnames';
-
 import { useButton } from '@react-aria/button';
 import { useFocus, useKeyboard } from '@react-aria/interactions';
 import { SliderState } from '@react-stately/slider';
+
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: {
@@ -162,7 +162,7 @@ export const Value: React.FC<ValueProps> = ({
       ) : (
         <div
           ref={outputButtonRef}
-          className={cx({
+          className={cn({
             'cursor-default': !allowEdit,
             'cursor-text': allowEdit,
           })}

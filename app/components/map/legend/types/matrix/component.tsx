@@ -1,6 +1,6 @@
 import React from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 export interface LegendTypeMatrixProps {
   className?: string;
@@ -108,7 +108,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
       </div>
 
       <div
-        className={cx({
+        className={cn({
           [className]: !!className,
         })}
       >

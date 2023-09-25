@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 export interface WrapperProps {
   children: ReactNode;
@@ -9,7 +9,7 @@ export interface WrapperProps {
 export const Wrapper: React.FC<WrapperProps> = ({ children }: WrapperProps) => {
   return (
     <div
-      className={cx({
+      className={cn({
         'mx-auto flex h-full w-full flex-grow flex-col px-10 md:container': true,
       })}
     >

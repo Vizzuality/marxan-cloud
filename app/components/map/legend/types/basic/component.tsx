@@ -1,6 +1,6 @@
 import React from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 export interface LegendTypeBasicProps {
   className?: string;
@@ -16,7 +16,7 @@ export const LegendTypeBasic: React.FC<LegendTypeBasicProps> = ({
 }: LegendTypeBasicProps) => {
   return (
     <div
-      className={cx({
+      className={cn({
         [className]: !!className,
       })}
     >

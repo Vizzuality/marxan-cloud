@@ -1,7 +1,5 @@
 import React, { useCallback, useMemo, useState, ReactNode } from 'react';
 
-import cx from 'classnames';
-
 import { useFeatureFlags } from 'hooks/feature-flags';
 
 import Button from 'components/button';
@@ -10,6 +8,7 @@ import Select from 'components/forms/select';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import STRAT_1_IMG from 'images/info-buttons/img_strat_1.png';
 import STRAT_2_IMG from 'images/info-buttons/img_strat_2.png';
@@ -128,13 +127,13 @@ export const Item: React.FC<ItemProps> = ({
   // RENDER
   return (
     <div
-      className={cx({
+      className={cn({
         'bg-gray-800 text-white': true,
         [className]: !!className,
       })}
     >
       <header
-        className={cx({
+        className={cn({
           'border-l-4 px-4 py-2': true,
           'border-yellow-500': true,
         })}
@@ -153,7 +152,7 @@ export const Item: React.FC<ItemProps> = ({
                   aria-label="manage-see-on-map"
                   type="button"
                   onClick={() => setSplitOpen(!splitOpen)}
-                  className={cx({
+                  className={cn({
                     'flex h-5 w-5 items-center justify-center ': true,
                     'text-white': !splitSelected,
                     'text-yellow-500': !!splitSelected,
@@ -177,7 +176,7 @@ export const Item: React.FC<ItemProps> = ({
                 aria-label="manage-see-on-map"
                 type="button"
                 onClick={onSeeOnMap}
-                className={cx({
+                className={cn({
                   'flex h-5 w-5 items-center justify-center text-white': true,
                   'text-gray-400': !isShown,
                 })}

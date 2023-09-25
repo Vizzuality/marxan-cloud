@@ -4,8 +4,6 @@ import { CookiesProvider } from 'react-cookie';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import cx from 'classnames';
-
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 
@@ -21,6 +19,7 @@ import { ToastProvider } from 'hooks/toast';
 import Loading from 'layout/loading';
 import { MediaContextProvider } from 'layout/media';
 import store from 'store';
+import { cn } from 'utils/cn';
 
 import 'styles/globals.css';
 
@@ -92,7 +91,7 @@ const MarxanApp = ({ Component, pageProps }: AppProps) => {
                           <Loading {...routeLoading} />
 
                           <div
-                            className={cx({
+                            className={cn({
                               'bg-black': !lightThemeRegex.test(pathname),
                               'bg-white': lightThemeRegex.test(pathname),
                             })}

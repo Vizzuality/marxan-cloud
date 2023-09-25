@@ -2,8 +2,6 @@ import React, { useCallback, useMemo } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
@@ -17,6 +15,7 @@ import { useScenario } from 'hooks/scenarios';
 import Tabs from 'components/tabs';
 import { TabsProps } from 'components/tabs/component';
 import HelpBeacon from 'layout/help/beacon';
+import { cn } from 'utils/cn';
 import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { TABS, STATUS } from './constants';
@@ -104,13 +103,13 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
         animate={{ opacity: 1, y: 0 }}
       >
         <div
-          className={cx({
+          className={cn({
             'rounded-[40px] bg-gray-800': true,
             'flex flex-grow flex-col': true,
           })}
         >
           <div
-            className={cx({
+            className={cn({
               'flex flex-grow flex-col px-10': true,
             })}
           >

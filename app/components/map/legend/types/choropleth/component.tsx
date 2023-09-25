@@ -1,6 +1,6 @@
 import React from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 export interface LegendTypeChoroplethProps {
   className?: string;
@@ -16,7 +16,7 @@ export const LegendTypeChoropleth: React.FC<LegendTypeChoroplethProps> = ({
 }: LegendTypeChoroplethProps) => {
   return (
     <div
-      className={cx({
+      className={cn({
         [className]: !!className,
       })}
     >

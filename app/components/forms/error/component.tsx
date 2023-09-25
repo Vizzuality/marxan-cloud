@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 export interface ErrorProps {
   children: ReactNode;
@@ -13,7 +13,7 @@ export const Error: React.FC<ErrorProps> = ({ children, visible, className }: Er
 
   return (
     <div
-      className={cx({
+      className={cn({
         'mb-5 rounded border border-red-600 bg-red-200 px-3 py-1 text-sm text-red-600': true,
         [className]: !!className,
       })}

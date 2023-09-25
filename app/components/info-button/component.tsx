@@ -1,9 +1,8 @@
 import React, { ReactElement } from 'react';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import INFO_SVG from 'svgs/ui/info.svg?sprite';
 
@@ -68,7 +67,7 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
   >
     <button
       aria-label="info-button"
-      className={cx({
+      className={cn({
         'flex flex-shrink-0 items-center justify-center rounded-full bg-opacity-50 transition hover:bg-opacity-75 focus:bg-opacity-90 focus:outline-none':
           true,
         [THEME[theme].button]: true,
@@ -79,7 +78,7 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
     >
       <Icon
         icon={INFO_SVG}
-        className={cx({
+        className={cn({
           [THEME[theme].icon]: true,
           [SIZE.icon[size]]: true,
         })}

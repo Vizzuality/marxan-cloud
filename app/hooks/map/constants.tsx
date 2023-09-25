@@ -146,7 +146,7 @@ export const LEGEND_LAYERS = {
     icon: (
       <Icon
         icon={HEXAGON_SVG}
-        className="fill-none mt-0.5 h-3.5 w-3.5 stroke-current stroke-2"
+        className="mt-0.5 h-3.5 w-3.5 fill-none stroke-current stroke-2"
         style={{ color: COLORS.primary }}
       />
     ),
@@ -281,7 +281,7 @@ export const LEGEND_LAYERS = {
       icon: (
         <Icon
           icon={HEXAGON_SVG}
-          className="fill-none mt-0.5 h-3.5 w-3.5 stroke-current stroke-2"
+          className="mt-0.5 h-3.5 w-3.5 fill-none stroke-current stroke-2"
           style={{ color: COLORS.available }}
         />
       ),
@@ -301,7 +301,7 @@ export const LEGEND_LAYERS = {
       icon: (
         <Icon
           icon={HEXAGON_SVG}
-          className="fill-none mt-0.5 h-3.5 w-3.5 stroke-current stroke-2"
+          className="mt-0.5 h-3.5 w-3.5 fill-none stroke-current stroke-2"
           style={{ color: COLORS.include }}
         />
       ),
@@ -321,7 +321,7 @@ export const LEGEND_LAYERS = {
       icon: (
         <Icon
           icon={HEXAGON_SVG}
-          className="fill-none mt-0.5 h-3.5 w-3.5 stroke-current stroke-2"
+          className="mt-0.5 h-3.5 w-3.5 fill-none stroke-current stroke-2"
           style={{ color: COLORS.exclude }}
         />
       ),

@@ -2,8 +2,6 @@ import React, { useCallback, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 
-import cx from 'classnames';
-
 import Link from 'next/link';
 
 import { useProjectsUsers } from 'hooks/project-users';
@@ -18,6 +16,7 @@ import HelpBeacon from 'layout/help/beacon';
 import Item from 'layout/projects/all/list/item';
 import DownloadModal from 'layout/projects/common/download-modal';
 import Wrapper from 'layout/wrapper';
+import { cn } from 'utils/cn';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 
@@ -187,7 +186,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
           >
             <div
               id="projects-list"
-              className={cx({
+              className={cn({
                 'grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3': true,
               })}
             >

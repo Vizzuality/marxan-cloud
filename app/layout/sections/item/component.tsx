@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 
-import cx from 'classnames';
-
 import { motion } from 'framer-motion';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -36,7 +35,7 @@ export const ScenariosSidebarAnalysisSection: React.FC<ScenariosSidebarAnalysisS
       onClick={() => onChangeSection(id)}
     >
       <h4
-        className={cx({
+        className={cn({
           'font-heading text-xs uppercase': true,
           'opacity-30': disabled,
         })}
@@ -44,7 +43,7 @@ export const ScenariosSidebarAnalysisSection: React.FC<ScenariosSidebarAnalysisS
         {name}
       </h4>
       <p
-        className={cx({
+        className={cn({
           'mt-1 text-sm text-gray-400': true,
           'opacity-30': disabled,
         })}
@@ -84,7 +83,7 @@ export const ScenariosSidebarAnalysisSection: React.FC<ScenariosSidebarAnalysisS
       >
         <Icon
           icon={ARROW_RIGHT_2_SVG}
-          className={cx({
+          className={cn({
             'h-5 w-5 text-primary-500': true,
             'opacity-75': !disabled,
             'opacity-30': disabled,

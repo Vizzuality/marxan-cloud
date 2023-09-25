@@ -1,10 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 
-import cx from 'classnames';
-
 import THEME from 'components/forms/select/constants/theme';
 import { SelectToggleProps } from 'components/forms/select/types';
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
@@ -47,7 +46,7 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
       aria-label="select"
       type="button"
       disabled={disabled}
-      className={cx({
+      className={cn({
         'relative flex w-full items-center tracking-wide focus:outline-none': true,
         [THEME.sizes[size]]: true,
       })}
@@ -61,7 +60,7 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
     >
       {prefix && (
         <span
-          className={cx({
+          className={cn({
             'mr-2 font-heading text-xs': true,
             [THEME[theme].prefix.base]: true,
           })}
@@ -71,7 +70,7 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
       )}
 
       <span
-        className={cx({
+        className={cn({
           'overflow-hidden overflow-ellipsis whitespace-nowrap text-sm leading-none': true,
           [THEME[theme].prefix.base]: selectedItems.length,
           [THEME.sizes.label[size]]: true,
@@ -81,7 +80,7 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
       </span>
 
       <Icon
-        className={cx({
+        className={cn({
           'absolute right-4 h-3 w-3': true,
           [THEME[theme].icon.closed]: !opened,
           [THEME[theme].icon.open]: opened,

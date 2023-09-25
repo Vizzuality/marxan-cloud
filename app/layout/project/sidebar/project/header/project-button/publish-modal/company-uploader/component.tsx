@@ -3,8 +3,6 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form, Field as FieldRFF } from 'react-final-form';
 
-import cx from 'classnames';
-
 import { motion } from 'framer-motion';
 
 import { useToasts } from 'hooks/toast';
@@ -19,6 +17,7 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
 import { COMPANY_LOGO_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { cn } from 'utils/cn';
 import { bytesToKilobytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
@@ -203,7 +202,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                               <div
                                 {...props}
                                 {...getRootProps()}
-                                className={cx({
+                                className={cn({
                                   'relative w-full cursor-pointer border border-dotted border-gray-400 bg-gray-200 bg-opacity-20 py-10 hover:bg-gray-200':
                                     true,
                                   'bg-gray-600': isDragActive,

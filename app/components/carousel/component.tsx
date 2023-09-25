@@ -1,10 +1,9 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 
-import cx from 'classnames';
-
 import Flicking, { ERROR_CODE, FlickingError } from '@egjs/react-flicking';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-left.svg?sprite';
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
@@ -104,7 +103,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
               onClick={() => {
                 slider.current.moveTo(i);
               }}
-              className={cx({
+              className={cn({
                 'relative w-20': true,
                 'h-1 bg-blue-600': slide === i,
                 'h-0.5 bg-gray-400': slide !== i,

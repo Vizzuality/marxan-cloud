@@ -1,10 +1,9 @@
 import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react';
 
-import classnames from 'classnames';
-
 import { scaleLinear, line, area, format } from 'd3';
 
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 import { blmFormat } from 'utils/units';
 
 import { VISUALIZATION_PADDING, X_AXIS_HEIGHT, Y_AXIS_WIDTH, Y_BASELINE_OFFSET } from './constants';
@@ -230,7 +229,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data, selected, onChange }: 
                 >
                   <div
                     aria-hidden="true"
-                    className={classnames({
+                    className={cn({
                       'h-3 w-3 cursor-pointer rounded-full border-2 border-blue-600 bg-black hover:border-2 hover:bg-primary-500':
                         true,
                       'bg-blue-600': blmValue === selected,

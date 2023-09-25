@@ -1,6 +1,6 @@
 import React, { InputHTMLAttributes } from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: {
@@ -42,7 +42,7 @@ export const Radio: React.FC<RadioProps> = ({
       {...props}
       type="radio"
       disabled={disabled}
-      className={cx({
+      className={cn({
         'form-radio': true,
         [THEME[theme].base]: true,
         [THEME[theme].status[st]]: true,

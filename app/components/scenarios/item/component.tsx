@@ -1,11 +1,10 @@
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 
-import cx from 'classnames';
-
 import Button from 'components/button';
 import Icon from 'components/icon';
 import ProgressBar from 'components/progress-bar';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 import LOCK_SVG from 'svgs/ui/lock.svg?sprite';
@@ -177,18 +176,18 @@ export const Item: React.FC<ItemProps> = ({
 
   return (
     <div
-      className={cx({
+      className={cn({
         'flex flex-col space-y-0.5 bg-transparent': true,
         [className]: className,
       })}
     >
       <div
-        className={cx({
+        className={cn({
           'flex h-16 space-x-0.5 bg-transparent': true,
         })}
       >
         <div
-          className={cx({
+          className={cn({
             'flex flex-grow flex-col rounded-l-3xl bg-gray-800 pl-8': true,
             'rounded-bl-none': settings,
           })}
@@ -228,7 +227,7 @@ export const Item: React.FC<ItemProps> = ({
 
                       <div className="line-clamp-1">
                         <span
-                          className={cx({
+                          className={cn({
                             'm-0 inline-block text-xs': true,
                             [SCENARIO_STATES[status].styles]:
                               status !== SCENARIO_STATES[status].text,
@@ -237,7 +236,7 @@ export const Item: React.FC<ItemProps> = ({
                           {`${SCENARIO_STATES[status].text} `}
                         </span>
                         <span
-                          className={cx({
+                          className={cn({
                             'ml-1 inline-block text-xs': true,
                             [SCENARIO_STATES[status].styles]:
                               status !== SCENARIO_STATES[status].text,
@@ -278,7 +277,7 @@ export const Item: React.FC<ItemProps> = ({
         <button
           type="button"
           onClick={onEdit}
-          className={cx({
+          className={cn({
             'flex-column flex h-full items-center rounded-r-3xl bg-gray-800 px-8': true,
             'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:bg-primary-300 focus:text-black focus:outline-none':
               true,

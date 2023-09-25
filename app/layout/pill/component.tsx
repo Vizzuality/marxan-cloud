@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 export interface PillProps {
   selected?: boolean;
@@ -10,14 +10,14 @@ export interface PillProps {
 export const Pill: React.FC<PillProps> = ({ children, selected }: PillProps) => {
   return (
     <div
-      className={cx({
+      className={cn({
         'rounded-[40px] bg-gray-800': true,
         'ring-1 ring-inset ring-gray-600 ring-offset-8 ring-offset-gray-800': selected,
         'flex flex-grow flex-col overflow-hidden': true,
       })}
     >
       <div
-        className={cx({
+        className={cn({
           'flex flex-grow flex-col overflow-hidden px-10': true,
           'py-10': selected,
           'py-3': !selected,

@@ -1,11 +1,10 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import { SCENARIO_TYPES } from './constants';
 
@@ -24,7 +23,7 @@ export const ProjectScenariosType: React.FC<ProjectScenariosTypeProps> = () => {
           return (
             <li
               key={`${s.id}`}
-              className={cx({
+              className={cn({
                 'group cursor-pointer rounded-3xl border-2 border-transparent transition-all hover:border-gray-200 hover:shadow-2xl':
                   true,
                 'pointer-events-none opacity-25': s.disabled,

@@ -1,7 +1,5 @@
 import React, { useCallback, useState } from 'react';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { useMe } from 'hooks/me';
@@ -13,6 +11,7 @@ import Avatar from 'components/avatar';
 import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Select from 'components/forms/select';
+import { cn } from 'utils/cn';
 import { ROLES, ROLE_OPTIONS } from 'utils/constants-roles';
 
 import DELETE_USER_WARNING_SVG from 'svgs/notifications/delete-user-warning.svg?sprite';
@@ -157,7 +156,7 @@ export const UserCard: React.FC<UserCardProps> = ({
       </div>
 
       <Button
-        className={cx({
+        className={cn({
           'group h-6 flex-shrink-0 bg-gray-700 py-2 text-sm': true,
           invisible: !isOwner || (isOwner && id === meData.id),
         })}
