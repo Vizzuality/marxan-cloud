@@ -53,7 +53,7 @@ test(`getting list of protected areas with scenario usage count for a project an
   const areas = await fixtures.WhenGettingProtectedAreasListForProjectWithFilter(
     projectId,
     'name',
-    'III',
+    'IUCN III',
   );
   await fixtures.ThenItContainsFilteredProtectedAreas(areas);
 });
