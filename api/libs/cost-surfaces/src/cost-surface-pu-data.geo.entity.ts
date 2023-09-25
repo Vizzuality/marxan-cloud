@@ -19,14 +19,11 @@ export class CostSurfacePuDataEntity {
     () => ProjectsPuEntity,
     (projectsPu: ProjectsPuEntity) => projectsPu.id,
   )
-  @JoinColumn({ name: 'puid' })
+  @JoinColumn({ name: 'projects_pu_id' })
   projectsPu?: ProjectsPuEntity;
 
-  @Column({ type: 'uuid', name: 'puid' })
-  /**
-   * @todo: Naming feels a bit confusing. The tasks states that this sould be a relation to ProjectsPu.id, however there are more entities with the puid column referecing planning_units
-   */
-  puid!: string;
+  @Column({ type: 'uuid', name: 'projects_pu_id' })
+  projectsPuId!: string;
 
   @Column({ type: 'float8' }) // Matching TypeORM type for float8
   cost!: number;

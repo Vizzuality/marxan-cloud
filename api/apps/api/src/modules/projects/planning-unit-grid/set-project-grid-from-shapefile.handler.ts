@@ -62,7 +62,10 @@ export class SetProjectGridFromShapefileHandler
       );
       await Promise.all(
         puIds.map((puid) =>
-          costSurfaceRepository.update({ puid }, { costSurfaceId }),
+          costSurfaceRepository.update(
+            { projectsPuId: puid },
+            { costSurfaceId },
+          ),
         ),
       );
     });

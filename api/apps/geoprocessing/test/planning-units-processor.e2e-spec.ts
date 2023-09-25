@@ -87,7 +87,7 @@ describe('planning units jobs (e2e)', () => {
         },
       });
       const costPus = await costPuDataRepo.find({
-        where: { puid: In(projectPus.map((pu) => pu.id)) },
+        where: { projectsPuId: In(projectPus.map((pu) => pu.id)) },
       });
 
       expect(projectPus.length).toBeGreaterThan(0);
