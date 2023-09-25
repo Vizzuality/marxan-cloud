@@ -1,7 +1,5 @@
 import React, { Children, cloneElement, isValidElement, useEffect, ReactElement } from 'react';
 
-import cx from 'classnames';
-
 import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
 import { useOverlay, usePreventScroll, useModal, OverlayContainer } from '@react-aria/overlays';
@@ -10,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useMultipleModal } from 'hooks/modal';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -98,7 +97,7 @@ export const Modal: React.FC<ModalProps> = ({
                 delay: 0.125,
               },
             }}
-            className={cx({ [OVERLAY_CLASSES]: true })}
+            className={cn({ [OVERLAY_CLASSES]: true })}
           >
             <FocusScope restoreFocus autoFocus>
               <div {...overlayProps} {...dialogProps} {...modalProps} ref={containerRef}>
@@ -124,7 +123,7 @@ export const Modal: React.FC<ModalProps> = ({
                       delay: 0,
                     },
                   }}
-                  className={cx({ [CONTENT_CLASSES[size]]: true, [className]: !!className })}
+                  className={cn({ [CONTENT_CLASSES[size]]: true, [className]: !!className })}
                   style={{
                     maxHeight: '90%',
                   }}

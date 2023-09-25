@@ -1028,7 +1028,7 @@ export function usePUCompareLayer({ active, sid, sid2, cache = 0, options }: Use
   //     ...COLOR_RAMPS.map((c, i) => {
   //       const step = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}
   // ${i % (COLOR_NUMBER + 1)}`;
-  //       const color = cx({
+  //       const color = cn({
   //         '#000000': step === '00',
   //         '#FFFFFF': step === '1010',
   //         [c]: step !== '00' && step !== '1010',

@@ -1,8 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 
-import cx from 'classnames';
-
 import Loading from 'components/loading';
+import { cn } from 'utils/cn';
 import { blmFormat } from 'utils/units';
 
 export interface ScenariosBlmResultsCardProps {
@@ -68,19 +67,19 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
     <div
       role="presentation"
       key={id}
-      className={cx({
+      className={cn({
         'relative cursor-pointer overflow-hidden rounded-md': true,
       })}
       onClick={handleClick}
     >
       <div
-        className={cx({
+        className={cn({
           'pointer-events-none absolute left-0 top-0 z-10 h-full w-full rounded-md ring-2 ring-inset ring-offset-primary-500':
             selected,
         })}
       />
       <dl
-        className={cx({
+        className={cn({
           'space-y-0.5 p-2': true,
           'bg-gray-700': !selected,
           'bg-primary-500': selected,
@@ -88,7 +87,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
       >
         <div className="flex justify-between">
           <dt
-            className={cx({
+            className={cn({
               'text-xs uppercase': true,
               'text-gray-800': selected,
             })}
@@ -96,7 +95,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
             BLM
           </dt>
           <dd
-            className={cx({
+            className={cn({
               'text-xs': true,
               'text-primary-500': !selected,
               'text-gray-800': selected,
@@ -107,7 +106,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
         </div>
         <div className="flex justify-between">
           <dt
-            className={cx({
+            className={cn({
               'text-xs uppercase': true,
               'text-gray-800': selected,
             })}
@@ -115,7 +114,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
             Cost
           </dt>
           <dd
-            className={cx({
+            className={cn({
               'text-xs': true,
               'text-primary-500': !selected,
               'text-gray-800': selected,
@@ -145,7 +144,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
           >
             <img className="w-full" src={pngData} alt={`BLM: ${blmValue}`} />
             <img
-              className={cx({
+              className={cn({
                 'pointer-events-none absolute left-0 top-0 z-10': true,
                 invisible: !enter,
               })}

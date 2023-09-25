@@ -1,7 +1,5 @@
 import React, { useCallback } from 'react';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { useAllPaginatedFeatures } from 'hooks/features';
@@ -10,6 +8,7 @@ import useBottomScrollListener from 'hooks/scroll';
 import Item from 'components/features/intersect-item';
 import Loading from 'components/loading';
 import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
+import { cn } from 'utils/cn';
 
 export interface ScenariosFeaturesIntersectListProps {
   search?: string;
@@ -72,7 +71,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
 
       <div
         ref={scrollRef}
-        className={cx({
+        className={cn({
           'divide-y divide-dashed divide-black divide-opacity-20 overflow-y-auto overflow-x-hidden bg-white px-8':
             true,
         })}
@@ -99,7 +98,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
               return (
                 <div
                   key={`${item.id}`}
-                  className={cx({
+                  className={cn({
                     'border-t border-dashed': i !== 0,
                   })}
                 >
@@ -127,7 +126,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
       <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-white via-white" />
 
       <div
-        className={cx({
+        className={cn({
           'opacity-100': allFeaturesIsFetchingNextPage,
           'pointer-events-none absolute bottom-0 left-0 z-20 w-full text-center font-heading text-xs uppercase opacity-0 transition':
             true,

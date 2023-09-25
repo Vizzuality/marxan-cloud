@@ -1,8 +1,8 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import { motion } from 'framer-motion';
+
+import { cn } from 'utils/cn';
 
 import Item from './item';
 
@@ -24,7 +24,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   return (
     <motion.div
       key="analysis"
-      className={cx({
+      className={cn({
         'relative ': true,
         'flex min-h-0 flex-col items-start justify-start overflow-hidden': scrollable,
       })}
@@ -36,7 +36,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         <div className="absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-800 via-gray-800" />
       )}
       <div
-        className={cx({
+        className={cn({
           'divide-y divide-gray-700 divide-opacity-50': true,
           'overflow-y-auto overflow-x-hidden': scrollable,
         })}

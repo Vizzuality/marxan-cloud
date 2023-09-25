@@ -1,8 +1,8 @@
 import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react';
 
-import classnames from 'classnames';
-
 import { scaleLinear, line, curveMonotoneX, area } from 'd3';
+
+import { cn } from 'utils/cn';
 
 import {
   VISUALIZATION_PADDING,
@@ -280,7 +280,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
 
                   <foreignObject x={0} y={0} width={THUMBNAIL_SIZE} height={THUMBNAIL_SIZE}>
                     <div
-                      className={classnames({
+                      className={cn({
                         'h-full w-full rounded-2xl bg-white bg-contain': true,
                         'border-2 border-gray-900': !isBlm,
                         'border-2 border-primary-500': isBlm,
@@ -303,7 +303,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                 className="h-3 w-3 -translate-x-1.5 -translate-y-1.5 transform"
               >
                 <div
-                  className={classnames({
+                  className={cn({
                     'h-3 w-3 rounded-full border-black': true,
                     'bg-white': !isBlm || !!hoveredPointCoords,
                     'bg-primary-500': isBlm && !hoveredPointCoords,

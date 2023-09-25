@@ -2,14 +2,13 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 
 import ReactMapGL, { FlyToInterpolator, TRANSITION_EVENTS, ViewportProps } from 'react-map-gl';
 
-import cx from 'classnames';
-
 import { fitBounds } from '@math.gl/web-mercator';
 import { easeCubic } from 'd3-ease';
 import isEmpty from 'lodash/isEmpty';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { MapProps } from 'types/map';
+import { cn } from 'utils/cn';
 
 const DEFAULT_VIEWPORT = {
   zoom: 2,
@@ -195,7 +194,7 @@ export const Map = ({
   return (
     <div
       ref={mapContainerRef}
-      className={cx({
+      className={cn({
         'relative z-0 h-full w-full': true,
         [className]: !!className,
       })}

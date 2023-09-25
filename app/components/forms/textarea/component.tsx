@@ -1,6 +1,6 @@
 import React, { TextareaHTMLAttributes } from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: {
@@ -41,7 +41,7 @@ export const Textarea: React.FC<TextareaProps> = ({
     <textarea
       {...props}
       disabled={disabled}
-      className={cx({
+      className={cn({
         'form-textarea w-full': true,
         [THEME[theme].base]: true,
         [THEME[theme].status[st]]: true,

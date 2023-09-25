@@ -1,8 +1,7 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import WARNING_SVG from 'svgs/notifications/warning.svg?sprite';
 
@@ -19,13 +18,13 @@ export interface DisclaimerProps {
 
 export const Disclaimer: React.FC<DisclaimerProps> = ({ children, type }: DisclaimerProps) => (
   <div
-    className={cx({
+    className={cn({
       'flex w-full items-center space-x-4 rounded-xl bg-gray-600 px-4 py-3 text-sm': true,
     })}
   >
     <Icon
       icon={WARNING_SVG}
-      className={cx({
+      className={cn({
         'z-10 h-6 w-6': true,
         [TYPE[type]]: true,
       })}

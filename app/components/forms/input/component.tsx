@@ -1,10 +1,9 @@
 import React, { InputHTMLAttributes } from 'react';
 
-import cx from 'classnames';
-
 import { useFocus } from '@react-aria/interactions';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: {
@@ -77,7 +76,7 @@ export const Input: React.FC<InputProps> = ({
       {icon && (
         <Icon
           icon={icon}
-          className={cx({
+          className={cn({
             'absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform': true,
             [THEME[theme].icon]: true,
           })}
@@ -88,7 +87,7 @@ export const Input: React.FC<InputProps> = ({
         {...props}
         ref={onReady}
         disabled={disabled}
-        className={cx({
+        className={cn({
           'form-input': true,
           [THEME[theme].base]: true,
           [THEME[theme].status[st]]: true,

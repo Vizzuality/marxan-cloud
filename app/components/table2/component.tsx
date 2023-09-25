@@ -2,10 +2,9 @@ import React, { useEffect } from 'react';
 
 import { useTable, useFlexLayout, usePagination, useSortBy } from 'react-table';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
 import Loading from 'components/loading';
+import { cn } from 'utils/cn';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
@@ -126,7 +125,7 @@ export const Table2: React.FC<Table2Props> = ({
                       role="presentation"
                       key={headerKey}
                       {...restHeaderProps}
-                      className={cx({
+                      className={cn({
                         'flex items-center space-x-2 py-5 pr-5 font-heading text-xs font-medium uppercase':
                           true,
                         'cursor-pointer': canSort,
@@ -147,7 +146,7 @@ export const Table2: React.FC<Table2Props> = ({
                       {sortSelected && sortSelected.id === column.id && (
                         <Icon
                           icon={ARROW_DOWN_SVG}
-                          className={cx({
+                          className={cn({
                             'h-3 w-3': true,
                             'rotate-180 transform': !sortSelected.desc,
                           })}
@@ -175,7 +174,7 @@ export const Table2: React.FC<Table2Props> = ({
                     <div
                       key={cellKey}
                       {...restCellProps}
-                      className={cx({
+                      className={cn({
                         'py-5 pr-5': true,
                         [cell?.column?.className]: !!cell?.column?.className,
                       })}

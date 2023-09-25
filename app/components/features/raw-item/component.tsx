@@ -1,11 +1,10 @@
-import React, { MutableRefObject } from 'react';
+import React, { ComponentProps, MutableRefObject } from 'react';
 
 import { useInView } from 'react-intersection-observer';
 
-import cx from 'classnames';
-
 import Button from 'components/button';
 import InfoButton from 'components/info-button';
+import { cn } from 'utils/cn';
 
 export interface ItemProps {
   id: string | number;
@@ -38,7 +37,7 @@ export const Item: React.FC<ItemProps> = ({
   return (
     <div
       ref={ref}
-      className={cx({
+      className={cn({
         'bg-white px-0 py-6 text-black': true,
         [className]: !!className,
         invisible: !inView,
@@ -60,10 +59,12 @@ export const Item: React.FC<ItemProps> = ({
         </div>
         <div>
           <Button
-            theme={cx({
-              secondary: selected,
-              'secondary-alt': !selected,
-            })}
+            theme={
+              cn({
+                secondary: selected,
+                'secondary-alt': !selected,
+              }) as ComponentProps<typeof Button>['theme']
+            }
             size="xs"
             onClick={onToggleSelected}
           >

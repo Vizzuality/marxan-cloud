@@ -4101,7 +4101,6 @@ __metadata:
     autoprefixer: ^10.0.2
     axios: 1.3.4
     chroma-js: ^2.4.2
-    classnames: ^2.2.6
     clsx: 1.2.1
     cookie: ^0.4.1
     d3: ^6.5.0
@@ -4774,13 +4773,6 @@ __metadata:
     isobject: ^3.0.0
     static-extend: ^0.1.1
   checksum: be108900801e639e50f96a7e4bfa8867c753a7750a7603879f3981f8b0a89cba657497a2d5f40cd4ea557ff15d535a100818bb486baf6e26fe5d7872e75f1078
-  languageName: node
-  linkType: hard
-
-"classnames@npm:^2.2.6":
-  version: 2.2.6
-  resolution: "classnames@npm:2.2.6"
-  checksum: 09a4fda780158aa8399079898eabeeca0c48c28641d9e4de140db7412e5e346843039ded1af0152f755afc2cc246ff8c3d6f227bf0dcb004e070b7fa14ec54cc
   languageName: node
   linkType: hard
 

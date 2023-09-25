@@ -1,9 +1,9 @@
 import React from 'react';
 
-import cx from 'classnames';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import LOADING_SVG from 'svgs/ui/processing.svg?sprite';
 
@@ -28,7 +28,7 @@ export const Loading: React.FC<LoadingProps> = ({
           key="loading"
           {...variants}
           transition={transition}
-          className={cx({
+          className={cn({
             [className]: !!className,
           })}
         >

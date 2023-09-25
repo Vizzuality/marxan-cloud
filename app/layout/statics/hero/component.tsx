@@ -1,9 +1,8 @@
 import React from 'react';
 
-import classnames from 'classnames';
-
 import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
+import { cn } from 'utils/cn';
 
 export interface StaticHeroProps {
   section?: string;
@@ -22,7 +21,7 @@ export const StaticHero: React.FC<StaticHeroProps> = ({
 }: StaticHeroProps) => {
   return (
     <div
-      className={classnames({
+      className={cn({
         'bg-primary-50 text-black': theme === 'light',
         'bg-black': theme === 'dark',
       })}

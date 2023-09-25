@@ -2,8 +2,6 @@ import React, { useEffect, useCallback } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
@@ -123,7 +121,7 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
       <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-800 via-gray-800" />
 
       <div
-        className={cx({
+        className={cn({
           'opacity-100': allFeaturesIsFetchingNextPage,
           'pointer-events-none absolute bottom-0 left-0 z-20 w-full text-center font-heading text-xs uppercase opacity-0 transition':
             true,

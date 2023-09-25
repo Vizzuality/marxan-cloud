@@ -2,11 +2,10 @@ import React, { ReactNode, MutableRefObject, useCallback, useMemo } from 'react'
 
 import { useInView } from 'react-intersection-observer';
 
-import cx from 'classnames';
-
 import Checkbox from 'components/forms/checkbox';
 import Select from 'components/forms/select';
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
@@ -113,14 +112,14 @@ export const Item: React.FC<ItemProps> = ({
   return (
     <div
       ref={ref}
-      className={cx({
+      className={cn({
         'bg-white text-gray-600': true,
         [className]: !!className,
         invisible: !inView,
       })}
     >
       <header
-        className={cx({
+        className={cn({
           'px-4 pb-4 pt-2': true,
         })}
       >

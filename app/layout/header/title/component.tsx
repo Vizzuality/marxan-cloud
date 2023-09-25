@@ -2,8 +2,6 @@ import React, { useCallback } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import cx from 'classnames';
-
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -14,6 +12,7 @@ import { useToasts } from 'hooks/toast';
 
 import { composeValidators } from 'components/forms/validations';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 export interface TitleProps {}
 
@@ -147,7 +146,7 @@ export const Title: React.FC<TitleProps> = () => {
       {!projectIsLoading && !scenarioIsLoading && (
         <motion.div
           key="project-scenario-loading"
-          className={cx({
+          className={cn({
             'flex divide-x': true,
           })}
           initial={{ y: -10 }}
@@ -173,7 +172,7 @@ export const Title: React.FC<TitleProps> = () => {
                   id="form-title-project"
                   onSubmit={fprops.handleSubmit}
                   autoComplete="off"
-                  className={cx({
+                  className={cn({
                     'relative h-6 max-w-max px-2': true,
                   })}
                 >
@@ -197,13 +196,13 @@ export const Title: React.FC<TitleProps> = () => {
                         }
                       >
                         <div
-                          className={cx({
+                          className={cn({
                             'relative h-6': true,
                           })}
                         >
                           <input
                             {...input}
-                            className={cx({
+                            className={cn({
                               'absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent px-1.5 font-heading font-normal focus:bg-primary-300 focus:text-gray-600 focus:outline-none':
                                 true,
                             })}
@@ -218,7 +217,7 @@ export const Title: React.FC<TitleProps> = () => {
                           />
 
                           <h1
-                            className={cx({
+                            className={cn({
                               'invisible h-full overflow-ellipsis px-1.5 font-heading font-normal':
                                 true,
                             })}

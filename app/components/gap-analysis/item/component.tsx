@@ -1,11 +1,10 @@
 import React, { MouseEventHandler, useEffect, useMemo, useRef, useState } from 'react';
 
-import classnames from 'classnames';
-
 import { useNumberFormatter } from '@react-aria/i18n';
 
 import Icon from 'components/icon';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import SHOW_SVG from 'svgs/ui/show.svg?sprite';
@@ -74,7 +73,7 @@ export const Item: React.FC<ItemProps> = ({
 
   return (
     <div
-      className={classnames({
+      className={cn({
         'relative overflow-hidden border-l-4 px-4 pb-4 pt-1 text-white transition-opacity duration-300':
           true,
         'opacity-20': muted,
@@ -138,7 +137,7 @@ export const Item: React.FC<ItemProps> = ({
             }}
           >
             <div
-              className={classnames({
+              className={cn({
                 'absolute left-1/2 top-full mt-2.5 -translate-y-1/2 transform whitespace-nowrap text-xs text-red-600':
                   true,
                 ...metStyles,

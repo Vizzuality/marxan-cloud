@@ -8,8 +8,6 @@ import React, {
   useState,
 } from 'react';
 
-import cx from 'classnames';
-
 import {
   DndContext,
   DragOverlay,
@@ -26,6 +24,8 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+
+import { cn } from 'utils/cn';
 
 import SortableItem from './item';
 import type { SortableItemProps } from './item/component';
@@ -116,7 +116,7 @@ export const SortableList: React.FC<SortableListProps> = ({
     >
       <SortableContext items={itemsIds} strategy={verticalListSortingStrategy}>
         <div
-          className={cx({
+          className={cn({
             'w-full': true,
           })}
         >

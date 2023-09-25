@@ -1,8 +1,7 @@
 import React, { ButtonHTMLAttributes } from 'react';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-left.svg?sprite';
 import FOLDER_SVG from 'svgs/ui/folder.svg?sprite';
@@ -21,7 +20,7 @@ export const Breadcrum: React.FC<BreadcrumProps> = ({
   <div className="inline-flex">
     <button
       type="button"
-      className={cx({
+      className={cn({
         'flex h-6 items-center overflow-hidden text-sm text-primary-500 hover:text-primary-300 focus:outline-none':
           true,
         [className]: !!className,

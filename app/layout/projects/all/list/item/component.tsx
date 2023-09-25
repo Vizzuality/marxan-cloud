@@ -1,7 +1,5 @@
 import React, { useCallback, useState } from 'react';
 
-import cx from 'classnames';
-
 import { AnimatePresence, motion } from 'framer-motion';
 import isEmpty from 'lodash/isEmpty';
 
@@ -12,6 +10,7 @@ import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
 import type { Project } from 'types/api/project';
+import { cn } from 'utils/cn';
 import { ROLES } from 'utils/constants-roles';
 
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
@@ -104,7 +103,7 @@ export const Item: React.FC<ItemProps> = ({
       <div
         role="presentation"
         style={style}
-        className={cx({
+        className={cn({
           'relative flex cursor-pointer flex-col rounded-[40px] bg-gray-900 px-7 py-8 text-left text-white':
             true,
           [className]: !!className,
@@ -122,7 +121,7 @@ export const Item: React.FC<ItemProps> = ({
           >
             <div className="flex space-x-2">
               <div
-                className={cx({
+                className={cn({
                   'rounded-3xl px-2.5 py-1 text-sm opacity-0 transition-opacity': true,
                   'opacity-100': !!ROLES[projectRole],
                   'bg-yellow-600 bg-opacity-20': isOwner,
@@ -130,7 +129,7 @@ export const Item: React.FC<ItemProps> = ({
                 })}
               >
                 <p
-                  className={cx({
+                  className={cn({
                     'text-yellow-600': isOwner,
                     'text-white': !isOwner,
                   })}
@@ -141,13 +140,13 @@ export const Item: React.FC<ItemProps> = ({
 
               {isPublic && (
                 <div
-                  className={cx({
+                  className={cn({
                     'rounded-3xl px-2.5 py-1 text-sm opacity-0 transition-opacity': true,
                     'bg-primary-500 bg-opacity-20 opacity-100': !!ROLES[projectRole],
                   })}
                 >
                   <p
-                    className={cx({
+                    className={cn({
                       'text-primary-500': ROLES[projectRole],
                     })}
                   >
@@ -159,7 +158,7 @@ export const Item: React.FC<ItemProps> = ({
             </div>
 
             <div
-              className={cx({
+              className={cn({
                 'inline-flex opacity-0 transition-opacity': true,
                 'opacity-100': !isEmpty(userColors),
               })}
@@ -175,7 +174,7 @@ export const Item: React.FC<ItemProps> = ({
                       return (
                         <li
                           key={userId}
-                          className={cx({
+                          className={cn({
                             '-ml-3': i !== 0,
                           })}
                         >

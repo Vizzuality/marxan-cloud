@@ -1,10 +1,9 @@
 import React from 'react';
 
-import classnames from 'classnames';
-
 import Link from 'next/link';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -24,7 +23,7 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
   const children = (
     <>
       <p
-        className={classnames({
+        className={cn({
           'mr-4 text-lg underline': true,
           'text-gray-700': theme === 'dark',
           'text-white': theme === 'light',
@@ -33,7 +32,7 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
         {caption}
       </p>
       <div
-        className={classnames({
+        className={cn({
           'flex h-7 w-7 items-center justify-center rounded-full border bg-transparent': true,
           'border-gray-700': theme === 'dark',
           'border-white': theme === 'light',
@@ -41,7 +40,7 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
       >
         <Icon
           icon={ARROW_RIGHT_2_SVG}
-          className={classnames({
+          className={cn({
             'h-3 w-3': true,
             'text-gray-700': theme === 'dark',
             'text-white': theme === 'light',

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 export interface ProgressBarProps {
   progress: number;
@@ -13,7 +13,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 }: ProgressBarProps) => {
   return (
     <div
-      className={cx({
+      className={cn({
         'relative w-full': true,
         className: !!className,
       })}

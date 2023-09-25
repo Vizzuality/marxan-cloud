@@ -1,9 +1,9 @@
 import React, { ReactElement, cloneElement } from 'react';
 
-import cx from 'classnames';
-
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+
+import { cn } from 'utils/cn';
 
 export interface SortableItemProps {
   id: string;
@@ -44,7 +44,7 @@ export const SortableItem: React.FC<SortableItemProps> = ({
         ...listeners,
         ...attributes,
       })}
-      className={cx({
+      className={cn({
         'opacity-0': isDragging,
       })}
     >

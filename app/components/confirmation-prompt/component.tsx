@@ -1,10 +1,9 @@
 import React from 'react';
 
-import classnames from 'classnames';
-
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
+import { cn } from 'utils/cn';
 
 import { ConfirmationPromptProps } from './types';
 
@@ -31,7 +30,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
           {title}
         </div>
         <p
-          className={classnames({
+          className={cn({
             'my-4 text-sm sm:pr-32': true,
             'text-black underline': !!danger,
             'text-gray-100': !danger,
@@ -41,7 +40,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
         </p>
       </header>
       <div
-        className={classnames({
+        className={cn({
           'flex items-end justify-between': true,
           'mt-10 sm:mt-12': !icon && !description,
           'mt-8': !icon && !!description,
@@ -50,7 +49,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
         })}
       >
         <div
-          className={classnames({
+          className={cn({
             flex: true,
             'flex-row-reverse': !!danger,
           })}
@@ -81,7 +80,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
         {icon && (
           <Icon
             icon={icon}
-            className={classnames({
+            className={cn({
               'flex-shrink-1 flex-grow-1 hidden sm:block': true,
               'ml-auto w-36': !iconClassName,
               [iconClassName]: !!iconClassName,

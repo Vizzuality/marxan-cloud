@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
 
-import cx from 'classnames';
-
 import Tippy from '@tippyjs/react/headless';
 import { useSpring, motion } from 'framer-motion';
 import { SpringOptions } from 'popmotion';
+
+import { cn } from 'utils/cn';
 
 import Arrow from './arrow';
 import { TooltipProps } from './types';
@@ -74,7 +74,7 @@ export const Tooltip = ({
           >
             <div className="relative shadow-2xl">
               <div
-                className={cx({
+                className={cn({
                   'flex-column relative flex flex-grow overflow-hidden': true,
                   [contentClassName]: !!contentClassName,
                 })}

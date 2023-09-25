@@ -1,8 +1,7 @@
 import React, { useMemo, useCallback, Children, isValidElement } from 'react';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import LEGEND_SVG from 'svgs/map/legend.svg?sprite';
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
@@ -42,7 +41,7 @@ export const Legend: React.FC<LegendProps> = ({
 
   return (
     <div
-      className={cx({
+      className={cn({
         'flex w-full flex-grow flex-col overflow-hidden rounded-3xl bg-black': true,
         hidden: !isChildren,
         [className]: !!className,
@@ -58,7 +57,7 @@ export const Legend: React.FC<LegendProps> = ({
 
         <Icon
           icon={ARROW_DOWN_SVG}
-          className={cx({
+          className={cn({
             'absolute right-5 top-1/2 h-3 w-3 -translate-y-1/2 transform text-primary-500 transition-transform':
               true,
             'rotate-180': !open,

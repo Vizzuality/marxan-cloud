@@ -3,8 +3,6 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { useSelector } from 'react-redux';
 
-import cx from 'classnames';
-
 import { motion } from 'framer-motion';
 
 import { useUploadLegacyProjectFile, useCancelUploadLegacyProjectFile } from 'hooks/projects';
@@ -13,6 +11,7 @@ import { useToasts } from 'hooks/toast';
 import Label from 'components/forms/label';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
+import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
@@ -154,7 +153,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: U
           <div
             {...fprops}
             {...getRootProps()}
-            className={cx({
+            className={cn({
               'relative w-full cursor-pointer border border-dotted border-gray-400 bg-gray-200 bg-opacity-20 py-10 hover:bg-gray-200':
                 true,
               'bg-gray-600': isDragActive,

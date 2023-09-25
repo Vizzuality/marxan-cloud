@@ -1,11 +1,11 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import { useNumberFormatter } from '@react-aria/i18n';
 import { setInteractionModality } from '@react-aria/interactions';
 import { useSlider } from '@react-aria/slider';
 import { useSliderState } from '@react-stately/slider';
+
+import { cn } from 'utils/cn';
 
 import Thumb from './thumb';
 import Value from './value';
@@ -168,7 +168,7 @@ export const Slider: React.FC<SliderProps> = ({
   return (
     <div
       {...groupProps}
-      className={cx({
+      className={cn({
         [THEME[theme].base]: true,
         'opacity-30': status === 'disabled',
       })}

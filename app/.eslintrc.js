@@ -63,11 +63,6 @@ module.exports = {
             group: 'builtin',
           },
           {
-            pattern: 'classnames',
-            group: 'builtin',
-            position: 'after',
-          },
-          {
             pattern: 'lodash-es/**',
             group: 'builtin',
             position: 'after',

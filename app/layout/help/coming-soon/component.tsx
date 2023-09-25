@@ -1,8 +1,7 @@
 import React, { ReactChild } from 'react';
 
-import cx from 'classnames';
-
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: {
@@ -28,14 +27,14 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
   return (
     <Tooltip
       arrow
-      arrowClassName={cx({
+      arrowClassName={cn({
         [THEME[theme].arrow]: true,
       })}
       placement={placement}
       maxWidth={350}
       content={
         <div
-          className={cx({
+          className={cn({
             [THEME[theme].base]: true,
           })}
         >

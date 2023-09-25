@@ -1,6 +1,4 @@
-import React, { useCallback, useState } from 'react';
-
-import classnames from 'classnames';
+import React, { ComponentProps, useCallback, useState } from 'react';
 
 import { usePlausible } from 'next-plausible';
 
@@ -12,6 +10,7 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
@@ -108,10 +107,12 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
           className="group px-6"
           size="s"
           disabled={duplicating || !user}
-          theme={classnames({
-            'transparent-white': theme === 'light',
-            'transparent-black': theme !== 'light',
-          })}
+          theme={
+            cn({
+              'transparent-white': theme === 'light',
+              'transparent-black': theme !== 'light',
+            }) as ComponentProps<typeof Button>['theme']
+          }
           onClick={onDuplicate}
         >
           <Loading
@@ -121,7 +122,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
           />
           Duplicate
           <Icon
-            className={classnames({
+            className={cn({
               'ml-2 h-3.5 w-3.5': true,
               'text-white group-hover:text-black': theme === 'light',
               'text-black group-hover:text-white': theme === 'dark',
