@@ -40,7 +40,7 @@ export class SelectionGetService {
 
     return [
       ...categories.map((category) => ({
-        name: category,
+        name: 'IUCN ' + category,
         id: category,
         kind: ProtectedAreaKind.Global,
         selected:
@@ -69,7 +69,7 @@ export class SelectionGetService {
 
     return [
       ...categories.map((category) => ({
-        name: category,
+        name: 'IUCN '+ category,
         id: category,
         isCustom: false,
       })),

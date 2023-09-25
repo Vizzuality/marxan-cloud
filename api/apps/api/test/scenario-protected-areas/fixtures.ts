@@ -132,7 +132,7 @@ export const getFixtures = async () => {
         {
           id: 'III',
           kind: 'global',
-          name: 'III',
+          name: 'IUCN III',
           selected: false,
         },
       ]);
@@ -156,7 +156,7 @@ export const getFixtures = async () => {
       response.data.sort();
       expect(response.data).toHaveLength(1);
       expect(response.data[0].attributes.isCustom).toBe(false);
-      expect(response.data[0].attributes.name).toBe('III');
+      expect(response.data[0].attributes.name).toBe('IUCN III');
       expect(response.data[0].attributes.scenarioUsageCount).toBe(1);
     },
 
@@ -166,7 +166,7 @@ export const getFixtures = async () => {
       expect(response.data[0].attributes.isCustom).toBe(true);
       expect(response.data[0].attributes.name).toBe('custom protected area');
       expect(response.data[1].attributes.isCustom).toBe(false);
-      expect(response.data[1].attributes.name).toBe('III');
+      expect(response.data[1].attributes.name).toBe('IUCN III');
     },
 
     GivenCustomProtectedAreaWasAddedToProject: async () => {
@@ -302,7 +302,7 @@ export const getFixtures = async () => {
       expect(response.find((e) => e.id === category)).toEqual({
         id: category,
         kind: `global`,
-        name: category,
+        name: 'IUCN ' + category,
         selected: true,
       });
     },
@@ -313,7 +313,7 @@ export const getFixtures = async () => {
       expect(response.find((e) => e.id === category)).toEqual({
         id: category,
         kind: `global`,
-        name: category,
+        name: 'IUCN ' + category,
         selected: false,
       });
     },
