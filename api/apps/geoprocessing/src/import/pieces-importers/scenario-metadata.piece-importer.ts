@@ -79,6 +79,7 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
         status: values.status,
         created_by: ownerId,
         solutions_are_locked: values.solutionsAreLocked,
+        cost_surface_id: values.cost_surface_id,
       })
       .execute();
   }
