@@ -36,7 +36,7 @@ export const Legend = ({
     >
       {open && (
         <ScrollArea className="relative flex w-full flex-col rounded-3xl bg-black px-2 py-2 before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-black before:via-black after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-black after:via-black">
-          <div className="divide-y divide-gray-600 divide-opacity-50 py-2">
+          <div className="divide-y divide-dashed divide-gray-700 py-2">
             {!!sortable && (
               <SortableList sortable={sortable} onChangeOrder={onChangeOrder}>
                 {children}

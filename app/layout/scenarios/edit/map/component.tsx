@@ -651,24 +651,26 @@ export const ScenariosEditMap = (): JSX.Element => {
                 defaultOpen
                 disabled={!c.layers?.length && !c.subgroups?.[0]?.layers?.length}
               >
-                {c.layers?.map((layer) => {
-                  if (layer) {
-                    return (
-                      <LegendItem
-                        key={layer.id}
-                        onChangeOpacity={(opacity) => onChangeOpacity(opacity, layer.id)}
-                        settings={layerSettings[layer.id]}
-                        {...layer}
-                      >
-                        {renderLegendItems(layer)}
-                      </LegendItem>
-                    );
-                  }
-                })}
+                <div className="divide-y divide-dashed divide-gray-700">
+                  {c.layers?.map((layer) => {
+                    if (layer) {
+                      return (
+                        <LegendItem
+                          key={layer.id}
+                          onChangeOpacity={(opacity) => onChangeOpacity(opacity, layer.id)}
+                          settings={layerSettings[layer.id]}
+                          {...layer}
+                        >
+                          {renderLegendItems(layer)}
+                        </LegendItem>
+                      );
+                    }
+                  })}
+                </div>
                 {c.subgroups?.map((subgroup) => {
                   return (
                     <LegendGroup key={subgroup.name} title={subgroup.name} className="pl-5">
-                      <div className="divide-y divide-dashed divide-gray-400">
+                      <div className="divide-y divide-dashed divide-gray-700">
                         {subgroup.layers?.map((layer) => {
                           if (layer) {
                             return (
@@ -676,6 +678,7 @@ export const ScenariosEditMap = (): JSX.Element => {
                                 key={layer.id}
                                 onChangeOpacity={(opacity) => onChangeOpacity(opacity, layer.id)}
                                 settings={layerSettings[layer.id]}
+                                className="pl-[2px]"
                                 {...layer}
                               >
                                 {renderLegendItems(layer as any)}
