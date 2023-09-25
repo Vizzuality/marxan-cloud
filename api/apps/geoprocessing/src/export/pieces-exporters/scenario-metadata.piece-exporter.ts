@@ -24,6 +24,7 @@ type SelectScenarioResult = {
   solutions_are_locked: boolean;
   status: ScenarioMetadataContent['status'] | null;
   type: string;
+  cost_surface_id: string;
 };
 
 type SelectScenarioBlmResult = {
@@ -103,6 +104,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       solutionsAreLocked: scenario.solutions_are_locked,
       type: scenario.type,
       status: scenario.status ?? undefined,
+      cost_surface_id: scenario.cost_surface_id,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
