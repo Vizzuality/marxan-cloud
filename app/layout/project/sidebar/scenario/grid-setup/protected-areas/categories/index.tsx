@@ -145,7 +145,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
     if (!wdpaData) return [];
 
     return wdpaData.map((w) => ({
-      label: w.kind === 'global' ? `IUCN ${w.name}` : `${w.name}`,
+      label: w.name,
       value: w.id,
       kind: w.kind,
       selected: w.selected,
