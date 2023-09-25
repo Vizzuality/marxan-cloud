@@ -26,7 +26,7 @@ export class TypeormProjectCostSurface
               CostSurfacePuDataEntity,
               rows.map((row) => ({
                 cost: row.cost,
-                puid: row.puid,
+                puid: row.projectsPuId,
                 costSurfaceId: row.costSurfaceId,
               })),
             );

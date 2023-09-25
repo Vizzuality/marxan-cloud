@@ -9,14 +9,10 @@ export class AddsCostSurfacePuDataGeoDb1692254627921
     await queryRunner.query(`
       CREATE TABLE cost_surface_pu_data (
         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        -- consider marking this as not null, as it is for projects, and maybe required for the GC
         cost_surface_id uuid NOT NULL,
-        puid uuid NOT NULL REFERENCES projects_pu(id) ON DELETE CASCADE,
+        projects_pu_id uuid NOT NULL REFERENCES projects_pu(id) ON DELETE CASCADE,
         cost float8 NOT NULL,
-        -- modifying this as I need the change for tests
-        UNIQUE (cost_surface_id, puid)
-
-
+        UNIQUE (cost_surface_id, projects_pu_id)
       );
      `);
   }

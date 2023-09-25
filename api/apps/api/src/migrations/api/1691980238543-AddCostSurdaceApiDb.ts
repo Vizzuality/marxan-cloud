@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddCostSurdaceApiDb1691980238543 implements MigrationInterface {
+export class AddCostSurfaceApiDb1691980238543 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
     CREATE TABLE cost_surfaces (

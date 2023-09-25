@@ -48,7 +48,7 @@ export class ProjectCostSurfaceProcessor
       costSurfaces.map(
         (record) =>
           ({
-            puid: projectPlanningUnitsByPuid[record.puid],
+            projectsPuId: projectPlanningUnitsByPuid[record.puid],
             cost: record.cost,
             costSurfaceId: job.data.costSurfaceId,
           } as CostSurfacePuDataEntity),
