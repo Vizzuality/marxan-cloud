@@ -30,9 +30,10 @@ export class ProjectCostSurfaceApiEvents
   async event(
     projectId: string,
     state: ProjectCostSurfaceState,
+    context?: Record<string, unknown>,
   ): Promise<void> {
     await this.create({
-      data: {},
+      data: context ?? {},
       topic: projectId,
       kind: this.eventsMap[state],
     });

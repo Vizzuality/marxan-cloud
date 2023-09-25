@@ -55,7 +55,7 @@ export class CreateProjectCostSurfaceHandler
     error: unknown,
   ) => {
     this.logger.error(
-      `Failed submitting update-cost-surface-for-${projectId} job`,
+      `Failed submitting cost-surface-for-${projectId} job`,
       String(error),
     );
     await this.events.event(
