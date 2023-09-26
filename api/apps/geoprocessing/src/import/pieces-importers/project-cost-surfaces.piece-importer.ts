@@ -19,14 +19,13 @@ import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import {
   CostSurfaceData,
-  ProjectCostSurfacesContent
-} from "@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces";
-import { CostSurfacePuDataEntity } from "@marxan/cost-surfaces";
+  ProjectCostSurfacesContent,
+} from '@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 
 @Injectable()
 @PieceImportProvider()
-export class ProjectCostSurfacesPieceImporter
-  implements ImportPieceProcessor {
+export class ProjectCostSurfacesPieceImporter implements ImportPieceProcessor {
   private readonly logger: Logger = new Logger(
     ProjectCostSurfacesPieceImporter.name,
   );
@@ -41,8 +40,7 @@ export class ProjectCostSurfacesPieceImporter
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
-      piece === ClonePiece.ProjectCostSurfaces &&
-      kind === ResourceKind.Project
+      piece === ClonePiece.ProjectCostSurfaces && kind === ResourceKind.Project
     );
   }
 
@@ -99,22 +97,21 @@ export class ProjectCostSurfacesPieceImporter
           });
 
           const costSurfaceData = data.map((data: CostSurfaceData) => ({
-              ...data,
-              cost_surface_id: costSurfaceId,
-            }))
-
+            ...data,
+            cost_surface_id: costSurfaceId,
+          }));
 
           const costSurfaceInsertData = costSurfaceData.map(
             (data: CostSurfaceData) => ({
               costSurfaceId: costSurfaceId,
               cost: data.cost,
               projectsPuId: projectPusMap[data.puid],
-
             }),
           );
 
-          costSurfacesDataInsertValues = costSurfacesDataInsertValues.concat(costSurfaceInsertData);
-
+          costSurfacesDataInsertValues = costSurfacesDataInsertValues.concat(
+            costSurfaceInsertData,
+          );
         });
 
         await Promise.all(

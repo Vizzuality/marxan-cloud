@@ -1,15 +1,15 @@
-import { MigrationInterface, QueryRunner } from "typeorm"
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddClonePieceForProjectCostSurfaces1695040870835 implements MigrationInterface {
+export class AddClonePieceForProjectCostSurfaces1695040870835
+  implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TYPE clone_piece_enum ADD VALUE 'project-cost-surfaces'`,
+    );
+  }
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(
-        `ALTER TYPE clone_piece_enum ADD VALUE 'project-cost-surfaces'`,
-      );
-    }
-
-    public async down(queryRunner: QueryRunner): Promise<void> {
-      await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
     CREATE TYPE "clone_piece_enum_tmp" AS ENUM(
       'export-config',
       'project-metadata',
@@ -33,21 +33,20 @@ export class AddClonePieceForProjectCostSurfaces1695040870835 implements Migrati
     );
     `);
 
-      await queryRunner.query(`
+    await queryRunner.query(`
       ALTER TABLE export_components
       ALTER COLUMN piece TYPE clone_piece_enum_tmp;
     `);
-      await queryRunner.query(`
+    await queryRunner.query(`
       ALTER TABLE import_components
       ALTER COLUMN piece TYPE clone_piece_enum_tmp;
     `);
 
-      await queryRunner.query(`
+    await queryRunner.query(`
       DROP TYPE clone_piece_enum;
     `);
-      await queryRunner.query(`
+    await queryRunner.query(`
       ALTER TYPE clone_piece_enum_tmp RENAME TO clone_piece_enum;
     `);
-    }
-
+  }
 }

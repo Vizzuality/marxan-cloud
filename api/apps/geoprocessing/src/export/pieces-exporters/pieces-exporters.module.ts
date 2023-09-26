@@ -30,9 +30,7 @@ import { ScenarioOutputFolderPieceExporter } from './scenario-output-folder.piec
 import { ScenarioPlanningUnitsDataPieceExporter } from './scenario-planning-units-data.piece-exporter';
 import { ScenarioProtectedAreasPieceExporter } from './scenario-protected-areas.piece-exporter';
 import { ScenarioRunResultsPieceExporter } from './scenario-run-results.piece-exporter';
-import {
-  ProjectCostSurfacesPieceExporter
-} from "@marxan-geoprocessing/export/pieces-exporters/project-cost-surfaces.piece-exporter";
+import { ProjectCostSurfacesPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/project-cost-surfaces.piece-exporter';
 
 @Module({
   imports: [
