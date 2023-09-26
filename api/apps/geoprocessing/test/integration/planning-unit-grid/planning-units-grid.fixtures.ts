@@ -146,7 +146,7 @@ export const getFixtures = async () => {
     },
     async ThenThePUCostOfThatPlanningAreaIsCreated(planingAreaId: string) {
       const costForPlanningArea = await puGeoRepo.query(
-        `select * from cost_surface_pu_data join projects_pu pp on cost_surface_pu_data.puid = pp.id where pp.planning_area_id = $1`,
+        `select * from cost_surface_pu_data join projects_pu pp on cost_surface_pu_data.projects_pu_id = pp.id where pp.planning_area_id = $1`,
         [planingAreaId],
       );
       const pusForProject = await projectsPuRepo.query(

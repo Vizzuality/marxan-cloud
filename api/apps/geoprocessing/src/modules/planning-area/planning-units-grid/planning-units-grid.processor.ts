@@ -63,7 +63,7 @@ export class PlanningUnitsGridProcessor {
         // TODO: Maybe add a custom method in the repo, share it in libs to be used in both sides
         const projectPuIds = projectPus.map((p) => p.id);
         await manager.query(
-          `INSERT INTO cost_surface_pu_data (puid, cost, cost_surface_id)
+          `INSERT INTO cost_surface_pu_data (projects_pu_id, cost, cost_surface_id)
                     SELECT ppu.id, round(pug.area / 1000000) as area, ppu.id
                     FROM projects_pu ppu
                     INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
