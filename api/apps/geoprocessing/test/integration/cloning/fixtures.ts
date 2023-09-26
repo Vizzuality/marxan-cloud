@@ -154,8 +154,8 @@ export async function GivenScenarioExists(
   organizationId: string,
   scenarioData: Record<string, any> = {},
   projectData: Record<string, any> = {},
+  costSurfaceId = v4(),
 ) {
-  const costSurfaceId = v4();
   await GivenProjectExists(
     em,
     projectId,

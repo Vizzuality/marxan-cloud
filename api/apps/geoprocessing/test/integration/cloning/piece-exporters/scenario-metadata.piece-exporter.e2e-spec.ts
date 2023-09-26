@@ -83,6 +83,7 @@ const getFixtures = async () => {
 
   const projectId = v4();
   const scenarioId = v4();
+  const costSurfaceId = v4();
   const organizationId = v4();
   const sut = sandbox.get(ScenarioMetadataPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
@@ -105,6 +106,7 @@ const getFixtures = async () => {
     ranAtLeastOnce: false,
     solutionsAreLocked,
     type: 'marxan',
+    cost_surface_id: costSurfaceId,
   });
 
   return {
@@ -140,6 +142,8 @@ const getFixtures = async () => {
           metadata: { marxanInputParameterFile: { meta: '1' } },
           solutions_are_locked: solutionsAreLocked,
         },
+        {},
+        costSurfaceId,
       );
     },
     GivenScenarioBlmRangeExist: async () => {

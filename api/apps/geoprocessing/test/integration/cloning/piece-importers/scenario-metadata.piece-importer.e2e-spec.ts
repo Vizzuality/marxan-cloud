@@ -151,6 +151,7 @@ const getFixtures = async () => {
   const organizationId = v4();
   const oldScenarioId = v4();
   const userId = v4();
+  const costSurfaceId = v4();
 
   const sut = sandbox.get(ScenarioMetadataPieceImporter);
   const fileRepository = sandbox.get(CloningFilesRepository);
@@ -175,6 +176,7 @@ const getFixtures = async () => {
     solutionsAreLocked,
     projectScenarioId: 1,
     type: 'marxan',
+    cost_surface_id: costSurfaceId,
   });
 
   return {
@@ -197,6 +199,9 @@ const getFixtures = async () => {
         scenarioId,
         projectId,
         organizationId,
+        {},
+        {},
+        costSurfaceId,
       );
     },
     GivenJobInput: (

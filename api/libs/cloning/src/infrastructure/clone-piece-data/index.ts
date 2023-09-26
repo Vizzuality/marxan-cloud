@@ -1,6 +1,6 @@
 import { isDefined } from '../../../../utils/src';
 import { SlugService } from '../../../../utils/src/slug.service';
-import { ComponentLocation, ResourceKind } from '../../domain';
+import { ResourceKind } from '../../domain';
 import { ClonePiece } from '../../domain/clone-piece';
 import { exportConfigRelativePath } from './export-config';
 import { marxanExecutionMetadataRelativePath } from './marxan-execution-metadata';
@@ -55,22 +55,23 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   //
   [ClonePiece.ProjectMetadata]: 0,
   //
-  [ClonePiece.ScenarioMetadata]: 1,
   [ClonePiece.PlanningAreaGAdm]: 1,
   [ClonePiece.PlanningAreaCustom]: 1,
   [ClonePiece.PlanningUnitsGrid]: 1,
   [ClonePiece.ProjectCustomProtectedAreas]: 1,
   //
-  [ClonePiece.ProjectCustomFeatures]: 2,
-  [ClonePiece.ScenarioProtectedAreas]: 2,
-  [ClonePiece.ScenarioPlanningUnitsData]: 2,
+  [ClonePiece.ScenarioMetadata]: 2,
   //
-  [ClonePiece.ProjectPuvsprCalculations]: 3,
-  [ClonePiece.ScenarioFeaturesData]: 3,
+  [ClonePiece.ProjectCustomFeatures]: 3,
+  [ClonePiece.ScenarioProtectedAreas]: 3,
+  [ClonePiece.ScenarioPlanningUnitsData]: 3,
   //
-  [ClonePiece.ScenarioRunResults]: 4,
-  [ClonePiece.MarxanExecutionMetadata]: 4,
-  [ClonePiece.FeaturesSpecification]: 4,
+  [ClonePiece.ProjectPuvsprCalculations]: 4,
+  [ClonePiece.ScenarioFeaturesData]: 4,
+  //
+  [ClonePiece.ScenarioRunResults]: 5,
+  [ClonePiece.MarxanExecutionMetadata]: 5,
+  [ClonePiece.FeaturesSpecification]: 5,
 };
 
 export class ClonePieceRelativePathResolver {
