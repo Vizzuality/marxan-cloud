@@ -26,7 +26,7 @@ export class TypeormProjectCostSurface
               CostSurfacePuDataEntity,
               rows.map((row) => ({
                 cost: row.cost,
-                puid: row.projectsPuId,
+                projectsPuId: row.projectsPuId,
                 costSurfaceId: row.costSurfaceId,
               })),
             );
@@ -70,7 +70,7 @@ export class TypeormProjectCostSurface
      */
     await this.geoprocessingEntityManager.query(
       `
-        INSERT INTO cost_surface_pu_data (puid, cost, cost_surface_id)
+        INSERT INTO cost_surface_pu_data (projects_pu_id, cost, cost_surface_id)
         SELECT ppu.id, round(pug.area / 1000000) as area, $2
         FROM projects_pu ppu
           INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
