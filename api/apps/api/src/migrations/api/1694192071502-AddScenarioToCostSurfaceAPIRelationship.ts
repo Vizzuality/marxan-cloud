@@ -72,10 +72,6 @@ async function costSurfaceMigrationUp(queryRunner: QueryRunner): Promise<void> {
     }
 
     ///////////////////////// Geo processing Side
-    // Fix a small bug that would prevent having more than 1 cost surface with shared PUs
-    await geoQueryRunner.query(`ALTER TABLE cost_surface_pu_data DROP CONSTRAINT if exists cost_surface_pu_data_puid_key;
-                                      ALTER TABLE cost_surface_pu_data ADD CONSTRAINT unique_cost_surface_puid UNIQUE (cost_surface_id, puid);`);
-
     const updatedScenarios: {
       id: string;
       cost_surface_id: string;
