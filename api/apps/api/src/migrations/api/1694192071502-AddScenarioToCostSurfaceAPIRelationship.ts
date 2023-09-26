@@ -42,10 +42,10 @@ async function costSurfaceMigrationUp(queryRunner: QueryRunner): Promise<void> {
     // Create Cost Surface per Scenario and link them
     for (const scenario of scenarios) {
       const costSurface: { id: string }[] = await apiQueryRunner.query(
-        `INSERT INTO cost_surfaces (id, name, min, max, is_default, project_id)
-               VALUES (gen_random_uuid(), $1, 0, 0, false, $2)
+        `INSERT INTO cost_surfaces (id, name, min, max, is_default, project_id, is_migrated)
+               VALUES (gen_random_uuid(), $1, 0, 0, false, $2, true)
                RETURNING id;`,
-        [`MIGRATED - ${scenario.name} Cost Surface`, scenario.project_id],
+        [`${scenario.name} Cost Surface`, scenario.project_id],
       );
 
       await apiQueryRunner.query(
@@ -65,9 +65,9 @@ async function costSurfaceMigrationUp(queryRunner: QueryRunner): Promise<void> {
 
     for (const project of projects) {
       await apiQueryRunner.query(
-        `INSERT INTO cost_surfaces (id, name, min, max, is_default, project_id)
-               VALUES (gen_random_uuid(), $1, 0, 0, true, $2);`,
-        [`MIGRATED - Default Cost Surface`, project.id],
+        `INSERT INTO cost_surfaces (id, name, min, max, is_default, project_id, is_migrated)
+               VALUES (gen_random_uuid(), $1, 0, 0, true, $2, true);`,
+        [`Default Cost Surface`, project.id],
       );
     }
 
@@ -75,7 +75,6 @@ async function costSurfaceMigrationUp(queryRunner: QueryRunner): Promise<void> {
     // Fix a small bug that would prevent having more than 1 cost surface with shared PUs
     await geoQueryRunner.query(`ALTER TABLE cost_surface_pu_data DROP CONSTRAINT if exists cost_surface_pu_data_puid_key;
                                       ALTER TABLE cost_surface_pu_data ADD CONSTRAINT unique_cost_surface_puid UNIQUE (cost_surface_id, puid);`);
-
 
     const updatedScenarios: {
       id: string;
