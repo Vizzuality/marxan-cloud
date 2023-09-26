@@ -64,11 +64,8 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   [ClonePiece.ProjectCostSurfaces]: 2,
   [ClonePiece.ProjectCustomFeatures]: 2,
   //
-  [ClonePiece.ScenarioProtectedAreas]: 3,
-  [ClonePiece.ScenarioPlanningUnitsData]: 3,
   [ClonePiece.ScenarioMetadata]: 3,
   //
-  [ClonePiece.ProjectCustomFeatures]: 4,
   [ClonePiece.ScenarioProtectedAreas]: 4,
   [ClonePiece.ScenarioPlanningUnitsData]: 4,
   //
