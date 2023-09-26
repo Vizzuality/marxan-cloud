@@ -33,7 +33,7 @@ type ProjectCostSurfacesSelectResult = {
 type CostSurfaceDataSelectResult = {
   cost_surface_id: string;
   cost: number;
-  project_pu_id: number;
+  projects_pu_id: number;
 };
 
 @Injectable()
@@ -60,7 +60,7 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const costSurfaces: ProjectCostSurfacesSelectResult[] = await this.apiEntityManager
       .createQueryBuilder()
-      .select(['cs.id', 'cs.name', 'cs.is_default'])
+      .select(['cs.id', 'cs.name', 'cs.min', 'cs.max', 'cs.is_default'])
       .from('cost_surfaces', 'cs')
       .where('cs.project_id = :projectId', { projectId: input.resourceId })
       .execute();
@@ -71,7 +71,7 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
     if (costSurfacesIds.length > 0) {
       costSurfaceData = await this.geoprocessingEntityManager
         .createQueryBuilder()
-        .select(['scpd.cost_surface_id', 'scpd.cost', 'scpd.puid'])
+        .select(['cost_surface_id', 'cost', 'projects_pu_id'])
         .from('cost_surface_pu_data', 'scpd')
         .where('cost_surface_id IN (:...costSurfacesIds)', {
           costSurfacesIds,
@@ -85,8 +85,8 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
       costSurfaces: costSurfaces.map(({ id, ...costSurface }) => ({
         ...costSurface,
         data: costSurfaceData.filter((data : CostSurfaceDataSelectResult) => data.cost_surface_id === id)
-          .map(({ cost_surface_id, project_pu_id, ...data }) => {
-            const puid = projectPusMap[project_pu_id];
+          .map(({ cost_surface_id, projects_pu_id, ...data }) => {
+            const puid = projectPusMap[projects_pu_id];
             return { puid, ...data };
           }),
       })),
