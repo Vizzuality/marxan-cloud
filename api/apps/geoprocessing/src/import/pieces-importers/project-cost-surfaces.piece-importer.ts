@@ -17,7 +17,10 @@ import {
 import { chunk } from 'lodash';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
-import { ProjectCostSurfacesContent } from "@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces";
+import {
+  CostSurfaceData,
+  ProjectCostSurfacesContent
+} from "@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces";
 import { CostSurfacePuDataEntity } from "@marxan/cost-surfaces";
 
 @Injectable()
@@ -85,6 +88,7 @@ export class ProjectCostSurfacesPieceImporter
 
       await this.apiEntityManager.transaction(async (apiEm) => {
         const costSurfacesInsertValues: any[] = [];
+        let costSurfacesDataInsertValues: any[] = [];
         costSurfaces.forEach(({ data, ...costSurface }) => {
           const costSurfaceId = v4();
 
@@ -93,6 +97,23 @@ export class ProjectCostSurfacesPieceImporter
             project_id: projectId,
             id: costSurfaceId,
           });
+
+          const costSurfaceData = data.map((data: CostSurfaceData) => ({
+              ...data,
+              cost_surface_id: costSurfaceId,
+            }))
+
+
+          const costSurfaceInsertData = costSurfaceData.map(
+            (data: CostSurfaceData) => ({
+              costSurfaceId: costSurfaceId,
+              cost: data.cost,
+              projectsPuId: projectPusMap[data.puid],
+
+            }),
+          );
+
+          costSurfacesDataInsertValues = costSurfacesDataInsertValues.concat(costSurfaceInsertData);
 
         });
 
@@ -107,26 +128,9 @@ export class ProjectCostSurfacesPieceImporter
           ),
         );
 
-
-        const costSurfaceData = costSurfacesInsertValues.flatMap((costSurface) =>
-          costSurface.data.map((data: any) => ({
-            ...data,
-            cost_surface_id: costSurface.id,
-          })),
-        );
-
-        const costSurfaceDataInsertValues = costSurfaceData.map(
-          ({ projectPuPuid, ...data }) => ({
-            cost_surface_id: data.cost_surface_id,
-            cost: data.cost,
-            puid: projectPusMap[projectPuPuid],
-
-          }),
-        );
-
         await Promise.all(
           chunk(
-            costSurfaceDataInsertValues,
+            costSurfacesDataInsertValues,
             CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
           ).map((values) =>
             this.geoprocessingEntityManager

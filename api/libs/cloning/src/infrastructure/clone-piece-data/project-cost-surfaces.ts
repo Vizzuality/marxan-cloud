@@ -1,6 +1,6 @@
 export const projectCostSurfacesRelativePath = 'cost-surfaces.json';
 
-type CostSurfaceData = {
+export type CostSurfaceData = {
   cost: number;
   puid: number;
 };
