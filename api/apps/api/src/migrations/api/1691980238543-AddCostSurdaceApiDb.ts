@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddCostSurfaceApiDb1691980238543 implements MigrationInterface {
+export class AddCostSurdaceApiDb1691980238543 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
     CREATE TABLE cost_surfaces (
@@ -17,6 +17,7 @@ export class AddCostSurfaceApiDb1691980238543 implements MigrationInterface {
 
     ALTER TABLE cost_surfaces
     ADD CONSTRAINT UQ_cost_surface_name_for_project UNIQUE (project_id, name);
+
 
     CREATE UNIQUE INDEX IDX_default_cost_surface_for_project
     ON cost_surfaces (project_id)
