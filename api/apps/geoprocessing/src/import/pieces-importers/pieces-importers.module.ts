@@ -19,9 +19,7 @@ import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importe
 import { ScenarioPlanningUnitsDataPieceImporter } from './scenario-planning-units-data.piece-importer';
 import { ScenarioProtectedAreasPieceImporter } from './scenario-protected-areas.piece-importer';
 import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-importer';
-import {
-  ProjectCostSurfacesPieceImporter
-} from "@marxan-geoprocessing/import/pieces-importers/project-cost-surfaces.piece-importer";
+import { ProjectCostSurfacesPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-cost-surfaces.piece-importer';
 
 @Module({
   imports: [

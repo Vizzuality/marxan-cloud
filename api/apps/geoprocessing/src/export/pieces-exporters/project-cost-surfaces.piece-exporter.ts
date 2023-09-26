@@ -84,7 +84,10 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
     const fileContent: ProjectCostSurfacesContent = {
       costSurfaces: costSurfaces.map(({ id, ...costSurface }) => ({
         ...costSurface,
-        data: costSurfaceData.filter((data : CostSurfaceDataSelectResult) => data.cost_surface_id === id)
+        data: costSurfaceData
+          .filter(
+            (data: CostSurfaceDataSelectResult) => data.cost_surface_id === id,
+          )
           .map(({ cost_surface_id, projects_pu_id, ...data }) => {
             const puid = projectPusMap[projects_pu_id];
             return { puid, ...data };
