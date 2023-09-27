@@ -7,6 +7,7 @@ import Icon from 'components/icon';
 import { LegendItemType } from 'components/map/legend/types';
 import { CostSurface } from 'types/api/cost-surface';
 import { Feature } from 'types/api/feature';
+import { Scenario } from 'types/api/scenario';
 import { WDPA } from 'types/api/wdpa';
 
 import HEXAGON_SVG from 'svgs/map/hexagon.svg?sprite';
@@ -530,8 +531,12 @@ export const LEGEND_LAYERS = {
     },
     onChangeVisibility: options?.onChangeVisibility,
   }),
-  compare: (options) => {
-    const { scenario1, scenario2 } = options;
+  compare: (options: {
+    scenario1: Scenario;
+    scenario2: Scenario;
+    onChangeVisibility: () => void;
+  }) => {
+    const { scenario1, scenario2, onChangeVisibility } = options;
     const COLOR_NUMBER = 10;
     const colors = [...Array((COLOR_NUMBER + 1) * (COLOR_NUMBER + 1)).keys()];
 
@@ -554,12 +559,13 @@ export const LEGEND_LAYERS = {
 
     return {
       id: 'compare',
-      name: 'Solutions distribution',
+      // name: 'Solutions distribution',
       type: 'matrix' as LegendItemType,
       settingsManager: {
         opacity: true,
         visibility: true,
       },
+      onChangeVisibility,
       intersections: ramp.map((c, i) => ({ id: i, color: c })).reverse(),
       items: [
         {
