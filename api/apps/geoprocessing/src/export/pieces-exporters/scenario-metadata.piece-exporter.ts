@@ -67,6 +67,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
         'status',
         'ran_at_least_once',
         'solutions_are_locked',
+        'cost_surface_id',
       ])
       .from('scenarios', 's')
       .where('s.id = :scenarioId', { scenarioId })

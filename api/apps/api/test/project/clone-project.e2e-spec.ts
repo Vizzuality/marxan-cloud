@@ -121,9 +121,9 @@ export const getFixtures = async () => {
   };
 
   const completeSchedueleImportPieces = async () => {
-    commandBus.subscribe((command) => {
+    commandBus.subscribe(async (command) => {
       if (command instanceof SchedulePieceImport) {
-        commandBus.execute(
+        await commandBus.execute(
           new CompleteImportPiece(command.importId, command.componentId),
         );
       }
@@ -159,7 +159,7 @@ export const getFixtures = async () => {
       organizationId = result.organizationId;
     },
     GivenCloneWasRequested: async () => {
-      completeSchedueleImportPieces();
+      await completeSchedueleImportPieces();
 
       const response = await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/clone`)
