@@ -8,6 +8,7 @@ import { projectNotEditable } from '@marxan-api/modules/projects/projects.servic
 import { UploadCostSurfaceShapefileDto } from '@marxan-api/modules/cost-surface/dto/upload-cost-surface-shapefile.dto';
 import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
 import { CostSurfaceCalculationPort } from '@marxan-api/modules/cost-surface/ports/project/cost-surface-calculation.port';
+import { forbiddenError } from '@marxan-api/modules/access-control';
 
 export const costSurfaceNotEditableWithinProject = Symbol(
   `cost surface not editable within project`,
@@ -20,6 +21,11 @@ export const costSurfaceNotFoundForProject = Symbol(
 export const costSurfaceNameAlreadyExistsForProject = Symbol(
   `cost surface already exists for project`,
 );
+
+export interface CostRange {
+  min: number;
+  max: number;
+}
 
 @Injectable()
 export class CostSurfaceService {
@@ -133,6 +139,35 @@ export class CostSurfaceService {
     costSurface = await this.costSurfaceRepository.save(costSurface);
 
     return right(costSurface);
+  }
+
+  async getCostSurfaceRange(
+    costSurfaceId: string,
+    projectId: string,
+    userId: string,
+  ): Promise<
+    Either<
+      typeof costSurfaceNotFoundForProject | typeof projectNotEditable,
+      CostRange
+    >
+  > {
+    if (
+      !(await this.projectAclService.canEditCostSurfaceInProject(
+        userId,
+        projectId,
+      ))
+    ) {
+      return left(projectNotEditable);
+    }
+    const costRange = await this.costSurfaceRepository.findOne({
+      select: ['min', 'max'],
+      where: { id: costSurfaceId, projectId },
+    });
+    if (costRange) {
+      return right({ min: costRange.min, max: costRange.max });
+    } else {
+      return left(costSurfaceNotFoundForProject);
+    }
   }
 
   static defaultCostSurfaceName(): string {

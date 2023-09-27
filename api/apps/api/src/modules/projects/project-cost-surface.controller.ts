@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   forwardRef,
   Get,
   Inject,
@@ -131,23 +132,35 @@ export class ProjectCostSurfaceController {
 
   @ImplementsAcl()
   @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: 'costSurfaceId',
+    description: 'The id of the Cost Surface to be updated',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'The id of the Project that the Cost Surface is associated to',
+  })
   @Get(`:projectId/cost-surface/:costSurfaceId/cost-range`)
   @ApiOkResponse({ type: CostRangeDto })
   async getCostRange(
-    @Param('projectId') scenarioId: string,
+    @Param('projectId') projectId: string,
+    @Param('costSurfaceId') costSurfaceId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<CostRangeDto> {
-    const result = await this.scenarioService.getCostRange(
-      scenarioId,
+    const result = await this.costSurfaceService.getCostSurfaceRange(
+      costSurfaceId,
+      projectId,
       req.user.id,
     );
+
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
-        scenarioId,
+        projectId,
+        costSurfaceId,
         userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
       });
     }
+
     return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
   }
 }

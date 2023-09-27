@@ -8,6 +8,11 @@ describe('Cost Surface', () => {
   beforeEach(async () => {
     fixtures = await getProjectCostSurfaceFixtures();
   });
+
+  afterEach(async () => {
+    await fixtures.cleanup();
+  });
+
   describe('Default Cost Surface', () => {
     it(`should create a default Cost Surface`, async () => {
       const { projectId } = await fixtures.WhenCreatingAProject(
@@ -132,6 +137,26 @@ describe('Cost Surface', () => {
         costSurface2.id,
       );
       await fixtures.ThenCostSurfaceAPIEntityWasNotUpdated(costSurface2);
+    });
+  });
+
+  describe('Get Cost Surface Range', () => {
+    it(`should return the range of the cost surface`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const costSurface = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId,
+        'costSurfaceName',
+      );
+
+      // ACT
+      const response = await fixtures.WhenGettingCostSurfaceRange(
+        costSurface.id,
+        projectId,
+      );
+
+      // ASSERT
+      await fixtures.ThenCostSurfaceRangeWasReturned(response);
     });
   });
 });

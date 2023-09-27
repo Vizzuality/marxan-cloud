@@ -151,6 +151,18 @@ export const getProjectCostSurfaceFixtures = async () => {
         .send({ name: costSurfaceName });
     },
 
+    WhenGettingCostSurfaceRange: async (
+      costSurfaceId: string,
+      projectId: string,
+    ) => {
+      return request(app.getHttpServer())
+        .get(
+          `/api/v1/projects/${projectId}/cost-surface/${costSurfaceId}/cost-range`,
+        )
+        .set('Authorization', `Bearer ${token}`)
+        .send();
+    },
+
     ThenCostSurfaceAPIEntityWasProperlySaved: async (name: string) => {
       const savedCostSurface = await costSurfaceRepo.findOne({
         where: { name },
@@ -229,6 +241,11 @@ export const getProjectCostSurfaceFixtures = async () => {
       });
 
       expect(costSurface).toBeDefined();
+    },
+
+    ThenCostSurfaceRangeWasReturned: async (response: any) => {
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body).toEqual({ min: 0, max: 0 });
     },
   };
 };
