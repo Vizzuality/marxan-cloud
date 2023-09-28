@@ -26,11 +26,11 @@ export class ProjectCostSurfaceEventsHandler
   // TODO!!! Create proper events
 
   private failEventsMapper: EventKind = {
-    event: API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1,
+    event: API_EVENT_KINDS.project__costSurface_shapefile_failed__v1alpha1,
   };
 
   private successEventsMapper: EventKind = {
-    event: API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1,
+    event: API_EVENT_KINDS.project__costSurface_shapefile_finished__v1alpha1,
   };
 
   constructor(
