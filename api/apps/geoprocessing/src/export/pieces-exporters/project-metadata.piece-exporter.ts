@@ -77,12 +77,15 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       .where('ops.project_id = :projectId', { projectId })
       .execute();
 
-    if (!outputSummary) {
-      const errorMessage = `${ProjectMetadataPieceExporter.name} - Output Summary for project with id ${projectId} does not exist.`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
+    /**
+     * Projects may not have any summary data if no scenarios have ever run.
+     * This is a normal situation: in this case, we just log this for reference.
+     */
+    if (!outputSummary?.summaryZip) {
+      const warningMessage = `${ProjectMetadataPieceExporter.name} - Output Summary for project with id ${projectId} does not exist.`;
+      this.logger.log(warningMessage);
     }
-    const summaryZip64 = outputSummary.summaryZip.toString('base64');
+    const summaryZip64 = outputSummary?.summaryZip ? outputSummary.summaryZip.toString('base64') : undefined;
 
     const [blmRange]: [
       SelectProjectBlmResult,

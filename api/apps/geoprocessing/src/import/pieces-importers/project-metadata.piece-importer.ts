@@ -178,18 +178,22 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
           .values({ id: projectId, ...projectMetadata.blmRange })
           .execute();
 
-        await em
-          .createQueryBuilder()
-          .insert()
-          .into('output_project_summaries')
-          .values({
-            project_id: projectId,
-            summary_zipped_data: Buffer.from(
-              projectMetadata.outputSummaryZip,
-              'base64',
-            ),
-          })
-          .execute();
+        if(projectMetadata?.outputSummaryZip) {
+          await em
+            .createQueryBuilder()
+            .insert()
+            .into('output_project_summaries')
+            .values({
+              project_id: projectId,
+              summary_zipped_data: Buffer.from(
+                projectMetadata.outputSummaryZip,
+                'base64',
+              ),
+            })
+            .execute();
+        } else {
+          this.logger.log(`No output summary data for project ${projectId}: the source project may not have any scenarios run yet.`);
+        }
       });
     } catch (e) {
       this.logger.error(e);
