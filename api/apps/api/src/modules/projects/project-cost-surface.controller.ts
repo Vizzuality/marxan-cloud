@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   forwardRef,
   Get,
   Inject,
