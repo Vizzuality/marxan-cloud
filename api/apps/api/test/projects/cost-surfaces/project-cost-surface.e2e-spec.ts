@@ -190,7 +190,7 @@ describe('Cost Surface', () => {
       );
 
       // ASSERT
-      await fixtures.ThenEmptyErrorWasReturned(response);
+      fixtures.ThenEmptyErrorWasReturned(response);
     });
   });
   describe('Update Cost Surface', () => {
