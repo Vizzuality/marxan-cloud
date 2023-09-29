@@ -191,8 +191,13 @@ export class Import extends AggregateRoot {
       );
     if (isThisTheLastBatch || !hasThisBatchFinished) return right(true);
 
+    const nextBatchOrder = Math.min(
+      ...this.pieces
+        .filter((piece) => piece.order > pieceToComplete.order)
+        .map((piece) => piece.order),
+    );
     const nextBatch = this.pieces.filter(
-      (piece) => piece.order === pieceToComplete.order + 1,
+      (piece) => piece.order === nextBatchOrder,
     );
 
     for (const component of nextBatch) {
