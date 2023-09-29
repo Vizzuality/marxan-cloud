@@ -422,12 +422,6 @@ export const ProjectMap = (): JSX.Element => {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
         >
-          <Loading
-            visible={!mapInteractive}
-            className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-90"
-            iconClassName="w-10 h-10 text-primary-500"
-          />
-
           <HelpBeacon
             id="project-map"
             title="Map view"
@@ -632,8 +626,8 @@ export const ProjectMap = (): JSX.Element => {
           )}
           <Loading
             visible={!mapInteractive}
-            className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-90"
-            iconClassName="w-10 h-10 text-primary-500"
+            className="absolute bottom-0 left-0 top-0 z-10 flex h-full w-full items-center justify-center bg-black/75"
+            iconClassName="w-10 h-10 text-primary-500 translate-x-[275px]"
           />
         </motion.div>
       )}
