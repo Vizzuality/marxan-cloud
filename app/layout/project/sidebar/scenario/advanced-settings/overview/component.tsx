@@ -1,8 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Form as FormRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
+
+import { useAppDispatch } from 'store/hooks';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
@@ -25,6 +28,10 @@ export const ScenariosAdvancedSettings = (): JSX.Element => {
 
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
+
+  const scenarioSlice = useMemo(() => getScenarioEditSlice(sid), [sid]);
+  const { setLayerSettings } = scenarioSlice.actions;
+  const dispatch = useAppDispatch();
 
   const editable = useCanEditScenario(pid, sid);
   const { data: scenarioData } = useScenario(sid);

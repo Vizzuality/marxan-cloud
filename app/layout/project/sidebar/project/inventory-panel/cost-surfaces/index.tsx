@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedCostSurface as setVisibleCostSurface } from 'store/slices/projects/[id]';
+import { setSelectedCostSurfaces as setVisibleCostSurface } from 'store/slices/projects/[id]';
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 

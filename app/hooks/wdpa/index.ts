@@ -23,7 +23,7 @@ export function useWDPACategories({
   const { data: session } = useSession();
 
   return useQuery(
-    ['protected-areas', adminAreaId, customAreaId],
+    ['protected-areas', adminAreaId, customAreaId, scenarioId],
     async () =>
       API.request({
         method: 'GET',

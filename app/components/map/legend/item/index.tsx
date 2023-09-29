@@ -1,6 +1,7 @@
 import React, { Children, isValidElement, ReactNode, useMemo, useState } from 'react';
 
 import { useNumberFormatter } from '@react-aria/i18n';
+import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 import Slider from 'components/forms/slider';
 import Icon from 'components/icon';
@@ -9,8 +10,6 @@ import { cn } from 'utils/cn';
 
 import OPACITY_SVG from 'svgs/map/opacity.svg?sprite';
 import DRAG_SVG from 'svgs/ui/drag.svg?sprite';
-import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
-import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 
 export interface LegendItemProps {
   id: string;
@@ -35,7 +34,7 @@ export interface LegendItemProps {
   };
   theme?: 'dark' | 'light';
   className?: string;
-  onChangeOpacity?: () => void;
+  onChangeOpacity?: (opacity: number) => void;
   onChangeVisibility?: () => void;
 }
 
@@ -63,8 +62,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
     });
     return chldn && chldn.some((c) => !!c);
   }, [children]);
-
-  const { opacity = 1, visibility = true } = settings || {};
+  const { opacity = 1, visibility = false } = settings || {};
 
   const { format } = useNumberFormatter({
     style: 'percent',
@@ -74,21 +72,20 @@ export const LegendItem: React.FC<LegendItemProps> = ({
     <div
       key={id}
       className={cn({
-        'px-5 py-2.5': !className,
+        'space-y-2.5 px-5 py-2': true,
         [className]: !!className,
       })}
     >
-      <header className="relative mb-1 flex justify-between">
+      <header className="relative flex justify-between">
         <div
           className={cn({
-            relative: true,
-            'pl-5': icon,
+            'flex items-center space-x-2': true,
           })}
         >
-          {icon && <div className="absolute left-0 top-0">{icon}</div>}
+          {icon ?? null}
           <div
             className={cn({
-              'font-heading text-sm': true,
+              'text-sm': true,
               'text-white': theme === 'dark' || !theme,
               'text-gray-800': theme === 'light',
             })}
@@ -109,7 +106,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
           </button>
         )}
 
-        <div className="flex space-x-3">
+        <div className="flex space-x-[10px]">
           {settingsManager?.opacity && (
             <div className="flex">
               <Tooltip
@@ -156,7 +153,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                       type="button"
                       className={cn({
                         'flex h-5 w-5 items-center justify-center text-white': true,
-                        'text-gray-400': opacity !== 1,
+                        'text-white': opacity,
                       })}
                     >
                       <Icon className="h-4 w-4 pt-px" icon={OPACITY_SVG} />
@@ -183,17 +180,19 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                     'text-gray-400': !visibility,
                   })}
                 >
-                  <Icon className="h-4 w-4" icon={visibility ? SHOW_SVG : HIDE_SVG} />
+                  {visibility ? (
+                    <HiEye className="h-4 w-4 text-blue-400" />
+                  ) : (
+                    <HiEyeOff className="h-4 w-4" />
+                  )}
                 </button>
               </Tooltip>
             </div>
           )}
         </div>
       </header>
-
-      <div className="text-sm text-gray-400">{description}</div>
-
-      {validChildren && <div className="mt-2.5">{children}</div>}
+      {description && <div className="text-sm text-gray-400">{description}</div>}
+      {validChildren && children}
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { ScenarioPlanningUnit } from 'hooks/scenarios/types';
 
 import { injectReducer } from 'store';
+import { CostSurface } from 'types/api/cost-surface';
 import { Solution } from 'types/api/solution';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 
@@ -22,6 +23,9 @@ interface ScenarioEditStateProps {
   selectedFeatures: string[];
   preHighlightFeatures: string[];
   postHighlightFeatures: string[];
+
+  // Cost Surface
+  selectedCostSurface: CostSurface['id'];
 
   // ADJUST PLANNING UNITS
   cache: number;
@@ -71,6 +75,8 @@ const initialState = {
   preHighlightFeatures: [],
   postHighlightFeatures: [],
 
+  selectedCostSurface: null,
+
   // ADJUST PLANNING UNITS
   cache: Date.now(),
   puAction: 'include',
@@ -90,7 +96,12 @@ const initialState = {
   selectedSolution: null,
 
   // SETTINGS
-  layerSettings: {},
+  layerSettings: {
+    pugrid: {
+      visibility: true,
+      opacity: 1,
+    },
+  },
 
   // BLM CALIBRATION
   blm: null,
@@ -136,6 +147,13 @@ export function getScenarioEditSlice(id) {
       },
       setPostHighlightFeatures: (state, action: PayloadAction<string[]>) => {
         state.postHighlightFeatures = action.payload;
+      },
+
+      setSelectedCostSurface: (
+        state,
+        action: PayloadAction<ScenarioEditStateProps['selectedCostSurface']>
+      ) => {
+        state.selectedCostSurface = action.payload;
       },
 
       // ADJUST PLANNING UNITS

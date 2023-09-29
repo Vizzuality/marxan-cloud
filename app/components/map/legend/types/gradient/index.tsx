@@ -32,7 +32,7 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
     >
       <div
         className={cn({
-          'flex h-2 w-full': true,
+          'flex h-2 w-full rounded-[37px]': true,
           [className?.bar]: className?.bar,
         })}
         style={{

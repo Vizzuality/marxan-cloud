@@ -62,7 +62,7 @@ export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element =>
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
         features: layerSettings.features,
-        cost: layerSettings.cost,
+        'cost-surface': layerSettings['cost'],
         'lock-in': layerSettings['lock-in'],
         'lock-out': layerSettings['lock-out'],
         'lock-available': layerSettings['lock-available'],

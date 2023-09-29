@@ -18,6 +18,7 @@ import Item from 'components/features/selected-item';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
 import { ScrollArea } from 'components/scroll-area';
+import { Feature } from 'types/api/feature';
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
@@ -30,11 +31,11 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
   const [intersecting, setIntersecting] = useState(null);
   const [deleteFeature, setDeleteFeature] = useState(null);
 
-  const { push, query } = useRouter();
+  const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setFeatures, setSubTab, setSelectedFeatures } = scenarioSlice.actions;
+  const { setFeatures, setLayerSettings, setSelectedFeatures } = scenarioSlice.actions;
   const { selectedFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const dispatch = useDispatch();
@@ -239,17 +240,31 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
   }, [onContinue]);
 
   const toggleSeeOnMap = useCallback(
-    (id) => {
+    (id: Feature['id']) => {
       const newSelectedFeatures = [...selectedFeatures];
-      if (!newSelectedFeatures.includes(id)) {
+      const isIncluded = newSelectedFeatures.includes(id);
+      if (!isIncluded) {
         newSelectedFeatures.push(id);
       } else {
         const i = newSelectedFeatures.indexOf(id);
         newSelectedFeatures.splice(i, 1);
       }
       dispatch(setSelectedFeatures(newSelectedFeatures));
+
+      const selectedFeature = selectedFeaturesData.find(({ featureId }) => featureId === id);
+      const { color } = selectedFeature || {};
+
+      dispatch(
+        setLayerSettings({
+          id,
+          settings: {
+            visibility: !isIncluded,
+            color,
+          },
+        })
+      );
     },
-    [dispatch, setSelectedFeatures, selectedFeatures]
+    [dispatch, setSelectedFeatures, setLayerSettings, selectedFeatures, selectedFeaturesData]
   );
 
   const isShown = useCallback(

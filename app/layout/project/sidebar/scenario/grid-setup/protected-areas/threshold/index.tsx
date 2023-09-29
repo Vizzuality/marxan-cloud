@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
 
+// import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useCanEditScenario } from 'hooks/permissions';
@@ -34,11 +35,11 @@ export const WDPAThreshold = ({ onGoBack }): JSX.Element => {
   const { push, query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
-  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { wdpaCategories } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setWDPAThreshold } = scenarioSlice.actions;
-  const dispatch = useDispatch();
+  const scenarioSlice = useMemo(() => getScenarioEditSlice(sid), [sid]);
+  const { setWDPAThreshold, setLayerSettings } = scenarioSlice.actions;
+  const dispatch = useAppDispatch();
 
   const { data: projectData } = useProject(pid);
   const editable = useCanEditScenario(pid, sid);
@@ -120,12 +121,6 @@ export const WDPAThreshold = ({ onGoBack }): JSX.Element => {
   const areGlobalPAreasSelected = !!globalPAreasSelectedIds.length;
   const areProjectPAreasSelected = !!projectPAreasSelectedIds.length;
 
-  useEffect(() => {
-    dispatch(
-      setWDPAThreshold(scenarioData?.wdpaThreshold ? scenarioData.wdpaThreshold / 100 : 0.75)
-    );
-  }, [scenarioData]); //eslint-disable-line
-
   const handleSubmit = useCallback(
     (values) => {
       setSubmitting(true);
@@ -172,12 +167,23 @@ export const WDPAThreshold = ({ onGoBack }): JSX.Element => {
         }
       );
     },
-    [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast]
+    [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast, pid, push]
   );
 
-  // const handleBack = useCallback(() => {
-  //   push(`/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas`);
-  // }, [push, pid, sid]);
+  useEffect(() => {
+    dispatch(
+      setWDPAThreshold(scenarioData?.wdpaThreshold ? scenarioData.wdpaThreshold / 100 : 0.75)
+    );
+  }, [dispatch, setWDPAThreshold, scenarioData]);
+
+  useEffect(() => {
+    dispatch(
+      setLayerSettings({
+        id: 'wdpa-percentage',
+        settings: { visibility: true },
+      })
+    );
+  }, [dispatch, setLayerSettings]);
 
   // Loading
   if (

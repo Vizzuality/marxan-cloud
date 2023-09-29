@@ -180,19 +180,12 @@ export const ScenarioNewMap = (): JSX.Element => {
 
       {/* Legend */}
       <div className="absolute bottom-16 right-5 w-full max-w-xs">
-        <Legend open={open} className="w-full" maxHeight={325} onChangeOpen={() => setOpen(!open)}>
+        <Legend open={open} className="max-h-[325px] w-full" onChangeOpen={() => setOpen(!open)}>
           {LEGEND.map((i) => {
             const { type, items, intersections } = i;
 
             return (
-              <LegendItem
-                sortable={false}
-                key={i.id}
-                settingsManager={i.settingsManager}
-                // onChangeOpacity={(opacity) => onChangeOpacity(opacity, id)}
-                // onChangeVisibility={() => onChangeVisibility(id)}
-                {...i}
-              >
+              <LegendItem sortable={false} key={i.id} settingsManager={i.settingsManager} {...i}>
                 {type === 'matrix' && (
                   <LegendTypeMatrix
                     className="text-sm text-white"

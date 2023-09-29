@@ -1,8 +1,11 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
+
+import { useAppDispatch } from 'store/hooks';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { format } from 'd3';
 import { motion } from 'framer-motion';
@@ -32,6 +35,10 @@ export const ScenariosBLMCalibration = (): JSX.Element => {
 
   const { addToast } = useToasts();
   const plausible = usePlausible();
+
+  const scenarioSlice = useMemo(() => getScenarioEditSlice(sid), [sid]);
+  const { setLayerSettings } = scenarioSlice.actions;
+  const dispatch = useAppDispatch();
 
   const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
   const editable = useCanEditScenario(pid, sid);
@@ -100,6 +107,15 @@ export const ScenariosBLMCalibration = (): JSX.Element => {
     blmCalibrationFrom: calibrationRange ? calibrationRange[0] : null,
     blmCalibrationTo: calibrationRange ? calibrationRange[1] : null,
   };
+
+  useEffect(() => {
+    dispatch(
+      setLayerSettings({
+        id: 'wdpa-percentage',
+        settings: { visibility: true },
+      })
+    );
+  }, [dispatch, setLayerSettings]);
 
   return (
     <motion.div

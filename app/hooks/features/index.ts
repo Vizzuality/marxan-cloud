@@ -9,11 +9,14 @@ import {
 } from 'react-query';
 
 import { AxiosRequestConfig } from 'axios';
+import chroma from 'chroma-js';
 import Fuse from 'fuse.js';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
 import partition from 'lodash/partition';
 import { useSession } from 'next-auth/react';
+
+import { COLORS } from 'hooks/map/constants';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
@@ -227,7 +230,7 @@ export function useSelectedFeatures(
     select: ({ data }) => {
       const { features = [] } = data;
 
-      let parsedData = features.map((d) => {
+      let parsedData = features.map((d, index) => {
         const { featureId, geoprocessingOperations, metadata } = d;
 
         const {
@@ -293,12 +296,18 @@ export function useSelectedFeatures(
           );
         }
 
+        const color =
+          features.length > COLORS['features-preview'].ramp.length
+            ? chroma.scale(COLORS['features-preview'].ramp).colors(features.length)[index]
+            : COLORS['features-preview'].ramp[index];
+
         return {
           ...d,
           id: featureId,
           name: alias || featureClassName,
           type: tag,
           description,
+          color,
 
           // SPLIT
           splitOptions,

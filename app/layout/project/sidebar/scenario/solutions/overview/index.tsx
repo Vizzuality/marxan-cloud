@@ -1,9 +1,8 @@
-import React, { useCallback, useState } from 'react';
-
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
@@ -31,14 +30,14 @@ export const SolutionsOverview = (): JSX.Element => {
   const [showTable, setShowTable] = useState<boolean>(false);
   const { addToast } = useToasts();
 
-  const scenarioSlice = getScenarioEditSlice(sid);
+  const scenarioSlice = useMemo(() => getScenarioEditSlice(sid), [sid]);
   const { setLayerSettings } = scenarioSlice.actions;
 
-  const { selectedSolution, layerSettings } = useSelector(
+  const { selectedSolution, layerSettings } = useAppSelector(
     (state) => state[`/scenarios/${sid}/edit`]
   );
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { data: projectData } = useProject(pid);
 
@@ -134,6 +133,21 @@ export const SolutionsOverview = (): JSX.Element => {
     },
     [dispatch, setLayerSettings, layerSettings]
   );
+
+  useEffect(() => {
+    dispatch(
+      setLayerSettings({
+        id: 'solution',
+        settings: { visibility: true },
+      })
+    );
+    dispatch(
+      setLayerSettings({
+        id: 'frequency',
+        settings: { visibility: true },
+      })
+    );
+  }, [dispatch, setLayerSettings]);
 
   return (
     <motion.div

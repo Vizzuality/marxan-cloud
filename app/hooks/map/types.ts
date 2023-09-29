@@ -3,6 +3,7 @@ import { PUAction } from 'store/slices/scenarios/types';
 import { TargetSPFItemProps } from 'components/features/target-spf-item/types';
 import { Feature } from 'types/api/feature';
 import { Scenario } from 'types/api/scenario';
+import { WDPA } from 'types/api/wdpa';
 
 export interface UseGeoJSONLayer {
   cache?: number;
@@ -64,7 +65,7 @@ export interface UseWDPAPreviewLayer {
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
-  wdpaIucnCategories?: string[];
+  WDPACategories?: WDPA['id'][];
   options?: Record<string, unknown>;
 }
 
@@ -89,8 +90,7 @@ export interface UseFeaturePreviewLayers {
     featuresRecipe?: Record<string, any>[];
     featureHoverId?: string;
     selectedFeatures?: Array<string>;
-    opacity?: number;
-    visibility?: boolean;
+    layerSettings?: Record<string, { opacity?: number; visibility?: boolean; color: string }>;
   };
 }
 export interface UseTargetedPreviewLayers {
@@ -142,11 +142,7 @@ export interface UsePUGridLayer {
         opacity?: number;
         visibility?: boolean;
       };
-      'features-highlight'?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      cost?: {
+      'cost-surface'?: {
         opacity?: number;
         visibility?: boolean;
       };
@@ -167,6 +163,10 @@ export interface UsePUGridLayer {
         visibility?: boolean;
       };
       solution?: {
+        opacity?: number;
+        visibility?: boolean;
+      };
+      [key: string]: {
         opacity?: number;
         visibility?: boolean;
       };
