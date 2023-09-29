@@ -8,9 +8,11 @@ import chroma from 'chroma-js';
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useAllFeatures } from 'hooks/features';
 import { COLORS, LEGEND_LAYERS } from 'hooks/map/constants';
+import { useScenario } from 'hooks/scenarios';
 import { useProjectWDPAs } from 'hooks/wdpa';
 
 import { Feature } from 'types/api/feature';
+import { Scenario } from 'types/api/scenario';
 import { WDPA } from 'types/api/wdpa';
 
 export const usePlanningGridLegend = () => {
@@ -203,12 +205,62 @@ export const useFeaturesLegend = () => {
   });
 };
 
-export const useInventoryLegend = () => {
+export const useComparisonScenariosLegend = ({
+  comparisonSettings = {},
+}: {
+  comparisonSettings: Parameters<typeof useInventoryLegend>[0]['comparisonSettings'];
+}) => {
+  const { layerSettings } = useAppSelector((state) => state['/projects/[id]']);
+  const dispatch = useAppDispatch();
+
+  const scenenario1Query = useScenario(comparisonSettings.sid1);
+  const scenenario2Query = useScenario(comparisonSettings.sid2);
+
+  if (Object.keys(comparisonSettings).length === 0) return [];
+
+  return LEGEND_LAYERS['compare']({
+    scenario1: scenenario1Query.data,
+    scenario2: scenenario2Query.data,
+    onChangeVisibility: () => {
+      dispatch(
+        setLayerSettings({
+          id: 'compare',
+          settings: {
+            visibility: !layerSettings['compare']?.visibility,
+          },
+        })
+      );
+    },
+  });
+};
+
+export const useInventoryLegend = ({
+  isComparisonEnabled = false,
+  comparisonSettings = {},
+}: {
+  isComparisonEnabled?: boolean;
+  comparisonSettings?: Partial<{
+    sid1: Scenario['id'];
+    sid2: Scenario['id'];
+  }>;
+}) => {
+  const comparisonItems = useComparisonScenariosLegend({
+    comparisonSettings,
+  });
+
   return [
     {
       name: 'Planning Grid',
       layers: [usePlanningGridLegend()],
       subgroups: [
+        ...(isComparisonEnabled
+          ? [
+              {
+                name: 'Solutions distribution',
+                layers: [comparisonItems],
+              },
+            ]
+          : []),
         {
           name: 'Cost Surface',
           layers: useCostSurfaceLegend(),

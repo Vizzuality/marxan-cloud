@@ -1,4 +1,4 @@
-import React, { ComponentProps, useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { ComponentProps, useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -10,6 +10,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import pick from 'lodash/pick';
 import { FiLayers } from 'react-icons/fi';
+import { HiOutlinePrinter } from 'react-icons/hi';
 
 import { useAccessToken } from 'hooks/auth';
 import { useAllFeatures } from 'hooks/features';
@@ -27,7 +28,6 @@ import { useToasts } from 'hooks/toast';
 import { useProjectWDPAs } from 'hooks/wdpa';
 
 import Select from 'components/forms/select';
-import Icon from 'components/icon/component';
 import Loading from 'components/loading';
 import Map from 'components/map';
 import Controls from 'components/map/controls';
@@ -48,8 +48,6 @@ import { MapProps } from 'types/map';
 import { cn } from 'utils/cn';
 import { centerMap } from 'utils/map';
 
-import PRINT_SVG from 'svgs/ui/print.svg?sprite';
-
 import { useInventoryLegend } from './legend/hooks';
 
 const minZoom = 2;
@@ -65,7 +63,6 @@ export const ProjectMap = (): JSX.Element => {
     selectedFeatures: selectedFeaturesIds,
     selectedCostSurface,
   } = useAppSelector((state) => state['/projects/[id]']);
-  const legendConfig = useInventoryLegend();
 
   const accessToken = useAccessToken();
 
@@ -86,6 +83,16 @@ export const ProjectMap = (): JSX.Element => {
 
   const BBOX = useBBOX({
     bbox,
+  });
+
+  const isComparisonEnabled = Boolean(!tab && sid1 && sid2);
+
+  const legendConfig = useInventoryLegend({
+    isComparisonEnabled,
+    comparisonSettings: {
+      sid1,
+      sid2,
+    },
   });
 
   const allFeaturesQuery = useAllFeatures(pid);
@@ -145,7 +152,7 @@ export const ProjectMap = (): JSX.Element => {
   });
 
   const PUCompareLayer = usePUCompareLayer({
-    active: !!sid1 && !!sid2,
+    active: isComparisonEnabled,
     sid: sid1,
     sid2,
     options: {
@@ -183,22 +190,6 @@ export const ProjectMap = (): JSX.Element => {
       });
   }, [selectedFeaturesIds, selectedFeaturesData]);
 
-  // const allProjectCostSurfacesQuery = useProjectCostSurfaces(
-  //   pid,
-  //   {},
-  //   {
-  //     select: (data) =>
-  //       data
-  //         ?.map((cs) => ({
-  //           id: cs.id,
-  //           name: cs.name,
-  //         }))
-  //         .find((cs) => selectedCostSurfaceIds.includes(cs.id)),
-  //     keepPreviousData: true,
-  //     placeholderData: [],
-  //   }
-  // );
-
   const LAYERS = [
     PUGridLayer,
     PUCompareLayer,
@@ -206,25 +197,6 @@ export const ProjectMap = (): JSX.Element => {
     WDPAsPreviewLayers,
     ...FeaturePreviewLayers,
   ].filter((l) => !!l);
-
-  // const LEGEND = useLegend({
-  //   layers: [
-  //     ...(!!selectedFeaturesData?.length ? ['features-preview'] : []),
-  //     ...(!!selectedCostSurfaceIds ? ['cost'] : []),
-  //     ...(!!selectedWDPAsIds?.length ? ['wdpa-preview'] : []),
-  //     ...(!!sid1 && !sid2 ? ['frequency'] : []),
-
-  //     ...(!!sid1 && !!sid2 ? ['compare'] : []),
-  //     ...(rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2
-  //       ? ['pugrid']
-  //       : []),
-  //   ],
-  //   options: {
-  //     layerSettings,
-  //     cost: { name: allProjectCostSurfacesQuery.data?.name, min: 1, max: 100 },
-  //     items: selectedPreviewFeatures,
-  //   },
-  // });
 
   const SCENARIOS_RUNNED = useMemo(() => {
     const status = rawScenariosData
@@ -340,6 +312,7 @@ export const ProjectMap = (): JSX.Element => {
               rawScenariosData.find((sc) => sc.id === s),
               ['id', 'name']
             ),
+            visibility: true,
           },
         })
       );
@@ -358,19 +331,6 @@ export const ProjectMap = (): JSX.Element => {
     },
     [dispatch]
   );
-
-  // const onChangeVisibility = useCallback(
-  //   (lid: string) => {
-  //     const { visibility = true } = layerSettings[lid] || {};
-  //     dispatch(
-  //       setLayerSettings({
-  //         id: lid,
-  //         settings: { visibility: !visibility },
-  //       })
-  //     );
-  //   },
-  //   [dispatch, layerSettings]
-  // );
 
   const downloadScenarioComparisonReportMutation = useDownloadScenarioComparisonReport({
     projectId: pid,
@@ -545,32 +505,34 @@ export const ProjectMap = (): JSX.Element => {
               onFitBoundsChange={handleFitBoundsChange}
             />
           </Controls>
-          {/* Print */}
-          {!tab && sid1 && sid2 && (
-            <button
-              className="absolute bottom-32 right-5 flex h-14 w-14 items-center justify-center rounded-full bg-black"
-              onClick={onDownloadReport}
-            >
-              <Icon icon={PRINT_SVG} className="h-5 w-5 text-white" />
-            </button>
-          )}
           {/* Legend */}
           <div className="absolute bottom-16 right-5 flex w-full max-w-xs flex-col items-end space-y-2">
-            <button
-              type="button"
-              onClick={() => setOpen(!open)}
-              className={cn({
-                'rounded-full bg-gray-800 p-5 shadow-xl': true,
-                'bg-blue-400': open,
-              })}
-            >
-              <FiLayers
+            <div className="flex flex-col space-y-2">
+              {/* Print */}
+              {isComparisonEnabled && (
+                <button
+                  className="rounded-full bg-gray-800 p-5 shadow-xl"
+                  onClick={onDownloadReport}
+                >
+                  <HiOutlinePrinter className="h-6 w-6 text-white" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setOpen(!open)}
                 className={cn({
-                  'h-6 w-6 text-white': true,
-                  'text-gray-700': open,
+                  'rounded-full bg-gray-800 p-5 shadow-xl': true,
+                  'bg-blue-400': open,
                 })}
-              />
-            </button>
+              >
+                <FiLayers
+                  className={cn({
+                    'h-6 w-6 text-white': true,
+                    'text-gray-700': open,
+                  })}
+                />
+              </button>
+            </div>
             <Legend
               open={open}
               className="max-h-[50svh] w-full"
@@ -662,6 +624,7 @@ export const ProjectMap = (): JSX.Element => {
                   clearSelectionActive
                   options={SCENARIOS_RUNNED.sid2Options}
                   selected={sid2}
+                  disabled={!sid1}
                   onChange={onChangeScenario2}
                 />
               </div>
