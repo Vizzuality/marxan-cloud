@@ -23,6 +23,7 @@ export class ScheduleCleanupForProjectUnusedResourcesHandler
     scenarioIds,
   }: ScheduleCleanupForProjectUnusedResources): Promise<void> {
     const job = await this.queue.add(`project-unused-resources-cleanup`, {
+      type: 'Project',
       projectId,
       projectCustomFeaturesIds,
       scenarioIds,

@@ -1,19 +1,19 @@
 import {
-  isUnusedScenarioResourcesCleanupJobInput,
   UnusedProjectResourcesCleanupJobInput,
   UnusedResourcesCleanupJobInput,
   UnusedResourcesCleanupJobOutput,
-  UnusedScenarioResourcesCleanupJobInput,
 } from '@marxan/unused-resources-cleanup';
 import { Injectable } from '@nestjs/common';
 import { ProjectUnusedResources } from './delete-unused-resources/project-unused-resources';
 import { ScenarioUnusedResources } from './delete-unused-resources/scenario-unused-resources';
+import { CostSurfaceUnusedResources } from '@marxan-geoprocessing/modules/unused-resources-cleanup/delete-unused-resources/cost-surface-unused-resources';
 
 @Injectable()
 export class UnusedResourcesCleanupProcessor {
   constructor(
     private readonly projectUnusedResources: ProjectUnusedResources,
     private readonly scenarioUnusedResources: ScenarioUnusedResources,
+    private readonly costSurfaceUnusedResources: CostSurfaceUnusedResources,
   ) {}
 
   private async cleanProjectAndScenariosResources({
@@ -21,16 +21,13 @@ export class UnusedResourcesCleanupProcessor {
     scenarioIds,
     projectCustomFeaturesIds,
   }: UnusedProjectResourcesCleanupJobInput) {
-    if (scenarioIds.length === 0)
-      return this.projectUnusedResources.removeUnusedResources(projectId, {
-        projectCustomFeaturesIds,
-      });
-
-    await Promise.all(
-      scenarioIds.map((scenarioId) =>
-        this.scenarioUnusedResources.removeUnusedResources(scenarioId),
-      ),
-    );
+    if (scenarioIds.length > 0) {
+      await Promise.all(
+        scenarioIds.map((scenarioId) =>
+          this.scenarioUnusedResources.removeUnusedResources(scenarioId),
+        ),
+      );
+    }
 
     return this.projectUnusedResources.removeUnusedResources(projectId, {
       projectCustomFeaturesIds,
@@ -40,18 +37,17 @@ export class UnusedResourcesCleanupProcessor {
   async run(
     input: UnusedResourcesCleanupJobInput,
   ): Promise<UnusedResourcesCleanupJobOutput> {
-    const isScenarioCleanUp = isUnusedScenarioResourcesCleanupJobInput(input);
-
-    if (isScenarioCleanUp) {
+    if (input.type === 'Scenario') {
       await this.scenarioUnusedResources.removeUnusedResources(
-        (input as UnusedScenarioResourcesCleanupJobInput).scenarioId,
+        input.scenarioId,
       );
-      return input;
+    } else if (input.type === 'Project') {
+      await this.cleanProjectAndScenariosResources(input);
+    } else if (input.type === 'Cost Surface') {
+      await this.costSurfaceUnusedResources.removeUnusedResources(
+        input.costSurfaceId,
+      );
     }
-
-    await this.cleanProjectAndScenariosResources(
-      input as UnusedProjectResourcesCleanupJobInput,
-    );
 
     return input;
   }

@@ -58,3 +58,30 @@ describe('Upload Cost Surface Shapefile', () => {
     await fixtures.ThenCostSurfaceAPIEntityWasNotUpdated(costSurface);
   });
 });
+
+describe('Delete Cost Surface', () => {
+  beforeEach(async () => {
+    fixtures = await getProjectCostSurfaceFixtures();
+  });
+
+  it(`should not Delete CostSurface API entity if the user doesn't have permissions to edit the project`, async () => {
+    // ARRANGE
+    const projectId = await fixtures.GivenProject('someProject', [
+      ProjectRoles.project_viewer,
+    ]);
+    const costSurface = await fixtures.GivenCostSurfaceMetadataForProject(
+      projectId,
+      'something',
+    );
+
+    // ACT
+    const response = await fixtures.WhenDeletingCostSurface(
+      projectId,
+      costSurface.id,
+    );
+
+    // ASSERT
+    await fixtures.ThenProjectNotEditableErrorWasReturned(response, projectId);
+    await fixtures.ThenCostSurfaceWasNotDeleted(costSurface.id);
+  });
+});
