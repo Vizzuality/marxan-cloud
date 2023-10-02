@@ -61,6 +61,9 @@ export const getProjectCostSurfaceFixtures = async () => {
   const projectsRepo: Repository<Project> = app.get(
     getRepositoryToken(Project),
   );
+  const scenarioRepo: Repository<Scenario> = app.get(
+    getRepositoryToken(Scenario),
+  );
   const projectsPuRepo: Repository<ProjectsPuEntity> = app.get(
     getRepositoryToken(ProjectsPuEntity, DbConnections.geoprocessingDB),
   );
