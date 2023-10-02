@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   forwardRef,
   Get,
   Inject,
@@ -127,6 +128,38 @@ export class ProjectCostSurfaceController {
     }
 
     return this.costSurfaceSeralizer.serialize(result.right);
+  }
+
+  @ImplementsAcl()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ description: 'Delete CostSurface' })
+  @ApiOkResponse()
+  @ApiParam({
+    name: 'costSurfaceId',
+    description: 'The id of the Cost Surface to be deleted',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'The id of the Project that the Cost Surface is associated to',
+  })
+  @Delete(`:projectId/cost-surface/:costSurfaceId`)
+  async deleteCostSurface(
+    @Param('projectId') projectId: string,
+    @Param('costSurfaceId') costSurfaceId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.costSurfaceService.deleteCostSurface(
+      req.user.id,
+      projectId,
+      costSurfaceId,
+    );
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        projectId,
+        costSurfaceId,
+        userId: req.user.id,
+      });
+    }
   }
 
   @ImplementsAcl()

@@ -22,6 +22,7 @@ export class ScheduleCleanupForScenarioUnusedResourcesHandler
     scenarioId,
   }: ScheduleCleanupForScenarioUnusedResources): Promise<void> {
     const job = await this.queue.add(`scenario-unused-resources-cleanup`, {
+      type: 'Scenario',
       scenarioId,
     });
 
