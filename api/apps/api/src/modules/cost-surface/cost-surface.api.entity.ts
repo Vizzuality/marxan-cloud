@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
@@ -73,6 +73,9 @@ export class CostSurface {
   @ApiProperty()
   @OneToMany(() => Scenario, (scenario) => scenario.costSurface, {})
   scenarios!: Scenario[];
+
+  @ApiPropertyOptional()
+  scenarioUsageCount?: number;
 }
 
 export class JSONAPICostSurface {
