@@ -133,7 +133,7 @@ export class ProjectCostSurfaceController {
   @UseGuards(JwtAuthGuard)
   @ApiParam({
     name: 'costSurfaceId',
-    description: 'The id of the Cost Surface to be updated',
+    description: 'The id of the Cost Surface for which to retrieve [min,max] cost range',
   })
   @ApiParam({
     name: 'projectId',
