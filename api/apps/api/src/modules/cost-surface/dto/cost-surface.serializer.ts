@@ -20,8 +20,14 @@ export class CostSurfaceSerializer {
         'isDefault',
         'createdAt',
         'lastModifiedAt',
+        'scenarios',
+        'scenarioUsageCount',
       ],
       keyForAttribute: 'camelCase',
+      scenarios: {
+        ref: 'id',
+        attributes: ['id', 'name'],
+      },
       project: {
         ref: 'id',
         attributes: [
