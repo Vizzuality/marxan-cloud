@@ -32,8 +32,8 @@ const THEME: ToastTheme = {
   },
   error: {
     icon: ERROR_SVG,
-    bg: 'from-red-1000 to-red-800',
-    hoverBg: 'from-red-200 to-red-1000',
+    bg: 'from-red-500 to-red-800',
+    hoverBg: 'from-red-200 to-red-900',
   },
 };
 

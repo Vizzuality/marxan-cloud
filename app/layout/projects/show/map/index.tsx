@@ -417,7 +417,7 @@ export const ProjectMap = (): JSX.Element => {
       {id && (
         <motion.div
           key="project-map"
-          className="relative col-span-5 h-full w-full overflow-hidden"
+          className="relative h-full w-full overflow-hidden"
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
