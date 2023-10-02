@@ -41,12 +41,14 @@ describe(ProjectMetadataPieceExporter, () => {
       .ThenAProjectExistErrorShouldBeThrown();
   });
 
-  it('fails when project output summary is not found', async () => {
-    await fixtures.GivenProjectExist(ProjectSourcesEnum.marxanCloud);
+  it('saves file successfully even when project output summary was never created yet', async () => {
+    const marxanSource = ProjectSourcesEnum.marxanCloud;
     const input = fixtures.GivenAProjectMetadataExportJob();
+    await fixtures.GivenProjectExist(marxanSource);
+    await fixtures.GivenProjectBlmRangeExists();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenAnOtuputSummaryExistErrorShouldBeThrown();
+      .ThenProjectMetadataFileIsSaved(marxanSource);
   });
 
   it('fails when project blm range is not found', async () => {
@@ -62,7 +64,7 @@ describe(ProjectMetadataPieceExporter, () => {
     const marxanSource = ProjectSourcesEnum.marxanCloud;
     const input = fixtures.GivenAProjectMetadataExportJob();
     await fixtures.GivenProjectExist(marxanSource);
-    await fixtures.GivenProjectBlmRangeExist();
+    await fixtures.GivenProjectBlmRangeExists();
     await fixtures.GivenOutputProjectSummaryExists();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
@@ -73,7 +75,7 @@ describe(ProjectMetadataPieceExporter, () => {
     const legacySource = ProjectSourcesEnum.legacyImport;
     const input = fixtures.GivenAProjectMetadataExportJob();
     await fixtures.GivenProjectExist(legacySource);
-    await fixtures.GivenProjectBlmRangeExist();
+    await fixtures.GivenProjectBlmRangeExists();
     await fixtures.GivenOutputProjectSummaryExists();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
@@ -116,18 +118,27 @@ const getFixtures = async () => {
 
   const expectedContent: (
     sources: ProjectSourcesEnum,
-  ) => ProjectMetadataContent = (sources: ProjectSourcesEnum) => ({
-    name: `test project - ${projectId}`,
-    planningUnitGridShape: PlanningUnitGridShape.Square,
-    blmRange: {
-      defaults: [0, 20, 40, 60, 80, 100],
-      range: [0, 100],
-      values: [],
-    },
-    outputSummaryZip: summaryZipEncoded,
-    metadata,
-    sources,
-  });
+    options?: { withProjectSummary?: boolean },
+  ) => ProjectMetadataContent = (
+    sources: ProjectSourcesEnum,
+    options?: { withProjectSummary?: boolean },
+  ) => {
+    const expected: ProjectMetadataContent = {
+      name: `test project - ${projectId}`,
+      planningUnitGridShape: PlanningUnitGridShape.Square,
+      blmRange: {
+        defaults: [0, 20, 40, 60, 80, 100],
+        range: [0, 100],
+        values: [],
+      },
+      metadata,
+      sources,
+    };
+    if (options?.withProjectSummary) {
+      expected.outputSummaryZip = summaryZipEncoded;
+    }
+    return expected;
+  };
 
   return {
     cleanUp: async () => {
@@ -155,7 +166,7 @@ const getFixtures = async () => {
         sources,
       });
     },
-    GivenProjectBlmRangeExist: async () => {
+    GivenProjectBlmRangeExists: async () => {
       return apiEntityManager
         .createQueryBuilder()
         .insert()
@@ -187,12 +198,10 @@ const getFixtures = async () => {
         ThenAProjectBlmExistErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(/blm.*does not exist/gi);
         },
-        ThenAnOtuputSummaryExistErrorShouldBeThrown: async () => {
-          await expect(sut.run(input)).rejects.toThrow(
-            /Output Summary.*does not exist/gi,
-          );
-        },
-        ThenProjectMetadataFileIsSaved: async (sources: ProjectSourcesEnum) => {
+        ThenProjectMetadataFileIsSaved: async (
+          sources: ProjectSourcesEnum,
+          options?: { withProjectSummary?: boolean },
+        ) => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
@@ -201,7 +210,11 @@ const getFixtures = async () => {
           const content = await readSavedFile<ProjectMetadataContent>(
             savedStrem,
           );
-          expect(content).toMatchObject(expectedContent(sources));
+          expect(content).toMatchObject(
+            expectedContent(sources, {
+              withProjectSummary: options?.withProjectSummary,
+            }),
+          );
         },
       };
     },
