@@ -164,6 +164,16 @@ export const getProjectCostSurfaceFixtures = async () => {
       return __dirname + `/../upload-feature/import-files/wetlands.zip`;
     },
 
+    WhenGettingCostSurfacesForProject: async (projectId: string) => {
+      return request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/cost-surface`)
+        .set('Authorization', `Bearer ${token}`);
+    },
+    WhenGettingCostSurfaceForProject: async (projectId: string, id: string) => {
+      return request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/cost-surface/${id}`)
+        .set('Authorization', `Bearer ${token}`);
+    },
     WhenUploadingCostSurfaceShapefileForProject: async (
       projectId: string,
       costSurfaceName: string,
@@ -204,6 +214,50 @@ export const getProjectCostSurfaceFixtures = async () => {
       expect(savedCostSurface?.name).toEqual(name);
     },
 
+    ThenResponseHasCostSurface: async (
+      response: request.Response,
+      costSurface: CostSurface,
+    ) => {
+      const jsonAPICostSurfaces = response.body.data;
+
+      expect(costSurface.id).toEqual(jsonAPICostSurfaces.id);
+      expect(costSurface.name).toEqual(jsonAPICostSurfaces.attributes.name);
+      expect(costSurface.scenarioUsageCount).toEqual(
+        jsonAPICostSurfaces.attributes.scenarioUsageCount,
+      );
+      expect(jsonAPICostSurfaces.attributes.scenarioUsageCount).toEqual(
+        jsonAPICostSurfaces.relationships.scenarios.data.length,
+      );
+      expect(costSurface.scenarios.length).toEqual(
+        jsonAPICostSurfaces.relationships.scenarios.data.length,
+      );
+    },
+    ThenReponseHasCostSurfaceList: async (
+      response: request.Response,
+      costSurfaces: CostSurface[],
+    ) => {
+      const jsonAPICostSurfaces = response.body.data;
+      const expected = costSurfaces.sort((a, b) => b.id.localeCompare(a.id));
+      const received = jsonAPICostSurfaces.sort((a: any, b: any) =>
+        b.id.localeCompare(a.id),
+      );
+
+      expect(expected.length).toEqual(received.length);
+      for (let i = 0; i < expected.length; i++) {
+        expect(expected[i].id).toEqual(received[i].id);
+        expect(expected[i].name).toEqual(received[i].attributes.name);
+        expect(expected[i].scenarioUsageCount).toEqual(
+          received[i].attributes.scenarioUsageCount,
+        );
+        expect(received[i].attributes.scenarioUsageCount).toEqual(
+          received[i].relationships.scenarios.data.length,
+        );
+        expect(expected[i].scenarios.length).toEqual(
+          received[i].relationships.scenarios.data.length,
+        );
+      }
+    },
+
     ThenCostSurfaceAPIEntityWasProperlyUpdated: async (
       response: request.Response,
       name: string,
@@ -226,6 +280,13 @@ export const getProjectCostSurfaceFixtures = async () => {
       expect(savedCostSurface.max).toEqual(costSurface.max);
     },
 
+    ThenProjectNotViewableErrorWasReturned: (response: request.Response) => {
+      const error: any = response.body.errors[0].title;
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+      expect(error).toContain(
+        `User with ID: ${userId} is not allowed to perform this action on costSurfaces.`,
+      );
+    },
     ThenProjectNotEditableErrorWasReturned: (
       response: request.Response,
       projectId: string,

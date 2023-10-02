@@ -16,6 +16,145 @@ describe('Cost Surface', () => {
       await fixtures.ThenADefaultCostSurfaceWasCreated(projectId);
     });
   });
+  describe('Getting Cost Surfaces for Project', () => {
+    it(`should return the costSurface for the given id, along with its scenarioUsageCount`, async () => {
+      // ARRANGE
+      const projectId1 = await fixtures.GivenProject('someProject 1');
+      const projectId2 = await fixtures.GivenProject('the REAL project');
+      const default2 = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId1,
+      );
+      const costSurface11 = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId1,
+        'costSurface 1 1',
+      );
+      const costSurface21 = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId2,
+        'costSurface 2 1',
+      );
+      const costSurface22 = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId2,
+        'costSurface 2 2',
+      );
+      await fixtures.GivenScenario(projectId1, costSurface11.id);
+      await fixtures.GivenScenario(projectId1, costSurface11.id);
+      await fixtures.GivenScenario(projectId2, costSurface21.id);
+      const scenario22 = await fixtures.GivenScenario(
+        projectId2,
+        costSurface22.id,
+      );
+      const scenario23 = await fixtures.GivenScenario(
+        projectId2,
+        costSurface22.id,
+      );
+      const scenario24 = await fixtures.GivenScenario(
+        projectId2,
+        costSurface22.id,
+      );
+
+      // ACT
+      const response = await fixtures.WhenGettingCostSurfaceForProject(
+        projectId2,
+        costSurface22.id,
+      );
+
+      // ASSERT
+      await fixtures.ThenResponseHasCostSurface(response, {
+        ...costSurface22,
+        scenarioUsageCount: 3,
+        scenarios: [scenario22, scenario23, scenario24],
+      });
+    });
+
+    it(`should return all the Project's CostSurfaces along their corresponding scenarioUsageCount`, async () => {
+      // ARRANGE
+      const projectId1 = await fixtures.GivenProject('someProject 1');
+      const projectId2 = await fixtures.GivenProject('the REAL project');
+      const default1 = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId1,
+      );
+      const default2 = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId2,
+      );
+      const costSurface11 = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId1,
+        'costSurface 1 1',
+      );
+      const costSurface21 = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId2,
+        'costSurface 2 1',
+      );
+      const costSurface22 = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId2,
+        'costSurface 2 2',
+      );
+      const scenario11 = await fixtures.GivenScenario(
+        projectId1,
+        costSurface11.id,
+      );
+      const scenario12 = await fixtures.GivenScenario(
+        projectId1,
+        costSurface11.id,
+      );
+      const scenario21 = await fixtures.GivenScenario(
+        projectId2,
+        costSurface21.id,
+      );
+      const scenario22 = await fixtures.GivenScenario(
+        projectId2,
+        costSurface22.id,
+      );
+      const scenario23 = await fixtures.GivenScenario(
+        projectId2,
+        costSurface22.id,
+      );
+      const scenario24 = await fixtures.GivenScenario(
+        projectId2,
+        costSurface22.id,
+      );
+      const scenario25 = await fixtures.GivenScenario(
+        projectId2,
+        costSurface22.id,
+      );
+
+      const expectedResponse1 = [
+        { ...default1, scenarioUsageCount: 0, scenarios: [] },
+        {
+          ...costSurface11,
+          scenarioUsageCount: 2,
+          scenarios: [scenario11, scenario12],
+        },
+      ];
+
+      const expectedResponse2 = [
+        { ...default2, scenarioUsageCount: 0, scenarios: [] },
+        { ...costSurface21, scenarioUsageCount: 1, scenarios: [scenario21] },
+        {
+          ...costSurface22,
+          scenarioUsageCount: 4,
+          scenarios: [scenario22, scenario23, scenario24, scenario25],
+        },
+      ];
+
+      // ACT
+      const response1 = await fixtures.WhenGettingCostSurfacesForProject(
+        projectId1,
+      );
+      const response2 = await fixtures.WhenGettingCostSurfacesForProject(
+        projectId2,
+      );
+
+      // ASSERT
+      await fixtures.ThenReponseHasCostSurfaceList(
+        response1,
+        expectedResponse1,
+      );
+      await fixtures.ThenReponseHasCostSurfaceList(
+        response2,
+        expectedResponse2,
+      );
+    });
+  });
   describe('Upload Cost Surface Shapefile', () => {
     it(`should create CostSurface API entity with the provided name`, async () => {
       // ARRANGE
