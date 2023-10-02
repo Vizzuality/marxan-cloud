@@ -178,7 +178,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
           .values({ id: projectId, ...projectMetadata.blmRange })
           .execute();
 
-        if(projectMetadata?.outputSummaryZip) {
+        if (projectMetadata?.outputSummaryZip) {
           await em
             .createQueryBuilder()
             .insert()
@@ -192,7 +192,9 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
             })
             .execute();
         } else {
-          this.logger.log(`No output summary data for project ${projectId}: the source project may not have any scenarios run yet.`);
+          this.logger.log(
+            `No output summary data for project ${projectId}: the source project may not have any scenarios run yet.`,
+          );
         }
       });
     } catch (e) {

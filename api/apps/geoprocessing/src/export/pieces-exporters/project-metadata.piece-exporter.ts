@@ -85,7 +85,9 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       const warningMessage = `${ProjectMetadataPieceExporter.name} - Output Summary for project with id ${projectId} does not exist.`;
       this.logger.log(warningMessage);
     }
-    const summaryZip64 = outputSummary?.summaryZip ? outputSummary.summaryZip.toString('base64') : undefined;
+    const summaryZip64 = outputSummary?.summaryZip
+      ? outputSummary.summaryZip.toString('base64')
+      : undefined;
 
     const [blmRange]: [
       SelectProjectBlmResult,
