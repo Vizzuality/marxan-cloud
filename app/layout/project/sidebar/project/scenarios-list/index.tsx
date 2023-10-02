@@ -310,7 +310,7 @@ export const ScenariosList: React.FC = () => {
           {!hasScenarios && !search && !hasFilters && scenariosIsFetched && (
             <div className="flex flex-col space-y-2">
               <motion.div
-                key="project-scenarios-empty"
+                // key="project-scenarios-empty"
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -10, opacity: 0 }}
@@ -342,7 +342,7 @@ export const ScenariosList: React.FC = () => {
               </motion.div>
 
               <motion.div
-                key="project-scenarios-empty"
+                // key="project-scenarios-empty"
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -10, opacity: 0 }}

@@ -74,6 +74,7 @@ const EditableTitle = ({
         initial={{ y: -10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -10, opacity: 0 }}
+        className="max-w-[calc(100%-115px)]"
       >
         <FormRFF<FormFields>
           onSubmit={handleSubmit}
@@ -95,7 +96,7 @@ const EditableTitle = ({
               autoComplete="off"
               className="relative"
             >
-              <div className="flex items-center justify-items-start space-x-1">
+              <div className="flex items-center space-x-2">
                 <FieldRFF<FormFields['name']>
                   name="name"
                   validate={composeValidators([{ presence: true }])}
@@ -105,30 +106,28 @@ const EditableTitle = ({
                   }}
                 >
                   {({ input }) => (
-                    <div className="relative h-16">
-                      <div
-                        className={cn({
-                          'relative h-full max-w-[260px] overflow-hidden': true,
-                          [className]: Boolean(className),
-                        })}
-                      >
-                        <input
-                          {...input}
-                          ref={titleInputRef}
-                          className="absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent px-1.5 font-heading text-3xl focus:bg-primary-300 focus:text-gray-600 focus:outline-none"
-                          disabled={!editting}
-                          value={input.value}
-                        />
+                    <div
+                      className={cn({
+                        'relative h-16 overflow-hidden text-ellipsis': true,
+                        [className]: Boolean(className),
+                      })}
+                    >
+                      <input
+                        {...input}
+                        ref={titleInputRef}
+                        className="absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent font-heading text-3xl focus:bg-primary-300 focus:text-gray-600 focus:outline-none"
+                        disabled={!editting}
+                        value={input.value}
+                      />
 
-                        <h1 className="invisible h-full overflow-ellipsis px-0 py-1 font-heading text-4xl font-normal">
-                          {invisibleValue(input?.value)}
-                        </h1>
-                      </div>
+                      <h1 className="invisible h-full overflow-ellipsis px-0 py-1 font-heading text-3xl font-normal">
+                        {invisibleValue(input?.value)}
+                      </h1>
                     </div>
                   )}
                 </FieldRFF>
 
-                <div className="relative right-0 flex space-x-0.5">
+                <div className="flex space-x-1 ">
                   {editable && !editting && (
                     <motion.button
                       key="edit-button"
@@ -160,12 +159,12 @@ const EditableTitle = ({
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
                       className={cn({
-                        'flex h-8 w-8 items-center justify-center rounded-full border border-gray-600 px-2 transition-colors hover:border-gray-400 focus:outline-none':
+                        'flex h-8 w-8 items-center justify-center rounded-full border border-gray-500 transition-colors hover:border-white focus:outline-none':
                           true,
-                        'bg-white': editting,
+                        'bg-gray-700': editting,
                       })}
                     >
-                      <HiCheck className="h-4 w-4 text-green-600 transition-colors" />
+                      <HiCheck className="h-4 w-4 text-white transition-colors" />
                     </motion.button>
                   )}
 
@@ -177,13 +176,13 @@ const EditableTitle = ({
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
                       className={cn({
-                        'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-600 px-2 transition-colors hover:border-gray-400 focus:outline-none':
+                        'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-gray-500 transition-colors hover:border-white focus:outline-none':
                           true,
-                        'bg-white': editting,
+                        'bg-gray-700': editting,
                       })}
                       onClick={() => handleCancel(fprops.form)}
                     >
-                      <HiX className="h-3 w-3 text-red-600 transition-colors" />
+                      <HiX className="h-4 w-4 text-white transition-colors" />
                     </motion.button>
                   )}
                 </div>
