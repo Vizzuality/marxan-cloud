@@ -93,3 +93,11 @@ export class CostSurfaceResult {
   @ApiProperty()
   data!: JSONAPICostSurface;
 }
+
+export class CostSurfaceResultPlural {
+  @ApiProperty({
+    isArray: true,
+    type: JSONAPICostSurface,
+  })
+  data!: JSONAPICostSurface[];
+}

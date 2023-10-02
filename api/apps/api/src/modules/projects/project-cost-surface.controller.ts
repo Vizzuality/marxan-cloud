@@ -46,8 +46,14 @@ import {
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
 import { CostSurfaceSerializer } from '@marxan-api/modules/cost-surface/dto/cost-surface.serializer';
-import { JSONAPICostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
+import {
+  costSurfaceResource,
+  CostSurfaceResult,
+  CostSurfaceResultPlural,
+  JSONAPICostSurface,
+} from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
+//@Todo refactor all endpoints to use cost-surfaces instead of singular cost-surface
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectCostSurfaceController {
@@ -57,6 +63,56 @@ export class ProjectCostSurfaceController {
     public readonly costSurfaceService: CostSurfaceService,
     public readonly costSurfaceSeralizer: CostSurfaceSerializer,
   ) {}
+
+  @ImplementsAcl()
+  @UseGuards(JwtAuthGuard)
+  @Get(`:projectId/cost-surface/:costSurfaceId`)
+  @ApiOkResponse({ type: CostSurfaceResult })
+  async getCostSurfaces(
+    @Param('projectId') projectId: string,
+    @Param('costSurfaceId') costSurfaceId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.costSurfaceService.getCostSurface(
+      req.user.id,
+      projectId,
+      costSurfaceId,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        projectId,
+        userId: req.user.id,
+        resourceType: costSurfaceResource.name.plural,
+      });
+    }
+
+    return this.costSurfaceSeralizer.serialize(result.right);
+  }
+
+  @ImplementsAcl()
+  @UseGuards(JwtAuthGuard)
+  @Get(`:projectId/cost-surface/`)
+  @ApiOkResponse({ type: CostSurfaceResultPlural })
+  async getCostSurface(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.costSurfaceService.getCostSurfaces(
+      req.user.id,
+      projectId,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        projectId,
+        userId: req.user.id,
+        resourceType: costSurfaceResource.name.plural,
+      });
+    }
+
+    return this.costSurfaceSeralizer.serialize(result.right);
+  }
 
   @ImplementsAcl()
   @UseGuards(JwtAuthGuard)
