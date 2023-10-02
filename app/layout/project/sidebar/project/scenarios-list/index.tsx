@@ -206,7 +206,7 @@ export const ScenariosList: React.FC = () => {
       'download-info',
       <>
         <h2 className="font-medium">Download in progress</h2>
-        <ul className="text-sm">Your report is being downloaded.</ul>
+        <ul className="text-sm">The report is being downloaded.</ul>
       </>,
       {
         level: 'info',
@@ -220,8 +220,8 @@ export const ScenariosList: React.FC = () => {
           addToast(
             'download-error',
             <>
-              <h2 className="font-medium">Error</h2>
-              <ul className="text-sm">Solutions report not downloaded</ul>
+              <h2 className="font-medium">Something went wrong</h2>
+              <ul className="text-sm">The report could not be downloaded. Please, try again.</ul>
             </>,
             {
               level: 'error',
