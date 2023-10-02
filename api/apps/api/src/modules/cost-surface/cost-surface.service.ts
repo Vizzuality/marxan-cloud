@@ -4,7 +4,7 @@ import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.e
 import { Repository } from 'typeorm';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 import { Either, left, right } from 'fp-ts/lib/Either';
-import { projectNotEditable } from '@marxan-api/modules/projects/projects.service';
+import { projectNotEditable, projectNotVisible } from "@marxan-api/modules/projects/projects.service";
 import { UploadCostSurfaceShapefileDto } from '@marxan-api/modules/cost-surface/dto/upload-cost-surface-shapefile.dto';
 import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
 import { CostSurfaceCalculationPort } from '@marxan-api/modules/cost-surface/ports/project/cost-surface-calculation.port';
@@ -145,17 +145,17 @@ export class CostSurfaceService {
     userId: string,
   ): Promise<
     Either<
-      typeof costSurfaceNotFoundForProject | typeof projectNotEditable,
+      typeof costSurfaceNotFoundForProject | typeof projectNotVisible,
       CostRange
     >
   > {
     if (
-      !(await this.projectAclService.canEditCostSurfaceInProject(
+      !(await this.projectAclService.canViewProject(
         userId,
         projectId,
       ))
     ) {
-      return left(projectNotEditable);
+      return left(projectNotVisible);
     }
     const costRange = await this.costSurfaceRepository.findOne({
       select: ['min', 'max'],
