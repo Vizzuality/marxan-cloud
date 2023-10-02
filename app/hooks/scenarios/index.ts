@@ -20,7 +20,6 @@ import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
-import { CostSurface } from 'types/api/cost-surface';
 import { Job } from 'types/api/job';
 import { Project } from 'types/api/project';
 import { Scenario } from 'types/api/scenario';

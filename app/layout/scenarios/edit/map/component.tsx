@@ -259,7 +259,7 @@ export const ScenariosEditMap = (): JSX.Element => {
   const TargetedPreviewLayers = useTargetedPreviewLayers({
     features: targetedFeaturesData,
     cache,
-    active: targetedFeaturesData.length > 0,
+    active: targetedFeaturesData?.length > 0,
     bbox,
     options: {
       featuresRecipe,

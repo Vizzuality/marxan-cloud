@@ -1,10 +1,11 @@
 import React, { Fragment, useCallback, useState } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useSelector } from 'react-redux';
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+
+import { useAppSelector } from 'store/hooks';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { flatten } from 'lodash';
@@ -30,6 +31,7 @@ import HelpBeacon from 'layout/help/beacon';
 import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 import ScenarioToolbar from 'layout/project/sidebar/project/scenarios-list/toolbar';
 import Section from 'layout/section';
+import { Scenario } from 'types/api/scenario';
 import { cn } from 'utils/cn';
 
 import bgScenariosDashboard from 'images/new-layout/bg-scenarios-dashboard.png';
@@ -40,15 +42,18 @@ import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 import ScenarioItem from './scenario-item';
 import ScenarioTypes from './types';
 
+const LINK_CLASSES =
+  'inline-block rounded-xl bg-gray-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-100';
+
 export const ScenariosList: React.FC = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToasts();
 
   const [modal, setModal] = useState<boolean>(false);
-  const [deleteScenario, setDelete] = useState(null);
+  const [deleteScenario, setDelete] = useState<Scenario>(null);
   const [solutionsReportLoader, setSolutionsReportLoader] = useState<boolean>(false);
 
-  const { search, filters, sort } = useSelector((state) => state['/projects/[id]']);
+  const { search, filters, sort } = useAppSelector((state) => state['/projects/[id]']);
 
   const { query } = useRouter();
   const { pid } = query as { pid: string };
@@ -77,11 +82,13 @@ export const ScenariosList: React.FC = () => {
 
   const deleteMutation = useDeleteScenario({});
 
+  const atLeastOneScenarioIsRun = scenariosData.some(({ ranAtLeastOnce }) => ranAtLeastOnce);
+
   const onDelete = useCallback(() => {
     deleteMutation.mutate(
       { id: deleteScenario.id },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           addToast(
             `success-scenario-delete-${deleteScenario.id}`,
             <>
@@ -92,7 +99,7 @@ export const ScenariosList: React.FC = () => {
               level: 'success',
             }
           );
-          queryClient.invalidateQueries(['scenarios', pid]);
+          await queryClient.invalidateQueries(['scenarios', pid]);
           setDelete(null);
         },
         onError: () => {
@@ -119,7 +126,7 @@ export const ScenariosList: React.FC = () => {
   });
 
   const onDuplicate = useCallback(
-    (scenarioId, scenarioName) => {
+    (scenarioId: Scenario['id'], scenarioName: Scenario['name']) => {
       duplicateScenarioMutation.mutate(
         { sid: scenarioId },
         {
@@ -156,7 +163,7 @@ export const ScenariosList: React.FC = () => {
   const cancelRunMutation = useCancelRunScenario({});
 
   const onCancelRun = useCallback(
-    (scenarioId, scenarioName) => {
+    (scenarioId: Scenario['id'], scenarioName: Scenario['name']) => {
       cancelRunMutation.mutate(
         { id: scenarioId },
         {
@@ -164,7 +171,7 @@ export const ScenariosList: React.FC = () => {
             addToast(
               'success-cancel-scenario',
               <>
-                <h2 className="font-medium">Success!</h2>
+                <h2 className="font-medium">Success</h2>
                 <p className="text-sm">Scenario {scenarioName} canceled</p>
               </>,
               {
@@ -176,7 +183,7 @@ export const ScenariosList: React.FC = () => {
             addToast(
               'error-cancel-scenario',
               <>
-                <h2 className="font-medium">Error!</h2>
+                <h2 className="font-medium">Error</h2>
                 <p className="text-sm">Scenario {scenarioName} not canceled</p>
               </>,
               {
@@ -195,6 +202,17 @@ export const ScenariosList: React.FC = () => {
   const onDownloadSolutionsSummary = useCallback(() => {
     setSolutionsReportLoader(true);
 
+    addToast(
+      'download-info',
+      <>
+        <h2 className="font-medium">Download in progress</h2>
+        <ul className="text-sm">Your report is being downloaded.</ul>
+      </>,
+      {
+        level: 'info',
+      }
+    );
+
     downloadSolutionsSummary.mutate(
       { id: pid },
       {
@@ -202,7 +220,7 @@ export const ScenariosList: React.FC = () => {
           addToast(
             'download-error',
             <>
-              <h2 className="font-medium">Error!</h2>
+              <h2 className="font-medium">Error</h2>
               <ul className="text-sm">Solutions report not downloaded</ul>
             </>,
             {
@@ -312,19 +330,13 @@ export const ScenariosList: React.FC = () => {
                 </div>
                 <div className="mx-10 flex flex-wrap justify-center gap-2">
                   <Link href={`/projects/${pid}/?tab=protected-areas`}>
-                    <div className="inline-block rounded-xl bg-gray-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-100">
-                      Upload Protected Areas
-                    </div>
+                    <div className={LINK_CLASSES}>Upload Protected Areas</div>
                   </Link>
                   <Link href={`/projects/${pid}/?tab=cost-surface`}>
-                    <div className="inline-block rounded-xl bg-gray-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-100">
-                      Upload Cost Surface
-                    </div>
+                    <div className={LINK_CLASSES}>Upload Cost Surface</div>
                   </Link>
                   <Link href={`/projects/${pid}/?tab=features`}>
-                    <div className="inline-block rounded-xl bg-gray-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-100">
-                      Upload Features
-                    </div>
+                    <div className={LINK_CLASSES}>Upload Features</div>
                   </Link>
                 </div>
               </motion.div>
@@ -357,7 +369,7 @@ export const ScenariosList: React.FC = () => {
                   theme="primary-alt"
                   size="base"
                   className="flex w-full overflow-hidden uppercase"
-                  disabled={solutionsReportLoader}
+                  disabled={solutionsReportLoader || !atLeastOneScenarioIsRun}
                   onClick={onDownloadSolutionsSummary}
                 >
                   <Loading

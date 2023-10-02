@@ -130,10 +130,10 @@ export const useFeatureAbundanceLegend = () => {
 
   const { layerSettings } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const totalItems = features.length || 0;
+  const totalItems = features?.length || 0;
 
   const items =
-    features.map(({ id, name, amountRange = { min: 5000, max: 100000 } }, index) => {
+    features?.map(({ id, name, amountRange = { min: 5000, max: 100000 } }, index) => {
       const color =
         totalItems > COLORS['features-preview'].ramp.length
           ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
@@ -178,10 +178,10 @@ export const useFeaturesLegend = () => {
     (state) => state[`/scenarios/${sid}/edit`]
   );
 
-  const totalItems = features.length || 0;
+  const totalItems = features?.length || 0;
 
   const items =
-    features.map(({ id, name }, index) => {
+    features?.map(({ id, name }, index) => {
       const color =
         totalItems > COLORS['features-preview'].ramp.length
           ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]

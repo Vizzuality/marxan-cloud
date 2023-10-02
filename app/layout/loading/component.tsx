@@ -22,7 +22,7 @@ export const Loading: React.FC<LoadingProps> = ({ loading }: LoadingProps) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className={cn({
-            'z-60 fixed h-full w-full': true,
+            'fixed z-50 h-full w-full': true,
           })}
         >
           <div

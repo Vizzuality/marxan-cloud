@@ -23,7 +23,7 @@ export const DocumentationLink = () => {
         />
       </div>
       {isHover && (
-        <div className="z-60 absolute right-12 top-2 rounded-xl bg-white px-2 py-px text-black">
+        <div className="absolute right-12 top-2 z-50 rounded-xl bg-white px-2 py-px text-black">
           <p className="whitespace-nowrap font-sans text-sm">Marxan&apos;s documentation</p>
         </div>
       )}

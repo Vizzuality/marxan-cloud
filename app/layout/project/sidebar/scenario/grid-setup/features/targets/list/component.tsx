@@ -265,9 +265,9 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
             iconClassName="w-10 h-10 text-white"
           />
 
-          {(!targetedFeaturesData || !targetedFeaturesData.length) && <NoResults />}
+          {!targetedFeaturesData?.length && <NoResults />}
 
-          {!!targetedFeaturesData && !!targetedFeaturesData.length && (
+          {!!targetedFeaturesData.length && (
             <div className="relative flex flex-grow flex-col overflow-hidden">
               <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-800 via-gray-800" />
               <div className="relative h-full overflow-y-auto overflow-x-visible px-0.5">
@@ -346,7 +346,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
             </div>
           )}
 
-          {!!targetedFeaturesData && !!targetedFeaturesData.length && (
+          {!!targetedFeaturesData?.length && (
             <div className="flex flex-shrink-0 justify-center space-x-3">
               <Button
                 className="w-full"
