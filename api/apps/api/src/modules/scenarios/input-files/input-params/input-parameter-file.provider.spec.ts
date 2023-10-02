@@ -251,6 +251,7 @@ async function getFixtures() {
           },
           createdAt: new Date(),
           lastModifiedAt: new Date(),
+          scenarios: [],
         },
         project: {
           name: 'Project Name',

@@ -110,10 +110,13 @@ import {
   globalProtectedAreaNotDeletable,
 } from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
 import {
+  cannotDeleteDefaultCostSurface,
   costSurfaceNameAlreadyExistsForProject,
   costSurfaceNotFound,
   costSurfaceNotFoundForProject,
+  costSurfaceStillInUse,
 } from '@marxan-api/modules/cost-surface/cost-surface.service';
+import { deleteCostSurfaceFailed } from '@marxan-api/modules/cost-surface/delete-cost-surface/delete-cost-surface.command';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -199,7 +202,10 @@ export const mapAclDomainToHttpError = (
     | typeof globalProtectedAreaNotDeletable
     | typeof costSurfaceNotFoundForProject
     | typeof costSurfaceNameAlreadyExistsForProject
-    | typeof costSurfaceNotFound,
+    | typeof costSurfaceNotFound
+    | typeof costSurfaceStillInUse
+    | typeof cannotDeleteDefaultCostSurface
+    | typeof deleteCostSurfaceFailed,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -394,6 +400,18 @@ export const mapAclDomainToHttpError = (
     case costSurfaceNameAlreadyExistsForProject:
       throw new ForbiddenException(
         `Cost Surface with id ${options?.costSurfaceId} cannot be updated: name is already in use in the associated Project`,
+      );
+    case costSurfaceStillInUse:
+      throw new ForbiddenException(
+        `Cost Surface with id ${options?.costSurfaceId} cannot be deleted: it's still in use by Scenarios`,
+      );
+    case cannotDeleteDefaultCostSurface:
+      throw new ForbiddenException(
+        `Cost Surface with id ${options?.costSurfaceId} cannot be deleted: it's the Project's default`,
+      );
+    case deleteCostSurfaceFailed:
+      return new BadRequestException(
+        `Cost Surface ${options?.costSurfaceId} and associated resources could not be deleted.`,
       );
     case scenarioNotCreated:
       throw new NotFoundException(

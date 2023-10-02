@@ -134,4 +134,82 @@ describe('Cost Surface', () => {
       await fixtures.ThenCostSurfaceAPIEntityWasNotUpdated(costSurface2);
     });
   });
+
+  describe('Delete Cost Surface', () => {
+    beforeEach(async () => {
+      fixtures = await getProjectCostSurfaceFixtures();
+    });
+
+    it(`should delete the CostSurface properly and emit event`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const costSurface = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId,
+        'costSurfaceName',
+      );
+
+      // ACT
+      await fixtures.WhenDeletingCostSurface(projectId, costSurface.id);
+
+      // ASSERT
+      await fixtures.ThenCostSurfaceWasDeleted(costSurface.id);
+      await fixtures.ThenCostSurfaceDeletedEventWasEmitted(costSurface.id);
+      await fixtures.ThenUnusedResourceJobWasSent(costSurface.id);
+    });
+
+    it(`should return error when the cost surface could not be found`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+
+      // ACT
+      const response = await fixtures.WhenDeletingCostSurface(projectId, v4());
+
+      // ASSERT
+      await fixtures.ThenNotFoundErrorWasReturned(response, projectId);
+    });
+
+    it(`should return error when the CostSurface is still in use by Scenarios`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const costSurface = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId,
+        'anotherCostSurface',
+      );
+      await fixtures.GivenScenario(projectId, costSurface.id, 'something');
+
+      // ACT
+      const response = await fixtures.WhenDeletingCostSurface(
+        projectId,
+        costSurface.id,
+      );
+
+      // ASSERT
+      await fixtures.ThenCostSurfaceWasNotDeleted(costSurface.id);
+      await fixtures.ThenCostSurfaceStillInUseErrorWasReturned(
+        response,
+        costSurface.id,
+      );
+    });
+
+    it(`should return error if the CostSurface is the Project's default`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const costSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId,
+      );
+
+      // ACT
+      const response = await fixtures.WhenDeletingCostSurface(
+        projectId,
+        costSurface.id,
+      );
+
+      // ASSERT
+      await fixtures.ThenCostSurfaceWasNotDeleted(costSurface.id);
+      await fixtures.ThenCostSurfaceDefaultCannotBeDeletedErrorWasReturned(
+        response,
+        costSurface.id,
+      );
+    });
+  });
 });

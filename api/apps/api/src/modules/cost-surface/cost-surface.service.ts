@@ -7,7 +7,14 @@ import { Either, left, right } from 'fp-ts/lib/Either';
 import { projectNotEditable } from '@marxan-api/modules/projects/projects.service';
 import { UploadCostSurfaceShapefileDto } from '@marxan-api/modules/cost-surface/dto/upload-cost-surface-shapefile.dto';
 import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
+import { forbiddenError } from '@marxan-api/modules/access-control';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import {
+  DeleteCostSurfaceCommand,
+  deleteCostSurfaceFailed,
+} from '@marxan-api/modules/cost-surface/delete-cost-surface/delete-cost-surface.command';
 import { CostSurfaceCalculationPort } from '@marxan-api/modules/cost-surface/ports/project/cost-surface-calculation.port';
+import { CommandBus } from '@nestjs/cqrs';
 
 export const costSurfaceNotEditableWithinProject = Symbol(
   `cost surface not editable within project`,
@@ -20,6 +27,10 @@ export const costSurfaceNotFoundForProject = Symbol(
 export const costSurfaceNameAlreadyExistsForProject = Symbol(
   `cost surface already exists for project`,
 );
+export const costSurfaceStillInUse = Symbol(`cost surface still in use`);
+export const cannotDeleteDefaultCostSurface = Symbol(
+  `cannot delete default cost surface`,
+);
 
 @Injectable()
 export class CostSurfaceService {
@@ -28,6 +39,7 @@ export class CostSurfaceService {
     private readonly costSurfaceRepository: Repository<CostSurface>,
     private readonly projectAclService: ProjectAclService,
     private readonly calculateCost: CostSurfaceCalculationPort,
+    private readonly commandBus: CommandBus,
   ) {}
 
   createDefaultCostSurfaceModel(): CostSurface {
@@ -92,6 +104,49 @@ export class CostSurfaceService {
     return right(void 0);
   }
 
+  async deleteCostSurface(
+    userId: string,
+    projectId: string,
+    costSurfaceId: string,
+  ): Promise<
+    Either<
+      | typeof projectNotEditable
+      | typeof costSurfaceNotFoundForProject
+      | typeof costSurfaceStillInUse
+      | typeof cannotDeleteDefaultCostSurface
+      | typeof deleteCostSurfaceFailed,
+      true
+    >
+  > {
+    if (
+      !(await this.projectAclService.canEditCostSurfaceInProject(
+        userId,
+        projectId,
+      ))
+    ) {
+      return left(projectNotEditable);
+    }
+
+    const costSurface = await this.costSurfaceRepository.findOne({
+      where: { projectId, id: costSurfaceId },
+      relations: { scenarios: true },
+    });
+
+    if (!costSurface) {
+      return left(costSurfaceNotFoundForProject);
+    }
+    if (costSurface.isDefault) {
+      return left(cannotDeleteDefaultCostSurface);
+    }
+    if (costSurface.scenarios.length > 0) {
+      return left(costSurfaceStillInUse);
+    }
+
+    return await this.commandBus.execute(
+      new DeleteCostSurfaceCommand(costSurfaceId),
+    );
+  }
+
   async update(
     userId: string,
     projectId: string,
@@ -133,6 +188,74 @@ export class CostSurfaceService {
     costSurface = await this.costSurfaceRepository.save(costSurface);
 
     return right(costSurface);
+  }
+
+  async getCostSurface(
+    userId: string,
+    projectId: string,
+    costSurfaceId: string,
+  ): Promise<
+    Either<typeof forbiddenError | typeof costSurfaceNotFound, CostSurface>
+  > {
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+
+    const costSurface = await this.costSurfaceRepository.findOne({
+      where: { projectId, id: costSurfaceId },
+      relations: { scenarios: true },
+    });
+
+    if (!costSurface) {
+      return left(costSurfaceNotFound);
+    }
+
+    const result = await this.costSurfaceRepository
+      .createQueryBuilder('cs')
+      .select('cs.id', 'costSurfaceId')
+      .addSelect('COUNT(s.id)', 'usage')
+      .leftJoin(Scenario, 's', 'cs.id = s.cost_surface_id')
+      .where('cs.project_id = :projectId', { projectId })
+      .andWhere('cs.id = :costSurfaceId', { costSurfaceId })
+      .groupBy('cs.id')
+      .getRawOne();
+
+    costSurface.scenarioUsageCount = result.usage ? Number(result.usage) : 0;
+
+    return right(costSurface);
+  }
+
+  async getCostSurfaces(
+    userId: string,
+    projectId: string,
+  ): Promise<Either<typeof forbiddenError, CostSurface[]>> {
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+    const costSurfaces = await this.costSurfaceRepository.find({
+      where: { projectId },
+      relations: { scenarios: true },
+    });
+
+    const usageCounts = await this.costSurfaceRepository
+      .createQueryBuilder('cs')
+      .select('cs.id', 'costSurfaceId')
+      .addSelect('COUNT(s.id)', 'usage')
+      .leftJoin(Scenario, 's', 'cs.id = s.cost_surface_id')
+      .where('cs.project_id = :projectId', { projectId })
+      .groupBy('cs.id')
+      .getRawMany();
+
+    const usageCountMap = new Map(
+      usageCounts.map((usageRow) => [usageRow.costSurfaceId, usageRow.usage]),
+    );
+
+    for (const costSurface of costSurfaces) {
+      const usage = usageCountMap.get(costSurface.id);
+      costSurface.scenarioUsageCount = usage ? Number(usage) : 0;
+    }
+
+    return right(costSurfaces);
   }
 
   static defaultCostSurfaceName(): string {

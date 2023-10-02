@@ -1,6 +1,6 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { ExportJobInput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { Inject, Logger } from '@nestjs/common';
 import {
@@ -58,6 +58,10 @@ export class SchedulePieceExportHandler
       piece,
       resourceId,
     }));
+
+    if (piece === ClonePiece.ScenarioInputFolder) {
+      this.logger.log('SCENARIO INPUT FOLDER');
+    }
 
     const job = await this.queue.add(`export-piece`, {
       piece,

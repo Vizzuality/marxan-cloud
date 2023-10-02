@@ -28,14 +28,29 @@ import { GivenProjectExists } from '../steps/given-project';
 import { GivenProjectsPu } from '../../../geoprocessing/test/steps/given-projects-pu-exists';
 import * as request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { CqrsModule } from '@nestjs/cqrs';
+import { EventBusTestUtils } from '../utils/event-bus.test.utils';
+import { CostSurfaceDeleted } from '@marxan-api/modules/cost-surface/events/cost-surface-deleted.event';
+import { FakeQueue } from '../utils/queues';
+import { unusedResourcesCleanupQueueName } from '@marxan/unused-resources-cleanup';
 
 export const getProjectCostSurfaceFixtures = async () => {
-  const app = await bootstrapApplication([
-    TypeOrmModule.forFeature(
-      [PlanningUnitsGeom, ProjectsPuEntity, ScenariosPuCostDataGeo],
-      DbConnections.geoprocessingDB,
-    ),
-  ]);
+  const app = await bootstrapApplication(
+    [
+      CqrsModule,
+      TypeOrmModule.forFeature(
+        [PlanningUnitsGeom, ProjectsPuEntity, ScenariosPuCostDataGeo],
+        DbConnections.geoprocessingDB,
+      ),
+    ],
+    [EventBusTestUtils],
+  );
+  const eventBusTestUtils = app.get(EventBusTestUtils);
+  eventBusTestUtils.startInspectingEvents();
+  const unusedResourceCleanupQueue = FakeQueue.getByName(
+    unusedResourcesCleanupQueueName,
+  );
 
   const token = await GivenUserIsLoggedIn(app, 'aa');
   const userId = await GivenUserExists(app, 'aa');
@@ -64,6 +79,9 @@ export const getProjectCostSurfaceFixtures = async () => {
       await projectsRepo.delete({});
       await projectsPuRepo.delete({});
       await organizationRepo.delete({});
+      await costSurfaceRepo.delete({});
+      eventBusTestUtils.stopInspectingEvents();
+      await app.close();
     },
 
     GivenProject: async (projectName: string, roles?: ProjectRoles[]) => {
@@ -104,6 +122,22 @@ export const getProjectCostSurfaceFixtures = async () => {
           name: `Organization ${Date.now()}`,
         },
       ),
+    GivenDefaultCostSurfaceForProject: async (projectId: string) => {
+      return costSurfaceRepo.findOneOrFail({
+        where: { projectId, isDefault: true },
+      });
+    },
+    GivenScenario: async (
+      projectId: string,
+      costSurfaceId: string,
+      name?: string,
+    ) => {
+      return scenarioRepo.save({
+        projectId,
+        costSurfaceId,
+        name: name || `Scenario for project ${projectId}`,
+      });
+    },
 
     GivenProjectPuData: async (projectId: string) => {
       await GivenProjectsPu(
@@ -149,6 +183,14 @@ export const getProjectCostSurfaceFixtures = async () => {
         .patch(`/api/v1/projects/${projectId}/cost-surface/${costSurfaceId}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ name: costSurfaceName });
+    },
+    WhenDeletingCostSurface: async (
+      projectId: string,
+      costSurfaceId: string,
+    ) => {
+      return request(app.getHttpServer())
+        .delete(`/api/v1/projects/${projectId}/cost-surface/${costSurfaceId}`)
+        .set('Authorization', `Bearer ${token}`);
     },
 
     ThenCostSurfaceAPIEntityWasProperlySaved: async (name: string) => {
@@ -198,6 +240,32 @@ export const getProjectCostSurfaceFixtures = async () => {
 
       expect(costSurface).toBeNull();
     },
+    ThenCostSurfaceWasDeleted: async (costSurfaceId: string) => {
+      const costSurface = await costSurfaceRepo.findOne({
+        where: { id: costSurfaceId },
+      });
+      expect(costSurface).toBeNull();
+    },
+    ThenCostSurfaceWasNotDeleted: async (costSurfaceId: string) => {
+      const costSurface = await costSurfaceRepo.findOne({
+        where: { id: costSurfaceId },
+      });
+      expect(costSurface).not.toBeNull();
+    },
+    ThenCostSurfaceDeletedEventWasEmitted: async (costSurfaceId: string) => {
+      const event = await eventBusTestUtils.waitUntilEventIsPublished(
+        CostSurfaceDeleted,
+      );
+
+      expect(event).toMatchObject({ costSurfaceId });
+    },
+    ThenUnusedResourceJobWasSent: async (costSurfaceId: string) => {
+      expect(Object.values(unusedResourceCleanupQueue.jobs).length).toBe(1);
+      const job = Object.values(unusedResourceCleanupQueue.jobs)[0];
+      expect(job.data.type).toEqual('Cost Surface');
+      expect(job.data.costSurfaceId).toEqual(costSurfaceId);
+    },
+
     ThenEmptyErrorWasReturned: (response: request.Response) => {
       const error: any =
         response.body.errors[0].meta.rawError.response.message[0];
@@ -229,6 +297,26 @@ export const getProjectCostSurfaceFixtures = async () => {
       });
 
       expect(costSurface).toBeDefined();
+    },
+    ThenCostSurfaceStillInUseErrorWasReturned: (
+      response: request.Response,
+      costSurfaceId: string,
+    ) => {
+      const error: any = response.body.errors[0].meta.rawError.response.message;
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+      expect(error).toContain(
+        `Cost Surface with id ${costSurfaceId} cannot be deleted: it's still in use by Scenarios`,
+      );
+    },
+    ThenCostSurfaceDefaultCannotBeDeletedErrorWasReturned: (
+      response: request.Response,
+      costSurfaceId: string,
+    ) => {
+      const error: any = response.body.errors[0].meta.rawError.response.message;
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+      expect(error).toContain(
+        `Cost Surface with id ${costSurfaceId} cannot be deleted: it's the Project's default`,
+      );
     },
   };
 };

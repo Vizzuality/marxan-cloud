@@ -18,6 +18,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectUnusedResources } from './project-unused-resources';
 import { ScenarioUnusedResources } from './scenario-unused-resources';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
+import { CostSurfaceUnusedResources } from '@marxan-geoprocessing/modules/unused-resources-cleanup/delete-unused-resources/cost-surface-unused-resources';
 
 @Module({
   imports: [
@@ -35,11 +37,20 @@ import { ScenarioUnusedResources } from './scenario-unused-resources';
         ProjectsPuEntity,
         ScenarioFeaturesData,
         MarxanExecutionMetadataGeoEntity,
+        CostSurfacePuDataEntity,
       ],
       geoprocessingConnections.default,
     ),
   ],
-  providers: [ProjectUnusedResources, ScenarioUnusedResources],
-  exports: [ProjectUnusedResources, ScenarioUnusedResources],
+  providers: [
+    ProjectUnusedResources,
+    ScenarioUnusedResources,
+    CostSurfaceUnusedResources,
+  ],
+  exports: [
+    ProjectUnusedResources,
+    ScenarioUnusedResources,
+    CostSurfaceUnusedResources,
+  ],
 })
 export class UnusedResourcesModule {}
