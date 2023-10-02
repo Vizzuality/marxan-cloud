@@ -141,10 +141,6 @@ describe('Cost Surface', () => {
   });
 
   describe('Delete Cost Surface', () => {
-    beforeEach(async () => {
-      fixtures = await getProjectCostSurfaceFixtures();
-    });
-
     it(`should delete the CostSurface properly and emit event`, async () => {
       // ARRANGE
       const projectId = await fixtures.GivenProject('someProject');
