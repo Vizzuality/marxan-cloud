@@ -14,6 +14,7 @@ import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { BlmPartialResultEntity } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.geo.entity';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
+import { CostSurfacePuDataEntity } from "@marxan/cost-surfaces";
 
 const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
 const cronJobInterval: string = AppConfig.get(
@@ -23,6 +24,7 @@ const cronJobInterval: string = AppConfig.get(
 type ProjectIdsInUse = { project_id: string }[];
 type ScenarioIdsInUse = { scenario_id: string }[];
 type FeatureIdsInUse = { feature_id: string }[];
+type CostSurfacesIdsInUse = { cost_surface_id: string }[];
 
 @Injectable()
 export class CleanupTasksService implements CleanupTasks {
@@ -46,6 +48,8 @@ export class CleanupTasksService implements CleanupTasks {
 
     const { apiFeaturesIds, geoFeatureIds } = await this.getFeaturesIdsInUse();
 
+    const { apiCostSurfacesIds, geoCostSurfacesIds } = await this.getCostSurfacesIdsInUse();
+
     await this.storeDanglingProjectIds(apiProjectIds, geoProjectIds);
 
     await this.deleteDanglinProjectIdsInGeoDb();
@@ -55,6 +59,10 @@ export class CleanupTasksService implements CleanupTasks {
     await this.deleteDanglinScenarioIdsInGeoDb();
 
     await this.storeDanglingFeatureIds(apiFeaturesIds, geoFeatureIds);
+
+    await this.deleteDanglingFeatureIdsInGeoDb();
+
+    await this.storeDanglingCostSurfacesIds(apiCostSurfacesIds, geoCostSurfacesIds);
 
     await this.deleteDanglingFeatureIdsInGeoDb();
   }
@@ -113,6 +121,25 @@ export class CleanupTasksService implements CleanupTasks {
       const geoFeatureIds = await this.getGeoFeatureIdsInUse();
 
       return { apiFeaturesIds, geoFeatureIds };
+    });
+  }
+
+  async getCostSurfacesIdsInUse() {
+    return this.apiEntityManager.transaction(async (apiTransactionManager) => {
+      const apiCostSurfacesIds: string[] = await apiTransactionManager
+        .createQueryBuilder()
+        .from('cost_surfaces', 'cs')
+        .select(['id'])
+        .setLock('pessimistic_write_or_fail')
+        .getRawMany()
+        .then((result) => result.map((i) => i.id))
+        .catch((error) => {
+          throw new Error(error);
+        });
+
+      const geoCostSurfacesIds = await this.getGeoCostSurfacesIdsInUse();
+
+      return { apiCostSurfacesIds, geoCostSurfacesIds };
     });
   }
 
@@ -238,6 +265,19 @@ export class CleanupTasksService implements CleanupTasks {
       });
   }
 
+  async getGeoCostSurfacesIdsInUse() {
+    return this.geoEntityManager
+      .createQueryBuilder()
+      .distinctOn(['cost_surface_id'])
+      .select('cost_surface_id')
+      .from(CostSurfacePuDataEntity, 'cspd')
+      .execute()
+      .then((result: CostSurfacesIdsInUse) => result.map((i) => i.cost_surface_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+  }
+
   async storeDanglingProjectIds(
     apiProjectIds: string[],
     geoProjectIds: string[],
@@ -328,6 +368,36 @@ export class CleanupTasksService implements CleanupTasks {
     }
   }
 
+  async storeDanglingCostSurfacesIds(
+    apiCostSurfacesIds: string[],
+    geoCostSurfacesIds: string[],
+  ) {
+    const danglingCostSurfacesIds = this.getGeoIdsInUseNotInApiIdsInUse(
+      apiCostSurfacesIds,
+      geoCostSurfacesIds,
+    );
+
+    await this.geoEntityManager
+      .createQueryBuilder()
+      .delete()
+      .from('dangling_cost_surfaces')
+      .execute();
+
+    for (const costSurfacesIdsChunks of chunk(
+      danglingCostSurfacesIds,
+      CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+    )) {
+      await this.geoEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into('dangling_cost_surfaces')
+        .values(
+          costSurfacesIdsChunks.map((costSurfaceId) => ({ cost_surface_id: costSurfaceId })),
+        )
+        .execute();
+    }
+  }
+
   async deleteDanglinProjectIdsInGeoDb() {
     // For every related entity, we look for matching ids inside entity table
     // and compare it with intermediate dangling_projects table to delete records
@@ -393,6 +463,15 @@ export class CleanupTasksService implements CleanupTasks {
       `DELETE FROM features_data fa
       WHERE fa.feature_id IN (
         SELECT df.feature_id FROM dangling_features df
+      );`,
+    );
+  }
+
+  async deleteDanglingCostSurfacesIdsInGeoDb() {
+    await this.geoEntityManager.query(
+      `DELETE FROM cost_surface_pu_data cspd
+      WHERE cspd.cost_surface_id IN (
+        SELECT dcs.cost_surface_id FROM dangling_cost_surfaces dcs
       );`,
     );
   }
