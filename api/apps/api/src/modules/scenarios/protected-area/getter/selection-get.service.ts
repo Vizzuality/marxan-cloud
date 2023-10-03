@@ -69,7 +69,7 @@ export class SelectionGetService {
 
     return [
       ...categories.map((category) => ({
-        name: 'IUCN '+ category,
+        name: 'IUCN ' + category,
         id: category,
         isCustom: false,
       })),
