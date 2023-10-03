@@ -145,6 +145,18 @@ describe('ScenariosModule (e2e)', () => {
     fixtures.ThenCorrectScenariosAreReturned(response, { scenarioId, name });
   });
 
+  it('Getting scenario by id response includes cost surface name', async () => {
+    await fixtures.GivenScenarioWasCreated('test singular');
+    const response = await fixtures.WhenGettingScenarioByIdWithCostSurfaceInfo();
+    fixtures.ThenCostSurfaceNameIsIncludedInSingularResponse(response);
+  });
+  it('Getting scenarios response includes cost surface name', async () => {
+    await fixtures.GivenScenarioWasCreated('test plural');
+    await fixtures.GivenScenarioWasCreated('test plural2');
+    const response = await fixtures.WhenGettingScenariosWithCostSurfaceInfo();
+    fixtures.ThenCostSurfaceNameIsIncludedInPluralResponse(response);
+  });
+
   it('Contributor fails to delete scenario', async () => {
     const scenarioId = await fixtures.GivenScenarioWasCreated();
     await fixtures.GivenContributorWasAddedToScenario(scenarioId);
@@ -344,6 +356,14 @@ async function getFixtures() {
       return response;
     },
 
+    WhenGettingScenarioByIdWithCostSurfaceInfo: async () =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}?include=costSurface`)
+        .set('Authorization', `Bearer ${ownerToken}`),
+    WhenGettingScenariosWithCostSurfaceInfo: async () =>
+      await request(app.getHttpServer())
+        .get('/api/v1/scenarios?include=costSurface')
+        .set('Authorization', `Bearer ${ownerToken}`),
     WhenGettingScenariosAsOwner: async () =>
       await request(app.getHttpServer())
         .get('/api/v1/scenarios')
@@ -497,6 +517,31 @@ async function getFixtures() {
         totalItems: expect.any(Number),
         totalPages: expect.any(Number),
       });
+    },
+
+    ThenCostSurfaceNameIsIncludedInSingularResponse: (
+      response: request.Response,
+    ) => {
+      const resource = response.body.data;
+      const includedEntity = response.body.included;
+      expect(resource.relationships.costSurface.data.id).toBeDefined();
+      expect(includedEntity[0].type).toBe('costSurfaces');
+      expect(includedEntity[0].attributes.name).toBeDefined();
+      expect(includedEntity[0].attributes.isDefault).toBeDefined();
+    },
+    ThenCostSurfaceNameIsIncludedInPluralResponse: (
+      response: request.Response,
+    ) => {
+      const resources = response.body.data;
+      const includedEntities = response.body.included;
+      for (const resource of resources) {
+        expect(resource.relationships.costSurface.data.id).toBeDefined();
+      }
+      for (const includedEntity of includedEntities) {
+        expect(includedEntity.type).toBe('costSurfaces');
+        expect(includedEntity.attributes.name).toBeDefined();
+        expect(includedEntity.attributes.isDefault).toBeDefined();
+      }
     },
 
     ThenAllScenariosFromContributorAreReturned: (

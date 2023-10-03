@@ -72,6 +72,7 @@ export class ScenariosCrudService extends AppBaseService<
         'ranAtLeastOnce',
         'solutionsAreLocked',
         'projectScenarioId',
+        'costSurface',
       ],
       keyForAttribute: 'camelCase',
       project: {
@@ -87,6 +88,10 @@ export class ScenariosCrudService extends AppBaseService<
           'createdAt',
           'lastModifiedAt',
         ],
+      },
+      costSurface: {
+        ref: 'id',
+        attributes: ['name', 'isDefault'],
       },
       users: {
         ref: 'id',
