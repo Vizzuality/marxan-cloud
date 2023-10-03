@@ -63,8 +63,8 @@ export const Navigation = (): JSX.Element => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
-  const isProjectRoute = route === '/projects/[pid]';
-  const isScenarioRoute = route.startsWith('/projects/[pid]/scenarios/');
+  const isProjectRoute = route.startsWith('/projects/[pid]');
+  const isScenarioRoute = route.startsWith('/projects/[pid]/scenarios/') && !route.endsWith('/new');
 
   const { addToast } = useToasts();
   const plausible = usePlausible();
@@ -149,7 +149,7 @@ export const Navigation = (): JSX.Element => {
         },
       }
     );
-  }, [addToast, runScenarioMutation, sid]);
+  }, [addToast, runScenarioMutation, sid, plausible, user]);
 
   const isSolutionsSectionEnabled = scenarioQuery.data?.ranAtLeastOnce ?? false;
 

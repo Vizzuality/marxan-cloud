@@ -374,6 +374,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const query = useInfiniteQuery(['scenarios', pId, JSON.stringify(options)], fetchScenarios, {
     retry: false,
     keepPreviousData: true,
+    refetchOnWindowFocus: true,
     getNextPageParam: (lastPage) => {
       const {
         data: { meta },
