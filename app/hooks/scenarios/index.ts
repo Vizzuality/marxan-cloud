@@ -179,7 +179,7 @@ export function useScenariosStatusOnce({
   };
 
   return useMutation(saveScenarioLock, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -286,7 +286,7 @@ export function useSaveScenarioLock({
   };
 
   return useMutation(saveScenarioLock, {
-    onSuccess: (data: any, variables) => {
+    onSuccess: (data, variables) => {
       const { sid } = variables;
       queryClient.invalidateQueries('project-locks');
       queryClient.invalidateQueries(['scenario-lock', sid]);
@@ -317,7 +317,7 @@ export function useDeleteScenarioLock({
   };
 
   return useMutation(deleteScenarioLock, {
-    onSuccess: (data: any, variables) => {
+    onSuccess: (data, variables) => {
       const { sid } = variables;
       queryClient.invalidateQueries('project-locks');
       queryClient.invalidateQueries(['scenario-lock', sid]);
@@ -578,7 +578,7 @@ export function useUploadScenarioPU({
   };
 
   return useMutation(uploadScenarioPUShapefile, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -669,7 +669,7 @@ export function useUploadCostSurface({
   };
 
   return useMutation(uploadScenarioCostSurface, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -760,7 +760,7 @@ export function useSaveScenarioPU({
   };
 
   return useMutation(saveScenario, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
       const { id } = variables;
       queryClient.invalidateQueries(['scenarios-pu', id]);
@@ -791,8 +791,8 @@ export function useDuplicateScenario({
   };
 
   return useMutation(duplicateScenario, {
-    onSuccess: (data: any, variables, context) => {
-      queryClient.invalidateQueries(['scenarios']);
+    onSuccess: async (data, variables, context) => {
+      await queryClient.invalidateQueries(['scenarios']);
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -825,6 +825,7 @@ export function useRunScenario({
   return useMutation(runScenario, {
     onSuccess: async (data, variables) => {
       const { id } = variables;
+      await queryClient.invalidateQueries(['scenarios']);
       await queryClient.invalidateQueries(['scenario', id]);
     },
     onError: (error, variables, context) => {
@@ -852,7 +853,7 @@ export function useCancelRunScenario({
   };
 
   return useMutation(duplicateScenario, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -997,7 +998,7 @@ export function useSaveScenarioCalibrationRange({
   };
 
   return useMutation(saveScenarioCalibrationRange, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Succcess', data, variables, context);
       const { sid: scenarioId } = variables;
       queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
@@ -1034,7 +1035,7 @@ export function useDownloadScenarioReport({
   };
 
   return useMutation(downloadScenarioReport, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       const { data: blob } = data;
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
@@ -1072,7 +1073,7 @@ export function useDeletePUScenaro() {
   };
 
   return useMutation(deletePUScenario, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
       // const { id } = variables;
       // queryClient.invalidateQueries(['scenarios-pu', id]);
