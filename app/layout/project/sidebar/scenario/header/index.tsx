@@ -31,7 +31,9 @@ export const ScenarioHeader = (): JSX.Element => {
     [saveScenarioMutation, sid]
   );
 
-  return <Title title={name} description={description} onEditTitle={onEditScenarioName} />;
+  return (
+    <>{sid && <Title title={name} description={description} onEditTitle={onEditScenarioName} />}</>
+  );
 };
 
 export default ScenarioHeader;

@@ -50,7 +50,7 @@ export const useInventoryItems = (): SubMenuItem[] => {
 export const useGridSetupItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
-  const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
+  const isScenarioRoute = route.startsWith(SCENARIO_ROUTE) && !route.endsWith('/new');
 
   return [
     {
@@ -91,7 +91,7 @@ export const useGridSetupItems = (): SubMenuItem[] => {
 export const useSolutionItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
-  const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
+  const isScenarioRoute = route.startsWith(SCENARIO_ROUTE) && !route.endsWith('/new');
 
   return [
     {
@@ -112,7 +112,7 @@ export const useSolutionItems = (): SubMenuItem[] => {
 export const useAdvancedSettingsItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
-  const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
+  const isScenarioRoute = route.startsWith(SCENARIO_ROUTE) && !route.endsWith('/new');
 
   return [
     {
