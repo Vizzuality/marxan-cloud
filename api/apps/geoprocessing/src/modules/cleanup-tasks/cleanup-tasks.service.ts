@@ -14,7 +14,7 @@ import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { BlmPartialResultEntity } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.geo.entity';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
-import { CostSurfacePuDataEntity } from "@marxan/cost-surfaces";
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 
 const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
 const cronJobInterval: string = AppConfig.get(
@@ -48,7 +48,10 @@ export class CleanupTasksService implements CleanupTasks {
 
     const { apiFeaturesIds, geoFeatureIds } = await this.getFeaturesIdsInUse();
 
-    const { apiCostSurfacesIds, geoCostSurfacesIds } = await this.getCostSurfacesIdsInUse();
+    const {
+      apiCostSurfacesIds,
+      geoCostSurfacesIds,
+    } = await this.getCostSurfacesIdsInUse();
 
     await this.storeDanglingProjectIds(apiProjectIds, geoProjectIds);
 
@@ -62,9 +65,12 @@ export class CleanupTasksService implements CleanupTasks {
 
     await this.deleteDanglingFeatureIdsInGeoDb();
 
-    await this.storeDanglingCostSurfacesIds(apiCostSurfacesIds, geoCostSurfacesIds);
+    await this.storeDanglingCostSurfacesIds(
+      apiCostSurfacesIds,
+      geoCostSurfacesIds,
+    );
 
-    await this.deleteDanglingFeatureIdsInGeoDb();
+    await this.deleteDanglingCostSurfacesIdsInGeoDb();
   }
 
   async getProjectIdsInUse() {
@@ -272,7 +278,9 @@ export class CleanupTasksService implements CleanupTasks {
       .select('cost_surface_id')
       .from(CostSurfacePuDataEntity, 'cspd')
       .execute()
-      .then((result: CostSurfacesIdsInUse) => result.map((i) => i.cost_surface_id))
+      .then((result: CostSurfacesIdsInUse) =>
+        result.map((i) => i.cost_surface_id),
+      )
       .catch((error) => {
         throw new Error(error);
       });
@@ -392,7 +400,9 @@ export class CleanupTasksService implements CleanupTasks {
         .insert()
         .into('dangling_cost_surfaces')
         .values(
-          costSurfacesIdsChunks.map((costSurfaceId) => ({ cost_surface_id: costSurfaceId })),
+          costSurfacesIdsChunks.map((costSurfaceId) => ({
+            cost_surface_id: costSurfaceId,
+          })),
         )
         .execute();
     }
