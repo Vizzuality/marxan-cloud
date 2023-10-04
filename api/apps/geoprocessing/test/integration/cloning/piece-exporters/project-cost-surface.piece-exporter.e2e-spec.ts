@@ -141,18 +141,12 @@ const getFixtures = async () => {
           const content = await readSavedFile<ProjectCostSurfacesContent>(
             savedStrem,
           );
-          expect(content.costSurfaces).toHaveLength(1);
+          expect(content.costSurfaces).toHaveLength(2);
           const costSurfacesExported = content.costSurfaces;
 
-
-
-          expect(
-            costSurfacesExported.every(
-              ({ name, data, min, max }) =>
-                name === 'cost surface' &&
-                data.length === 10
-            ),
-          );
+          const nonDefaultCostSurface = costSurfacesExported.find((costSurface) => costSurface.name === 'Cost Surface')
+          expect(nonDefaultCostSurface).toBeDefined();
+          expect(nonDefaultCostSurface?.data).toHaveLength(10);
         },
       };
     },
