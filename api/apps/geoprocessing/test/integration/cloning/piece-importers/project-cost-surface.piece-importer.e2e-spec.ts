@@ -231,6 +231,7 @@ const getFixtures = async () => {
             .addSelect('cs.name', 'name')
             .from('cost_surfaces', 'cs')
             .where('cs.project_id = :projectId', { projectId })
+            .andWhere('cs.is_default = false')
             .execute();
 
           expect(costSurfaces).toHaveLength(1);
