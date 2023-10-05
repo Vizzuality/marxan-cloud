@@ -68,18 +68,22 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
     const costSurfacesIds = costSurfaces.map((costSurface) => costSurface.id);
     let costSurfaceData: CostSurfaceDataSelectResult[] = [];
     let projectPusMap: Record<string, number> = {};
-    if (costSurfacesIds.length > 0) {
-      costSurfaceData = await this.geoprocessingEntityManager
-        .createQueryBuilder()
-        .select(['cost_surface_id', 'cost', 'projects_pu_id'])
-        .from('cost_surface_pu_data', 'scpd')
-        .where('cost_surface_id IN (:...costSurfacesIds)', {
-          costSurfacesIds,
-        })
-        .execute();
 
-      projectPusMap = await this.getProjectPusMap(input.resourceId);
+    if (!costSurfacesIds) {
+      const errorMessage = `${ProjectCostSurfacesPieceExporter.name} - Project Cost Surfaces - couldn't find cost surfaces for project ${input.resourceId}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
+    costSurfaceData = await this.geoprocessingEntityManager
+      .createQueryBuilder()
+      .select(['cost_surface_id', 'cost', 'projects_pu_id'])
+      .from('cost_surface_pu_data', 'scpd')
+      .where('cost_surface_id IN (:...costSurfacesIds)', {
+        costSurfacesIds,
+      })
+      .execute();
+
+    projectPusMap = await this.getProjectPusMap(input.resourceId);
 
     const fileContent: ProjectCostSurfacesContent = {
       costSurfaces: costSurfaces.map(({ id, ...costSurface }) => ({

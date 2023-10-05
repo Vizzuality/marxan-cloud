@@ -106,9 +106,14 @@ export const getFixtures = async (app: INestApplication) => {
     },
 
     cleanup: async () => {
-      await geoEntityManager.query(`DELETE FROM cost_surface_pu_data WHERE cost_surface_id = $1`, [costSurfaceId]);
+      await geoEntityManager.query(
+        `DELETE FROM cost_surface_pu_data WHERE cost_surface_id = $1`,
+        [costSurfaceId],
+      );
       await geoEntityManager.query(`DELETE FROM projects_pu`);
-      await apiEntityManager.query(`DELETE FROM cost_surfaces WHERE id = $1`, [costSurfaceId]);
+      await apiEntityManager.query(`DELETE FROM cost_surfaces WHERE id = $1`, [
+        costSurfaceId,
+      ]);
       await apiEntityManager.query(`DELETE FROM projects`);
       await apiEntityManager.query(`DELETE FROM organizations`);
     },

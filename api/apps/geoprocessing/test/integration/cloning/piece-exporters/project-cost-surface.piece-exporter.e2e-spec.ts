@@ -12,19 +12,19 @@ import { Readable } from 'stream';
 import { EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import {
-  DeleteProjectAndOrganization, GivenCostSurfaceData, GivenCostSurfaces,
+  DeleteProjectAndOrganization,
+  GivenCostSurfaceData,
+  GivenCostSurfaces,
   GivenFeatures,
   GivenFeaturesData,
   GivenProjectExists,
-  readSavedFile
-} from "../fixtures";
+  readSavedFile,
+} from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
-import {
-  ProjectCostSurfacesPieceExporter
-} from "@marxan-geoprocessing/export/pieces-exporters/project-cost-surfaces.piece-exporter";
-import { CostSurfacePuDataEntity } from "@marxan/cost-surfaces";
-import { ProjectCostSurfacesContent } from "@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces";
+import { ProjectCostSurfacesPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/project-cost-surfaces.piece-exporter';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
+import { ProjectCostSurfacesContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -78,9 +78,10 @@ const getFixtures = async () => {
   const geoEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.default),
   );
-  const costSurfacesDataRepo = geoEntityManager.getRepository(CostSurfacePuDataEntity);
+  const costSurfacesDataRepo = geoEntityManager.getRepository(
+    CostSurfacePuDataEntity,
+  );
   const fileRepository = sandbox.get(CloningFilesRepository);
-
 
   return {
     cleanUp: async () => {
@@ -90,7 +91,6 @@ const getFixtures = async () => {
         organizationId,
       );
       await costSurfacesDataRepo.delete({});
-
     },
     GivenAProjectCostSurfacesExportJob: (): ExportJobInput => {
       return {
@@ -114,14 +114,13 @@ const getFixtures = async () => {
     GivenCostSurfacesForProject: async () => {
       const costSurface = await GivenCostSurfaces(
         apiEntityManager,
-        1, 10, 'Cost Surface', projectId
+        1,
+        10,
+        'Cost Surface',
+        projectId,
       );
 
-      await GivenCostSurfaceData(
-        geoEntityManager,
-        projectId,
-        costSurface.id,
-      );
+      await GivenCostSurfaceData(geoEntityManager, projectId, costSurface.id);
       return costSurface.id;
     },
     GivenTagOnFeature: async (featureId: string, tag: string) =>
@@ -144,7 +143,9 @@ const getFixtures = async () => {
           expect(content.costSurfaces).toHaveLength(2);
           const costSurfacesExported = content.costSurfaces;
 
-          const nonDefaultCostSurface = costSurfacesExported.find((costSurface) => costSurface.name === 'Cost Surface')
+          const nonDefaultCostSurface = costSurfacesExported.find(
+            (costSurface) => costSurface.name === 'Cost Surface',
+          );
           expect(nonDefaultCostSurface).toBeDefined();
           expect(nonDefaultCostSurface?.data).toHaveLength(10);
         },
