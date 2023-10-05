@@ -22,7 +22,7 @@ import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { CostSurfacePuDataEntity } from "@marxan/cost-surfaces";
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 
 export type TestSpecification = {
   id: string;
@@ -604,8 +604,12 @@ export async function GivenCostSurfaces(
   projectId: string,
 ) {
   const costSurface = Array({
-    id: v4(), min, max, name, project_id: projectId,
-  })
+    id: v4(),
+    min,
+    max,
+    name,
+    project_id: projectId,
+  });
 
   await Promise.all(
     costSurface.map((values) =>
@@ -626,14 +630,12 @@ export async function GivenCostSurfaceData(
   projectId: string,
   costSurfaceId: string,
 ): Promise<{ id: string; hash: string; feature_id: string }[]> {
-
   const projectPus = await GivenProjectPus(em, projectId, 10);
   const insertValues = projectPus.map((pu, index) => ({
     id: v4(),
     costSurfaceId: costSurfaceId,
     projectsPuId: pu.id,
     cost: index + 1,
-
   }));
 
   const result = await em

@@ -21,18 +21,15 @@ import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
   GenerateRandomGeometries,
-  GivenProjectExists, GivenProjectPus
-} from "../fixtures";
+  GivenProjectExists,
+  GivenProjectPus,
+} from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
-import {
-  ProjectCostSurfacesPieceImporter
-} from "@marxan-geoprocessing/import/pieces-importers/project-cost-surfaces.piece-importer";
-import { ProjectCostSurfacesContent } from "@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces";
-import { CostSurfacePuDataEntity } from "@marxan/cost-surfaces";
-import {
-  ProjectCostSurfacesPieceExporter
-} from "@marxan-geoprocessing/export/pieces-exporters/project-cost-surfaces.piece-exporter";
+import { ProjectCostSurfacesPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-cost-surfaces.piece-importer';
+import { ProjectCostSurfacesContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
+import { ProjectCostSurfacesPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/project-cost-surfaces.piece-exporter';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -138,8 +135,7 @@ const getFixtures = async () => {
     },
     GivenProject: () =>
       GivenProjectExists(apiEntityManager, projectId, organizationId),
-    GivenProjectPus: () =>
-      GivenProjectPus(geoEntityManager, projectId, 3),
+    GivenProjectPus: () => GivenProjectPus(geoEntityManager, projectId, 3),
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ProjectCostSurfaces,
@@ -178,7 +174,8 @@ const getFixtures = async () => {
       );
 
       validProjectCostSurfacesFile = {
-        costSurfaces: [{
+        costSurfaces: [
+          {
             name: 'Cost Surface',
             min: 1,
             max: 10,
@@ -188,7 +185,8 @@ const getFixtures = async () => {
                 cost: dataIndex * 2,
                 puid: dataIndex + 1,
               })),
-          }],
+          },
+        ],
       };
 
       const exportId = v4();
