@@ -63,20 +63,21 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   //
   [ClonePiece.ProjectCostSurfaces]: 2,
   [ClonePiece.ProjectCustomFeatures]: 2,
-  [ClonePiece.ScenarioProtectedAreas]: 2,
-  [ClonePiece.ScenarioPlanningUnitsData]: 2,
-  [ClonePiece.ScenarioMetadata]: 2,
   //
-  [ClonePiece.ProjectCustomFeatures]: 3,
   [ClonePiece.ScenarioProtectedAreas]: 3,
   [ClonePiece.ScenarioPlanningUnitsData]: 3,
+  [ClonePiece.ScenarioMetadata]: 3,
   //
-  [ClonePiece.ProjectPuvsprCalculations]: 4,
-  [ClonePiece.ScenarioFeaturesData]: 4,
+  [ClonePiece.ProjectCustomFeatures]: 4,
+  [ClonePiece.ScenarioProtectedAreas]: 4,
+  [ClonePiece.ScenarioPlanningUnitsData]: 4,
   //
-  [ClonePiece.ScenarioRunResults]: 5,
-  [ClonePiece.MarxanExecutionMetadata]: 5,
-  [ClonePiece.FeaturesSpecification]: 5,
+  [ClonePiece.ProjectPuvsprCalculations]: 5,
+  [ClonePiece.ScenarioFeaturesData]: 5,
+  //
+  [ClonePiece.ScenarioRunResults]: 6,
+  [ClonePiece.MarxanExecutionMetadata]: 6,
+  [ClonePiece.FeaturesSpecification]: 6,
 };
 
 export class ClonePieceRelativePathResolver {
