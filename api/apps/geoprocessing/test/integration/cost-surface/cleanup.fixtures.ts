@@ -1,8 +1,7 @@
 import { INestApplication } from '@nestjs/common';
-import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
-import { EntityManager, In, Repository } from 'typeorm';
+import { getEntityManagerToken } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
-import {} from '@marxan-geoprocessing/modules/cost-surface/application/project-cost-surface.processor';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { CleanupTasksService } from '@marxan-geoprocessing/modules/cleanup-tasks/cleanup-tasks.service';
@@ -106,9 +105,14 @@ export const getFixtures = async (app: INestApplication) => {
     },
 
     cleanup: async () => {
-      await geoEntityManager.query(`DELETE FROM cost_surface_pu_data`);
+      await geoEntityManager.query(
+        `DELETE FROM cost_surface_pu_data WHERE cost_surface_id = $1`,
+        [costSurfaceId],
+      );
       await geoEntityManager.query(`DELETE FROM projects_pu`);
-      await apiEntityManager.query(`DELETE FROM cost_surfaces`);
+      await apiEntityManager.query(`DELETE FROM cost_surfaces WHERE id = $1`, [
+        costSurfaceId,
+      ]);
       await apiEntityManager.query(`DELETE FROM projects`);
       await apiEntityManager.query(`DELETE FROM organizations`);
     },
