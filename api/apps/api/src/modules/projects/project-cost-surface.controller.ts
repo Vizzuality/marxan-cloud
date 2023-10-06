@@ -1,17 +1,20 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Delete,
   forwardRef,
   Get,
   Inject,
-  Param,
+  Param, ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Req,
+  Res,
   UploadedFile,
-  UseGuards,
-} from '@nestjs/common';
+  UseGuards
+} from "@nestjs/common";
 import {
   ApiForbiddenResponse,
   ApiOkResponse,
@@ -45,6 +48,10 @@ import {
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
 import { CostSurfaceSerializer } from '@marxan-api/modules/cost-surface/dto/cost-surface.serializer';
+import { JSONAPICostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
+import { TilesOpenApi } from '@marxan/tiles';
+import { Response } from 'express';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import {
   costSurfaceResource,
   CostSurfaceResult,
@@ -60,6 +67,7 @@ export class ProjectCostSurfaceController {
     public readonly scenarioService: ScenariosService,
     public readonly costSurfaceService: CostSurfaceService,
     public readonly costSurfaceSeralizer: CostSurfaceSerializer,
+    private readonly proxyService: ProxyService,
   ) {}
 
   @ImplementsAcl()
@@ -249,5 +257,41 @@ export class ProjectCostSurfaceController {
     }
 
     return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
+  }
+
+  @ImplementsAcl()
+  @TilesOpenApi()
+  @ApiOperation({
+    description: 'Get cost surface tiles.',
+  })
+  @ApiParam({
+    name: 'costSurfaceId',
+    description:
+      'The id of the Cost Surface for which to retrieve [min,max] cost range',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'The id of the Project that the Cost Surface is associated to',
+  })
+  @Get(':projectId/cost-surface/:costSurfaceId/preview/tiles/:z/:x/:y.mvt')
+  async proxyCostSurfaceTile(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('costSurfaceId', ParseUUIDPipe) costSurfaceId: string,
+    @Param('z', ParseIntPipe) z: number,
+    @Param('x', ParseIntPipe) x: number,
+    @Param('y', ParseIntPipe) y: number,
+  ): Promise<void> {
+    const checkCostSurfaceForProject = await this.costSurfaceService.checkProjectCostSurfaceVisibility(
+      req.user.id,
+      projectId,
+      costSurfaceId,
+    );
+    if (isLeft(checkCostSurfaceForProject)) {
+      throw new ForbiddenException();
+    }
+
+    return await this.proxyService.proxyTileRequest(req, response);
   }
 }
