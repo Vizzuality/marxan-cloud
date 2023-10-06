@@ -18,7 +18,10 @@ import { BBox } from 'geojson';
 
 import { Response } from 'express';
 import { setTileResponseHeadersForSuccessfulRequests } from '@marxan/tiles';
-import { CostSurfaceService, CostSurfaceTileRequest } from "@marxan-geoprocessing/modules/cost-surface/cost-surface.service";
+import {
+  CostSurfaceService,
+  CostSurfaceTileRequest,
+} from '@marxan-geoprocessing/modules/cost-surface/cost-surface.service';
 
 @Controller(`${apiGlobalPrefixes.v1}/cost-surfaces`)
 export class FeaturesController {
@@ -66,9 +69,7 @@ export class FeaturesController {
     @Param() TileSpecification: CostSurfaceTileRequest,
     @Res() response: Response,
   ): Promise<Response> {
-    const tile: Buffer = await this.service.findTile(
-      TileSpecification
-    );
+    const tile: Buffer = await this.service.findTile(TileSpecification);
     setTileResponseHeadersForSuccessfulRequests(response);
     return response.send(tile);
   }

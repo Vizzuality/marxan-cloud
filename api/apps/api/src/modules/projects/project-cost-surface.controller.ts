@@ -6,15 +6,16 @@ import {
   forwardRef,
   Get,
   Inject,
-  Param, ParseIntPipe,
+  Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Patch,
   Post,
   Req,
   Res,
   UploadedFile,
-  UseGuards
-} from "@nestjs/common";
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiForbiddenResponse,
   ApiOkResponse,

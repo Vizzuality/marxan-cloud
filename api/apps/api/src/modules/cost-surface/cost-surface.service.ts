@@ -316,5 +316,4 @@ export class CostSurfaceService {
   static defaultCostSurfaceName(): string {
     return `Default Cost Surface`;
   }
-
 }
