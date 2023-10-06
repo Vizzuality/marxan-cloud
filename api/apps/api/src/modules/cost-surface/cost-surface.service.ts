@@ -222,6 +222,28 @@ export class CostSurfaceService {
     }
   }
 
+  async checkProjectCostSurfaceVisibility(
+    userId: string,
+    projectId: string,
+    costSurfaceId: string,
+  ): Promise<
+    Either<
+      typeof costSurfaceNotFoundForProject | typeof projectNotVisible,
+      CostSurface
+    >
+  > {
+    const costSurface = await this.costSurfaceRepository.findOne({
+      where: { id: costSurfaceId, projectId },
+    });
+    if (!costSurface) {
+      return left(costSurfaceNotFoundForProject);
+    }
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(projectNotVisible);
+    }
+
+    return right(costSurface);
+  }
   async getCostSurface(
     userId: string,
     projectId: string,
@@ -294,4 +316,5 @@ export class CostSurfaceService {
   static defaultCostSurfaceName(): string {
     return `Default Cost Surface`;
   }
+
 }
