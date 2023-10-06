@@ -1,8 +1,7 @@
 import { INestApplication } from '@nestjs/common';
-import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
-import { EntityManager, In, Repository } from 'typeorm';
+import { getEntityManagerToken } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
-import {} from '@marxan-geoprocessing/modules/cost-surface/application/project-cost-surface.processor';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { CleanupTasksService } from '@marxan-geoprocessing/modules/cleanup-tasks/cleanup-tasks.service';
