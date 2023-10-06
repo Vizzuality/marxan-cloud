@@ -1,19 +1,21 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository } from "typeorm";
-import { GeoFeatureGeometry } from '@marxan/geofeatures';
-import { IsArray, IsNumber, IsString, IsOptional, IsDefined } from "class-validator";
+import { Repository } from 'typeorm';
+import {
+  IsArray,
+  IsNumber,
+  IsString,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
 import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo';
 
 import { TileRequest } from '@marxan/tiles';
-import { ProtectedAreaTileRequest } from "@marxan-geoprocessing/modules/protected-areas/protected-area-tile-request";
-import { QueryResult } from "pg";
-import { TileSpecification } from "@marxan-geoprocessing/modules/features/features.service";
-import { CostSurfacePuDataEntity } from "@marxan/cost-surfaces";
+
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 export class CostSurfaceTileRequest extends TileRequest {
   @ApiProperty()
   @IsString()
@@ -32,19 +34,17 @@ export class CostSurfaceFilters {
   bbox?: BBox;
 }
 
-
 @Injectable()
 export class CostSurfaceService {
   private readonly logger: Logger = new Logger(CostSurfaceService.name);
 
   constructor(
-    @InjectRepository(GeoFeatureGeometry)
+    @InjectRepository(CostSurfacePuDataEntity)
     private readonly costSurfaceDataRepository: Repository<CostSurfacePuDataEntity>,
     private readonly tileService: TileService,
   ) {}
 
-
-  buildFeaturesWhereQuery(id: string, bbox?: BBox): string {
+  buildCostSurfacesWhereQuery(id: string, bbox?: BBox): string {
     let whereQuery = `cost_surface_id = '${id}'`;
 
     if (bbox) {
@@ -76,7 +76,7 @@ export class CostSurfaceService {
                           from "${this.costSurfaceDataRepository.metadata.tableName}")
                           inner join projects_pu on project_pu.id = cost_surface_pu_dat.projects_pu_id`;
 
-    const customQuery = this.buildFeaturesWhereQuery(costSurfaceId, bbox);
+    const customQuery = this.buildCostSurfacesWhereQuery(costSurfaceId, bbox);
     return this.tileService.getTile({
       z,
       x,
