@@ -116,18 +116,28 @@ try:
         min_max = cur_geo_db.fetchone()
         min_val, max_val = min_max if min_max else (None, None)
 
-        # If min and max are null, remove scenario and cost_surface from api_db
         if min_val is None or max_val is None:
-            cur_api_db.execute("DELETE FROM scenarios WHERE id = %s;", (scenario_id,))
-            cur_api_db.execute("DELETE FROM cost_surfaces WHERE id = %s;", (cost_surface_id,))
             orphan_scenario_ids.append(scenario_id)
-        else:
-            # Update min and max in the cost_surfaces table in the api_db
-            cur_api_db.execute("""
-                UPDATE cost_surfaces
-                SET min = %s, max = %s
-                WHERE id = %s;
-            """, (min_val, max_val, cost_surface_id))
+            print(f'''Could not find Min/Max for scenario {scenario_id}, cost surface {cost_surface_id}.
+            This may mean that no scenarios_pu_cost_data rows were created for this scenario.
+            This should never happen, so data for this scenario should be checked.
+            The scenario may be invalid, and it may need to be deleted.
+            ''')
+
+        # If min and max are null, remove scenario and cost_surface from api_db
+        if min_val is None:
+            min_val = 0
+            print(f'Setting min to 0 for scenario {scenario_id}, cost surface {cost_surface_id}')
+        if max_val is None:
+            max_val = 0
+            print(f'Setting max to 0 for scenario {scenario_id}, cost surface {cost_surface_id}')
+
+        # Update min and max in the cost_surfaces table in the api_db
+        cur_api_db.execute("""
+            UPDATE cost_surfaces
+            SET min = %s, max = %s
+            WHERE id = %s;
+        """, (min_val, max_val, cost_surface_id))
 
     #Default Cost Surface for projects
     cur_api_db.execute("SELECT id FROM projects;")
