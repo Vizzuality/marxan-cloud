@@ -40,13 +40,17 @@ try:
         scenario_id, scenario_name, project_id = scenario
 
         # Insert new row in cost_surfaces
+        #
+        # We use scenario_id as the id for the cost_surface so that we can make
+        # the process idempotent, at least in terms of creating cost surfaces
+        # for existing scenarios.
         insert_cost_surface_sql = '''
             INSERT INTO cost_surfaces (id, name, min, max, is_default, project_id, is_migrated)
-            VALUES (gen_random_uuid(), %s, 0, 0, false, %s, true)
+            VALUES (%s, %s, 0, 0, false, %s, true)
             RETURNING id;
         '''
 
-        cur_api_db.execute(insert_cost_surface_sql, (scenario_name, project_id))
+        cur_api_db.execute(insert_cost_surface_sql, (scenario_id, scenario_name, project_id))
         cost_surface_id = cur_api_db.fetchone()[0]  # Retrieve the unique id for this new cost_surface
 
         # Update scenarios.cost_surface_id for this specific scenario
@@ -66,12 +70,16 @@ try:
         project_id = project[0]
 
         # Insert new row in cost_surfaces with project-specific information
+        #
+        # We use project_id as the id for the cost_surface so that we can make
+        # the process idempotent, at least in terms of creating default cost
+        # surfaces for existing projects.
         insert_cost_surface_for_project_sql = '''
             INSERT INTO cost_surfaces (id, project_id, min, max, is_default, name, is_migrated)
-            VALUES (gen_random_uuid(), %s, 1, 1, true, 'default', true);
+            VALUES (%s, %s, 1, 1, true, 'default', true);
         '''
 
-        cur_api_db.execute(insert_cost_surface_for_project_sql, (project_id,))
+        cur_api_db.execute(insert_cost_surface_for_project_sql, (project_id, project_id,))
 
     print("Successfully migrated API model data from marxan-api for:")
     print(len(all_scenarios), "scenarios")
