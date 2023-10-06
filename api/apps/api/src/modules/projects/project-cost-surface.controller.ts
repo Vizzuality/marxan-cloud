@@ -49,7 +49,6 @@ import {
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
 import { CostSurfaceSerializer } from '@marxan-api/modules/cost-surface/dto/cost-surface.serializer';
-import { JSONAPICostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 import { TilesOpenApi } from '@marxan/tiles';
 import { Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
