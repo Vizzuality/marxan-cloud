@@ -313,22 +313,6 @@ export const LEGEND_LAYERS = {
       visibility: true,
     },
   }),
-  // 'features-highlight': () => ({
-  //   id: 'features-highlight',
-  //   name: 'Selected Features',
-  //   icon: (
-  //     <Icon
-  //       icon={HEXAGON_SVG}
-  //       className="mt-0.5 h-3.5 w-3.5 stroke-current stroke-2"
-  //       style={{ color: COLORS.highlightFeatures }}
-  //     />
-  //   ),
-  //   settingsManager: {
-  //     opacity: true,
-  //     visibility: true,
-  //   },
-  // }),
-
   // ANALYSIS
   ['features-abundance']: (options: {
     items: {
@@ -366,7 +350,7 @@ export const LEGEND_LAYERS = {
   },
   'cost-surface': (options: {
     items: { id: CostSurface['id']; name: CostSurface['name']; min?: number; max?: number }[];
-    onChangeVisibility: () => void;
+    onChangeVisibility: (id: CostSurface['id']) => void;
   }) => {
     const { items, onChangeVisibility } = options;
 
@@ -388,7 +372,9 @@ export const LEGEND_LAYERS = {
           value: `${max}`,
         },
       ],
-      onChangeVisibility,
+      onChangeVisibility: () => {
+        onChangeVisibility?.(id);
+      },
     }));
   },
   'lock-available': (options) => {

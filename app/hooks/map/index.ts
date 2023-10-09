@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 
 import chroma from 'chroma-js';
+import { Layer } from 'mapbox-gl';
+
+import { CostSurface } from 'types/api/cost-surface';
+import { Project } from 'types/api/project';
 
 import { COLORS, LEGEND_LAYERS } from './constants';
 import {
@@ -169,6 +173,56 @@ export function useGridPreviewLayer({ active, gridId, cache = 0 }: UseGridPrevie
       },
     };
   }, [active, gridId, cache]);
+}
+
+export function useCostSurfaceLayer({
+  active,
+  pid,
+  costSurfaceId,
+  layerSettings,
+}: {
+  active: boolean;
+  pid: Project['id'];
+  costSurfaceId: CostSurface['id'];
+  layerSettings: UsePUGridLayer['options']['settings']['cost-surface'];
+}): Layer {
+  return useMemo(() => {
+    if (!active) return null;
+
+    return {
+      id: `cost-surface-layer-${pid}-${costSurfaceId}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/cost-surfaces/${costSurfaceId}/preview/tiles/{z}/{x}/{y}.mvt`,
+        ],
+      },
+      render: {
+        layers: [
+          {
+            type: 'fill',
+            'source-layer': 'layer0',
+            layout: {
+              visibility: layerSettings.visibility ? 'visible' : 'none',
+            },
+            paint: {
+              'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'cost'],
+                layerSettings.min === layerSettings.max ? 0 : layerSettings.min,
+                COLORS.cost[0],
+                layerSettings.max,
+                COLORS.cost[1],
+              ],
+              'fill-opacity': 0.75 * (layerSettings.opacity || 1),
+            },
+          },
+        ],
+      },
+    };
+  }, [active, pid, costSurfaceId, layerSettings]);
 }
 
 // WDPA preview layer
@@ -601,14 +655,9 @@ export function usePUGridLayer({
     const {
       wdpaIucnCategories = [],
       wdpaThreshold = 0,
-      cost = {
-        min: 0,
-        max: 100,
-      },
       puIncludedValue,
       puExcludedValue,
       puAvailableValue,
-      // features = [],
       preHighlightFeatures = [],
       postHighlightFeatures = [],
       runId,
@@ -617,8 +666,6 @@ export function usePUGridLayer({
     const {
       pugrid: PUgridSettings = {},
       'wdpa-percentage': WdpaPercentageSettings = {},
-      // features: FeaturesSettings = {},
-      'cost-surface': CostSettings = {},
       'lock-in': LockInSettings = {},
       'lock-out': LockOutSettings = {},
       'lock-available': LockAvailableSettings = {},
@@ -630,9 +677,6 @@ export function usePUGridLayer({
     const { opacity: PUgridOpacity = 1, visibility: PUgridVisibility = true } = PUgridSettings;
     const { opacity: WdpaPercentageOpacity = 1, visibility: WdpaPercentageVisibility = true } =
       WdpaPercentageSettings;
-    // const { opacity: FeaturesOpacity = 1, visibility: FeaturesVisibility = true } =
-    //   FeaturesSettings;
-    const { opacity: CostOpacity = 1, visibility: CostVisibility = true } = CostSettings;
     const { opacity: LockInOpacity = 1, visibility: LockInVisibility = true } = LockInSettings;
     const { opacity: LockOutOpacity = 1, visibility: LockOutVisibility = true } = LockOutSettings;
     const { opacity: LockAvailableOpacity = 1, visibility: LockAvailableVisibility = true } =
@@ -720,31 +764,6 @@ export function usePUGridLayer({
                     ],
                   },
                 })),
-              ]
-            : []),
-
-          // ANALYSIS - COST SURFACE
-          ...(sublayers.includes('cost')
-            ? [
-                {
-                  type: 'fill',
-                  'source-layer': 'layer0',
-                  layout: {
-                    visibility: getLayerVisibility(CostVisibility),
-                  },
-                  paint: {
-                    'fill-color': [
-                      'interpolate',
-                      ['linear'],
-                      ['get', 'costValue'],
-                      cost.min === cost.max ? 0 : cost.min,
-                      COLORS.cost[0],
-                      cost.max,
-                      COLORS.cost[1],
-                    ],
-                    'fill-opacity': 0.75 * CostOpacity,
-                  },
-                },
               ]
             : []),
 

@@ -68,7 +68,7 @@ const DeleteModal = ({
         addToast(
           'delete-bulk-project-cost-surfaces',
           <>
-            <h2 className="font-medium">Error!</h2>
+            <h2 className="font-medium">Error</h2>
             <p className="text-sm">Something went wrong deleting the cost surfaces.</p>
           </>,
           {

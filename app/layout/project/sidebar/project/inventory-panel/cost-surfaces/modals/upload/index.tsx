@@ -214,7 +214,7 @@ export const CostSurfaceUploadModal = ({
                   </InfoButton>
                 </div>
 
-                <p className="!mt-4 text-sm text-gray-100">
+                <p className="mt-4 text-sm text-gray-900">
                   Please download and fill in the{' '}
                   <button
                     className="text-primary-500 underline hover:no-underline"

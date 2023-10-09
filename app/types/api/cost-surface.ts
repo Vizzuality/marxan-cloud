@@ -1,6 +1,8 @@
 export interface CostSurface {
   id: string;
   name: string;
-  isCustom: boolean;
+  isDefault: boolean;
+  min: number;
+  max: number;
   scenarioUsageCount: number;
 }

@@ -1,9 +1,14 @@
-import { useState, useCallback, useEffect, ChangeEvent } from 'react';
+import { useState, useCallback, useEffect, ChangeEvent, useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedCostSurfaces as setVisibleCostSurface } from 'store/slices/projects/[id]';
+import {
+  setLayerSettings,
+  setSelectedCostSurfaces as setVisibleCostSurface,
+} from 'store/slices/projects/[id]';
+
+import { orderBy } from 'lodash';
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 
@@ -22,9 +27,11 @@ const COST_SURFACE_TABLE_COLUMNS = [
 
 const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { selectedCostSurface: visibleCostSurface, search } = useAppSelector(
-    (state) => state['/projects/[id]']
-  );
+  const {
+    selectedCostSurface: visibleCostSurface,
+    search,
+    layerSettings,
+  } = useAppSelector((state) => state['/projects/[id]']);
 
   const { query } = useRouter();
   const { pid } = query as { pid: string };
@@ -34,26 +41,44 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
     sort: COST_SURFACE_TABLE_COLUMNS[0].name,
   });
 
-  const allProjectCostSurfacesQuery = useProjectCostSurfaces(
+  const allProjectCostSurfacesQuery = useProjectCostSurfaces<
+    Omit<CostSurface & Pick<DataItem, 'isCustom'>, 'isDefault'>[]
+  >(
     pid,
     {
       ...filters,
-      search,
     },
     {
       select: (data) =>
-        data?.map((cs) => ({
-          id: cs.id,
-          name: cs.name,
-          isCustom: cs.isCustom,
-          scenarioUsageCount: cs.scenarioUsageCount,
-        })),
+        data
+          .filter(({ isDefault }) => !isDefault)
+          .map((cs) => ({
+            ...cs,
+            isCustom: !cs.isDefault,
+          })),
       keepPreviousData: true,
       placeholderData: [],
     }
   );
 
-  const costSurfaceIds = allProjectCostSurfacesQuery.data?.map((cs) => cs.id);
+  const filteredData = useMemo(() => {
+    let sortedData = allProjectCostSurfacesQuery.data;
+
+    if (filters.sort === '-name') {
+      sortedData = orderBy(allProjectCostSurfacesQuery.data, 'name', 'desc');
+    }
+
+    if (search) {
+      sortedData = sortedData.filter((cs) =>
+        cs.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+      );
+    }
+
+    // the API assumes the default sort is ascending
+    return sortedData;
+  }, [filters, allProjectCostSurfacesQuery.data, search]);
+
+  const costSurfaceIds = filteredData?.map((cs) => cs.id);
 
   const handleSelectAll = useCallback(
     (evt: ChangeEvent<HTMLInputElement>) => {
@@ -81,13 +106,24 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
 
   const toggleSeeOnMap = useCallback(
     (costSurfaceId: CostSurface['id']) => {
+      costSurfaceIds.forEach((id) => {
+        dispatch(
+          setLayerSettings({
+            id,
+            settings: {
+              visibility: id !== costSurfaceId ? false : !layerSettings[costSurfaceId]?.visibility,
+            },
+          })
+        );
+      });
+
       if (costSurfaceId === visibleCostSurface) {
         dispatch(setVisibleCostSurface(null));
       } else {
         dispatch(setVisibleCostSurface(costSurfaceId));
       }
     },
-    [dispatch, visibleCostSurface]
+    [dispatch, visibleCostSurface, layerSettings, costSurfaceIds]
   );
 
   const handleSort = useCallback(
@@ -104,7 +140,7 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
 
   const displayBulkActions = selectedCostSurfaceIds.length > 0;
 
-  const data: DataItem[] = allProjectCostSurfacesQuery.data?.map((cs) => ({
+  const data: DataItem[] = filteredData?.map((cs) => ({
     ...cs,
     name: cs.name,
     scenarios: cs.scenarioUsageCount,

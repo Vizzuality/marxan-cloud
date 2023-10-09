@@ -19,7 +19,7 @@ export const useInventoryItems = (): SubMenuItem[] => {
   const { showCS } = useFeatureFlags();
   const { query, route } = useRouter();
   const { pid, tab } = query as { pid: string; tab: string };
-  const isProjectRoute = route.startsWith('/projects/[pid]');
+  const isProjectRoute = route.startsWith('/projects/[pid]') && !route.includes('/scenarios');
 
   return [
     {
