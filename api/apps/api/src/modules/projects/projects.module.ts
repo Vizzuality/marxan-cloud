@@ -60,6 +60,7 @@ import { ProjectFeaturesController } from './projects.project-features.controlle
 import { ProjectCloningController } from './projects.cloning.controller';
 import { ProjectPlanningAreaAndGridController } from './projects.planning-area-and-grid.controller';
 import { ProjectBLMController } from './projects.blm.controller';
+import { ProjectSummariesController } from './projects.summaries.controller';
 
 @Module({
   imports: [
@@ -134,6 +135,7 @@ import { ProjectBLMController } from './projects.blm.controller';
     ProjectPlanningAreaAndGridController,
     ProjectProtectedAreasController,
     ProjectScenarioComparisonController,
+    ProjectSummariesController,
   ],
   // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
   exports: [ProjectsCrudService, TypeOrmModule, ProjectsService],
