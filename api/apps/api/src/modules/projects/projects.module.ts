@@ -59,6 +59,7 @@ import { LegacyProjectsController } from './projects.legacy-projects.controller'
 import { ProjectFeaturesController } from './projects.project-features.controller';
 import { ProjectCloningController } from './projects.cloning.controller';
 import { ProjectPlanningAreaAndGridController } from './projects.planning-area-and-grid.controller';
+import { ProjectBLMController } from './projects.blm.controller';
 
 @Module({
   imports: [
@@ -125,6 +126,7 @@ import { ProjectPlanningAreaAndGridController } from './projects.planning-area-a
     LegacyProjectsController,
     ProjectsController,
     ProjectsListingController,
+    ProjectBLMController,
     ProjectCloningController,
     ProjectCostSurfaceController,
     ProjectDetailsController,
