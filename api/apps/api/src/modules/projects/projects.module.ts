@@ -58,6 +58,7 @@ import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface
 import { LegacyProjectsController } from './projects.legacy-projects.controller';
 import { ProjectFeaturesController } from './projects.project-features.controller';
 import { ProjectCloningController } from './projects.cloning.controller';
+import { ProjectPlanningAreaAndGridController } from './projects.planning-area-and-grid.controller';
 
 @Module({
   imports: [
@@ -122,14 +123,15 @@ import { ProjectCloningController } from './projects.cloning.controller';
   ],
   controllers: [
     LegacyProjectsController,
+    ProjectsController,
     ProjectsListingController,
     ProjectCloningController,
+    ProjectCostSurfaceController,
     ProjectDetailsController,
     ProjectFeaturesController,
-    ProjectsController,
+    ProjectPlanningAreaAndGridController,
     ProjectProtectedAreasController,
     ProjectScenarioComparisonController,
-    ProjectCostSurfaceController,
   ],
   // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
   exports: [ProjectsCrudService, TypeOrmModule, ProjectsService],
