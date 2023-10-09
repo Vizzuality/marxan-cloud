@@ -21,7 +21,7 @@ test(`cost surface template - should return a file when it is calculated`, async
   fixtures.templateAvailable('123', 'sample shapefile');
   // when
   const test = request(app.getHttpServer()).get(
-    '/api/v1/projects/123/cost-surface/shapefile-template',
+    '/api/v1/projects/123/cost-surfaces/shapefile-template',
   );
   // then
   const response = await test.expect(200);
@@ -47,7 +47,7 @@ it(`should return a timeout when file is in progress`, async () => {
   fixtures.templateInProgress(`123`);
   // when
   const test = request(app.getHttpServer()).get(
-    '/api/v1/projects/123/cost-surface/shapefile-template',
+    '/api/v1/projects/123/cost-surfaces/shapefile-template',
   );
   // then
   await test.expect(504);

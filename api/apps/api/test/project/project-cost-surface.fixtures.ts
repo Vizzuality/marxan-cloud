@@ -166,12 +166,12 @@ export const getProjectCostSurfaceFixtures = async () => {
 
     WhenGettingCostSurfacesForProject: async (projectId: string) => {
       return request(app.getHttpServer())
-        .get(`/api/v1/projects/${projectId}/cost-surface`)
+        .get(`/api/v1/projects/${projectId}/cost-surfaces`)
         .set('Authorization', `Bearer ${token}`);
     },
     WhenGettingCostSurfaceForProject: async (projectId: string, id: string) => {
       return request(app.getHttpServer())
-        .get(`/api/v1/projects/${projectId}/cost-surface/${id}`)
+        .get(`/api/v1/projects/${projectId}/cost-surfaces/${id}`)
         .set('Authorization', `Bearer ${token}`);
     },
     WhenUploadingCostSurfaceShapefileForProject: async (
@@ -180,7 +180,7 @@ export const getProjectCostSurfaceFixtures = async () => {
       shapefilePath: string,
     ) => {
       return request(app.getHttpServer())
-        .post(`/api/v1/projects/${projectId}/cost-surface/shapefile`)
+        .post(`/api/v1/projects/${projectId}/cost-surfaces/shapefile`)
         .set('Authorization', `Bearer ${token}`)
         .attach(`file`, shapefilePath)
         .field({
@@ -193,7 +193,7 @@ export const getProjectCostSurfaceFixtures = async () => {
       costSurfaceName: string,
     ) => {
       return request(app.getHttpServer())
-        .patch(`/api/v1/projects/${projectId}/cost-surface/${costSurfaceId}`)
+        .patch(`/api/v1/projects/${projectId}/cost-surfaces/${costSurfaceId}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ name: costSurfaceName });
     },
@@ -202,7 +202,7 @@ export const getProjectCostSurfaceFixtures = async () => {
       costSurfaceId: string,
     ) => {
       return request(app.getHttpServer())
-        .delete(`/api/v1/projects/${projectId}/cost-surface/${costSurfaceId}`)
+        .delete(`/api/v1/projects/${projectId}/cost-surfaces/${costSurfaceId}`)
         .set('Authorization', `Bearer ${token}`);
     },
 
@@ -212,7 +212,7 @@ export const getProjectCostSurfaceFixtures = async () => {
     ) => {
       return request(app.getHttpServer())
         .get(
-          `/api/v1/projects/${projectId}/cost-surface/${costSurfaceId}/cost-range`,
+          `/api/v1/projects/${projectId}/cost-surfaces/${costSurfaceId}/cost-range`,
         )
         .set('Authorization', `Bearer ${token}`)
         .send();
