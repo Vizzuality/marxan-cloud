@@ -43,7 +43,7 @@ import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export
 import { LegacyProjectImportModule } from '../legacy-project-import/legacy-project-import.module';
 import { DeleteProjectModule } from './delete-project/delete-project.module';
 import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/infra/legacy-project-import.repository.module';
-import { ProjectsProxyController } from '@marxan-api/modules/projects/projects-proxy.controller';
+import { ProjectScenarioComparisonController } from '@marxan-api/modules/projects/projects.scenario-comparison.controller';
 import { WebshotModule } from '@marxan/webshot';
 import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.module';
 import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.module';
@@ -128,7 +128,7 @@ import { ProjectCloningController } from './projects.cloning.controller';
     ProjectFeaturesController,
     ProjectsController,
     ProjectProtectedAreasController,
-    ProjectsProxyController,
+    ProjectScenarioComparisonController,
     ProjectCostSurfaceController,
   ],
   // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
