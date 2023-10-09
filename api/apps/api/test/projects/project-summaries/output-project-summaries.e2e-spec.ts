@@ -13,13 +13,13 @@ import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { parseStream } from 'fast-csv';
 import { Readable } from 'stream';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenScenarioPuData } from '../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
+import { bootstrapApplication } from '../../utils/api-application';
+import { GivenScenarioPuData } from '../../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
 import { Parse, ParseStream } from 'unzipper';
-import { GivenProjectsPu } from '../../../geoprocessing/test/steps/given-projects-pu-exists';
+import { GivenProjectsPu } from '../../../../geoprocessing/test/steps/given-projects-pu-exists';
 import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;

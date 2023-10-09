@@ -2,9 +2,9 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
 import { EntityManager, Repository } from 'typeorm';
-import { GivenProjectExists } from '../steps/given-project';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { bootstrapApplication } from '../utils/api-application';
+import { GivenProjectExists } from '../../steps/given-project';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
+import { bootstrapApplication } from '../../utils/api-application';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { v4 } from 'uuid';
 import {
@@ -13,11 +13,11 @@ import {
 } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
-import { GivenUserExists } from '../steps/given-user-exists';
-import { GivenScenarioFeaturesData } from '../../../geoprocessing/test/integration/cloning/fixtures';
+import { GivenUserExists } from '../../steps/given-user-exists';
+import { GivenScenarioFeaturesData } from '../../../../geoprocessing/test/integration/cloning/fixtures';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { apiConnections } from '@marxan-api/ormconfig';
-import { GivenScenarioExists } from '../steps/given-scenario-exists';
+import { GivenScenarioExists } from '../../steps/given-scenario-exists';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 let fixtures: FixtureType<typeof getFixtures>;

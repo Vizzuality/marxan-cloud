@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
-import { E2E_CONFIG } from './e2e.config';
-import { TestClientApi } from './utils/test-client/test-client-api';
+import { E2E_CONFIG } from '../../e2e.config';
+import { TestClientApi } from '../../utils/test-client/test-client-api';
 import { Repository } from 'typeorm';
 import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';

@@ -1,7 +1,7 @@
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { bootstrapApplication } from '../../utils/api-application';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
+import { OrganizationsTestUtils } from '../../utils/organizations.test.utils';
+import { ProjectsTestUtils } from '../../utils/projects.test.utils';
 import * as request from 'supertest';
 
 export const getFixtures = async () => {

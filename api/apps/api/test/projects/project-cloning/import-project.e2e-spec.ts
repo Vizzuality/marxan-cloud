@@ -32,12 +32,12 @@ import { Readable } from 'stream';
 import * as request from 'supertest';
 import { DataSource } from 'typeorm';
 import { v4 } from 'uuid';
-import { ExportId } from '../../src/modules/clone';
-import { ExportRepository } from '../../src/modules/clone/export/application/export-repository.port';
-import { ManifestFileService } from '../../src/modules/clone/export/application/manifest-file-service.port';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { bootstrapApplication } from '../utils/api-application';
-import { EventBusTestUtils } from '../utils/event-bus.test.utils';
+import { ExportId } from '../../../src/modules/clone';
+import { ExportRepository } from '../../../src/modules/clone/export/application/export-repository.port';
+import { ManifestFileService } from '../../../src/modules/clone/export/application/manifest-file-service.port';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
+import { bootstrapApplication } from '../../utils/api-application';
+import { EventBusTestUtils } from '../../utils/event-bus.test.utils';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

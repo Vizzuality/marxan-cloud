@@ -1,11 +1,11 @@
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { E2E_CONFIG } from '../e2e.config';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { bootstrapApplication } from '../../utils/api-application';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
+import { OrganizationsTestUtils } from '../../utils/organizations.test.utils';
+import { E2E_CONFIG } from '../../e2e.config';
+import { ProjectsTestUtils } from '../../utils/projects.test.utils';
 import * as request from 'supertest';
 import { CqrsModule } from '@nestjs/cqrs';
-import { EventBusTestUtils } from '../utils/event-bus.test.utils';
+import { EventBusTestUtils } from '../../utils/event-bus.test.utils';
 import { ProjectDeleted } from '@marxan-api/modules/projects/events/project-deleted.event';
 
 export const getFixtures = async () => {

@@ -1,8 +1,8 @@
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { E2E_CONFIG } from '../e2e.config';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { bootstrapApplication } from '../../utils/api-application';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
+import { OrganizationsTestUtils } from '../../utils/organizations.test.utils';
+import { E2E_CONFIG } from '../../e2e.config';
+import { ProjectsTestUtils } from '../../utils/projects.test.utils';
 import * as request from 'supertest';
 import { CommandBus } from '@nestjs/cqrs';
 import { SetProjectBlm } from '@marxan-api/modules/projects/blm/set-project-blm';

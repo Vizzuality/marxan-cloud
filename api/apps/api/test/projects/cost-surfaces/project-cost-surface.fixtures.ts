@@ -1,4 +1,4 @@
-import { bootstrapApplication } from '../utils/api-application';
+import { bootstrapApplication } from '../../utils/api-application';
 import {
   getEntityManagerToken,
   getRepositoryToken,
@@ -13,8 +13,8 @@ import {
   ScenariosPuCostDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { GivenUserExists } from '../steps/given-user-exists';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
+import { GivenUserExists } from '../../steps/given-user-exists';
 import { EntityManager, Repository } from 'typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
@@ -24,15 +24,15 @@ import {
 } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
-import { GivenProjectExists } from '../steps/given-project';
-import { GivenProjectsPu } from '../../../geoprocessing/test/steps/given-projects-pu-exists';
+import { GivenProjectExists } from '../../steps/given-project';
+import { GivenProjectsPu } from '../../../../geoprocessing/test/steps/given-projects-pu-exists';
 import * as request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { CqrsModule } from '@nestjs/cqrs';
-import { EventBusTestUtils } from '../utils/event-bus.test.utils';
+import { EventBusTestUtils } from '../../utils/event-bus.test.utils';
 import { CostSurfaceDeleted } from '@marxan-api/modules/cost-surface/events/cost-surface-deleted.event';
-import { FakeQueue } from '../utils/queues';
+import { FakeQueue } from '../../utils/queues';
 import { unusedResourcesCleanupQueueName } from '@marxan/unused-resources-cleanup';
 
 export const getProjectCostSurfaceFixtures = async () => {
@@ -161,7 +161,7 @@ export const getProjectCostSurfaceFixtures = async () => {
       );
     },
     GivenMockCostSurfaceShapefile: () => {
-      return __dirname + `/../upload-feature/import-files/wetlands.zip`;
+      return __dirname + `/../../upload-feature/import-files/wetlands.zip`;
     },
 
     WhenGettingCostSurfacesForProject: async (projectId: string) => {
