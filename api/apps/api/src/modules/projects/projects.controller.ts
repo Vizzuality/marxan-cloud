@@ -8,45 +8,33 @@ import {
   Header,
   InternalServerErrorException,
   NotFoundException,
-  Param,
-  ParseIntPipe,
-  ParseUUIDPipe,
+  Param, ParseUUIDPipe,
   Patch,
   Post,
   Req,
-  Res,
-  UploadedFile,
-  UseGuards,
+  Res, UseGuards
 } from '@nestjs/common';
 
 import { projectResource, ProjectResultSingular } from './project.api.entity';
 import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOkResponse,
+  ApiBearerAuth, ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiProduces,
-  ApiTags,
+  ApiTags
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import {
-  ensureShapefileHasRequiredFiles,
-} from '@marxan-api/utils/file-uploads.utils';
 
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import {
-  ProjectsService,
-  validationFailed,
+  ProjectsService
 } from './projects.service';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
-import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
@@ -57,10 +45,6 @@ import {
   updateFailure,
 } from '@marxan-api/modules/projects/blm/change-project-blm-range.command';
 import { ProjectBlmValuesResponseDto } from '@marxan-api/modules/projects/dto/project-blm-values-response.dto';
-import {
-  GeometryFileInterceptor,
-  GeometryKind,
-} from '@marxan-api/decorators/file-interceptors.decorator';
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import {
   projectNotFound as blmProjectNotFound,
@@ -72,17 +56,9 @@ import {
   IsMissingAclImplementation,
 } from '@marxan-api/decorators/acl.decorator';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
-import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
-import { TilesOpenApi } from '@marxan/tiles';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { deleteProjectFailed } from './delete-project/delete-project.command';
 import { outputProjectSummaryResource } from './output-project-summaries/output-project-summary.api.entity';
-import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
-import {
-  AsyncJobDto,
-  JsonApiAsyncJobMeta,
-} from '@marxan-api/dto/async-job.dto';
-import { scenarioResource } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -93,7 +69,6 @@ export class ProjectsController {
     private readonly projectsService: ProjectsService,
     private readonly projectSerializer: ProjectSerializer,
     private readonly jobsStatusSerializer: JobStatusSerializer,
-    private readonly proxyService: ProxyService,
   ) {}
 
   @ImplementsAcl()
@@ -167,30 +142,6 @@ export class ProjectsController {
   }
 
   @IsMissingAclImplementation()
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @ApiOperation({
-    description: 'Upload shapefile for project-specific planning unit grid',
-  })
-  @GeometryFileInterceptor(GeometryKind.Complex)
-  @ApiCreatedResponse({ type: PlanningAreaResponseDto })
-  @ApiTags(asyncJobTag)
-  @Post(`planning-area/shapefile-grid`)
-  async uploadCustomGridShapefile(
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<PlanningAreaResponseDto> {
-    await ensureShapefileHasRequiredFiles(file);
-
-    const result = await this.projectsService.savePlanningAreaFromShapefile(
-      file,
-      true,
-    );
-    if (isLeft(result)) {
-      throw new InternalServerErrorException(result.left);
-    }
-    return result.right;
-  }
-
-  @IsMissingAclImplementation()
   @ApiOperation({
     description: `Find running jobs for each scenario under given project`,
   })
@@ -207,194 +158,6 @@ export class ProjectsController {
       },
     );
     return this.jobsStatusSerializer.serialize(projectId, projectWithScenarios);
-  }
-
-  @IsMissingAclImplementation()
-  @ApiConsumesShapefile({
-    withGeoJsonResponse: true,
-    type: PlanningAreaResponseDto,
-    description: 'Upload shapefile with project planning-area',
-  })
-  @GeometryFileInterceptor(GeometryKind.Simple)
-  @ApiTags(inlineJobTag)
-  @Post('planning-area/shapefile')
-  async shapefileWithProjectPlanningArea(
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<PlanningAreaResponseDto> {
-    await ensureShapefileHasRequiredFiles(file);
-
-    const result = await this.projectsService.savePlanningAreaFromShapefile(
-      file,
-    );
-    if (isLeft(result)) {
-      const mapping: Record<typeof result['left'], () => never> = {
-        [validationFailed]: () => {
-          throw new BadRequestException();
-        },
-      };
-      mapping[result.left]();
-      throw new InternalServerErrorException();
-    }
-
-    return result.right;
-  }
-
-  @ImplementsAcl()
-  @TilesOpenApi()
-  @ApiOperation({
-    description: 'Get planning area grid tiles for user uploaded grid.',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'planning area id',
-    type: String,
-    required: true,
-    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
-  })
-  @Get('planning-area/:id/grid/preview/tiles/:z/:x/:y.mvt')
-  async proxyPlanningAreaGridTile(
-    @Req() req: RequestWithAuthenticatedUser,
-    @Res() response: Response,
-    @Param('id', ParseUUIDPipe) planningAreaId: string,
-  ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      planningAreaId,
-      req.user.id,
-    );
-    if (isLeft(checkPlanningAreaBelongsToProject)) {
-      throw new ForbiddenException();
-    }
-    return await this.proxyService.proxyTileRequest(req, response);
-  }
-
-  @ImplementsAcl()
-  @TilesOpenApi()
-  @ApiOperation({
-    description: 'Get planning area tiles for uploaded planning area.',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'Scenario id',
-    type: String,
-    required: true,
-    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
-  })
-  @Get('planning-area/:id/preview/tiles/:z/:x/:y.mvt')
-  async proxyPlanningAreaTile(
-    @Req() req: RequestWithAuthenticatedUser,
-    @Res() response: Response,
-    @Param('id', ParseUUIDPipe) planningAreaId: string,
-  ): Promise<void> {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      planningAreaId,
-      req.user.id,
-    );
-    if (isLeft(checkPlanningAreaBelongsToProject)) {
-      throw new ForbiddenException();
-    }
-
-    return await this.proxyService.proxyTileRequest(req, response);
-  }
-
-  @ImplementsAcl()
-  @TilesOpenApi()
-  @ApiOperation({
-    description: 'Get planning area tiles for project planning area.',
-  })
-  @ApiParam({
-    name: 'projectId',
-    description: 'Scenario id',
-    type: String,
-    required: true,
-    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
-  })
-  @Get(':projectId/planning-area/tiles/:z/:x/:y.mvt')
-  async proxyProjectPlanningAreaTile(
-    @Req() req: RequestWithAuthenticatedUser,
-    @Res() response: Response,
-    @Param('projectId', ParseUUIDPipe) projectId: string,
-    @Param('z', ParseIntPipe) z: number,
-    @Param('x', ParseIntPipe) x: number,
-    @Param('y', ParseIntPipe) y: number,
-  ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      projectId,
-      req.user.id,
-    );
-    if (isLeft(checkPlanningAreaBelongsToProject)) {
-      throw new ForbiddenException();
-    }
-
-    const result = await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
-      projectId,
-      req.user.id,
-      z,
-      x,
-      y,
-    );
-
-    if (isLeft(result)) {
-      throw new ForbiddenException();
-    }
-    req.url = req.url.replace(result.right.from, result.right.to);
-    req.originalUrl = req.originalUrl.replace(
-      result.right.from,
-      result.right.to,
-    );
-
-    return await this.proxyService.proxyTileRequest(req, response);
-  }
-
-  @ImplementsAcl()
-  @TilesOpenApi()
-  @ApiOperation({
-    description: 'Get planning area grid tiles for project grid.',
-  })
-  @ApiParam({
-    name: 'projectId',
-    description: 'Scenario id',
-    type: String,
-    required: true,
-    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
-  })
-  @Get(':projectId/grid/tiles/:z/:x/:y.mvt')
-  async proxyProjectPlanningUnitsTile(
-    @Req() req: RequestWithAuthenticatedUser,
-    @Res() response: Response,
-    @Param('projectId', ParseUUIDPipe) projectId: string,
-    @Param('z', ParseIntPipe) z: number,
-    @Param('x', ParseIntPipe) x: number,
-    @Param('y', ParseIntPipe) y: number,
-  ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      projectId,
-      req.user.id,
-    );
-    if (isLeft(checkPlanningAreaBelongsToProject)) {
-      throw new ForbiddenException();
-    }
-
-    const result = await this.projectsService.getActualUrlForProjectPlanningGridTiles(
-      projectId,
-      req.user.id,
-      z,
-      x,
-      y,
-    );
-
-    if (isLeft(result)) {
-      throw new ForbiddenException();
-    }
-
-    req.url = req.url.replace(result.right.from, result.right.to);
-    req.originalUrl = req.originalUrl.replace(
-      result.right.from,
-      result.right.to,
-    );
-
-    req.query = result.right.query;
-
-    return await this.proxyService.proxyTileRequest(req, response);
   }
 
   @ImplementsAcl()
