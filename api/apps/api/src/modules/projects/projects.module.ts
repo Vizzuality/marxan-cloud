@@ -57,6 +57,7 @@ import { ProtectedAreaModule } from '@marxan-api/modules/scenarios/protected-are
 import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 import { LegacyProjectsController } from './projects.legacy-projects.controller';
 import { ProjectFeaturesController } from './projects.project-features.controller';
+import { ProjectCloningController } from './projects.cloning.controller';
 
 @Module({
   imports: [
@@ -122,6 +123,7 @@ import { ProjectFeaturesController } from './projects.project-features.controlle
   controllers: [
     LegacyProjectsController,
     ProjectsListingController,
+    ProjectCloningController,
     ProjectDetailsController,
     ProjectFeaturesController,
     ProjectsController,
