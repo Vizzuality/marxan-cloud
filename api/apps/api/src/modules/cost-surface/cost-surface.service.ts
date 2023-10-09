@@ -249,6 +249,7 @@ export class CostSurfaceService {
       .leftJoin(Scenario, 's', 'cs.id = s.cost_surface_id')
       .where('cs.project_id = :projectId', { projectId })
       .andWhere('cs.id = :costSurfaceId', { costSurfaceId })
+      .orderBy('cs.name', 'ASC')
       .groupBy('cs.id')
       .getRawOne();
 
