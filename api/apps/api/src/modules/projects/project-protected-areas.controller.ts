@@ -1,10 +1,13 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
   ParseUUIDPipe,
+  Post,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
 } from '@nestjs/common';
 
@@ -37,6 +40,13 @@ import {
   JSONAPIProtectedAreasListQueryParams,
 } from '@marxan-api/decorators/json-api-parameters.decorator';
 import { ProtectedAreaResult } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
+import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
+import { GeometryFileInterceptor, GeometryKind } from '@marxan-api/decorators/file-interceptors.decorator';
+import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
+import { UploadShapefileDto } from '../scenarios/dto/upload.shapefile.dto';
+import { AsyncJobDto, JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
+import { ProjectsService } from './projects.service';
+import { scenarioResource } from '../scenarios/scenario.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -45,6 +55,7 @@ import { ProtectedAreaResult } from '@marxan-api/modules/protected-areas/protect
 export class ProjectProtectedAreasController {
   constructor(
     private readonly projectProtectedAreasService: ProjectProtectedAreasService,
+    private readonly projectsService: ProjectsService,
   ) {}
 
   @ImplementsAcl()
@@ -85,5 +96,38 @@ export class ProjectProtectedAreasController {
     } else {
       return result.right;
     }
+  }
+
+  @ImplementsAcl()
+  @ApiConsumesShapefile({ withGeoJsonResponse: false })
+  @ApiOperation({
+    description: 'Upload shapefile with protected areas for project',
+  })
+  @GeometryFileInterceptor(GeometryKind.Complex)
+  @ApiTags(asyncJobTag)
+  @Post(':id/protected-areas/shapefile')
+  async shapefileForProtectedArea(
+    @Param('id') projectId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: UploadShapefileDto,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const outcome = await this.projectsService.addProtectedAreaFor(
+      projectId,
+      file,
+      { authenticatedUser: req.user },
+      dto,
+    );
+    if (isLeft(outcome)) {
+      if (isLeft(outcome)) {
+        throw mapAclDomainToHttpError(outcome.left, {
+          projectId,
+          userId: req.user.id,
+          resourceType: scenarioResource.name.plural,
+        });
+      }
+    }
+
+    return AsyncJobDto.forProject().asJsonApiMetadata();
   }
 }

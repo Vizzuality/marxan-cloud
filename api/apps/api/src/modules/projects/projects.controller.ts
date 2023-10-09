@@ -527,37 +527,4 @@ export class ProjectsController {
 
     return result.right;
   }
-
-  @ImplementsAcl()
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @ApiOperation({
-    description: 'Upload shapefile with protected areas for project',
-  })
-  @GeometryFileInterceptor(GeometryKind.Complex)
-  @ApiTags(asyncJobTag)
-  @Post(':id/protected-areas/shapefile')
-  async shapefileForProtectedArea(
-    @Param('id') projectId: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: RequestWithAuthenticatedUser,
-    @Body() dto: UploadShapefileDto,
-  ): Promise<JsonApiAsyncJobMeta> {
-    const outcome = await this.projectsService.addProtectedAreaFor(
-      projectId,
-      file,
-      { authenticatedUser: req.user },
-      dto,
-    );
-    if (isLeft(outcome)) {
-      if (isLeft(outcome)) {
-        throw mapAclDomainToHttpError(outcome.left, {
-          projectId,
-          userId: req.user.id,
-          resourceType: scenarioResource.name.plural,
-        });
-      }
-    }
-
-    return AsyncJobDto.forProject().asJsonApiMetadata();
-  }
 }
