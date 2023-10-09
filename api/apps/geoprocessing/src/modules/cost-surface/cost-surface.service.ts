@@ -74,7 +74,7 @@ export class CostSurfaceService {
                           (coalesce(properties,'{}'::jsonb) || jsonb_build_object('cost', cost)) as properties,
                           cost_surface_id
                           from "${this.costSurfaceDataRepository.metadata.tableName}")
-                          inner join projects_pu on project_pu.id = cost_surface_pu_dat.projects_pu_id`;
+                          inner join projects_pu on project_pu.id = cost_surface_pu_data.projects_pu_id`;
 
     const customQuery = this.buildCostSurfacesWhereQuery(costSurfaceId, bbox);
     return this.tileService.getTile({
