@@ -55,6 +55,7 @@ import { ProtectedAreasCrudModule } from '../protected-areas/protected-areas-cru
 import { ProjectCostSurfaceController } from './project-cost-surface.controller';
 import { ProtectedAreaModule } from '@marxan-api/modules/scenarios/protected-area';
 import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
+import { LegacyProjectsController } from './projects.legacy-projects.controller';
 
 @Module({
   imports: [
@@ -118,6 +119,7 @@ import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface
     },
   ],
   controllers: [
+    LegacyProjectsController,
     ProjectsListingController,
     ProjectDetailsController,
     ProjectsController,
