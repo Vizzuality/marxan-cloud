@@ -29,9 +29,9 @@ import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
-@ApiTags(projectResource.className)
+@ApiTags('Project - scenario comparison')
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
-export class ProjectsProxyController {
+export class ProjectScenarioComparisonController {
   constructor(public readonly projectsService: ProjectsService) {}
 
   @ApiBearerAuth()
@@ -39,14 +39,14 @@ export class ProjectsProxyController {
   @UseGuards(JwtAuthGuard)
   @ApiParam({
     name: 'scenarioIdA',
-    description: 'First scenario to be compare',
+    description: 'First of two scenarios to compare',
     type: String,
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @ApiParam({
     name: 'scenarioIdB',
-    description: 'Second scenario to be compare with the first',
+    description: 'Second of two scenarios to compare',
     type: String,
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
