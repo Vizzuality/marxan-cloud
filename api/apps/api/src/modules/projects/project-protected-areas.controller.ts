@@ -14,7 +14,6 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -36,7 +35,6 @@ import {
 } from 'nestjs-base-service';
 import {
   JSONAPIProtectedAreasListQueryParams,
-  JSONAPIQueryParams,
 } from '@marxan-api/decorators/json-api-parameters.decorator';
 import { ProtectedAreaResult } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 
