@@ -36,7 +36,7 @@ export class ProjectTemplateController {
     private readonly projectTemplateService: ProjectTemplateService,
   ) {}
 
-  @Get(':id/cost-surface/shapefile-template')
+  @Get(':id/cost-surfaces/shapefile-template')
   @ApiAcceptedResponse()
   @ApiOkResponse({
     schema: {

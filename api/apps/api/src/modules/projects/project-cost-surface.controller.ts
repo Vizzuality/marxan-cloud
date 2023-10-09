@@ -66,7 +66,7 @@ export class ProjectCostSurfaceController {
 
   @ImplementsAcl()
   @UseGuards(JwtAuthGuard)
-  @Get(`:projectId/cost-surface/:costSurfaceId`)
+  @Get(`:projectId/cost-surfaces/:costSurfaceId`)
   @ApiOkResponse({ type: CostSurfaceResult })
   async getCostSurfaces(
     @Param('projectId') projectId: string,
@@ -92,7 +92,7 @@ export class ProjectCostSurfaceController {
 
   @ImplementsAcl()
   @UseGuards(JwtAuthGuard)
-  @Get(`:projectId/cost-surface/`)
+  @Get(`:projectId/cost-surfaces/`)
   @ApiOkResponse({ type: CostSurfaceResultPlural })
   async getCostSurface(
     @Param('projectId') projectId: string,
@@ -120,7 +120,7 @@ export class ProjectCostSurfaceController {
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @GeometryFileInterceptor(GeometryKind.Complex)
   @ApiTags(asyncJobTag)
-  @Post(`:projectId/cost-surface/shapefile`)
+  @Post(`:projectId/cost-surfaces/shapefile`)
   async processCostSurfaceShapefile(
     @Param('projectId') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
@@ -161,7 +161,7 @@ export class ProjectCostSurfaceController {
   })
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
-  @Patch(`:projectId/cost-surface/:costSurfaceId`)
+  @Patch(`:projectId/cost-surfaces/:costSurfaceId`)
   async updateCostSurface(
     @Param('projectId') projectId: string,
     @Param('costSurfaceId') costSurfaceId: string,
@@ -198,7 +198,7 @@ export class ProjectCostSurfaceController {
     name: 'projectId',
     description: 'The id of the Project that the Cost Surface is associated to',
   })
-  @Delete(`:projectId/cost-surface/:costSurfaceId`)
+  @Delete(`:projectId/cost-surfaces/:costSurfaceId`)
   async deleteCostSurface(
     @Param('projectId') projectId: string,
     @Param('costSurfaceId') costSurfaceId: string,
@@ -229,7 +229,7 @@ export class ProjectCostSurfaceController {
     name: 'projectId',
     description: 'The id of the Project that the Cost Surface is associated to',
   })
-  @Get(`:projectId/cost-surface/:costSurfaceId/cost-range`)
+  @Get(`:projectId/cost-surfaces/:costSurfaceId/cost-range`)
   @ApiOkResponse({ type: CostRangeDto })
   async getCostRange(
     @Param('projectId') projectId: string,
