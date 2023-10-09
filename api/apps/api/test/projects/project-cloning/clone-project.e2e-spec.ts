@@ -33,13 +33,13 @@ import { isLeft } from 'fp-ts/lib/These';
 import { Readable } from 'stream';
 import * as request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
-import { GivenProjectExists } from '../steps/given-project';
-import { GivenUserExists } from '../steps/given-user-exists';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { bootstrapApplication } from '../utils/api-application';
-import { EventBusTestUtils } from '../utils/event-bus.test.utils';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { GivenProjectExists } from '../../steps/given-project';
+import { GivenUserExists } from '../../steps/given-user-exists';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
+import { bootstrapApplication } from '../../utils/api-application';
+import { EventBusTestUtils } from '../../utils/event-bus.test.utils';
+import { OrganizationsTestUtils } from '../../utils/organizations.test.utils';
+import { ProjectsTestUtils } from '../../utils/projects.test.utils';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

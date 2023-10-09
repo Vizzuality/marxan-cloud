@@ -1,7 +1,7 @@
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenUserIsLoggedIn, userObj } from '../steps/given-user-is-logged-in';
-import { GivenUserIsCreated } from '../steps/given-user-is-created';
-import { GivenProjectExists } from '../steps/given-project';
+import { bootstrapApplication } from '../../utils/api-application';
+import { GivenUserIsLoggedIn, userObj } from '../../steps/given-user-is-logged-in';
+import { GivenUserIsCreated } from '../../steps/given-user-is-created';
+import { GivenProjectExists } from '../../steps/given-project';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 

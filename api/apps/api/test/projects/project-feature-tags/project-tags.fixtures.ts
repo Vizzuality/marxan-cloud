@@ -1,19 +1,19 @@
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
+import { bootstrapApplication } from '../../utils/api-application';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { ILike, Repository } from 'typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { E2E_CONFIG } from '../e2e.config';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { OrganizationsTestUtils } from '../../utils/organizations.test.utils';
+import { E2E_CONFIG } from '../../e2e.config';
+import { ProjectsTestUtils } from '../../utils/projects.test.utils';
 import * as request from 'supertest';
 
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
-import { GivenUserExists } from '../steps/given-user-exists';
+import { GivenUserExists } from '../../steps/given-user-exists';
 import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
 

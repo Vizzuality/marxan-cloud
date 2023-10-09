@@ -5,17 +5,17 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
 import { Repository } from 'typeorm';
-import { ProjectChecker } from '../../src/modules/projects/project-checker/project-checker.service';
-import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
-import { GivenProjectExists } from '../steps/given-project';
-import { GivenScenarioExists } from '../steps/given-scenario-exists';
-import { GivenUserExists } from '../steps/given-user-exists';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { bootstrapApplication } from '../utils/api-application';
-import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
-import { ScenarioCheckerFake } from '../utils/scenario-checker.service-fake';
-import { FakeQueue } from '../utils/queues';
-import { exportPieceQueueToken } from '../../src/modules/clone/infra/export/export-queue.provider';
+import { ProjectChecker } from '../../../src/modules/projects/project-checker/project-checker.service';
+import { ScenarioChecker } from '../../../src/modules/scenarios/scenario-checker/scenario-checker.service';
+import { GivenProjectExists } from '../../steps/given-project';
+import { GivenScenarioExists } from '../../steps/given-scenario-exists';
+import { GivenUserExists } from '../../steps/given-user-exists';
+import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
+import { bootstrapApplication } from '../../utils/api-application';
+import { ProjectCheckerFake } from '../../utils/project-checker.service-fake';
+import { ScenarioCheckerFake } from '../../utils/scenario-checker.service-fake';
+import { FakeQueue } from '../../utils/queues';
+import { exportPieceQueueToken } from '../../../src/modules/clone/infra/export/export-queue.provider';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
