@@ -17,13 +17,11 @@ import {
   Res,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 
 import { projectResource, ProjectResultSingular } from './project.api.entity';
 import {
   ApiBearerAuth,
-  ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -33,10 +31,8 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ensureShapefileHasRequiredFiles,
-  uploadOptions,
 } from '@marxan-api/utils/file-uploads.utils';
 
 import { UpdateProjectDTO } from './dto/update.project.dto';
@@ -44,8 +40,6 @@ import { CreateProjectDTO } from './dto/create.project.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import {
-  notAllowed,
-  projectNotFound,
   ProjectsService,
   validationFailed,
 } from './projects.service';
@@ -77,31 +71,10 @@ import {
   ImplementsAcl,
   IsMissingAclImplementation,
 } from '@marxan-api/decorators/acl.decorator';
-import {
-  GetLatestExportResponseDto,
-  GetLatestExportsResponseDto,
-  RequestProjectCloneResponseDto,
-  RequestProjectExportBodyDto,
-  RequestProjectExportResponseDto,
-  RequestProjectImportBodyDto,
-  RequestProjectImportResponseDto,
-} from './dto/cloning.project.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
-import {
-  cloningExportProvided,
-  invalidExportZipFile,
-} from '../clone/infra/import/generate-export-from-zip-file.command';
-import {
-  integrityCheckFailed,
-  invalidSignature,
-} from '../clone/export/application/manifest-file-service.port';
-import {
-  exportNotFound,
-  unfinishedExport,
-} from '../clone/export/application/get-archive.query';
 import { deleteProjectFailed } from './delete-project/delete-project.command';
 import { outputProjectSummaryResource } from './output-project-summaries/output-project-summary.api.entity';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
@@ -503,201 +476,6 @@ export class ProjectsController {
   }
 
   @ImplementsAcl()
-  @ApiParam({
-    name: 'projectId',
-    description: 'ID of the Project',
-  })
-  @ApiOkResponse({ type: RequestProjectExportResponseDto })
-  @Post(`:projectId/export`)
-  async requestProjectExport(
-    @Param('projectId') projectId: string,
-    @Req() req: RequestWithAuthenticatedUser,
-    @Body() dto: RequestProjectExportBodyDto,
-  ) {
-    const result = await this.projectsService.requestExport(
-      projectId,
-      req.user.id,
-      dto.scenarioIds,
-      false,
-    );
-
-    if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case projectNotFound:
-          throw new NotFoundException(
-            `Could not find project with ID: ${projectId}`,
-          );
-
-        default:
-          throw new InternalServerErrorException();
-      }
-    }
-    return {
-      id: result.right.exportId.value,
-    };
-  }
-
-  @ImplementsAcl()
-  @ApiParam({
-    name: 'projectId',
-    description: 'ID of the Project',
-  })
-  @ApiOkResponse({ type: RequestProjectCloneResponseDto })
-  @Post(`:projectId/clone`)
-  async requestProjectClone(
-    @Param('projectId') projectId: string,
-    @Req() req: RequestWithAuthenticatedUser,
-    @Body() dto: RequestProjectExportBodyDto,
-  ): Promise<RequestProjectCloneResponseDto> {
-    const result = await this.projectsService.requestExport(
-      projectId,
-      req.user.id,
-      dto.scenarioIds,
-      true,
-    );
-
-    if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case projectNotFound:
-          throw new NotFoundException(
-            `Could not find project with ID: ${projectId}`,
-          );
-
-        default:
-          throw new InternalServerErrorException();
-      }
-    }
-
-    return {
-      exportId: result.right.exportId.value,
-      projectId: result.right.importResourceId!.value,
-    };
-  }
-
-  @ImplementsAcl()
-  @ApiParam({
-    name: 'projectId',
-    description: 'ID of the Project',
-  })
-  @ApiParam({
-    name: 'exportId',
-    description: 'ID of the Export',
-  })
-  @Get(`:projectId/export/:exportId`)
-  @Header(`Content-Type`, `application/zip`)
-  @Header('Content-Disposition', 'attachment; filename="export.zip"')
-  async getProjectExportArchive(
-    @Param('projectId') projectId: string,
-    @Param('exportId') exportId: string,
-    @Res() response: Response,
-    @Req() req: RequestWithAuthenticatedUser,
-  ) {
-    const result = await this.projectsService.getExportedArchive(
-      projectId,
-      req.user.id,
-      exportId,
-    );
-
-    if (isLeft(result)) {
-      switch (result.left) {
-        case unfinishedExport:
-          throw new BadRequestException(
-            `Export with ID ${exportId} hasn't finished`,
-          );
-        case notAllowed:
-          throw new ForbiddenException(
-            `Your role cannot retrieve export .zip files for project with ID: ${projectId}`,
-          );
-        case projectNotFound:
-          throw new NotFoundException(
-            `Could not find project with ID: ${projectId}`,
-          );
-        case exportNotFound:
-          throw new NotFoundException(
-            `Could not find export with ID: ${exportId}`,
-          );
-
-        default:
-          throw new InternalServerErrorException();
-      }
-    }
-
-    result.right.pipe(response);
-  }
-
-  @ImplementsAcl()
-  @ApiOperation({
-    description: 'Returns the latest exportId of a given project',
-  })
-  @ApiParam({
-    name: 'projectId',
-    description: 'ID of the Project',
-  })
-  @ApiOkResponse({ type: GetLatestExportResponseDto })
-  @Get(`:projectId/export`)
-  async getLatestExportId(
-    @Param('projectId') projectId: string,
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<GetLatestExportResponseDto> {
-    const resultOrError = await this.projectsService.getLatestExportForProject(
-      projectId,
-      req.user.id,
-    );
-
-    if (isLeft(resultOrError)) {
-      switch (resultOrError.left) {
-        case exportNotFound:
-          throw new NotFoundException(
-            `Export for project with id ${projectId} not found`,
-          );
-        case forbiddenError:
-          throw new ForbiddenException();
-        default:
-          throw new InternalServerErrorException();
-      }
-    }
-    return resultOrError.right;
-  }
-
-  @ImplementsAcl()
-  @ApiOperation({
-    description: 'Returns the latest exports for a given project',
-  })
-  @ApiParam({
-    name: 'projectId',
-    description: 'ID of the Project',
-  })
-  @ApiOkResponse({ type: GetLatestExportsResponseDto })
-  @Get(`:projectId/latest-exports`)
-  async getLatestExports(
-    @Param('projectId') projectId: string,
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<GetLatestExportsResponseDto> {
-    const resultOrError = await this.projectsService.getLatestExportsForProject(
-      projectId,
-      req.user.id,
-    );
-
-    if (isLeft(resultOrError)) {
-      switch (resultOrError.left) {
-        case exportNotFound:
-          throw new NotFoundException(
-            `Export for project with id ${projectId} not found`,
-          );
-        case forbiddenError:
-          throw new ForbiddenException();
-        default:
-          throw new InternalServerErrorException();
-      }
-    }
-    return { exports: resultOrError.right };
-  }
-
-  @ImplementsAcl()
   @ApiOperation({
     description:
       "Returns a zip file containing CSVs with summary information for the execution of all the Project's Scenarios",
@@ -748,51 +526,6 @@ export class ProjectsController {
     }
 
     return result.right;
-  }
-
-  @ImplementsAcl()
-  @Post('import')
-  @ApiOkResponse({ type: RequestProjectImportResponseDto })
-  @ApiConsumes('multipart/form-data')
-  /**
-   * Marxan Cloud archives can get rather big. Let's aim for a limit of 50MB for
-   * the time being. This may need to be raised in the future, but if doing so,
-   * the system should be diligently stress-tested to make sure we can actually
-   * handle bigger archives, which may came with their own set of additional
-   * challenges.
-   */
-  @UseInterceptors(
-    FileInterceptor('file', { limits: uploadOptions(50 * 1024 ** 2).limits }),
-  )
-  async importProject(
-    @Body() dto: RequestProjectImportBodyDto,
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<RequestProjectImportResponseDto> {
-    const idsOrError = await this.projectsService.importProjectFromZipFile(
-      file,
-      req.user.id,
-      dto.projectName,
-    );
-
-    if (isLeft(idsOrError)) {
-      switch (idsOrError.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case invalidSignature:
-        case integrityCheckFailed:
-        case cloningExportProvided:
-        case invalidExportZipFile:
-          throw new BadRequestException('Invalid export zip file');
-        default:
-          throw new InternalServerErrorException(idsOrError.left);
-      }
-    }
-
-    return {
-      importId: idsOrError.right.importId,
-      projectId: idsOrError.right.projectId,
-    };
   }
 
   @ImplementsAcl()
