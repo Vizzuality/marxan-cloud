@@ -73,6 +73,9 @@ export class ProjectCloningController {
   ) {}
 
   @ImplementsAcl()
+  @ApiOperation({
+    description: `Request the preparation of a downloadable export for the project.`,
+  })
   @ApiParam({
     name: 'projectId',
     description: 'ID of the Project',
@@ -110,6 +113,9 @@ export class ProjectCloningController {
   }
 
   @ImplementsAcl()
+  @ApiOperation({
+    description: `Request a clone of the project to be created.`,
+  })
   @ApiParam({
     name: 'projectId',
     description: 'ID of the Project',
@@ -149,6 +155,9 @@ export class ProjectCloningController {
   }
 
   @ImplementsAcl()
+  @ApiOperation({
+    description: `Download a prepared export of the project.`,
+  })
   @ApiParam({
     name: 'projectId',
     description: 'ID of the Project',
@@ -201,7 +210,7 @@ export class ProjectCloningController {
 
   @ImplementsAcl()
   @ApiOperation({
-    description: 'Returns the latest exportId of a given project',
+    description: 'Return the exportId of the most recently prepared export for a given project',
   })
   @ApiParam({
     name: 'projectId',
@@ -235,7 +244,7 @@ export class ProjectCloningController {
 
   @ImplementsAcl()
   @ApiOperation({
-    description: 'Returns the latest exports for a given project',
+    description: 'List the latest exports for a given project',
   })
   @ApiParam({
     name: 'projectId',
@@ -268,6 +277,9 @@ export class ProjectCloningController {
   }
 
   @ImplementsAcl()
+  @ApiOperation({
+    description: `Import a project from a downloaded export artifact.`,
+  })
   @Post('import')
   @ApiOkResponse({ type: RequestProjectImportResponseDto })
   @ApiConsumes('multipart/form-data')
