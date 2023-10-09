@@ -20,7 +20,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { projectResource } from '@marxan-api/modules/projects/project.api.entity';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import {
@@ -53,8 +52,7 @@ import {
   JSONAPICostSurface,
 } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
-//@Todo refactor all endpoints to use cost-surfaces instead of singular cost-surface
-@ApiTags(projectResource.className)
+@ApiTags('Project - Cost Surfaces')
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectCostSurfaceController {
   constructor(
