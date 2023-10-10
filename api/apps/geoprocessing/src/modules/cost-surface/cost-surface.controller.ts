@@ -24,8 +24,8 @@ import {
 } from '@marxan-geoprocessing/modules/cost-surface/cost-surface.service';
 
 @Controller(`${apiGlobalPrefixes.v1}/cost-surfaces`)
-export class FeaturesController {
-  private readonly logger: Logger = new Logger(FeaturesController.name);
+export class CostSurfaceController {
+  private readonly logger: Logger = new Logger(CostSurfaceController.name);
 
   constructor(public service: CostSurfaceService) {}
 
@@ -63,7 +63,7 @@ export class FeaturesController {
     required: false,
     example: [-1, 40, 1, 42],
   })
-  @Get(':projectId/cost-surface/:costSurfaceId/preview/tiles/:z/:x/:y.mvt')
+  @Get(':costSurfaceId/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
   async getTile(
     @Param() TileSpecification: CostSurfaceTileRequest,
