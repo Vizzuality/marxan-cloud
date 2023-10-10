@@ -1,13 +1,10 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
 import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo';
-
 import { TileRequest } from '@marxan/tiles';
 
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
@@ -34,8 +31,6 @@ export class CostSurfaceService {
   private readonly logger: Logger = new Logger(CostSurfaceService.name);
 
   constructor(
-    @InjectRepository(CostSurfacePuDataEntity)
-    private readonly costSurfaceDataRepository: Repository<CostSurfacePuDataEntity>,
     private readonly tileService: TileService,
   ) {}
 

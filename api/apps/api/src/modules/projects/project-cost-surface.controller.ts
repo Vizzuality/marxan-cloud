@@ -7,7 +7,6 @@ import {
   Get,
   Inject,
   Param,
-  ParseIntPipe,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -49,7 +48,6 @@ import {
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { UpdateCostSurfaceDto } from '@marxan-api/modules/cost-surface/dto/update-cost-surface.dto';
 import { CostSurfaceSerializer } from '@marxan-api/modules/cost-surface/dto/cost-surface.serializer';
-import { TilesOpenApi } from '@marxan/tiles';
 import { Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import {
@@ -273,15 +271,30 @@ export class ProjectCostSurfaceController {
     name: 'projectId',
     description: 'The id of the Project that the Cost Surface is associated to',
   })
-  @Get(':projectId/cost-surface/:costSurfaceId/preview/tiles/:z/:x/:y.mvt')
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @Get(':projectId/cost-surfaces/:costSurfaceId/preview/tiles/:z/:x/:y.mvt')
   async proxyCostSurfaceTile(
     @Req() req: RequestWithAuthenticatedUser,
     @Res() response: Response,
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('costSurfaceId', ParseUUIDPipe) costSurfaceId: string,
-    @Param('z', ParseIntPipe) z: number,
-    @Param('x', ParseIntPipe) x: number,
-    @Param('y', ParseIntPipe) y: number,
   ): Promise<void> {
     const checkCostSurfaceForProject = await this.costSurfaceService.checkProjectCostSurfaceVisibility(
       req.user.id,
@@ -293,8 +306,8 @@ export class ProjectCostSurfaceController {
     }
 
     req.url = req.url.replace(
-      `projects/${projectId}/cost-surface/`,
-      `cost-surfaces/`,
+      `projects/${projectId}/`,
+      ``,
     );
 
     return await this.proxyService.proxyTileRequest(req, response);

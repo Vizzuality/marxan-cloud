@@ -1,20 +1,15 @@
 import {
   Controller,
   Get,
-  Header,
   Logger,
   Param,
-  Query,
   Res,
 } from '@nestjs/common';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
 import {
   ApiBadRequestResponse,
   ApiOperation,
-  ApiParam,
-  ApiQuery,
 } from '@nestjs/swagger';
-import { BBox } from 'geojson';
 
 import { Response } from 'express';
 import { setTileResponseHeadersForSuccessfulRequests } from '@marxan/tiles';
@@ -31,37 +26,6 @@ export class CostSurfaceController {
 
   @ApiOperation({
     description: 'Get tile for a cost surface by id.',
-  })
-  @ApiParam({
-    name: 'z',
-    description: 'The zoom level ranging from 0 - 20',
-    type: Number,
-    required: true,
-  })
-  @ApiParam({
-    name: 'x',
-    description: 'The tile x offset on Mercator Projection',
-    type: Number,
-    required: true,
-  })
-  @ApiParam({
-    name: 'y',
-    description: 'The tile y offset on Mercator Projection',
-    type: Number,
-    required: true,
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'Specific id of the cost surface',
-    type: String,
-    required: true,
-  })
-  @ApiQuery({
-    name: 'bbox',
-    description: 'Bounding box of the project',
-    type: [Number],
-    required: false,
-    example: [-1, 40, 1, 42],
   })
   @Get(':costSurfaceId/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
