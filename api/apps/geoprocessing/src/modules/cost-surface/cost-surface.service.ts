@@ -69,12 +69,13 @@ export class CostSurfaceService {
   ): Promise<Buffer> {
     const { z, x, y, costSurfaceId } = tileSpecification;
     const simplificationLevel = 360 / (Math.pow(2, z + 1) * 100);
-    const attributes = 'cost_surface_id, properties';
+    const attributes = 'cost_surface_id, cost';
     const table = `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) as the_geom,
-                          (coalesce(properties,'{}'::jsonb) || jsonb_build_object('cost', cost)) as properties,
+                          cost,
                           cost_surface_id
-                          from "${this.costSurfaceDataRepository.metadata.tableName}")
-                          inner join projects_pu on project_pu.id = cost_surface_pu_data.projects_pu_id`;
+                          from cost_surface_pu_data
+                          inner join projects_pu ppu on ppu.id=cost_surface_pu_data.projects_pu_id
+                          inner join planning_units_geom pug on pug.id=ppu.geom_id)`;
 
     const customQuery = this.buildCostSurfacesWhereQuery(costSurfaceId, bbox);
     return this.tileService.getTile({
