@@ -293,9 +293,10 @@ export class ProjectCostSurfaceController {
       throw new ForbiddenException();
     }
 
-    req.url = req.url.replace(`projects/${projectId}/cost-surface/`, `cost-surfaces/`)
-
-    console.log(req.url)
+    req.url = req.url.replace(
+      `projects/${projectId}/cost-surface/`,
+      `cost-surfaces/`,
+    );
 
     return await this.proxyService.proxyTileRequest(req, response);
   }

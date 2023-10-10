@@ -19,9 +19,9 @@ import { PuCostExtractor } from './adapters/pu-cost-extractor';
 import { AvailablePlanningUnitsRepository } from './adapters/available-planning-units-repository';
 import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
-import { CostSurfaceService } from "@marxan-geoprocessing/modules/cost-surface/cost-surface.service";
-import { CostSurfaceController } from "@marxan-geoprocessing/modules/cost-surface/cost-surface.controller";
-import { TileService } from "@marxan-geoprocessing/modules/tile/tile.service";
+import { CostSurfaceService } from '@marxan-geoprocessing/modules/cost-surface/cost-surface.service';
+import { CostSurfaceController } from '@marxan-geoprocessing/modules/cost-surface/cost-surface.controller';
+import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 
 @Module({
   imports: [

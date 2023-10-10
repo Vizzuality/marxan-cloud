@@ -2,12 +2,7 @@ import { Injectable, Logger, Inject } from '@nestjs/common';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  IsArray,
-  IsNumber,
-  IsString,
-  IsOptional,
-} from 'class-validator';
+import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
@@ -63,19 +58,22 @@ export class CostSurfaceService {
     return whereQuery;
   }
 
+  /** TODO: 'bbox' is an optional parameter here, confirm if we can remove it, since cost surface will always be
+   *   within the project grid
+   */
   public findTile(
     tileSpecification: CostSurfaceTileRequest,
     bbox?: BBox,
   ): Promise<Buffer> {
     const { z, x, y, costSurfaceId } = tileSpecification;
     const simplificationLevel = 360 / (Math.pow(2, z + 1) * 100);
-    const attributes = 'cost_surface_id, cost';
-    const table = `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) as the_geom,
+    const attributes = 'cost';
+    const table = `(SELECT ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) AS the_geom,
                           cost,
                           cost_surface_id
-                          from cost_surface_pu_data
-                          inner join projects_pu ppu on ppu.id=cost_surface_pu_data.projects_pu_id
-                          inner join planning_units_geom pug on pug.id=ppu.geom_id)`;
+                          FROM cost_surface_pu_data
+                          INNER JOIN projects_pu ppu on ppu.id=cost_surface_pu_data.projects_pu_id
+                          INNER JOIN planning_units_geom pug on pug.id=ppu.geom_id)`;
 
     const customQuery = this.buildCostSurfacesWhereQuery(costSurfaceId, bbox);
     return this.tileService.getTile({
