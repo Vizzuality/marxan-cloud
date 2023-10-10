@@ -261,7 +261,6 @@ export class ProjectCostSurfaceController {
 
   @ImplementsAcl()
   @UseGuards(JwtAuthGuard)
-  @TilesOpenApi()
   @ApiOperation({
     description: 'Get cost surface tiles.',
   })
