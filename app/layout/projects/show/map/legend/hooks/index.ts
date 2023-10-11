@@ -60,12 +60,7 @@ export const useCostSurfaceLegend = () => {
           setLayerSettings({
             id,
             settings: {
-<<<<<<< HEAD
               visibility: id !== costSurfaceId ? false : !layerSettings[costSurfaceId]?.visibility,
-=======
-              visibility:
-                id !== costSurfaceId ? false : !layerSettings[costSurfaceId]?.visibility || true,
->>>>>>> 18e9b711e (WIP)
             },
           })
         );
