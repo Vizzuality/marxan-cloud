@@ -408,7 +408,13 @@ const ProjectForm = ({ onFormUpdate }: ProjectFormProps): JSX.Element => {
                         Cancel
                       </Button>
                     </Link>
-                    <Button className="ml-6" theme="primary" size="xl" type="submit">
+                    <Button
+                      className="ml-6"
+                      theme="primary"
+                      size="xl"
+                      type="submit"
+                      disabled={saveProjectMutation.isLoading}
+                    >
                       Save
                     </Button>
                   </div>
