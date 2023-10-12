@@ -28,7 +28,6 @@ import { ProjectId, SetProjectGridFromShapefile } from './planning-unit-grid';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
-import { PublishedProject } from '../published-project/entities/published-project.api.entity';
 import { CostSurfaceId } from '@marxan-api/modules/projects/planning-unit-grid/project.id';
 import { getDefaultCostSurfaceIdFromProject } from '@marxan-api/modules/projects/get-default-project-cost-surface';
 
@@ -61,8 +60,6 @@ export class ProjectsCrudService extends AppBaseService<
     private readonly userProjects: Repository<UsersProjectsApiEntity>,
     @InjectRepository(ProtectedArea, DbConnections.geoprocessingDB)
     private readonly protectedAreas: Repository<ProtectedArea>,
-    @InjectRepository(PublishedProject)
-    private readonly publishedProjects: Repository<PublishedProject>,
     private readonly commandBus: CommandBus,
   ) {
     super(repository, 'project', 'projects', {
@@ -125,6 +122,34 @@ export class ProjectsCrudService extends AppBaseService<
       filters,
       projectFilterKeyNames,
     );
+    return query;
+  }
+
+  /**
+   * In some cases, newly-created projects may not have any of the grid-related
+   * data: either a GADM id (if the project was created using a GADM area as
+   * planning area) or a planning area geometry id (if the user uploaded a
+   * shapefile with the project's planning area or planning grid).
+   *
+   * This could either be a temporary state (while the planning grid is being
+   * created in geodb) or an error situation. Either way, allowing users to
+   * "discover" such projects (e.g. when requesting a list of projects they
+   * have access to) is not desirable, as no meaningful work can be done when
+   * a project is in a state like this. Therefore, we hide such projects from
+   * the results of `findAll()` and `getById()` queries.
+   */
+  private async hideProjectsWithIncompleteGridData(
+    query: SelectQueryBuilder<Project>,
+  ): Promise<SelectQueryBuilder<Project>> {
+    query.andWhere(`NOT(
+      ${this.alias}.country_id IS NULL
+      AND
+      ${this.alias}.admin_area_l1_id IS NULL
+      AND
+      ${this.alias}.admin_area_l2_id IS NULL
+      AND
+      ${this.alias}.planning_area_geometry_id IS NULL
+      )`);
     return query;
   }
 
@@ -264,8 +289,8 @@ export class ProjectsCrudService extends AppBaseService<
 
   async extendGetByIdQuery(
     query: SelectQueryBuilder<Project>,
-    fetchSpecification?: FetchSpecification,
-    info?: ProjectsRequest,
+    _fetchSpecification?: FetchSpecification,
+    _info?: ProjectsRequest,
   ): Promise<SelectQueryBuilder<Project>> {
     /**
      * Bring in publicMetadata (if the project has been made public). This is
@@ -273,6 +298,8 @@ export class ProjectsCrudService extends AppBaseService<
      * to true for public projects.
      */
     query.leftJoinAndSelect('project.publicMetadata', 'publicMetadata');
+
+    this.hideProjectsWithIncompleteGridData(query);
 
     return query;
   }
@@ -317,6 +344,8 @@ export class ProjectsCrudService extends AppBaseService<
         { [nameSearchFilterField]: `%${namesSearch}%` },
       );
     }
+
+    this.hideProjectsWithIncompleteGridData(query);
 
     if (loggedUser) {
       query
