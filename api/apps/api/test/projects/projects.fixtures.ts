@@ -25,6 +25,7 @@ import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
@@ -34,6 +35,9 @@ export const getFixtures = async () => {
   const adminUserToken = await GivenUserIsLoggedIn(app, 'dd');
   const publishedProjectsRepo: Repository<PublishedProject> = app.get(
     getRepositoryToken(PublishedProject),
+  );
+  const projectsRepo: Repository<Project> = app.get(
+    getRepositoryToken(Project),
   );
   const cleanups: (() => Promise<void>)[] = [];
 
@@ -98,6 +102,23 @@ export const getFixtures = async () => {
         randomUserToken,
       );
       cleanups.push(cleanup);
+      return projectId;
+    },
+    GivenPrivateProjectWithMalformedGridDataWasCreated: async () => {
+      const { cleanup, projectId } = await GivenProjectExists(
+        app,
+        randomUserToken,
+      );
+      cleanups.push(cleanup);
+      await projectsRepo.update(
+        { id: projectId },
+        {
+          countryId: undefined,
+          adminAreaLevel1Id: undefined,
+          adminAreaLevel2Id: undefined,
+          planningAreaId: undefined,
+        },
+      );
       return projectId;
     },
     GivenScenarioWasCreated: async (projectId: string, name?: string) => {
@@ -336,9 +357,22 @@ export const getFixtures = async () => {
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(403);
     },
+    ThenProjectIsNotIncludedInProjectsList: (
+      projectId: string,
+      response: request.Response,
+    ) => {
+      const allIdsOfProjectsInResponse = response.body.data.map(
+        (project: { id: string }) => project.id,
+      );
+      expect(allIdsOfProjectsInResponse).not.toContain(projectId);
+    },
     WhenGettingProject: async (projectId: string) =>
       await request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}`)
+        .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenGettingUserProjects: async () =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/projects`)
         .set('Authorization', `Bearer ${randomUserToken}`),
     WhenGettingProjectAsNotIncludedUser: async (projectId: string) =>
       await request(app.getHttpServer())

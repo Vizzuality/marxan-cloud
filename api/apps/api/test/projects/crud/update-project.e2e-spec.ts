@@ -28,5 +28,5 @@ test(`updating a project does not work if user is not in project`, async () => {
 
   const request = await fixtures.WhenProjectIsUpdatedAsNotIncludedUser();
 
-  await fixtures.ThenForbiddenIsReturned(request);
+  fixtures.ThenForbiddenIsReturned(request);
 });

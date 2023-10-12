@@ -32,3 +32,15 @@ test(`getting a project where the user is not in project`, async () => {
   );
   fixtures.ThenForbiddenIsReturned(response);
 });
+
+test(`if a project was created with malformed grid data and not GC'ed yet, it should not be included in project listings`, async () => {
+  const projectId = await fixtures.GivenPrivateProjectWithMalformedGridDataWasCreated();
+  const response = await fixtures.WhenGettingUserProjects();
+  fixtures.ThenProjectIsNotIncludedInProjectsList(projectId, response);
+});
+
+test(`if a project was created with malformed grid data and not GC'ed yet, a request to get its information should return 404`, async () => {
+  const projectId = await fixtures.GivenPrivateProjectWithMalformedGridDataWasCreated();
+  const response = await fixtures.WhenGettingProject(projectId);
+  fixtures.ThenNotFoundIsReturned(response);
+});
