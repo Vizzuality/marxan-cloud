@@ -4,6 +4,7 @@ LABEL maintainer="hello@vizzuality.com"
 ENV NAME marxan-geoprocessing
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME
+ENV YARN_VERSION 3.6.4
 
 RUN apk add --no-cache bash
 RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
@@ -16,8 +17,10 @@ RUN chown -R $USER:$USER /opt/marxan-project-cloning
 
 USER $USER
 
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY package.json yarn.lock .yarnrc.docker.yml ./
+COPY --chown=$USER:$USER .yarnrc.docker.yml .yarnrc.yml
+RUN yarn policies set-version $YARN_VERSION
+RUN yarn install --immutable
 
 COPY --chown=$USER:$USER nodemon.json tsconfig.json tsconfig.build.json nest-cli.json ./
 # @debt we should do this only for images used for tests
