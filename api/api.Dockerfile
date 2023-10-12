@@ -4,6 +4,7 @@ LABEL maintainer="hello@vizzuality.com"
 ENV NAME marxan-api
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME
+ENV YARN_VERSION 3.6.4
 
 RUN apk add --no-cache bash zip
 RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
@@ -13,7 +14,9 @@ RUN chown $USER:$USER $APP_HOME
 RUN mkdir /tmp/storage && chown $USER /tmp/storage
 
 COPY --chown=$USER:$USER package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY --chown=$USER:$USER .yarnrc.docker.yml .yarnrc.yml
+RUN yarn policies set-version $YARN_VERSION
+RUN yarn install --immutable
 
 COPY --chown=$USER:$USER nodemon.json tsconfig.json tsconfig.build.json nest-cli.json ./
 # @debt we should do this only for images used for tests
