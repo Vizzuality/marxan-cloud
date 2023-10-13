@@ -89,9 +89,7 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       ? outputSummary.summaryZip.toString('base64')
       : undefined;
 
-    const [blmRange]: [
-      SelectProjectBlmResult,
-    ] = await this.entityManager
+    const [blmRange]: [SelectProjectBlmResult] = await this.entityManager
       .createQueryBuilder()
       .select(['values', 'defaults', 'range'])
       .from('project_blms', 'pblms')

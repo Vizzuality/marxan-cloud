@@ -296,19 +296,17 @@ export class ProjectCostSurfaceController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('costSurfaceId', ParseUUIDPipe) costSurfaceId: string,
   ): Promise<void> {
-    const checkCostSurfaceForProject = await this.costSurfaceService.checkProjectCostSurfaceVisibility(
-      req.user.id,
-      projectId,
-      costSurfaceId,
-    );
+    const checkCostSurfaceForProject =
+      await this.costSurfaceService.checkProjectCostSurfaceVisibility(
+        req.user.id,
+        projectId,
+        costSurfaceId,
+      );
     if (isLeft(checkCostSurfaceForProject)) {
       throw new ForbiddenException();
     }
 
-    req.url = req.url.replace(
-      `projects/${projectId}/`,
-      ``,
-    );
+    req.url = req.url.replace(`projects/${projectId}/`, ``);
 
     return await this.proxyService.proxyTileRequest(req, response);
   }

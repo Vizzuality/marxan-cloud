@@ -12,7 +12,8 @@ import { AsyncJobsGarbageCollector } from './async-jobs.garbage-collector';
 
 @Injectable()
 export class ProjectAsyncJobsGarbageCollector
-  implements AsyncJobsGarbageCollector {
+  implements AsyncJobsGarbageCollector
+{
   constructor(
     private readonly gridAsyncJob: GridAsyncJob,
     private readonly legacyImportAsyncJob: LegacyImportAsyncJob,

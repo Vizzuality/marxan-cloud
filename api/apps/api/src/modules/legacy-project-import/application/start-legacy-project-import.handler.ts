@@ -18,7 +18,8 @@ import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surfac
 
 @CommandHandler(StartLegacyProjectImport)
 export class StartLegacyProjectImportHandler
-  implements IInferredCommandHandler<StartLegacyProjectImport> {
+  implements IInferredCommandHandler<StartLegacyProjectImport>
+{
   constructor(
     @InjectRepository(Project)
     private readonly projectRepo: Repository<Project>,
@@ -52,9 +53,10 @@ export class StartLegacyProjectImportHandler
         description,
       });
 
-      const costSurface = await this.costSurfaceService.createDefaultCostSurfaceForProject(
-        project.id,
-      );
+      const costSurface =
+        await this.costSurfaceService.createDefaultCostSurfaceForProject(
+          project.id,
+        );
 
       const scenarioName = name + ' - scenario';
       const scenario = await this.scenarioRepo.save({
@@ -93,9 +95,8 @@ export class StartLegacyProjectImportHandler
       ownerId,
     );
 
-    const legacyProjectImportSavedOrError = await this.legacyProjectImportRepository.save(
-      legacyProjectImport,
-    );
+    const legacyProjectImportSavedOrError =
+      await this.legacyProjectImportRepository.save(legacyProjectImport);
 
     if (isLeft(legacyProjectImportSavedOrError))
       return legacyProjectImportSavedOrError;

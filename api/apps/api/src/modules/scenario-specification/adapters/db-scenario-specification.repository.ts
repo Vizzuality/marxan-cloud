@@ -9,7 +9,8 @@ import { ScenarioSpecification, SpecificationId } from '../domain';
 
 @Injectable()
 export class DbScenarioSpecificationRepository
-  implements ScenarioSpecificationRepo {
+  implements ScenarioSpecificationRepo
+{
   constructor(
     @InjectRepository(Scenario)
     private readonly scenariosRepo: Repository<Scenario>,

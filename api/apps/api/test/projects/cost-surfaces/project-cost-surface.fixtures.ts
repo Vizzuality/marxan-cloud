@@ -329,9 +329,8 @@ export const getProjectCostSurfaceFixtures = async () => {
       expect(costSurface).not.toBeNull();
     },
     ThenCostSurfaceDeletedEventWasEmitted: async (costSurfaceId: string) => {
-      const event = await eventBusTestUtils.waitUntilEventIsPublished(
-        CostSurfaceDeleted,
-      );
+      const event =
+        await eventBusTestUtils.waitUntilEventIsPublished(CostSurfaceDeleted);
 
       expect(event).toMatchObject({ costSurfaceId });
     },

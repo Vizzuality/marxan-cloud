@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddCreatedAtAndForeignExportColumnsToExport1650537078058
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       ALTER TABLE exports ADD COLUMN foreign_export boolean NOT NULL DEFAULT 'false';

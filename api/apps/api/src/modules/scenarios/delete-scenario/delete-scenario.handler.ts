@@ -17,7 +17,8 @@ import {
 
 @CommandHandler(DeleteScenario)
 export class DeleteScenarioHandler
-  implements IInferredCommandHandler<DeleteScenario> {
+  implements IInferredCommandHandler<DeleteScenario>
+{
   constructor(
     @InjectRepository(Scenario)
     private readonly scenarioRepo: Repository<Scenario>,

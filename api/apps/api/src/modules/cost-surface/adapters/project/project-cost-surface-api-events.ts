@@ -10,22 +10,21 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 @Injectable()
 export class ProjectCostSurfaceApiEvents
   extends ApiEventsService
-  implements ProjectCostSurfaceEventsPort {
-  private readonly eventsMap: Record<
-    ProjectCostSurfaceState,
-    API_EVENT_KINDS
-  > = {
-    [ProjectCostSurfaceState.ShapefileSubmitted]:
-      API_EVENT_KINDS.project__costSurface_shapefile_submitted__v1alpha1,
-    [ProjectCostSurfaceState.ShapefileConverted]:
-      API_EVENT_KINDS.project__costSurface_shapeConverted__v1alpha1,
-    [ProjectCostSurfaceState.ShapefileConversionFailed]:
-      API_EVENT_KINDS.project__costSurface_shapeConversionFailed__v1alpha1,
-    [ProjectCostSurfaceState.CostUpdateFailed]:
-      API_EVENT_KINDS.project__costSurface_shapefile_failed__v1alpha1,
-    [ProjectCostSurfaceState.CostUpdateFinished]:
-      API_EVENT_KINDS.project__costSurface_shapefile_finished__v1alpha1,
-  };
+  implements ProjectCostSurfaceEventsPort
+{
+  private readonly eventsMap: Record<ProjectCostSurfaceState, API_EVENT_KINDS> =
+    {
+      [ProjectCostSurfaceState.ShapefileSubmitted]:
+        API_EVENT_KINDS.project__costSurface_shapefile_submitted__v1alpha1,
+      [ProjectCostSurfaceState.ShapefileConverted]:
+        API_EVENT_KINDS.project__costSurface_shapeConverted__v1alpha1,
+      [ProjectCostSurfaceState.ShapefileConversionFailed]:
+        API_EVENT_KINDS.project__costSurface_shapeConversionFailed__v1alpha1,
+      [ProjectCostSurfaceState.CostUpdateFailed]:
+        API_EVENT_KINDS.project__costSurface_shapefile_failed__v1alpha1,
+      [ProjectCostSurfaceState.CostUpdateFinished]:
+        API_EVENT_KINDS.project__costSurface_shapefile_finished__v1alpha1,
+    };
 
   async event(
     projectId: string,

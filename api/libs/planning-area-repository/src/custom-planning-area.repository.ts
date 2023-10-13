@@ -54,17 +54,15 @@ export class CustomPlanningAreaRepository {
   }
 
   async has(id: string): Promise<boolean> {
-    const selectedId: Pick<
-      PlanningArea,
-      'id'
-    > | null = await this.planningAreas.findOne({
-      where: {
-        id,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const selectedId: Pick<PlanningArea, 'id'> | null =
+      await this.planningAreas.findOne({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+        },
+      });
     return isDefined(selectedId?.id);
   }
 

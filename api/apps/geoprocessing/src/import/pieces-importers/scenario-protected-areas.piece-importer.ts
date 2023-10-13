@@ -16,7 +16,8 @@ import {
 @Injectable()
 @PieceImportProvider()
 export class ScenarioProtectedAreasPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     ScenarioProtectedAreasPieceImporter.name,
   );

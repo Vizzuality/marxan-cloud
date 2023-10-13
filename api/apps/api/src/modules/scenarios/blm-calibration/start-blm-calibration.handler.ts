@@ -12,7 +12,8 @@ import { AssetsService } from '../marxan-run/assets.service';
 
 @CommandHandler(StartBlmCalibration)
 export class StartBlmCalibrationHandler
-  implements IInferredCommandHandler<StartBlmCalibration> {
+  implements IInferredCommandHandler<StartBlmCalibration>
+{
   readonly #logger = new Logger(this.constructor.name);
 
   constructor(

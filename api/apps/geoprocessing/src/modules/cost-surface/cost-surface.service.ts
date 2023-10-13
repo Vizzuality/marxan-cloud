@@ -30,9 +30,7 @@ export class CostSurfaceFilters {
 export class CostSurfaceService {
   private readonly logger: Logger = new Logger(CostSurfaceService.name);
 
-  constructor(
-    private readonly tileService: TileService,
-  ) {}
+  constructor(private readonly tileService: TileService) {}
 
   buildCostSurfacesWhereQuery(id: string, bbox?: BBox): string {
     let whereQuery = `cost_surface_id = '${id}'`;

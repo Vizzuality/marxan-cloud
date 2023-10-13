@@ -11,7 +11,8 @@ import { UpdatePlanningUnitsCommand } from './update-planning-units.command';
 
 @CommandHandler(UpdatePlanningUnitsCommand)
 export class UpdatePlanningUnitsHandler
-  implements IInferredCommandHandler<UpdatePlanningUnitsCommand> {
+  implements IInferredCommandHandler<UpdatePlanningUnitsCommand>
+{
   constructor(
     private readonly commands: CommandBus,
     private readonly planningUnitsStatusCalculatorService: ScenarioPlanningUnitsProtectedStatusCalculatorService,

@@ -297,9 +297,7 @@ const getFixtures = async () => {
         ) => {
           await sut.run(input);
 
-          const [scenario]: [
-            ScenarioSelectResult,
-          ] = await entityManager
+          const [scenario]: [ScenarioSelectResult] = await entityManager
             .createQueryBuilder()
             .select()
             .from('scenarios', 's')
@@ -325,9 +323,7 @@ const getFixtures = async () => {
           expect(scenario.type).toEqual(validScenarioMetadataContent.type);
           expect(scenario.created_by).toEqual(userId);
 
-          const [blmRange]: [
-            BlmRange,
-          ] = await entityManager
+          const [blmRange]: [BlmRange] = await entityManager
             .createQueryBuilder()
             .select()
             .from('scenario_blms', 'pblms')

@@ -27,8 +27,7 @@ export class StratificationOperation {
   }) {
     await this.events.create({
       topic: data.scenarioId,
-      kind:
-        API_EVENT_KINDS.scenario__geofeatureStratification__submitted__v1__alpha1,
+      kind: API_EVENT_KINDS.scenario__geofeatureStratification__submitted__v1__alpha1,
     });
     try {
       const featureId: { id: string }[] = await this.entityManager.query(
@@ -44,14 +43,11 @@ export class StratificationOperation {
         [data.input.baseFeatureId, data.input.againstFeatureId],
       );
 
-      const {
-        project,
-        protectedAreaFilterByIds,
-        planningAreaLocation,
-      } = await this.stratificationDataProvider.prepareData({
-        scenarioId: data.scenarioId,
-        input: data.input,
-      });
+      const { project, protectedAreaFilterByIds, planningAreaLocation } =
+        await this.stratificationDataProvider.prepareData({
+          scenarioId: data.scenarioId,
+          input: data.input,
+        });
 
       const { parameters, query } = this.stratificationQuery.prepareQuery(
         data.input,
@@ -68,15 +64,13 @@ export class StratificationOperation {
       );
       await this.events.create({
         topic: data.scenarioId,
-        kind:
-          API_EVENT_KINDS.scenario__geofeatureStratification__finished__v1__alpha1,
+        kind: API_EVENT_KINDS.scenario__geofeatureStratification__finished__v1__alpha1,
       });
       return ids;
     } catch (error) {
       await this.events.create({
         topic: data.scenarioId,
-        kind:
-          API_EVENT_KINDS.scenario__geofeatureStratification__failed__v1__alpha1,
+        kind: API_EVENT_KINDS.scenario__geofeatureStratification__failed__v1__alpha1,
       });
       throw error;
     }

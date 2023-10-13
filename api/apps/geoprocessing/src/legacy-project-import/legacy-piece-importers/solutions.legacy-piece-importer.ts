@@ -38,7 +38,8 @@ type SolutionsFileExtension = 'dat' | 'csv' | 'txt';
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class SolutionsLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     SolutionsLegacyProjectPieceImporter.name,
   );
@@ -214,9 +215,8 @@ export class SolutionsLegacyProjectPieceImporter
       scenarioId,
       solutionsMatrixFileNameExtension,
     );
-    const planningUnitsState = await this.planningUnitsStateCalculator.consume(
-      solutionsStream,
-    );
+    const planningUnitsState =
+      await this.planningUnitsStateCalculator.consume(solutionsStream);
 
     const outputSumFileName = 'output_sum';
     const outputSumFileNameExtension = this.ensureThatOutputFileExists(

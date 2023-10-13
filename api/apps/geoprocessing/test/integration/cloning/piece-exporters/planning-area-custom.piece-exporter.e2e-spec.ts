@@ -138,9 +138,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<PlanningAreaCustomContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<PlanningAreaCustomContent>(savedStrem);
           expect(content.puAreaKm2).toBe(500);
           expect(content.puGridShape).toBe(PlanningUnitGridShape.Square);
           const geom = content.planningAreaGeom;

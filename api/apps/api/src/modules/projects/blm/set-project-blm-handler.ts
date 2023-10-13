@@ -8,7 +8,8 @@ import { BlmValuesPolicyFactory } from './blm-values-policy-factory';
 
 @CommandHandler(SetProjectBlm)
 export class SetProjectBlmHandler
-  implements IInferredCommandHandler<SetProjectBlm> {
+  implements IInferredCommandHandler<SetProjectBlm>
+{
   private readonly logger: Logger = new Logger(SetProjectBlm.name);
 
   constructor(

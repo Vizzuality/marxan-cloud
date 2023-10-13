@@ -71,12 +71,13 @@ export class ProjectScenarioComparisonController {
         }
       : config;
 
-    const pdfStream = await this.projectsService.getScenarioFrequencyComparisonMap(
-      scenarioIdA,
-      scenarioIdB,
-      req.user.id,
-      configForWebshot,
-    );
+    const pdfStream =
+      await this.projectsService.getScenarioFrequencyComparisonMap(
+        scenarioIdA,
+        scenarioIdB,
+        req.user.id,
+        configForWebshot,
+      );
 
     if (isLeft(pdfStream)) {
       throw mapAclDomainToHttpError(pdfStream.left, {});

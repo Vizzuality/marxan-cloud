@@ -166,9 +166,8 @@ const getFixtures = async () => {
           const expectedContent = getExpectedContent(options);
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectExportConfigContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ProjectExportConfigContent>(savedStrem);
           expect(content).toMatchObject(expectedContent);
         },
       };

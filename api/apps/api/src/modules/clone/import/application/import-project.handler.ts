@@ -26,7 +26,8 @@ import { ImportRepository } from './import.repository.port';
 
 @CommandHandler(ImportProject)
 export class ImportProjectHandler
-  implements IInferredCommandHandler<ImportProject> {
+  implements IInferredCommandHandler<ImportProject>
+{
   constructor(
     private readonly exportRepo: ExportRepository,
     private readonly importRepo: ImportRepository,

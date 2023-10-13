@@ -13,15 +13,14 @@ export const exportPieceEventsFactoryToken = Symbol(
   'export piece queue' + ' factory token',
 );
 
-export const exportPieceQueueProvider: FactoryProvider<
-  Queue<ExportJobInput>
-> = {
-  provide: exportPieceQueueToken,
-  useFactory: (queueBuilder: QueueBuilder<ExportJobInput>) => {
-    return queueBuilder.buildQueue(exportPieceQueueName);
-  },
-  inject: [QueueBuilder],
-};
+export const exportPieceQueueProvider: FactoryProvider<Queue<ExportJobInput>> =
+  {
+    provide: exportPieceQueueToken,
+    useFactory: (queueBuilder: QueueBuilder<ExportJobInput>) => {
+      return queueBuilder.buildQueue(exportPieceQueueName);
+    },
+    inject: [QueueBuilder],
+  };
 export const exportPiecenQueueEventsProvider: FactoryProvider<QueueEvents> = {
   provide: exportPieceEventsToken,
   useFactory: (eventsBuilder: QueueEventsBuilder) => {

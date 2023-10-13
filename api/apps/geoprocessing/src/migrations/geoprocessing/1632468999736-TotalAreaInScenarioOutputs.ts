@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class TotalAreaInScenarioOutputs1632468999736
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   name = 'TotalAreaInScenarioOutputs1632468999736';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

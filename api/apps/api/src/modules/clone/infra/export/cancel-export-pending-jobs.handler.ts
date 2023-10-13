@@ -13,7 +13,8 @@ import { exportPieceQueueToken } from './export-queue.provider';
 
 @CommandHandler(CancelExportPendingJobs)
 export class CancelExportPendingJobsHandler
-  implements IInferredCommandHandler<CancelExportPendingJobs> {
+  implements IInferredCommandHandler<CancelExportPendingJobs>
+{
   constructor(
     @Inject(exportPieceQueueToken)
     private readonly queue: Queue<ExportJobInput>,

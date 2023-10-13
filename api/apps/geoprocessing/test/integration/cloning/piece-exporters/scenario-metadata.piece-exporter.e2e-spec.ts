@@ -173,9 +173,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioMetadataContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioMetadataContent>(savedStrem);
           expect(content).toEqual(expectedContent(solutionsAreLocked));
         },
       };

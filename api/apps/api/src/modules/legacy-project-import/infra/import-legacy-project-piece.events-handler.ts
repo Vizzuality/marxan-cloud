@@ -21,7 +21,8 @@ import { importLegacyProjectPieceEventsFactoryToken } from './legacy-project-imp
 @Injectable()
 export class ImportLegacyProjectPieceEventsHandler
   implements
-    EventFactory<LegacyProjectImportJobInput, LegacyProjectImportJobOutput> {
+    EventFactory<LegacyProjectImportJobInput, LegacyProjectImportJobOutput>
+{
   private queueEvents: QueueEventsAdapter<
     LegacyProjectImportJobInput,
     LegacyProjectImportJobOutput

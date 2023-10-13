@@ -8,7 +8,8 @@ import { MarkExportAsFailed } from './mark-export-as-failed.command';
 
 @CommandHandler(MarkExportAsFailed)
 export class MarkExportAsFailedHandler
-  implements IInferredCommandHandler<MarkExportAsFailed> {
+  implements IInferredCommandHandler<MarkExportAsFailed>
+{
   private readonly logger: Logger = new Logger(MarkExportAsFailedHandler.name);
 
   private exportEventMapper: Record<ResourceKind, API_EVENT_KINDS> = {

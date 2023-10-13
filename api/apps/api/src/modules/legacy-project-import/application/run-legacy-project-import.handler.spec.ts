@@ -64,7 +64,8 @@ it(`fails to run for a second time`, async () => {
   const result = await fixtures.WhenRunningALegacyProjectImport();
   await fixtures.ThenStartingLegacyProjectImportIsUpdated(result);
 
-  const secondTimeRunningResult = await fixtures.WhenRunningALegacyProjectImport();
+  const secondTimeRunningResult =
+    await fixtures.WhenRunningALegacyProjectImport();
   fixtures.ThenLegacyProjectImportIsAlreadyStartedErrorIsRetured(
     secondTimeRunningResult,
   );

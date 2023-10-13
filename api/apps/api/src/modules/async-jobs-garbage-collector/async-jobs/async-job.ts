@@ -42,9 +42,8 @@ export abstract class AsyncJob {
     qualifiedTopic: QualifiedEventTopicSearch,
   ): Promise<ApiEventByTopicAndKind | undefined> {
     try {
-      const previousEvent = await this.apiEvents.getLatestEventForTopic(
-        qualifiedTopic,
-      );
+      const previousEvent =
+        await this.apiEvents.getLatestEventForTopic(qualifiedTopic);
 
       return previousEvent;
     } catch (err) {

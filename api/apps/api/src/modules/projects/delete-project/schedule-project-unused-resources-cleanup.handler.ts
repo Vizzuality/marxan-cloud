@@ -7,7 +7,8 @@ import { unusedResourcesCleanupQueueToken } from '@marxan/unused-resources-clean
 
 @CommandHandler(ScheduleCleanupForProjectUnusedResources)
 export class ScheduleCleanupForProjectUnusedResourcesHandler
-  implements IInferredCommandHandler<ScheduleCleanupForProjectUnusedResources> {
+  implements IInferredCommandHandler<ScheduleCleanupForProjectUnusedResources>
+{
   private readonly logger: Logger = new Logger(
     ScheduleCleanupForProjectUnusedResourcesHandler.name,
   );

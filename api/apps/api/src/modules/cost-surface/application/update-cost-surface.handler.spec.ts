@@ -26,9 +26,9 @@ beforeEach(async () => {
       UpdateCostSurfaceHandler,
       {
         provide: costSurfaceQueueToken,
-        useValue: ({
+        useValue: {
           add: addJobMock,
-        } as unknown) as Queue,
+        } as unknown as Queue,
       },
       {
         provide: CostSurfaceEventsPort,

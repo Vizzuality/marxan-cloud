@@ -164,30 +164,32 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
         relations: ['featureData'],
       });
 
-    const outputScenariosFeaturesData: OutputScenarioFeaturesDataSelectResult[] = await this.geoprocessingEntityManager
-      .createQueryBuilder()
-      .select('osfd.run_id', 'runId')
-      .addSelect('osfd.amount', 'amount')
-      .addSelect('osfd.occurrences', 'occurrences')
-      .addSelect('osfd.separation', 'separation')
-      .addSelect('osfd.target', 'target')
-      .addSelect('osfd.mpm', 'mpm')
-      .addSelect('osfd.total_area', 'totalArea')
-      .addSelect('osfd.scenario_features_id', 'scenarioFeaturesId')
-      .from(ScenarioFeaturesData, 'sfd')
-      .innerJoin(
-        OutputScenariosFeaturesDataGeoEntity,
-        'osfd',
-        'sfd.id = osfd.scenario_features_id',
-      )
-      .where('sfd.scenario_id = :scenarioId', {
-        scenarioId: input.resourceId,
-      })
-      .execute();
+    const outputScenariosFeaturesData: OutputScenarioFeaturesDataSelectResult[] =
+      await this.geoprocessingEntityManager
+        .createQueryBuilder()
+        .select('osfd.run_id', 'runId')
+        .addSelect('osfd.amount', 'amount')
+        .addSelect('osfd.occurrences', 'occurrences')
+        .addSelect('osfd.separation', 'separation')
+        .addSelect('osfd.target', 'target')
+        .addSelect('osfd.mpm', 'mpm')
+        .addSelect('osfd.total_area', 'totalArea')
+        .addSelect('osfd.scenario_features_id', 'scenarioFeaturesId')
+        .from(ScenarioFeaturesData, 'sfd')
+        .innerJoin(
+          OutputScenariosFeaturesDataGeoEntity,
+          'osfd',
+          'sfd.id = osfd.scenario_features_id',
+        )
+        .where('sfd.scenario_id = :scenarioId', {
+          scenarioId: input.resourceId,
+        })
+        .execute();
 
-    const scenarioFeaturesDataWithFeatureId = this.parseScenarioFeaturesDataToFeatureDataElementWithFeatureId(
-      scenarioFeaturesData,
-    );
+    const scenarioFeaturesDataWithFeatureId =
+      this.parseScenarioFeaturesDataToFeatureDataElementWithFeatureId(
+        scenarioFeaturesData,
+      );
     const featuresIds = [
       ...new Set<string>(
         scenarioFeaturesDataWithFeatureId.flatMap((sfd) => [
@@ -210,10 +212,11 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
         .execute();
     }
 
-    const scenarioFeaturesDataWithIsCustom = this.getScenarioFeaturesDataWithIsCustom(
-      scenarioFeaturesDataWithFeatureId,
-      features,
-    );
+    const scenarioFeaturesDataWithIsCustom =
+      this.getScenarioFeaturesDataWithIsCustom(
+        scenarioFeaturesDataWithFeatureId,
+        features,
+      );
 
     const fileContent = this.getFileContent(
       scenarioFeaturesDataWithIsCustom,

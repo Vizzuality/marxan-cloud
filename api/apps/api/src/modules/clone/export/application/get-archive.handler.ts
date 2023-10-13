@@ -12,7 +12,8 @@ import {
 
 @QueryHandler(GetExportArchive)
 export class GetArchiveHandler
-  implements IInferredQueryHandler<GetExportArchive> {
+  implements IInferredQueryHandler<GetExportArchive>
+{
   constructor(
     private readonly exportRepo: ExportRepository,
     private readonly fileRepo: CloningFilesRepository,

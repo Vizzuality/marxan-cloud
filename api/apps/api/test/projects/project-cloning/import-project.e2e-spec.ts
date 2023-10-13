@@ -128,12 +128,10 @@ export const getFixtures = async () => {
         scenarios: [],
         exportId: exportId.value,
       };
-      const exportConfigRelativePath = ClonePieceRelativePathResolver.resolveFor(
-        ClonePiece.ExportConfig,
-      );
-      const projectMetadataRelativePath = ClonePieceRelativePathResolver.resolveFor(
-        ClonePiece.ProjectMetadata,
-      );
+      const exportConfigRelativePath =
+        ClonePieceRelativePathResolver.resolveFor(ClonePiece.ExportConfig);
+      const projectMetadataRelativePath =
+        ClonePieceRelativePathResolver.resolveFor(ClonePiece.ProjectMetadata);
       const projectMetadataContent: ProjectMetadataContent = {
         name: 'test project',
         description: 'description',
@@ -158,9 +156,8 @@ export const getFixtures = async () => {
       );
 
       const exportFolder = cloningFilesRepo.getFilesFolderFor(exportId.value);
-      const manifestFile = await manifestFileService.generateManifestFileFor(
-        exportFolder,
-      );
+      const manifestFile =
+        await manifestFileService.generateManifestFileFor(exportFolder);
 
       if (isLeft(manifestFile)) {
         throw new Error('Error generating manifest file');

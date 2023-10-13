@@ -25,9 +25,10 @@ export function nominatim2bbox(nominatim: BBox): BBox {
  * @returns {BBox, BBox} west and east bbox split
  *
  */
-export function antimeridianBbox(
-  bbox: BBox,
-): { westBbox: BBox; eastBbox: BBox } {
+export function antimeridianBbox(bbox: BBox): {
+  westBbox: BBox;
+  eastBbox: BBox;
+} {
   if (bbox[2] > bbox[0]) {
     return {
       westBbox: [bbox[0], bbox[1], bbox[2] - 360, bbox[3]],

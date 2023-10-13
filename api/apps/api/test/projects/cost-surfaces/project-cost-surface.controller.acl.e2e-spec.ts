@@ -45,9 +45,8 @@ describe('Get Project Cost Surface', () => {
     await fixtures.GivenScenario(projectId, costSurface2.id);
     await fixtures.GivenScenario(projectId, costSurface2.id);
     // ACT
-    const response = await fixtures.WhenGettingCostSurfacesForProject(
-      projectId,
-    );
+    const response =
+      await fixtures.WhenGettingCostSurfacesForProject(projectId);
 
     // ASSERT
     await fixtures.ThenProjectNotViewableErrorWasReturned(response);

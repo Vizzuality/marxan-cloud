@@ -17,7 +17,8 @@ import {
 
 @CommandHandler(DeleteProject)
 export class DeleteProjectHandler
-  implements IInferredCommandHandler<DeleteProject> {
+  implements IInferredCommandHandler<DeleteProject>
+{
   constructor(
     @InjectRepository(Project)
     private readonly projectRepo: Repository<Project>,

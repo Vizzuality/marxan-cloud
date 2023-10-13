@@ -103,9 +103,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
     projectId: string,
     transactionalEntityManager: EntityManager,
   ) {
-    const [{ geomType }]: [
-      ProjectSelectResult,
-    ] = await this.apiEntityManager
+    const [{ geomType }]: [ProjectSelectResult] = await this.apiEntityManager
       .createQueryBuilder()
       .select('planning_unit_grid_shape', 'geomType')
       .from('projects', 'p')

@@ -25,10 +25,8 @@ describe(`when has two projects with scenarios and events`, () => {
   let scenarioIds: string[];
   let projectId: string;
   beforeEach(async () => {
-    ({
-      scenarioIds,
-      projectId,
-    } = await fixtures.givenProjectWithTwoScenariosWithOverridingEvents());
+    ({ scenarioIds, projectId } =
+      await fixtures.givenProjectWithTwoScenariosWithOverridingEvents());
     await fixtures.givenAnotherProjectWithAScenarioWithAnEvent();
 
     result = await fixtures.getJobStatusService().getJobStatusFor(projectId);
@@ -100,8 +98,7 @@ async function getFixtures() {
 
       const eventDtos = [
         {
-          kind:
-            API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1,
+          kind: API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1,
           topic: scenario1.id,
         },
         {
@@ -109,13 +106,11 @@ async function getFixtures() {
           topic: scenario1.id,
         },
         {
-          kind:
-            API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1,
+          kind: API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1,
           topic: scenario1.id,
         },
         {
-          kind:
-            API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1,
+          kind: API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1,
           topic: scenario1.id,
         },
         {
@@ -141,8 +136,7 @@ async function getFixtures() {
       );
       await GivenScenarioExists(application, projectId, token);
       const event = await eventsRepository.create({
-        kind:
-          API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1,
+        kind: API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1,
         topic: projectId,
       });
       addedOrganizations.push(organizationId);

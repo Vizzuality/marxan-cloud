@@ -56,10 +56,8 @@ export class ProjectTemplateController {
     @Param('id') id: string,
     @Res() res: express.Response,
   ): Promise<void> {
-    const shapefileStatus = await this.projectTemplateService.getTemplateShapefile(
-      id,
-      res,
-    );
+    const shapefileStatus =
+      await this.projectTemplateService.getTemplateShapefile(id, res);
 
     if (shapefileStatus === FileNotReady) {
       res.status(HttpStatus.GATEWAY_TIMEOUT).send();
@@ -87,10 +85,8 @@ export class ProjectTemplateController {
     @Param('id') id: string,
     @Res() res: express.Response,
   ): Promise<void> {
-    const shapefileStatus = await this.projectTemplateService.getTemplateShapefile(
-      id,
-      res,
-    );
+    const shapefileStatus =
+      await this.projectTemplateService.getTemplateShapefile(id, res);
 
     if (shapefileStatus === FileNotReady) {
       res.status(HttpStatus.GATEWAY_TIMEOUT).send();

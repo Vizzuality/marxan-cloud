@@ -31,7 +31,8 @@ import { ImportRepository } from './import.repository.port';
 
 @CommandHandler(ImportScenario)
 export class ImportScenarioHandler
-  implements IInferredCommandHandler<ImportScenario> {
+  implements IInferredCommandHandler<ImportScenario>
+{
   constructor(
     private readonly exportRepo: ExportRepository,
     @InjectRepository(Scenario)

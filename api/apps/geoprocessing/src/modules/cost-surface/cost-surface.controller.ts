@@ -1,15 +1,6 @@
-import {
-  Controller,
-  Get,
-  Logger,
-  Param,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, Logger, Param, Res } from '@nestjs/common';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
-import {
-  ApiBadRequestResponse,
-  ApiOperation,
-} from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiOperation } from '@nestjs/swagger';
 
 import { Response } from 'express';
 import { setTileResponseHeadersForSuccessfulRequests } from '@marxan/tiles';

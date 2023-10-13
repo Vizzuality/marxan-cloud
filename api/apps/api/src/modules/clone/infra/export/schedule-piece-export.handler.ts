@@ -16,7 +16,8 @@ import { SchedulePieceExport } from './schedule-piece-export.command';
 
 @CommandHandler(SchedulePieceExport)
 export class SchedulePieceExportHandler
-  implements IInferredCommandHandler<SchedulePieceExport> {
+  implements IInferredCommandHandler<SchedulePieceExport>
+{
   private readonly logger: Logger = new Logger(SchedulePieceExportHandler.name);
 
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {

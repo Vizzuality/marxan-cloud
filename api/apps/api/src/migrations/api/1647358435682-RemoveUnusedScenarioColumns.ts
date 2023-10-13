@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class RemoveUnusedScenarioColumns1647358435682
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(`
       ALTER TABLE scenarios

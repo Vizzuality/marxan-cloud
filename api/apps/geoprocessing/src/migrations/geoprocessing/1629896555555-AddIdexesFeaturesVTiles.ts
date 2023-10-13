@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddIdexesFeaturesVTiles1629896555555
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
     CREATE INDEX scenario_features_data_index_btree ON public.scenario_features_data USING btree (feature_id, scenario_id);

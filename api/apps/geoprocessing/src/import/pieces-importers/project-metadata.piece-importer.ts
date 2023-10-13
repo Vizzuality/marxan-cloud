@@ -114,14 +114,8 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const {
-      uris,
-      pieceResourceId,
-      projectId,
-      piece,
-      ownerId,
-      resourceName,
-    } = input;
+    const { uris, pieceResourceId, projectId, piece, ownerId, resourceName } =
+      input;
 
     try {
       if (uris.length !== 1) {

@@ -69,7 +69,8 @@ describe(ScenarioFeaturesSpecificationPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoScenarioFeaturesDataFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoScenarioFeaturesDataFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -78,7 +79,8 @@ describe(ScenarioFeaturesSpecificationPieceImporter, () => {
 
   it('imports empty scenario features specification', async () => {
     await fixtures.GivenScenario();
-    const archiveLocation = await fixtures.GivenEmptyScenarioFeaturesSpecificationFile();
+    const archiveLocation =
+      await fixtures.GivenEmptyScenarioFeaturesSpecificationFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -87,7 +89,8 @@ describe(ScenarioFeaturesSpecificationPieceImporter, () => {
 
   it('imports scenario features specification', async () => {
     await fixtures.GivenScenario();
-    const archiveLocation = await fixtures.GivenValidScenarioFeaturesSpecificationFile();
+    const archiveLocation =
+      await fixtures.GivenValidScenarioFeaturesSpecificationFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -130,9 +133,8 @@ const getFixtures = async () => {
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
   );
   const featuresDataRepo = geoEntityManager.getRepository(GeoFeatureGeometry);
-  const scenarioFeaturesDataRepo = geoEntityManager.getRepository(
-    ScenarioFeaturesData,
-  );
+  const scenarioFeaturesDataRepo =
+    geoEntityManager.getRepository(ScenarioFeaturesData);
   const sut = sandbox.get(ScenarioFeaturesSpecificationPieceImporter);
   const fileRepository = sandbox.get(CloningFilesRepository);
 
@@ -287,9 +289,8 @@ const getFixtures = async () => {
       const platformFeaturesIds = platformFeatures.map((feature) => feature.id);
 
       const customFeatureNameById = getFeatureClassNameByIdMap(customFeatures);
-      const platformFeatureNameById = getFeatureClassNameByIdMap(
-        platformFeatures,
-      );
+      const platformFeatureNameById =
+        getFeatureClassNameByIdMap(platformFeatures);
 
       featureIds = [...customFeaturesIds, ...platformFeaturesIds];
 
@@ -398,11 +399,10 @@ const getFixtures = async () => {
           );
         },
         ThenScenarioFeaturesDataShouldBeImported: async () => {
-          const beforeRunScenarioFeaturesData = await scenarioFeaturesDataRepo.find(
-            {
+          const beforeRunScenarioFeaturesData =
+            await scenarioFeaturesDataRepo.find({
               where: { scenarioId },
-            },
-          );
+            });
 
           expect(
             beforeRunScenarioFeaturesData.every((featureData) => {
@@ -488,11 +488,10 @@ const getFixtures = async () => {
           ).toBe(true);
         },
         ThenNoScenarioFeaturesDataShouldBeImported: async () => {
-          const beforeRunScenarioFeaturesData = await scenarioFeaturesDataRepo.find(
-            {
+          const beforeRunScenarioFeaturesData =
+            await scenarioFeaturesDataRepo.find({
               where: { scenarioId },
-            },
-          );
+            });
 
           expect(
             beforeRunScenarioFeaturesData.every((featureData) => {

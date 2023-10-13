@@ -25,18 +25,12 @@ import {
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  uploadOptions,
-} from '@marxan-api/utils/file-uploads.utils';
+import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import {
-  ProjectsService,
-} from './projects.service';
+import { ProjectsService } from './projects.service';
 import { isLeft } from 'fp-ts/Either';
 import { forbiddenError } from '@marxan-api/modules/access-control';
-import {
-  ImplementsAcl,
-} from '@marxan-api/decorators/acl.decorator';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 import {
   AddFileToLegacyProjectImportBodyDto,
   AddFileToLegacyProjectImportResponseDto,
@@ -64,9 +58,7 @@ import { blmCreationFailure } from '../scenarios/blm-calibration/create-initial-
 @ApiTags('Legacy projects')
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class LegacyProjectsController {
-  constructor(
-    private readonly projectsService: ProjectsService,
-  ) {}
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @ImplementsAcl()
   @ApiOperation({

@@ -29,7 +29,8 @@ type FolderZipData = {
 @Injectable()
 @PieceExportProvider()
 export class MarxanExecutionMetadataPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     MarxanExecutionMetadataPieceExporter.name,
   );
@@ -79,16 +80,17 @@ export class MarxanExecutionMetadataPieceExporter
         }),
       ),
     };
-    const foldersZipsData: FolderZipData[] = marxanExecutionMetadataWithBuffers.flatMap(
-      ({ id, inputZip, outputZip }) => {
-        const files: FolderZipData[] = [
-          { id, buffer: inputZip, type: 'input' },
-        ];
-        if (outputZip) files.push({ id, buffer: outputZip, type: 'output' });
+    const foldersZipsData: FolderZipData[] =
+      marxanExecutionMetadataWithBuffers.flatMap(
+        ({ id, inputZip, outputZip }) => {
+          const files: FolderZipData[] = [
+            { id, buffer: inputZip, type: 'input' },
+          ];
+          if (outputZip) files.push({ id, buffer: outputZip, type: 'output' });
 
-        return files;
-      },
-    );
+          return files;
+        },
+      );
 
     const jsonFileRelativePath = ClonePieceRelativePathResolver.resolveFor(
       ClonePiece.MarxanExecutionMetadata,

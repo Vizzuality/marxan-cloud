@@ -24,9 +24,10 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
   async calculatedProtectionStatusForPlanningUnitsIn(
     scenario: ScenarioMetadata,
   ): Promise<void> {
-    const puRepo = this.entityManager.getRepository<ScenariosPlanningUnitGeoEntity>(
-      ScenariosPlanningUnitGeoEntity,
-    );
+    const puRepo =
+      this.entityManager.getRepository<ScenariosPlanningUnitGeoEntity>(
+        ScenariosPlanningUnitGeoEntity,
+      );
 
     const query = `
       with pu as (

@@ -17,10 +17,8 @@ export class PuvsprDatLegacyProject implements PuvsprDat {
     scenarioId: string,
     featureIds: string[],
   ): Promise<FeatureAmountPerPlanningUnitId[]> {
-    const {
-      legacyFeatureIds,
-      marxanFeatureIds,
-    } = await this.getLegacyAndMarxanFeatures(featureIds);
+    const { legacyFeatureIds, marxanFeatureIds } =
+      await this.getLegacyAndMarxanFeatures(featureIds);
 
     const legacyFeaturesComputed = await this.computeLegacyFeatures(
       legacyFeatureIds,

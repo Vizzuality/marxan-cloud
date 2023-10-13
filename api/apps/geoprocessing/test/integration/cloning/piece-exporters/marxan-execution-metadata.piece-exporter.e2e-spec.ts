@@ -127,9 +127,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStream = file.right;
-          const content = await readSavedFile<MarxanExecutionMetadataContent>(
-            savedStream,
-          );
+          const content =
+            await readSavedFile<MarxanExecutionMetadataContent>(savedStream);
           expect(content.marxanExecutionMetadata).toHaveLength(
             amountOfMarxanRuns,
           );

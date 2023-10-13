@@ -22,9 +22,8 @@ export const createWorld = async (app: INestApplication): Promise<World> => {
   const entityManager = app.get<EntityManager>(
     getEntityManagerToken(DbConnections.geoprocessingDB),
   );
-  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
-    ProjectsPuEntity,
-  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> =
+    entityManager.getRepository(ProjectsPuEntity);
   const geomsRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );

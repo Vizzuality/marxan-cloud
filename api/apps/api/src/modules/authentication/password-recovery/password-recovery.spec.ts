@@ -34,9 +34,8 @@ test(`setting a new password`, async () => {
   fixtures.sendingConfirmationEnabled();
 
   fixtures.GivenAUser('user@email.com');
-  const resetToken = await fixtures.givenAUserRequestedPasswordReset(
-    'user@email.com',
-  );
+  const resetToken =
+    await fixtures.givenAUserRequestedPasswordReset('user@email.com');
   await service.changePassword(
     resetToken,
     'newComplexPasswordToFulfillTheEntropyValidation',
@@ -51,9 +50,8 @@ test(`setting a new password`, async () => {
 
 test(`only newest token is valid`, async () => {
   fixtures.GivenAUser('user@email.com');
-  const oldResetToken = await fixtures.givenAUserRequestedPasswordReset(
-    `user@email.com`,
-  );
+  const oldResetToken =
+    await fixtures.givenAUserRequestedPasswordReset(`user@email.com`);
   await fixtures.givenAUserRequestedPasswordReset(`user@email.com`);
   const result = await service.changePassword(oldResetToken, 'newPassword');
   expect(result).toStrictEqual(left(tokenInvalid));
@@ -62,9 +60,8 @@ test(`only newest token is valid`, async () => {
 
 test(`token expirancy`, async () => {
   fixtures.GivenAUser('user@email.com');
-  const resetToken = await fixtures.givenAUserRequestedPasswordReset(
-    `user@email.com`,
-  );
+  const resetToken =
+    await fixtures.givenAUserRequestedPasswordReset(`user@email.com`);
   const newDate = fixtures.GivenTimePassedToExpireToken();
   const result = await service.changePassword(
     resetToken,
@@ -85,9 +82,8 @@ test(`using a token twice`, async () => {
   fixtures.sendingConfirmationEnabled();
 
   fixtures.GivenAUser('user@email.com');
-  const resetToken = await fixtures.givenAUserRequestedPasswordReset(
-    'user@email.com',
-  );
+  const resetToken =
+    await fixtures.givenAUserRequestedPasswordReset('user@email.com');
   await service.changePassword(
     resetToken,
     'newComplexPasswordToFulfillTheEntropyValidation',

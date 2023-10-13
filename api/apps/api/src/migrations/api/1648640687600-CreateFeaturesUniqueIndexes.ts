@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateFeaturesUniqueIndexes1648640687600
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(`
       CREATE UNIQUE INDEX unique_platform_features ON features (feature_class_name) WHERE project_id IS NULL;

@@ -20,17 +20,14 @@ export class PlanningUnitsGridProcessor {
     private readonly paGarbageCollector: PlanningAreaGarbageCollector,
   ) {}
 
-  async save(
-    shapefile: Express.Multer.File,
-  ): Promise<
+  async save(shapefile: Express.Multer.File): Promise<
     {
       id: string;
       data: GeoJSON;
     } & SaveGeoJsonResult
   > {
-    const { data: geoJson } = await this.shapefileService.transformToGeoJson(
-      shapefile,
-    );
+    const { data: geoJson } =
+      await this.shapefileService.transformToGeoJson(shapefile);
     const planningAreaId = v4();
 
     const { bbox } = await this.entityManager

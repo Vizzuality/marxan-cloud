@@ -58,12 +58,13 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const costSurfaces: ProjectCostSurfacesSelectResult[] = await this.apiEntityManager
-      .createQueryBuilder()
-      .select(['cs.id', 'cs.name', 'cs.min', 'cs.max', 'cs.is_default'])
-      .from('cost_surfaces', 'cs')
-      .where('cs.project_id = :projectId', { projectId: input.resourceId })
-      .execute();
+    const costSurfaces: ProjectCostSurfacesSelectResult[] =
+      await this.apiEntityManager
+        .createQueryBuilder()
+        .select(['cs.id', 'cs.name', 'cs.min', 'cs.max', 'cs.is_default'])
+        .from('cost_surfaces', 'cs')
+        .where('cs.project_id = :projectId', { projectId: input.resourceId })
+        .execute();
 
     const costSurfacesIds = costSurfaces.map((costSurface) => costSurface.id);
     let costSurfaceData: CostSurfaceDataSelectResult[] = [];

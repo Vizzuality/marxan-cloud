@@ -137,9 +137,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectCostSurfacesContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ProjectCostSurfacesContent>(savedStrem);
           expect(content.costSurfaces).toHaveLength(2);
           const costSurfacesExported = content.costSurfaces;
 

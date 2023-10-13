@@ -14,11 +14,10 @@ export class BestSolutionDataService {
   async getBestSolutionData(
     scenarioId: string,
   ): Promise<{ planning_unit: number; selected: 0 | 1 }[]> {
-    const scenarioOutputResult = await this.scenariosOutputResultsRepo.findOneOrFail(
-      {
+    const scenarioOutputResult =
+      await this.scenariosOutputResultsRepo.findOneOrFail({
         where: { scenarioId, best: true },
-      },
-    );
+      });
     const bestRunId = scenarioOutputResult.runId;
 
     return this.geoEntityManager.query(

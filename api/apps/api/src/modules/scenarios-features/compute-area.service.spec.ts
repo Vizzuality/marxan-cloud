@@ -49,7 +49,8 @@ const getFixtures = async () => {
       {
         provide: PuvsprCalculationsService,
         useValue: {
-          computeMarxanAmountPerPlanningUnit: computeMarxanAmountPerPlanningUnitMock,
+          computeMarxanAmountPerPlanningUnit:
+            computeMarxanAmountPerPlanningUnitMock,
         },
       },
       ComputeArea,
@@ -59,9 +60,8 @@ const getFixtures = async () => {
   await sandbox.init();
 
   const sut = sandbox.get(ComputeArea);
-  const puvsprCalculationsRepo: MemoryPuvsprCalculationsRepository = sandbox.get(
-    PuvsprCalculationsRepository,
-  );
+  const puvsprCalculationsRepo: MemoryPuvsprCalculationsRepository =
+    sandbox.get(PuvsprCalculationsRepository);
 
   const expectedPuid = v4();
   const expectedAmount = 20;
@@ -105,10 +105,11 @@ const getFixtures = async () => {
       projectId: string,
       featureId: string,
     ) => {
-      const savedCalculations = await puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeature(
-        projectId,
-        [featureId],
-      );
+      const savedCalculations =
+        await puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeature(
+          projectId,
+          [featureId],
+        );
 
       expect(savedCalculations).toBeDefined();
       expect(savedCalculations[0]).toEqual({
@@ -122,10 +123,11 @@ const getFixtures = async () => {
       featureId: string,
     ) => {
       expect(computeMarxanAmountPerPlanningUnitMock).not.toHaveBeenCalled();
-      const hasBeenSaved = await puvsprCalculationsRepo.areAmountPerPlanningUnitAndFeatureSaved(
-        projectId,
-        featureId,
-      );
+      const hasBeenSaved =
+        await puvsprCalculationsRepo.areAmountPerPlanningUnitAndFeatureSaved(
+          projectId,
+          featureId,
+        );
 
       expect(hasBeenSaved).toEqual(false);
     },

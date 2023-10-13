@@ -39,9 +39,7 @@ export class ScenarioOutputFolderPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const [scenario]: [
-      SelectScenarioResult,
-    ] = await this.entityManager
+    const [scenario]: [SelectScenarioResult] = await this.entityManager
       .createQueryBuilder()
       .select('name')
       .from('scenarios', 's')

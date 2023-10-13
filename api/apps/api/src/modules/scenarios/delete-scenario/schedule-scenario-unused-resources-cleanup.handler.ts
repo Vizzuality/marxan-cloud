@@ -7,8 +7,8 @@ import { ScheduleCleanupForScenarioUnusedResources } from './schedule-scenario-u
 
 @CommandHandler(ScheduleCleanupForScenarioUnusedResources)
 export class ScheduleCleanupForScenarioUnusedResourcesHandler
-  implements
-    IInferredCommandHandler<ScheduleCleanupForScenarioUnusedResources> {
+  implements IInferredCommandHandler<ScheduleCleanupForScenarioUnusedResources>
+{
   private readonly logger: Logger = new Logger(
     ScheduleCleanupForScenarioUnusedResourcesHandler.name,
   );

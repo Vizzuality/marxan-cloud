@@ -58,7 +58,8 @@ describe(ProjectCustomFeaturesPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoProjectPuvsprCalculationsFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoProjectPuvsprCalculationsFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -67,7 +68,8 @@ describe(ProjectCustomFeaturesPieceImporter, () => {
 
   it('imports project puvspr calculations', async () => {
     await fixtures.GivenProject();
-    const archiveLocation = await fixtures.GivenValidProjectPuvsprCalculationsFile();
+    const archiveLocation =
+      await fixtures.GivenValidProjectPuvsprCalculationsFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -214,27 +216,28 @@ const getFixtures = async () => {
       const basePlatformFeature = platformFeatures[0];
       featureIds = [basePlatformFeature.id];
       const importedSplitDerivedFeature = customFeatures[0];
-      const validProjectPuvsprCalculationsFile: ProjectPuvsprCalculationsContent = {
-        projectFeaturesGeoOperations: [
-          {
-            featureName: importedSplitDerivedFeature.feature_class_name,
-            geoOperation: {
-              baseFeatureIsCustom: false,
-              baseFeatureName: basePlatformFeature.feature_class_name,
-              operation: SpecificationOperation.Split,
-              splitByProperty: 'random-property',
+      const validProjectPuvsprCalculationsFile: ProjectPuvsprCalculationsContent =
+        {
+          projectFeaturesGeoOperations: [
+            {
+              featureName: importedSplitDerivedFeature.feature_class_name,
+              geoOperation: {
+                baseFeatureIsCustom: false,
+                baseFeatureName: basePlatformFeature.feature_class_name,
+                operation: SpecificationOperation.Split,
+                splitByProperty: 'random-property',
+              },
             },
-          },
-        ],
-        puvsprCalculations: Array(amountOfPuvsprCalculations)
-          .fill(0)
-          .map((_, index) => ({
-            amount: 200,
-            featureName: basePlatformFeature.feature_class_name,
-            isCustom: false,
-            puid: projectPus[index].puid,
-          })),
-      };
+          ],
+          puvsprCalculations: Array(amountOfPuvsprCalculations)
+            .fill(0)
+            .map((_, index) => ({
+              amount: 200,
+              featureName: basePlatformFeature.feature_class_name,
+              isCustom: false,
+              puid: projectPus[index].puid,
+            })),
+        };
 
       const exportId = v4();
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
@@ -260,47 +263,53 @@ const getFixtures = async () => {
             /File with piece data for/gi,
           );
         },
-        ThenPuvsprCalculationsAreImportedAndDerivedFeaturesAreUpdated: async () => {
-          const projectFeaturesImported = 1;
-          const featuresAlreadyImported = await getFeaturesImported();
-          expect(
-            featuresAlreadyImported.every(
-              ({ geoOperation }) => geoOperation === null,
-            ),
-          );
-          expect(featuresAlreadyImported).toHaveLength(projectFeaturesImported);
-          const projectPuvsprCalculations = await puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeatureInProject(
-            projectId,
-          );
-          expect(projectPuvsprCalculations).toEqual([]);
-          const projectPus = await projectPusRepo.find({
-            where: { projectId },
-          });
-          expect(projectPus).toHaveLength(amountOfPuvsprCalculations);
+        ThenPuvsprCalculationsAreImportedAndDerivedFeaturesAreUpdated:
+          async () => {
+            const projectFeaturesImported = 1;
+            const featuresAlreadyImported = await getFeaturesImported();
+            expect(
+              featuresAlreadyImported.every(
+                ({ geoOperation }) => geoOperation === null,
+              ),
+            );
+            expect(featuresAlreadyImported).toHaveLength(
+              projectFeaturesImported,
+            );
+            const projectPuvsprCalculations =
+              await puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeatureInProject(
+                projectId,
+              );
+            expect(projectPuvsprCalculations).toEqual([]);
+            const projectPus = await projectPusRepo.find({
+              where: { projectId },
+            });
+            expect(projectPus).toHaveLength(amountOfPuvsprCalculations);
 
-          await sut.run(input);
+            await sut.run(input);
 
-          const featuresAfterImport = await getFeaturesImported();
-          expect(featuresAfterImport).toHaveLength(projectFeaturesImported);
-          const splitDerivedFeature = featuresAfterImport[0];
-          expect(splitDerivedFeature.geoOperation).not.toEqual(null);
-          const baseFeatureId = splitDerivedFeature.geoOperation!.baseFeatureId;
-          const baseFeature = await getFeatureById(baseFeatureId);
-          expect(baseFeature).toBeDefined();
-          expect(baseFeature!.geoOperation).toEqual(null);
+            const featuresAfterImport = await getFeaturesImported();
+            expect(featuresAfterImport).toHaveLength(projectFeaturesImported);
+            const splitDerivedFeature = featuresAfterImport[0];
+            expect(splitDerivedFeature.geoOperation).not.toEqual(null);
+            const baseFeatureId =
+              splitDerivedFeature.geoOperation!.baseFeatureId;
+            const baseFeature = await getFeatureById(baseFeatureId);
+            expect(baseFeature).toBeDefined();
+            expect(baseFeature!.geoOperation).toEqual(null);
 
-          const puvsprCalculationsAfterImport = await puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeatureInProject(
-            projectId,
-          );
-          expect(puvsprCalculationsAfterImport).toHaveLength(
-            amountOfPuvsprCalculations,
-          );
-          expect(
-            puvsprCalculationsAfterImport.every(
-              ({ featureId }) => baseFeatureId === featureId,
-            ),
-          );
-        },
+            const puvsprCalculationsAfterImport =
+              await puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeatureInProject(
+                projectId,
+              );
+            expect(puvsprCalculationsAfterImport).toHaveLength(
+              amountOfPuvsprCalculations,
+            );
+            expect(
+              puvsprCalculationsAfterImport.every(
+                ({ featureId }) => baseFeatureId === featureId,
+              ),
+            );
+          },
       };
     },
   };

@@ -26,9 +26,7 @@ import {
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  uploadOptions,
-} from '@marxan-api/utils/file-uploads.utils';
+import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import {
   notAllowed,
@@ -38,9 +36,7 @@ import {
 import { isLeft } from 'fp-ts/Either';
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { Response } from 'express';
-import {
-  ImplementsAcl,
-} from '@marxan-api/decorators/acl.decorator';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 import {
   GetLatestExportResponseDto,
   GetLatestExportsResponseDto,
@@ -68,9 +64,7 @@ import {
 @ApiTags('Project - cloning')
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectCloningController {
-  constructor(
-    private readonly projectsService: ProjectsService,
-  ) {}
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @ImplementsAcl()
   @ApiOperation({
@@ -210,7 +204,8 @@ export class ProjectCloningController {
 
   @ImplementsAcl()
   @ApiOperation({
-    description: 'Return the exportId of the most recently prepared export for a given project',
+    description:
+      'Return the exportId of the most recently prepared export for a given project',
   })
   @ApiParam({
     name: 'projectId',

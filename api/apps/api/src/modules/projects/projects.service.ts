@@ -241,9 +241,8 @@ export class ProjectsService {
       ? { planningAreaGeometryId: project.planningAreaId }
       : this.idToGid(project.planningAreaId);
 
-    const planningAreaEntity = await this.planningAreaService.locatePlanningAreaEntity(
-      planningAreaId,
-    );
+    const planningAreaEntity =
+      await this.planningAreaService.locatePlanningAreaEntity(planningAreaId);
 
     if (!planningAreaEntity) {
       return left(projectNotFound);
@@ -361,7 +360,8 @@ export class ProjectsService {
     ) {
       return left(forbiddenError);
     }
-    const defaultCostSurface = this.costSurfaceService.createDefaultCostSurfaceModel();
+    const defaultCostSurface =
+      this.costSurfaceService.createDefaultCostSurfaceModel();
     const project = await this.projectsCrud.create(
       { ...input, costSurfaces: [defaultCostSurface] } as CreateProjectDTO,
       info,
@@ -523,9 +523,8 @@ export class ProjectsService {
       StartLegacyProjectImportResult
     >
   > {
-    const userCanCreateProject = await this.projectAclService.canCreateProject(
-      userId,
-    );
+    const userCanCreateProject =
+      await this.projectAclService.canCreateProject(userId);
 
     if (!userCanCreateProject) {
       return left(forbiddenError);
@@ -600,9 +599,8 @@ export class ProjectsService {
       true
     >
   > {
-    const legacyProjectImportOrError = await this.legacyProjectImportRepository.find(
-      new ResourceId(projectId),
-    );
+    const legacyProjectImportOrError =
+      await this.legacyProjectImportRepository.find(new ResourceId(projectId));
 
     if (isLeft(legacyProjectImportOrError)) return legacyProjectImportOrError;
 
@@ -639,9 +637,10 @@ export class ProjectsService {
   }
 
   // TODO add ensureThatProjectIsNotBlocked guard
-  savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
-    this.planningAreaService,
-  );
+  savePlanningAreaFromShapefile =
+    this.planningAreaService.savePlanningAreaFromShapefile.bind(
+      this.planningAreaService,
+    );
 
   async getExportedArchive(
     projectId: string,
@@ -659,10 +658,8 @@ export class ProjectsService {
     const response = await this.assertProject(projectId, { id: userId });
     if (isLeft(response)) return left(projectNotFound);
 
-    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
-      userId,
-      projectId,
-    );
+    const canDownloadExport =
+      await this.projectAclService.canDownloadProjectExport(userId, projectId);
 
     if (!canDownloadExport) return left(notAllowed);
 
@@ -682,10 +679,8 @@ export class ProjectsService {
 
     if (isLeft(response)) return left(projectNotFound);
 
-    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
-      userId,
-      projectId,
-    );
+    const canDownloadExport =
+      await this.projectAclService.canDownloadProjectExport(userId, projectId);
 
     if (!canDownloadExport) return left(forbiddenError);
 
@@ -721,10 +716,8 @@ export class ProjectsService {
 
     if (isLeft(response)) return left(projectNotFound);
 
-    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
-      userId,
-      projectId,
-    );
+    const canDownloadExport =
+      await this.projectAclService.canDownloadProjectExport(userId, projectId);
 
     if (!canDownloadExport) return left(forbiddenError);
 
@@ -835,13 +828,14 @@ export class ProjectsService {
     /** @debt Refactor to use @nestjs/common's StreamableFile
      (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
      after upgrading NestJS to v8. **/
-    const pdfStream = await this.webshotService.getScenarioFrequencyComparisonMap(
-      scenarioIdA,
-      scenarioIdB,
-      scenarioA.right.projectId,
-      configForWebshot,
-      webshotUrl,
-    );
+    const pdfStream =
+      await this.webshotService.getScenarioFrequencyComparisonMap(
+        scenarioIdA,
+        scenarioIdB,
+        scenarioA.right.projectId,
+        configForWebshot,
+        webshotUrl,
+      );
 
     return pdfStream;
   }
@@ -856,9 +850,10 @@ export class ProjectsService {
       return left(forbiddenError);
     }
 
-    const summary = await this.outputProjectSummariesService.getOutputSummaryForProject(
-      projectId,
-    );
+    const summary =
+      await this.outputProjectSummariesService.getOutputSummaryForProject(
+        projectId,
+      );
     if (!summary) {
       return left(outputProjectSummaryNotFound);
     }

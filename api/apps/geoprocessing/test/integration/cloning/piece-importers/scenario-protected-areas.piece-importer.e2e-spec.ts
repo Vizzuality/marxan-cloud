@@ -57,7 +57,8 @@ describe(ScenarioProtectedAreasPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoScenarioProtectedAreasFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoScenarioProtectedAreasFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -66,7 +67,8 @@ describe(ScenarioProtectedAreasPieceImporter, () => {
 
   it('fails if a custom protected area is not found', async () => {
     await fixtures.GivenWdpaAndCustomProtectedAreas();
-    const archiveLocation = await fixtures.GivenScenarioProtectedAreasFileWithAnUnexistingCustomProtectedArea();
+    const archiveLocation =
+      await fixtures.GivenScenarioProtectedAreasFileWithAnUnexistingCustomProtectedArea();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -75,7 +77,8 @@ describe(ScenarioProtectedAreasPieceImporter, () => {
 
   it('fails if a wdpa protected area is not found', async () => {
     await fixtures.GivenWdpaAndCustomProtectedAreas();
-    const archiveLocation = await fixtures.GivenScenarioProtectedAreasFileWithAnUnexistingWdpaProtectedArea();
+    const archiveLocation =
+      await fixtures.GivenScenarioProtectedAreasFileWithAnUnexistingWdpaProtectedArea();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -85,7 +88,8 @@ describe(ScenarioProtectedAreasPieceImporter, () => {
   it('imports scenario protected areas', async () => {
     await fixtures.GivenWdpaAndCustomProtectedAreas();
     await fixtures.GivenScenario();
-    const archiveLocation = await fixtures.GivenValidScenarioProtectedAreasFile();
+    const archiveLocation =
+      await fixtures.GivenValidScenarioProtectedAreasFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -220,58 +224,67 @@ const getFixtures = async () => {
     GivenNoScenarioProtectedAreasFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenScenarioProtectedAreasFileWithAnUnexistingCustomProtectedArea: async () => {
-      const relativePath = ClonePieceRelativePathResolver.resolveFor(
-        ClonePiece.ScenarioProtectedAreas,
-        { kind: resourceKind, scenarioId: oldScenarioId },
-      );
-      const [geometry] = await GenerateRandomGeometries(
-        geoprocessingEntityManager,
-        1,
-        true,
-      );
-      const invalidScenarioProtectedAreasFileContent: ScenarioProtectedAreasContent = {
-        ...validScenarioProtectedAreasFileContent,
-        customProtectedAreas: validScenarioProtectedAreasFileContent.customProtectedAreas.concat(
+    GivenScenarioProtectedAreasFileWithAnUnexistingCustomProtectedArea:
+      async () => {
+        const relativePath = ClonePieceRelativePathResolver.resolveFor(
+          ClonePiece.ScenarioProtectedAreas,
+          { kind: resourceKind, scenarioId: oldScenarioId },
+        );
+        const [geometry] = await GenerateRandomGeometries(
+          geoprocessingEntityManager,
+          1,
+          true,
+        );
+        const invalidScenarioProtectedAreasFileContent: ScenarioProtectedAreasContent =
           {
-            name: 'Unexisting custom protected area',
-            geom: geometry.toJSON().data,
-          },
-        ),
-      };
+            ...validScenarioProtectedAreasFileContent,
+            customProtectedAreas:
+              validScenarioProtectedAreasFileContent.customProtectedAreas.concat(
+                {
+                  name: 'Unexisting custom protected area',
+                  geom: geometry.toJSON().data,
+                },
+              ),
+          };
 
-      const exportId = v4();
+        const exportId = v4();
 
-      const uriOrError = await fileRepository.saveCloningFile(
-        exportId,
-        Readable.from(JSON.stringify(invalidScenarioProtectedAreasFileContent)),
-        relativePath,
-      );
+        const uriOrError = await fileRepository.saveCloningFile(
+          exportId,
+          Readable.from(
+            JSON.stringify(invalidScenarioProtectedAreasFileContent),
+          ),
+          relativePath,
+        );
 
-      if (isLeft(uriOrError)) throw new Error("couldn't save file");
-      return new ArchiveLocation(uriOrError.right);
-    },
-    GivenScenarioProtectedAreasFileWithAnUnexistingWdpaProtectedArea: async () => {
-      const relativePath = ClonePieceRelativePathResolver.resolveFor(
-        ClonePiece.ScenarioProtectedAreas,
-        { kind: resourceKind, scenarioId: oldScenarioId },
-      );
-      const invalidScenarioProtectedAreasFileContent: ScenarioProtectedAreasContent = {
-        ...validScenarioProtectedAreasFileContent,
-        wdpa: validScenarioProtectedAreasFileContent.wdpa.concat(-1),
-      };
+        if (isLeft(uriOrError)) throw new Error("couldn't save file");
+        return new ArchiveLocation(uriOrError.right);
+      },
+    GivenScenarioProtectedAreasFileWithAnUnexistingWdpaProtectedArea:
+      async () => {
+        const relativePath = ClonePieceRelativePathResolver.resolveFor(
+          ClonePiece.ScenarioProtectedAreas,
+          { kind: resourceKind, scenarioId: oldScenarioId },
+        );
+        const invalidScenarioProtectedAreasFileContent: ScenarioProtectedAreasContent =
+          {
+            ...validScenarioProtectedAreasFileContent,
+            wdpa: validScenarioProtectedAreasFileContent.wdpa.concat(-1),
+          };
 
-      const exportId = v4();
+        const exportId = v4();
 
-      const uriOrError = await fileRepository.saveCloningFile(
-        exportId,
-        Readable.from(JSON.stringify(invalidScenarioProtectedAreasFileContent)),
-        relativePath,
-      );
+        const uriOrError = await fileRepository.saveCloningFile(
+          exportId,
+          Readable.from(
+            JSON.stringify(invalidScenarioProtectedAreasFileContent),
+          ),
+          relativePath,
+        );
 
-      if (isLeft(uriOrError)) throw new Error("couldn't save file");
-      return new ArchiveLocation(uriOrError.right);
-    },
+        if (isLeft(uriOrError)) throw new Error("couldn't save file");
+        return new ArchiveLocation(uriOrError.right);
+      },
     GivenValidScenarioProtectedAreasFile: async () => {
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioProtectedAreas,
@@ -312,9 +325,7 @@ const getFixtures = async () => {
         ThenScenarioProtectedAreasShouldBeImported: async () => {
           await sut.run(input);
 
-          const [scenario]: [
-            ScenarioSelectResult,
-          ] = await apiEntityManager
+          const [scenario]: [ScenarioSelectResult] = await apiEntityManager
             .createQueryBuilder()
             .select('protected_area_filter_by_ids, wdpa_threshold')
             .from('scenarios', 's')

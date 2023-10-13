@@ -170,9 +170,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectCustomFeaturesContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ProjectCustomFeaturesContent>(savedStrem);
           expect(content.features).toEqual([]);
         },
         ThenAProjectCustomFeaturesFileIsSaved: async (
@@ -185,9 +184,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectCustomFeaturesContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ProjectCustomFeaturesContent>(savedStrem);
           expect(content.features).toHaveLength(amountOfCustomFeatures);
           const featuresExported = content.features;
           const expectedFeatureNames = Array(amountOfCustomFeatures)

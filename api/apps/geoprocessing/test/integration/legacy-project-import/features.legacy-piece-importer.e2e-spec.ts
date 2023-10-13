@@ -77,9 +77,8 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
 
   it('fails when invalid delimiter is used on spec.dat', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
-    const location = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
+    const location =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
     const job = fixtures.GivenJobInput({ specDatFileLocation: location });
     fixtures.GivenSpecDatFileWithInvalidDelimiter();
 
@@ -90,9 +89,8 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
 
   it('fails when read operation on spec.dat fails', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
-    const location = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
+    const location =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
     const job = fixtures.GivenJobInput({ specDatFileLocation: location });
     fixtures.GivenInvalidSpecDatFile();
 
@@ -105,9 +103,8 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
     const job = fixtures.GivenJobInput({ specDatFileLocation });
     fixtures.GivenValidSpecDatFile();
 
@@ -120,9 +117,8 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -139,12 +135,12 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      puvsprDatFileType,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
+    const puvsprDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        puvsprDatFileType,
+      );
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -159,12 +155,14 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
   });
 
   it('fails if spec.dat file contains duplicate feature ids', async () => {
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.SpecDat,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.PuvsprDat,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        LegacyProjectImportFileType.SpecDat,
+      );
+    const puvsprDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        LegacyProjectImportFileType.PuvsprDat,
+      );
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -179,12 +177,14 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
   });
 
   it('fails if spec.dat file contains duplicate feature names', async () => {
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.SpecDat,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.PuvsprDat,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        LegacyProjectImportFileType.SpecDat,
+      );
+    const puvsprDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        LegacyProjectImportFileType.PuvsprDat,
+      );
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -203,12 +203,12 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
     await fixtures.GivenUserExists();
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      puvsprDatFileType,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
+    const puvsprDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        puvsprDatFileType,
+      );
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -533,9 +533,8 @@ const getFixtures = async () => {
 };
 
 class FakeSpecDatReader {
-  public readOperationResult: Either<string, SpecDatRow[]> = left(
-    'default error',
-  );
+  public readOperationResult: Either<string, SpecDatRow[]> =
+    left('default error');
 
   async readFile(): Promise<Either<string, SpecDatRow[]>> {
     return this.readOperationResult;
@@ -543,9 +542,8 @@ class FakeSpecDatReader {
 }
 
 class FakePuvsprDatReader {
-  public readOperationResult: Either<string, PuvrsprDatRow[]> = left(
-    'default error',
-  );
+  public readOperationResult: Either<string, PuvrsprDatRow[]> =
+    left('default error');
 
   async readFile(): Promise<Either<string, PuvrsprDatRow[]>> {
     return this.readOperationResult;

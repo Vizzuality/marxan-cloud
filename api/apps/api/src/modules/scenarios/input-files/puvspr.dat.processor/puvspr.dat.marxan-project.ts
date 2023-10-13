@@ -18,10 +18,11 @@ export class PuvsprDatMarxanProject implements PuvsprDat {
     scenarioId: string,
     featureIds: string[],
   ): Promise<FeatureAmountPerPlanningUnitId[]> {
-    const amountPerPlanningUnitOfFeature = await this.puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeature(
-      projectId,
-      featureIds,
-    );
+    const amountPerPlanningUnitOfFeature =
+      await this.puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeature(
+        projectId,
+        featureIds,
+      );
 
     const projectPusById = await this.getProjectPlanningUnitsById(projectId);
 

@@ -24,7 +24,8 @@ import {
 @Injectable()
 @PieceImportProvider()
 export class ScenarioPlanningUnitsDataPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     ScenarioPlanningUnitsDataPieceImporter.name,
   );
@@ -63,11 +64,8 @@ export class ScenarioPlanningUnitsDataPieceImporter
       const buffer = await readableToBuffer(readableOrError.right);
       const stringScenarioPlanningUnitsDataOrError = buffer.toString();
 
-      const {
-        planningUnitsData,
-      }: ScenarioPlanningUnitsDataContent = JSON.parse(
-        stringScenarioPlanningUnitsDataOrError,
-      );
+      const { planningUnitsData }: ScenarioPlanningUnitsDataContent =
+        JSON.parse(stringScenarioPlanningUnitsDataOrError);
       const projectPuIdByPuid: Record<number, string> = {};
 
       await this.entityManager.transaction(async (em) => {

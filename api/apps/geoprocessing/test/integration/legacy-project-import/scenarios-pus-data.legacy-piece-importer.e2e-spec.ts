@@ -64,7 +64,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('fails when invalid delimiter is used on pu.dat', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     fixtures.GivenSpecDatFileWithInvalidDelimiter();
 
@@ -74,7 +75,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('fails when read operation on pu.dat fails', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     fixtures.GivenInvalidPuDatFile();
 
@@ -84,7 +86,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('fails when pu.dat file contains duplicate puids', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     fixtures.GivenPuDatFileWithDuplicatePuids();
 
@@ -94,7 +97,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('fails when pu.dat file does not contain some projects pu data', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     await fixtures.GivenValidPuDatFile();
     fixtures.GivenPuDatLacksProjectPuDataRows();
@@ -105,7 +109,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('reports warnings when pu.dat contains unknown puids', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     await fixtures.GivenValidPuDatFile();
     fixtures.GivenPuDatFileWithUnknownPlanningUnits();
@@ -118,7 +123,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('imports successfully scenario pus data and scenario pus cost data', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     await fixtures.GivenValidPuDatFile();
 
@@ -374,9 +380,8 @@ const getFixtures = async () => {
 };
 
 class FakePuDatReader {
-  public readOperationResult: Either<string, PuDatRow[]> = left(
-    'default error',
-  );
+  public readOperationResult: Either<string, PuDatRow[]> =
+    left('default error');
 
   async readFile(): Promise<Either<string, PuDatRow[]>> {
     return this.readOperationResult;

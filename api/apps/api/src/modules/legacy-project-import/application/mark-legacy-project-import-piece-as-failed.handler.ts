@@ -18,7 +18,8 @@ import { isLeft } from 'fp-ts/lib/Either';
 
 @CommandHandler(MarkLegacyProjectImportPieceAsFailed)
 export class MarkLegacyProjectImportPieceAsFailedHandler
-  implements IInferredCommandHandler<MarkLegacyProjectImportPieceAsFailed> {
+  implements IInferredCommandHandler<MarkLegacyProjectImportPieceAsFailed>
+{
   private readonly logger: Logger = new Logger(
     MarkLegacyProjectImportPieceAsFailedHandler.name,
   );

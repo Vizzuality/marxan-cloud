@@ -14,7 +14,8 @@ import { isDefined } from '@marxan/utils';
 
 @QueryHandler(LastUpdatedSpecification)
 export class LastUpdatedSpecificationHandler
-  implements IInferredQueryHandler<LastUpdatedSpecification> {
+  implements IInferredQueryHandler<LastUpdatedSpecification>
+{
   constructor(
     private readonly specificationsRepo: ScenarioSpecificationRepo,
     private readonly queryBus: QueryBus,
@@ -25,9 +26,8 @@ export class LastUpdatedSpecificationHandler
   }: LastUpdatedSpecification): Promise<
     Either<LastUpdatedSpecificationError, SpecificationSnapshot>
   > {
-    const scenarioSpecification = await this.specificationsRepo.find(
-      forScenario,
-    );
+    const scenarioSpecification =
+      await this.specificationsRepo.find(forScenario);
     if (!scenarioSpecification) {
       return left(notFound);
     }

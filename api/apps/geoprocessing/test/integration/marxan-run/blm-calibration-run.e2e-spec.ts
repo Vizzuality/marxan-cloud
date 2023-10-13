@@ -134,36 +134,27 @@ const getFixtures = async () => {
     organizationId,
   );
   const entityManager = app.get<EntityManager>(getEntityManagerToken());
-  const featuresData: Repository<GeoFeatureGeometry> = entityManager.getRepository(
-    GeoFeatureGeometry,
-  );
-  const scenarioFeatureRepo: Repository<ScenarioFeaturesData> = entityManager.getRepository(
-    ScenarioFeaturesData,
-  );
-  const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> = entityManager.getRepository(
-    PlanningUnitsGeom,
-  );
-  const puOutputRepo: Repository<OutputScenariosPuDataGeoEntity> = entityManager.getRepository(
-    OutputScenariosPuDataGeoEntity,
-  );
-  const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = entityManager.getRepository(
-    MarxanExecutionMetadataGeoEntity,
-  );
-  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = entityManager.getRepository(
-    OutputScenariosFeaturesDataGeoEntity,
-  );
-  const blmFinalResultsRepo: Repository<BlmFinalResultEntity> = entityManager.getRepository(
-    BlmFinalResultEntity,
-  );
-  const blmPartialResultsRepo: Repository<BlmPartialResultEntity> = entityManager.getRepository(
-    BlmPartialResultEntity,
-  );
+  const featuresData: Repository<GeoFeatureGeometry> =
+    entityManager.getRepository(GeoFeatureGeometry);
+  const scenarioFeatureRepo: Repository<ScenarioFeaturesData> =
+    entityManager.getRepository(ScenarioFeaturesData);
+  const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> =
+    entityManager.getRepository(PlanningUnitsGeom);
+  const puOutputRepo: Repository<OutputScenariosPuDataGeoEntity> =
+    entityManager.getRepository(OutputScenariosPuDataGeoEntity);
+  const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> =
+    entityManager.getRepository(MarxanExecutionMetadataGeoEntity);
+  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> =
+    entityManager.getRepository(OutputScenariosFeaturesDataGeoEntity);
+  const blmFinalResultsRepo: Repository<BlmFinalResultEntity> =
+    entityManager.getRepository(BlmFinalResultEntity);
+  const blmPartialResultsRepo: Repository<BlmPartialResultEntity> =
+    entityManager.getRepository(BlmPartialResultEntity);
   // note that SandboxRunner may be both single and blm-calibration one
   const runModuleContext = app.select(BlmRunAdapterModule);
 
-  const sut: MarxanSandboxBlmRunnerService = runModuleContext.get(
-    blmSandboxRunner,
-  );
+  const sut: MarxanSandboxBlmRunnerService =
+    runModuleContext.get(blmSandboxRunner);
 
   const nockScope = nock(host, {
     reqheaders: {

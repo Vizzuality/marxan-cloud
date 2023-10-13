@@ -9,9 +9,8 @@ beforeEach(async () => {
 
 test(`uploading shapefile as planning units`, async () => {
   const shapefile = fixtures.GivenShapefileWasUploaded();
-  const output = await fixtures.WhenConvertingShapefileToPlanningUnits(
-    shapefile,
-  );
+  const output =
+    await fixtures.WhenConvertingShapefileToPlanningUnits(shapefile);
   await fixtures.ThenGeoJsonMatchesInput(output);
   await fixtures.ThenPlanningAreaIsCreated(output);
   await fixtures.ThenPlanningAreaBBoxIsValid(output);

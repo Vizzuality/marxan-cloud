@@ -44,7 +44,8 @@ beforeEach(async () => {
 });
 
 it('marks a component as finished and emits a LegacyProjectImportPieceImported event', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { pieces, projectId } = legacyProjectImport.toSnapshot();
   const [firstPiece] = pieces;
 
@@ -63,7 +64,8 @@ it('marks a component as finished and emits a LegacyProjectImportPieceImported e
 });
 
 it('advances to next batch and emits LegacyProjectImportPieceRequested events for next batch pieces', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
 
   const resourceId = new ResourceId(projectId);
@@ -84,7 +86,8 @@ it('advances to next batch and emits LegacyProjectImportPieceRequested events fo
 });
 
 it('fails to advances to next batch and emits HaltLegacyProjectImport event when user cancels the proccess ', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   await fixtures.GivenUserCancelsALegacyProjectImport(legacyProjectImport);
 
   const { projectId } = legacyProjectImport.toSnapshot();
@@ -101,10 +104,8 @@ it('fails to advances to next batch and emits HaltLegacyProjectImport event when
 });
 
 it('emits a LegacyProjectImportBatchFailed event when completing the last piece in a batch with failed pieces', async () => {
-  const {
-    projectId,
-    submittedPiece,
-  } = await fixtures.GivenLegacyProjectImportWithAFailedPiece();
+  const { projectId, submittedPiece } =
+    await fixtures.GivenLegacyProjectImportWithAFailedPiece();
 
   const componentId = new LegacyProjectImportComponentId(submittedPiece.id);
 
@@ -115,7 +116,8 @@ it('emits a LegacyProjectImportBatchFailed event when completing the last piece 
 });
 
 it('emits a AllLegacyProjectImportPiecesImported event if all components are finished', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
 
   const resourceId = new ResourceId(projectId);
@@ -140,7 +142,8 @@ it('sends a MarkLegacyProjectImportAsFailed command if import instance is not fo
 });
 
 it(`doesn't publish any event if import piece component is already completed`, async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { pieces, projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
   const [firstPiece] = pieces;
@@ -159,7 +162,8 @@ it(`doesn't publish any event if import piece component is already completed`, a
 });
 
 it('sends a MarkLegacyProjectImportAsFailed command if a piece is not found', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -169,7 +173,8 @@ it('sends a MarkLegacyProjectImportAsFailed command if a piece is not found', as
 });
 
 it('sends a MarkLegacyProjectImportAsFailed command if aggregate cannot be persisted', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId, pieces } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
   const [firstPiece] = pieces;
@@ -356,9 +361,8 @@ const getFixtures = async () => {
         );
       }
 
-      const updatedLegacyProjectImportOrError = await getLegacyProjectImport(
-        resourceId,
-      );
+      const updatedLegacyProjectImportOrError =
+        await getLegacyProjectImport(resourceId);
       return updatedLegacyProjectImportOrError
         .toSnapshot()
         .pieces.filter((piece) => piece.order === batch);

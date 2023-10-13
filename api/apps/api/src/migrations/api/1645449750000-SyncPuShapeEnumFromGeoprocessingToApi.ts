@@ -8,7 +8,7 @@ export class SyncPuShapeEnumFromGeoprocessingToApi1645449750000
     `);
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
+  public async down(_queryRunner: QueryRunner): Promise<void> {
     /**
      * Arguably not worth the effort sorry. Creating a new type with the old set
      * of values, making sure the values to be "dropped" are not used anywhere,

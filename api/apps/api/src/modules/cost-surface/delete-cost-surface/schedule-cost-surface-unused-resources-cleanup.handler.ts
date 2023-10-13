@@ -8,7 +8,8 @@ import { ScheduleCleanupForCostSurfaceUnusedResources } from '@marxan-api/module
 @CommandHandler(ScheduleCleanupForCostSurfaceUnusedResources)
 export class ScheduleCleanupForCostSurfaceUnusedResourcesHandler
   implements
-    IInferredCommandHandler<ScheduleCleanupForCostSurfaceUnusedResources> {
+    IInferredCommandHandler<ScheduleCleanupForCostSurfaceUnusedResources>
+{
   private readonly logger: Logger = new Logger(
     ScheduleCleanupForCostSurfaceUnusedResourcesHandler.name,
   );

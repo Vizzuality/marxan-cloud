@@ -49,9 +49,7 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
       throw new Error(`Exporting scenario is not yet supported.`);
     }
 
-    const [gadm]: [
-      QueryResult,
-    ] = await this.entityManager
+    const [gadm]: [QueryResult] = await this.entityManager
       .createQueryBuilder()
       .select('country_id')
       .addSelect('admin_area_l1_id')

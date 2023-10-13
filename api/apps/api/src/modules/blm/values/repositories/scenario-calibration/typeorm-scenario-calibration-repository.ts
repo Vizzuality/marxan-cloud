@@ -11,7 +11,8 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class TypeormScenarioCalibrationRepository
-  implements ScenarioCalibrationRepo {
+  implements ScenarioCalibrationRepo
+{
   constructor(
     @InjectRepository(BlmFinalResultEntity, DbConnections.geoprocessingDB)
     private readonly repository: Repository<BlmFinalResultEntity>,

@@ -144,9 +144,8 @@ const getFixtures = async () => {
   const scenarioId = v4();
 
   const sut = sandbox.get(PlanningGridLegacyProjectPieceImporter);
-  const fakeShapefileService: FakeShapefileService = sandbox.get(
-    ShapefileService,
-  );
+  const fakeShapefileService: FakeShapefileService =
+    sandbox.get(ShapefileService);
   const apiEntityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
   );
@@ -297,9 +296,7 @@ const getFixtures = async () => {
         ThenPlanningGridShouldBeImported: async () => {
           await sut.run(input);
 
-          const [project]: [
-            ProjectSelectResult,
-          ] = await apiEntityManager
+          const [project]: [ProjectSelectResult] = await apiEntityManager
             .createQueryBuilder()
             .select()
             .from('projects', 'p')

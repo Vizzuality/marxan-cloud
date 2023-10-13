@@ -8,7 +8,8 @@ import { MarkExportAsFinished } from './mark-export-as-finished.command';
 
 @CommandHandler(MarkExportAsFinished)
 export class MarkExportAsFinishedHandler
-  implements IInferredCommandHandler<MarkExportAsFinished> {
+  implements IInferredCommandHandler<MarkExportAsFinished>
+{
   private readonly logger: Logger = new Logger(
     MarkExportAsFinishedHandler.name,
   );

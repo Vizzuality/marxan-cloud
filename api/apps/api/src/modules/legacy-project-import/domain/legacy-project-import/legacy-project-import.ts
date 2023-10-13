@@ -47,16 +47,20 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
   | typeof legacyProjectImportComponentNotFound
   | typeof legacyProjectImportComponentAlreadyFailed;
 
-export type AddFileToLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
-export type DeleteFileFromLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
+export type AddFileToLegacyProjectImportErrors =
+  typeof legacyProjectImportAlreadyStarted;
+export type DeleteFileFromLegacyProjectImportErrors =
+  typeof legacyProjectImportAlreadyStarted;
 
-export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
+export type GenerateLegacyProjectImportPiecesErrors =
+  typeof legacyProjectImportMissingRequiredFile;
 
 export type RunLegacyProjectImportErrors =
   | typeof legacyProjectImportAlreadyStarted
   | GenerateLegacyProjectImportPiecesErrors;
 
-export type HaltLegacyProjectImportErros = typeof legacyProjectImportAlreadyFinished;
+export type HaltLegacyProjectImportErros =
+  typeof legacyProjectImportAlreadyFinished;
 
 export class LegacyProjectImport extends AggregateRoot {
   private constructor(

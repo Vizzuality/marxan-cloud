@@ -36,15 +36,19 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import {
-  JSONAPIProtectedAreasListQueryParams,
-} from '@marxan-api/decorators/json-api-parameters.decorator';
+import { JSONAPIProtectedAreasListQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
 import { ProtectedAreaResult } from '@marxan-api/modules/protected-areas/protected-area.geo.entity';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
-import { GeometryFileInterceptor, GeometryKind } from '@marxan-api/decorators/file-interceptors.decorator';
+import {
+  GeometryFileInterceptor,
+  GeometryKind,
+} from '@marxan-api/decorators/file-interceptors.decorator';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { UploadShapefileDto } from '../scenarios/dto/upload.shapefile.dto';
-import { AsyncJobDto, JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
+import {
+  AsyncJobDto,
+  JsonApiAsyncJobMeta,
+} from '@marxan-api/dto/async-job.dto';
 import { ProjectsService } from './projects.service';
 import { scenarioResource } from '../scenarios/scenario.api.entity';
 

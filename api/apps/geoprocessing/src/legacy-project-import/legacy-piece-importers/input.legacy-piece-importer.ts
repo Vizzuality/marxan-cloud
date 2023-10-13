@@ -23,7 +23,8 @@ import {
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class InputLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     InputLegacyProjectPieceImporter.name,
   );

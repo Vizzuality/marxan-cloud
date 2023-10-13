@@ -172,12 +172,11 @@ describe('UsersModule (e2e)', () => {
         throw new Error('Cannot retrieve data for newly created user.');
       }
 
-      const validationTokenEvent = await apiEventsService.getLatestEventForTopic(
-        {
+      const validationTokenEvent =
+        await apiEventsService.getLatestEventForTopic({
           topic: user.id,
           kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-        },
-      );
+        });
 
       await request(app.getHttpServer())
         .post(`/auth/validate`)
@@ -200,12 +199,11 @@ describe('UsersModule (e2e)', () => {
         throw new Error('Cannot retrieve data for newly created user.');
       }
 
-      const validationTokenEvent = await apiEventsService.getLatestEventForTopic(
-        {
+      const validationTokenEvent =
+        await apiEventsService.getLatestEventForTopic({
           topic: user.id,
           kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-        },
-      );
+        });
 
       await request(app.getHttpServer())
         .post(`/auth/validate`)
@@ -236,12 +234,11 @@ describe('UsersModule (e2e)', () => {
         throw new Error('Cannot retrieve data for newly created user.');
       }
 
-      const validationTokenEvent = await apiEventsService.getLatestEventForTopic(
-        {
+      const validationTokenEvent =
+        await apiEventsService.getLatestEventForTopic({
           topic: user.id,
           kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-        },
-      );
+        });
 
       await request(app.getHttpServer())
         .post(`/auth/validate`)
@@ -437,9 +434,8 @@ describe('UsersModule (e2e)', () => {
     });
 
     test('A platform admin should be able to add a new admin', async () => {
-      const { accessToken: newAdminToken, user } = await GivenUserIsCreated(
-        app,
-      );
+      const { accessToken: newAdminToken, user } =
+        await GivenUserIsCreated(app);
 
       const WhenAddingNewAdminResponse = await request(app.getHttpServer())
         .post(`/api/v1/users/admins/${user.id}`)

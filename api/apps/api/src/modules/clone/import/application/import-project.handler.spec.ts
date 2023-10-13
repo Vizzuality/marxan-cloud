@@ -96,9 +96,8 @@ const getFixtures = async () => {
   const sut = sandbox.get(ImportProjectHandler);
   const repo: MemoryImportRepository = sandbox.get(ImportRepository);
   const exportRepo: FakeExportRepository = sandbox.get(ExportRepository);
-  const importResourcePieces: FakeImportResourcePieces = sandbox.get(
-    ImportResourcePieces,
-  );
+  const importResourcePieces: FakeImportResourcePieces =
+    sandbox.get(ImportResourcePieces);
 
   return {
     GivenAnUnfinishedExport: () => {
@@ -227,9 +226,8 @@ class FakeExportRepository implements ExportRepository {
 }
 
 class FakeImportResourcePieces implements ImportResourcePieces {
-  mock: jest.MockedFunction<
-    ImportResourcePieces['resolveForProject']
-  > = jest.fn();
+  mock: jest.MockedFunction<ImportResourcePieces['resolveForProject']> =
+    jest.fn();
 
   resolveForProject(
     id: ResourceId,

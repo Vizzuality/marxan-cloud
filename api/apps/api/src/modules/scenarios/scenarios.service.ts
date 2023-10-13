@@ -244,11 +244,12 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-      true,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+        true,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -294,9 +295,10 @@ export class ScenariosService {
         return left(projectNotReady);
       }
     }
-    const isLegacyProjectCompleted = await this.legacyProjectChecker.isLegacyProjectImportCompletedFor(
-      input.projectId,
-    );
+    const isLegacyProjectCompleted =
+      await this.legacyProjectChecker.isLegacyProjectImportCompletedFor(
+        input.projectId,
+      );
 
     if (isRight(isLegacyProjectCompleted) && !isLegacyProjectCompleted.right)
       return left(projectNotReady);
@@ -372,10 +374,11 @@ export class ScenariosService {
     if (isLeft(scenario)) {
       return left(forbiddenError);
     }
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -442,17 +445,17 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
 
-    const updateConstraints: AdjustPlanningUnitsInput = this.mapLockStatusDtoToAdjustPlanningUnitsInput(
-      input,
-    );
+    const updateConstraints: AdjustPlanningUnitsInput =
+      this.mapLockStatusDtoToAdjustPlanningUnitsInput(input);
     await this.updatePlanningUnits.update(scenarioId, updateConstraints);
     return right(void 0);
   }
@@ -473,18 +476,17 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
 
-    const updateConstraints: AdjustPlanningUnitsInput = await this.mapCurrentPuStatusesAndClearRequested(
-      scenarioId,
-      kind,
-    );
+    const updateConstraints: AdjustPlanningUnitsInput =
+      await this.mapCurrentPuStatusesAndClearRequested(scenarioId, kind);
     await this.updatePlanningUnits.update(scenarioId, updateConstraints);
     return right(void 0);
   }
@@ -522,9 +524,8 @@ export class ScenariosService {
       LockStatus.LockedOut,
     );
 
-    const availablePus = await this.planningUnitsService.getAvailablePUsSetByUser(
-      scenarioId,
-    );
+    const availablePus =
+      await this.planningUnitsService.getAvailablePUsSetByUser(scenarioId);
 
     return {
       ...(kindToClear !== LockStatus.LockedIn
@@ -561,10 +562,11 @@ export class ScenariosService {
       void
     >
   > {
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -589,10 +591,11 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -623,7 +626,7 @@ export class ScenariosService {
                 properties: {},
               })),
             },
-          } as GeoJsonDataDTO),
+          }) as GeoJsonDataDTO,
       );
     return right(geoJson);
   }
@@ -692,10 +695,11 @@ export class ScenariosService {
       return left(lockedSolutions);
     }
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -744,10 +748,11 @@ export class ScenariosService {
     assertDefined(userInfo.authenticatedUser);
     if (isLeft(scenario)) return left(forbiddenError);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userInfo.authenticatedUser.id,
-      id,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userInfo.authenticatedUser.id,
+        id,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -800,10 +805,11 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -826,10 +832,11 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -990,7 +997,7 @@ export class ScenariosService {
    * @private
    */
   private getPayloadWithValidatedMetadata<
-    T extends CreateScenarioDTO | UpdateScenarioDTO
+    T extends CreateScenarioDTO | UpdateScenarioDTO,
   >(input: T): T {
     let marxanInput: MarxanParameters | undefined;
     if (input.metadata?.marxanInputParameterFile) {
@@ -1006,7 +1013,8 @@ export class ScenariosService {
       marxanInput = this.marxanInputValidator.from({});
     }
     const withValidatedMetadata: T = classToClass<T>(input);
-    (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile = marxanInput;
+    (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile =
+      marxanInput;
     return withValidatedMetadata;
   }
 
@@ -1111,10 +1119,11 @@ export class ScenariosService {
     });
     if (isLeft(scenarioResult)) return scenarioResult;
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -1177,10 +1186,11 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -1246,10 +1256,11 @@ export class ScenariosService {
     if (isLeft(scenarioResult)) return scenarioResult;
 
     assertDefined(info.authenticatedUser);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      info.authenticatedUser?.id,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        info.authenticatedUser?.id,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }

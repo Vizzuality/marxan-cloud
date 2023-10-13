@@ -5,7 +5,8 @@ import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.serv
 
 @EventsHandler(SpecificationCandidateCreated)
 export class SpecificationCandidateCreatedHandler
-  implements IEventHandler<SpecificationCandidateCreated> {
+  implements IEventHandler<SpecificationCandidateCreated>
+{
   constructor(private readonly apiEvents: ApiEventsService) {}
 
   async handle(event: SpecificationCandidateCreated) {

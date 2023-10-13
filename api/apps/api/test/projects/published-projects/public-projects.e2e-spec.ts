@@ -34,9 +34,8 @@ test(`when placing a public project under moderation as a platform admin`, async
   const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
   let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
-    projectId,
-  );
+  response =
+    await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(projectId);
   fixtures.ThenOkIsReturned(response);
 
   // Test that findAll only shows project for admin
@@ -63,17 +62,17 @@ test(`when clearing under moderation status from a public project as a platform 
   const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
   let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
-    projectId,
-  );
+  response =
+    await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(projectId);
   fixtures.ThenOkIsReturned(response);
 
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
 
-  response = await fixtures.WhenClearingUnderModerationStatusFromAPublicProjectAsAdmin(
-    projectId,
-  );
+  response =
+    await fixtures.WhenClearingUnderModerationStatusFromAPublicProjectAsAdmin(
+      projectId,
+    );
   fixtures.ThenOkIsReturned(response);
 
   response = await fixtures.WhenGettingPublicProjects();
@@ -85,9 +84,10 @@ test(`when placing a public project under moderation as not a platform admin`, a
   const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
   let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenPlacingAPublicProjectUnderModerationNotAsAdmin(
-    projectId,
-  );
+  response =
+    await fixtures.WhenPlacingAPublicProjectUnderModerationNotAsAdmin(
+      projectId,
+    );
   fixtures.ThenForbiddenIsReturned(response);
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenPublicProjectIsAvailable(projectId, response);
@@ -103,17 +103,17 @@ test(`when clearing under moderation status from a public project not as platfor
   const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
   let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
-    projectId,
-  );
+  response =
+    await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(projectId);
   fixtures.ThenOkIsReturned(response);
 
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
 
-  response = await fixtures.WhenClearingUnderModerationStatusFromAPublicProjectNotAsAdmin(
-    projectId,
-  );
+  response =
+    await fixtures.WhenClearingUnderModerationStatusFromAPublicProjectNotAsAdmin(
+      projectId,
+    );
   fixtures.ThenForbiddenIsReturned(response);
 
   response = await fixtures.WhenGettingPublicProjects();
@@ -139,9 +139,8 @@ test(`when unpublishing a public project that is under moderation as a project o
   const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
   let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
-    projectId,
-  );
+  response =
+    await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(projectId);
   fixtures.ThenOkIsReturned(response);
 
   response = await fixtures.WhenUnpublishingAProjectAsProjectOwner(projectId);
@@ -155,14 +154,14 @@ test(`when unpublishing a public project that is under moderation as a platform 
   const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
   let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
-    projectId,
-  );
+  response =
+    await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(projectId);
   fixtures.ThenOkIsReturned(response);
 
-  response = await fixtures.WhenClearingUnderModerationStatusAndUnpublishingAsAdmin(
-    projectId,
-  );
+  response =
+    await fixtures.WhenClearingUnderModerationStatusAndUnpublishingAsAdmin(
+      projectId,
+    );
   fixtures.ThenOkIsReturned(response);
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
@@ -182,9 +181,8 @@ test(`when updating a public project as not project owner`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
   let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenUpdatingAPublicProjectAsNotIncludedUser(
-    projectId,
-  );
+  response =
+    await fixtures.WhenUpdatingAPublicProjectAsNotIncludedUser(projectId);
   fixtures.ThenForbiddenIsReturned(response);
 });
 
@@ -200,9 +198,8 @@ test(`when publishing a project an exportId should be generated to be used in im
     response,
   );
 
-  const publicProjectExportId = await fixtures.GivenPublicProjectExportIdIsAvailable(
-    projectId,
-  );
+  const publicProjectExportId =
+    await fixtures.GivenPublicProjectExportIdIsAvailable(projectId);
 
   if (!publicProjectExportId) {
     throw Error('This public project has no exportId');
@@ -212,10 +209,8 @@ test(`when publishing a project an exportId should be generated to be used in im
     publicProjectExportId,
   );
 
-  const {
-    importId,
-    projectId: newProjectId,
-  } = await fixtures.WhenCloningAPublicProject(exportId);
+  const { importId, projectId: newProjectId } =
+    await fixtures.WhenCloningAPublicProject(exportId);
 
   await fixtures.ThenTheProjectShouldBeImported(newProjectId, importId);
 
@@ -230,10 +225,8 @@ test(`when cloning a project that does not belong to the requesting user, it sho
   const projectId = await fixtures.GivenPublicProjectWasCreated();
   const exportId = await fixtures.GivenProjectHasAnExportPrepared(projectId);
 
-  const {
-    importId,
-    projectId: newProjectId,
-  } = await fixtures.WhenCloningAPublicProject(exportId);
+  const { importId, projectId: newProjectId } =
+    await fixtures.WhenCloningAPublicProject(exportId);
 
   await fixtures.ThenTheProjectShouldBeImported(newProjectId, importId);
 });

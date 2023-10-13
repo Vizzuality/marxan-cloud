@@ -168,9 +168,7 @@ const getFixtures = async () => {
         },
         ThenProjectShouldBeUpdated: async () => {
           await sut.run(input);
-          const [project]: [
-            ProjectSelectResult,
-          ] = await entityManager
+          const [project]: [ProjectSelectResult] = await entityManager
             .createQueryBuilder()
             .select()
             .from('projects', 'p')

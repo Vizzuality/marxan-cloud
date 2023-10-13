@@ -48,10 +48,8 @@ export class CleanupTasksService implements CleanupTasks {
 
     const { apiFeaturesIds, geoFeatureIds } = await this.getFeaturesIdsInUse();
 
-    const {
-      apiCostSurfacesIds,
-      geoCostSurfacesIds,
-    } = await this.getCostSurfacesIdsInUse();
+    const { apiCostSurfacesIds, geoCostSurfacesIds } =
+      await this.getCostSurfacesIdsInUse();
 
     await this.storeDanglingProjectIds(apiProjectIds, geoProjectIds);
 

@@ -6,7 +6,8 @@ import { MarkLegacyProjectImportAsCanceled } from './mark-legacy-project-import-
 
 @CommandHandler(MarkLegacyProjectImportAsCanceled)
 export class MarkLegacyProjectImportAsCanceledHandler
-  implements IInferredCommandHandler<MarkLegacyProjectImportAsCanceled> {
+  implements IInferredCommandHandler<MarkLegacyProjectImportAsCanceled>
+{
   private readonly logger: Logger = new Logger(
     MarkLegacyProjectImportAsCanceledHandler.name,
   );

@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class PuGeometryUniqueWithinProject1631080265630
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       alter table planning_units_geom

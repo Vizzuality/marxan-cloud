@@ -20,7 +20,8 @@ import { CostRangeService } from '@marxan-api/modules/scenarios/cost-range-servi
 
 @CommandHandler(SetProjectGridFromShapefile)
 export class SetProjectGridFromShapefileHandler
-  implements IInferredCommandHandler<SetProjectGridFromShapefile> {
+  implements IInferredCommandHandler<SetProjectGridFromShapefile>
+{
   constructor(
     @InjectRepository(Project) private readonly projects: Repository<Project>,
     private readonly events: ApiEventsService,

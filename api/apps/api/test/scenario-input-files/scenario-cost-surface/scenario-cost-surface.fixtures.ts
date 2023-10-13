@@ -45,18 +45,18 @@ export const getFixtures = async () => {
   const entityManager = app.get<EntityManager>(
     getEntityManagerToken(DbConnections.geoprocessingDB),
   );
-  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
-    ProjectsPuEntity,
-  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> =
+    entityManager.getRepository(ProjectsPuEntity);
   const puGeometryRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );
-  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
-    getRepositoryToken(
-      ScenariosPlanningUnitGeoEntity,
-      DbConnections.geoprocessingDB,
-    ),
-  );
+  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> =
+    app.get(
+      getRepositoryToken(
+        ScenariosPlanningUnitGeoEntity,
+        DbConnections.geoprocessingDB,
+      ),
+    );
   const scenarioPuDataCostRepo: Repository<ScenariosPuCostDataGeo> = app.get(
     getRepositoryToken(ScenariosPuCostDataGeo, DbConnections.geoprocessingDB),
   );

@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddClonePieceForMarxanExecutionMetadata1649665709084
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `ALTER TYPE clone_piece_enum RENAME VALUE 'feautures-specification' TO 'features-specification'`,

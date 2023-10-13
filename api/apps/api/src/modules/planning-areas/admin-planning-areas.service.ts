@@ -37,9 +37,10 @@ export class AdminPlanningAreasService implements AbstractPlanningAreasService {
   > {
     const adminAreaLevelId = ids.adminAreaLevel2Id ?? ids.adminAreaLevel1Id;
     if (!isDefined(adminAreaLevelId)) return notSupported;
-    const adminAreaFields = await this.adminAreasRepository.findAdminAreaGidsAndNames(
-      adminAreaLevelId,
-    );
+    const adminAreaFields =
+      await this.adminAreasRepository.findAdminAreaGidsAndNames(
+        adminAreaLevelId,
+      );
     if (adminAreaFields === notFound) return notFound;
     return {
       planningAreaId:
@@ -60,9 +61,10 @@ export class AdminPlanningAreasService implements AbstractPlanningAreasService {
   ): Promise<{ bbox: BBox } | NotSupported | IdsMismatched | NotFound> {
     const adminAreaLevelId = ids.adminAreaLevel2Id ?? ids.adminAreaLevel1Id;
     if (!isDefined(adminAreaLevelId)) return notSupported;
-    const adminArea = await this.adminAreasRepository.findAdminAreaGidsAndBBox(
-      adminAreaLevelId,
-    );
+    const adminArea =
+      await this.adminAreasRepository.findAdminAreaGidsAndBBox(
+        adminAreaLevelId,
+      );
     if (adminArea === notFound) return notFound;
 
     const adminAreaGids = Gids.fromGids(adminArea);
@@ -84,9 +86,10 @@ export class AdminPlanningAreasService implements AbstractPlanningAreasService {
     const adminAreaLevelId = ids.adminAreaLevel2Id ?? ids.adminAreaLevel1Id;
     if (!isDefined(adminAreaLevelId)) return notSupported;
 
-    const foundId = await this.adminAreasRepository.findAdminAreaIdByLevelId(
-      adminAreaLevelId,
-    );
+    const foundId =
+      await this.adminAreasRepository.findAdminAreaIdByLevelId(
+        adminAreaLevelId,
+      );
 
     if (foundId === notFound) return notFound;
     return {

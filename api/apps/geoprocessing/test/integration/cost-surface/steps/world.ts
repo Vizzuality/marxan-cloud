@@ -35,25 +35,25 @@ export const createWorld = async (app: INestApplication) => {
       fixtures.projectCostSurfaceProcessor.process(job),
     GivenPuCostDataExists: fixtures.GivenPuCostDataExists,
     getShapefileForScenarioWithCost: () =>
-      (({
+      ({
         data: {
           scenarioId: fixtures.scenarioId,
           shapefile,
         },
         id: 'test-job',
-      } as unknown) as Job<FromShapefileJobInput>),
+      }) as unknown as Job<FromShapefileJobInput>,
     getShapefileForProjectWithCost: (
       projectId: string,
       costSurfaceId: string,
     ) =>
-      (({
+      ({
         data: {
           projectId,
           costSurfaceId,
           shapefile,
         },
         id: 'test-job',
-      } as unknown) as Job<FromProjectShapefileJobInput>),
+      }) as unknown as Job<FromProjectShapefileJobInput>,
     ThenCostIsUpdated: async () => {
       const newCost = await fixtures.GetPuCostsData(fixtures.scenarioId);
       expect(newCost).toEqual(

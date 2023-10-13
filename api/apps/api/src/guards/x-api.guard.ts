@@ -10,7 +10,7 @@ export class XApiGuard implements CanActivate {
 
   constructor() {
     // throws if not provided
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     this.#secret = AppConfig.get<string>('auth.xApiKey.secret')!;
   }
 

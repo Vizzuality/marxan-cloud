@@ -12,7 +12,8 @@ import { SandboxRunnerOutputHandler } from '../../ports/sandbox-runner-output-ha
 
 @Injectable()
 export class SolutionsOutputService
-  implements SandboxRunnerOutputHandler<ExecutionResult> {
+  implements SandboxRunnerOutputHandler<ExecutionResult>
+{
   constructor(
     private readonly geoOutputRepository: GeoOutputRepository,
     private readonly resultParserService: ResultParserService,

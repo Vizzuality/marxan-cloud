@@ -10,18 +10,14 @@ describe('Project ACL Patch', () => {
 
   test(`add every type of user to a project as project owner`, async () => {
     const projectId = await fixtures.GivenProjectWasCreated();
-    const viewerResponse = await fixtures.WhenAddingANewViewerToTheProjectAsOwner(
-      projectId,
-    );
-    const contributorResponse = await fixtures.WhenAddingANewContributorToTheProjectAsOwner(
-      projectId,
-    );
-    const ownerResponse = await fixtures.WhenAddingANewOwnerToTheProjectAsOwner(
-      projectId,
-    );
-    const allUsersInProjectResponse = await fixtures.WhenGettingProjectUsersAsOwner(
-      projectId,
-    );
+    const viewerResponse =
+      await fixtures.WhenAddingANewViewerToTheProjectAsOwner(projectId);
+    const contributorResponse =
+      await fixtures.WhenAddingANewContributorToTheProjectAsOwner(projectId);
+    const ownerResponse =
+      await fixtures.WhenAddingANewOwnerToTheProjectAsOwner(projectId);
+    const allUsersInProjectResponse =
+      await fixtures.WhenGettingProjectUsersAsOwner(projectId);
     fixtures.ThenNoContentIsReturned(viewerResponse);
     fixtures.ThenNoContentIsReturned(contributorResponse);
     fixtures.ThenNoContentIsReturned(ownerResponse);
@@ -33,15 +29,14 @@ describe('Project ACL Patch', () => {
   test(`add every type of user to a project as project contributor`, async () => {
     const projectId = await fixtures.GivenProjectWasCreated();
     await fixtures.GivenContributorWasAddedToProject(projectId);
-    const viewerResponse = await fixtures.WhenAddingANewViewerToTheProjectAsContributor(
-      projectId,
-    );
-    const contributorResponse = await fixtures.WhenAddingANewContributorToTheProjectAsContributor(
-      projectId,
-    );
-    const ownerResponse = await fixtures.WhenAddingANewOwnerToTheProjectAsContributor(
-      projectId,
-    );
+    const viewerResponse =
+      await fixtures.WhenAddingANewViewerToTheProjectAsContributor(projectId);
+    const contributorResponse =
+      await fixtures.WhenAddingANewContributorToTheProjectAsContributor(
+        projectId,
+      );
+    const ownerResponse =
+      await fixtures.WhenAddingANewOwnerToTheProjectAsContributor(projectId);
     fixtures.ThenForbiddenIsReturned(viewerResponse);
     fixtures.ThenForbiddenIsReturned(contributorResponse);
     fixtures.ThenForbiddenIsReturned(ownerResponse);
@@ -50,15 +45,14 @@ describe('Project ACL Patch', () => {
   test(`add every type of user to a project as project viewer`, async () => {
     const projectId = await fixtures.GivenProjectWasCreated();
     await fixtures.GivenViewerWasAddedToProject(projectId);
-    const viewerResponse = await fixtures.WhenAddingANewViewerToTheProjectAsContributor(
-      projectId,
-    );
-    const contributorResponse = await fixtures.WhenAddingANewContributorToTheProjectAsContributor(
-      projectId,
-    );
-    const ownerResponse = await fixtures.WhenAddingANewOwnerToTheProjectAsContributor(
-      projectId,
-    );
+    const viewerResponse =
+      await fixtures.WhenAddingANewViewerToTheProjectAsContributor(projectId);
+    const contributorResponse =
+      await fixtures.WhenAddingANewContributorToTheProjectAsContributor(
+        projectId,
+      );
+    const ownerResponse =
+      await fixtures.WhenAddingANewOwnerToTheProjectAsContributor(projectId);
     fixtures.ThenForbiddenIsReturned(viewerResponse);
     fixtures.ThenForbiddenIsReturned(contributorResponse);
     fixtures.ThenForbiddenIsReturned(ownerResponse);
@@ -66,9 +60,8 @@ describe('Project ACL Patch', () => {
 
   test(`change owner role as last owner`, async () => {
     const projectId = await fixtures.GivenProjectWasCreated();
-    const response = await fixtures.WhenChangingOwnerUserRoleAsLastOwner(
-      projectId,
-    );
+    const response =
+      await fixtures.WhenChangingOwnerUserRoleAsLastOwner(projectId);
     fixtures.ThenForbiddenIsReturned(response);
   });
 
@@ -77,33 +70,29 @@ describe('Project ACL Patch', () => {
     await fixtures.GivenViewerWasAddedToProject(projectId);
     const changeRoleResponse = await fixtures.WhenChangingUserRole(projectId);
     fixtures.ThenNoContentIsReturned(changeRoleResponse);
-    const allUsersInProjectResponse = await fixtures.WhenGettingProjectUsersAsOwner(
-      projectId,
-    );
+    const allUsersInProjectResponse =
+      await fixtures.WhenGettingProjectUsersAsOwner(projectId);
     fixtures.ThenUsersWithChangedRoleIsOnProject(allUsersInProjectResponse);
   });
 
   test(`adds a not allowed user role to project`, async () => {
     const projectId = await fixtures.GivenProjectWasCreated();
-    const incorrectRoleResponse = await fixtures.WhenAddingIncorrectUserRole(
-      projectId,
-    );
+    const incorrectRoleResponse =
+      await fixtures.WhenAddingIncorrectUserRole(projectId);
     fixtures.ThenBadRequestAndEnumMessageIsReturned(incorrectRoleResponse);
   });
 
   test(`adds nonsensical userId`, async () => {
     const projectId = await fixtures.GivenProjectWasCreated();
-    const nonsenseUserIdResponse = await fixtures.WhenAddingNonsenseUserId(
-      projectId,
-    );
+    const nonsenseUserIdResponse =
+      await fixtures.WhenAddingNonsenseUserId(projectId);
     fixtures.ThenBadRequestAndUserIdMessageIsReturned(nonsenseUserIdResponse);
   });
 
   test(`adds non-existent userId`, async () => {
     const projectId = await fixtures.GivenProjectWasCreated();
-    const nonExistentUserIdResponse = await fixtures.WhenAddingNonExistentUserId(
-      projectId,
-    );
+    const nonExistentUserIdResponse =
+      await fixtures.WhenAddingNonExistentUserId(projectId);
     fixtures.ThenUserNotFoundIsReturned(nonExistentUserIdResponse);
   });
 
@@ -112,9 +101,8 @@ describe('Project ACL Patch', () => {
     await fixtures.GivenUserWasAddedToProject(projectId);
     await fixtures.GivenUserIsDeleted();
 
-    const response = await fixtures.WhenChangingUserRoleForDeletedUser(
-      projectId,
-    );
+    const response =
+      await fixtures.WhenChangingUserRoleForDeletedUser(projectId);
     fixtures.ThenTransactionFailedIsReturned(response);
   });
 
@@ -126,37 +114,31 @@ describe('Project ACL Patch', () => {
     const projectId = await fixtures.GivenProjectWasCreated();
     await fixtures.GivenViewerWasAddedToProject(projectId);
 
-    const viewerResponse = await fixtures.WhenAddingANewViewerToTheProjectAsOwner(
-      projectId,
-    );
-    const contributorResponse = await fixtures.WhenAddingANewContributorToTheProjectAsOwner(
-      projectId,
-    );
+    const viewerResponse =
+      await fixtures.WhenAddingANewViewerToTheProjectAsOwner(projectId);
+    const contributorResponse =
+      await fixtures.WhenAddingANewContributorToTheProjectAsOwner(projectId);
     fixtures.ThenNoContentIsReturned(viewerResponse);
     fixtures.ThenNoContentIsReturned(contributorResponse);
 
     await fixtures.WhenRevokingAccessToContributorFromProjectAsOwner(projectId);
     await fixtures.WhenChangingUserRole(projectId);
-    let currentUsersResponse = await fixtures.WhenGettingProjectUsersAsOwner(
-      projectId,
-    );
+    let currentUsersResponse =
+      await fixtures.WhenGettingProjectUsersAsOwner(projectId);
     fixtures.ThenCorrectUsersAreReturnedAfterDeletionAndChangingRole(
       currentUsersResponse,
     );
 
-    const ownerResponse = await fixtures.WhenAddingANewOwnerToTheProjectAsOwner(
-      projectId,
-    );
+    const ownerResponse =
+      await fixtures.WhenAddingANewOwnerToTheProjectAsOwner(projectId);
     fixtures.ThenNoContentIsReturned(ownerResponse);
-    currentUsersResponse = await fixtures.WhenGettingProjectUsersAsOwner(
-      projectId,
-    );
+    currentUsersResponse =
+      await fixtures.WhenGettingProjectUsersAsOwner(projectId);
     fixtures.ThenThreeCorrectUsersAreReturned(currentUsersResponse);
 
     await fixtures.WhenRevokingAccessToViewerFromProjectAsOwner(projectId);
-    currentUsersResponse = await fixtures.WhenGettingProjectUsersAsOwner(
-      projectId,
-    );
+    currentUsersResponse =
+      await fixtures.WhenGettingProjectUsersAsOwner(projectId);
     fixtures.ThenLastTwoCorrectUsersAreReturned(currentUsersResponse);
   });
 });

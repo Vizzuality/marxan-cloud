@@ -3,16 +3,22 @@ import {
   Controller,
   Delete,
   ForbiddenException,
-  Get, InternalServerErrorException, Param, ParseUUIDPipe,
+  Get,
+  InternalServerErrorException,
+  Param,
+  ParseUUIDPipe,
   Patch,
   Post,
-  Req, UseGuards
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 
 import { projectResource, ProjectResultSingular } from './project.api.entity';
 import {
-  ApiBearerAuth, ApiOkResponse,
-  ApiOperation, ApiTags
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
@@ -20,9 +26,7 @@ import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import {
-  ProjectsService
-} from './projects.service';
+import { ProjectsService } from './projects.service';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';

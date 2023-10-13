@@ -50,7 +50,8 @@ describe(ProjectCostSurfacesPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoProjectCostSurfacesFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoProjectCostSurfacesFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)

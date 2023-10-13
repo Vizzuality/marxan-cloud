@@ -16,7 +16,7 @@ import { Either, left, right } from 'fp-ts/Either';
 const organizationFilterKeyNames = ['name'] as const;
 type OrganizationFilterKeys = keyof Pick<
   Organization,
-  typeof organizationFilterKeyNames[number]
+  (typeof organizationFilterKeyNames)[number]
 >;
 type OrganizationFilters = Record<OrganizationFilterKeys, string[]>;
 const notFoundError = Symbol('organization not found');

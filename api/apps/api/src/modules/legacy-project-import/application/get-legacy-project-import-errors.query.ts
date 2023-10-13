@@ -19,7 +19,8 @@ export type LegacyProjectImportComponentReport = {
   readonly warnings: string[];
 };
 
-export type GetLegacyProjectImportErrorsResult = LegacyProjectImportComponentReport[];
+export type GetLegacyProjectImportErrorsResult =
+  LegacyProjectImportComponentReport[];
 
 export type GetLegacyProjectImportErrorsReturnType = Either<
   GetLegacyProjectImportErrorsErrors,

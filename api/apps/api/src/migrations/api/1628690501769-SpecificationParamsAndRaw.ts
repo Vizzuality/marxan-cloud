@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class SpecificationParamsAndRaw1628690501769
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   name = 'SpecificationParamsAndRaw1628690501769';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

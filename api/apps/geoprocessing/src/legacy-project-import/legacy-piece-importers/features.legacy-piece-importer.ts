@@ -43,7 +43,8 @@ export const specDatPuidPropertyKey = 'puid';
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class FeaturesLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     FeaturesLegacyProjectPieceImporter.name,
   );
@@ -91,9 +92,8 @@ export class FeaturesLegacyProjectPieceImporter
       LegacyProjectImportFileType.SpecDat,
     );
 
-    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      firstLineReadable,
-    );
+    const delimiterOrError =
+      await this.datFileDelimiterFinder.findDelimiter(firstLineReadable);
     if (isLeft(delimiterOrError))
       this.logAndThrow(
         `Invalid delimiter in spec.dat file. Use either comma or tabulator as your file delimiter.`,
@@ -120,9 +120,8 @@ export class FeaturesLegacyProjectPieceImporter
       LegacyProjectImportFileType.PuvsprDat,
     );
 
-    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      firstLineReadable,
-    );
+    const delimiterOrError =
+      await this.datFileDelimiterFinder.findDelimiter(firstLineReadable);
     if (isLeft(delimiterOrError))
       this.logAndThrow(
         `Invalid delimiter in puvspr.dat file. Use either comma or tabulator as your file delimiter.`,
@@ -320,14 +319,12 @@ export class FeaturesLegacyProjectPieceImporter
           feature_class_name: row.name,
         }));
 
-        const {
-          featuresDataInsertValues,
-          nonExistingPus,
-        } = this.getFeaturesDataInsertValues(
-          featuresData,
-          puvsprDatRows,
-          projectPusGeomsMap,
-        );
+        const { featuresDataInsertValues, nonExistingPus } =
+          this.getFeaturesDataInsertValues(
+            featuresData,
+            puvsprDatRows,
+            projectPusGeomsMap,
+          );
 
         await Promise.all(
           chunk(

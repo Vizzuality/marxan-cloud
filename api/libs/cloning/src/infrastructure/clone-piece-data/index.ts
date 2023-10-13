@@ -85,13 +85,15 @@ export class ClonePieceRelativePathResolver {
     [ClonePiece.ExportConfig]: () => exportConfigRelativePath,
     [ClonePiece.PlanningAreaGAdm]: () => planningAreaGadmRelativePath,
     [ClonePiece.PlanningAreaCustom]: () => planningAreaCustomRelativePath,
-    [ClonePiece.PlanningAreaCustomGeojson]: ClonePieceRelativePathResolver.marxanDataProjectPieceRelativePathResolver(
-      planningAreaCustomGeoJSONRelativePath,
-    ),
+    [ClonePiece.PlanningAreaCustomGeojson]:
+      ClonePieceRelativePathResolver.marxanDataProjectPieceRelativePathResolver(
+        planningAreaCustomGeoJSONRelativePath,
+      ),
     [ClonePiece.PlanningUnitsGrid]: () => planningUnitsGridRelativePath,
-    [ClonePiece.PlanningUnitsGridGeojson]: ClonePieceRelativePathResolver.marxanDataProjectPieceRelativePathResolver(
-      planningUnitsGridGeoJSONRelativePath,
-    ),
+    [ClonePiece.PlanningUnitsGridGeojson]:
+      ClonePieceRelativePathResolver.marxanDataProjectPieceRelativePathResolver(
+        planningUnitsGridGeoJSONRelativePath,
+      ),
     [ClonePiece.ProjectMetadata]: () => projectMetadataRelativePath,
     [ClonePiece.ProjectCustomProtectedAreas]: () =>
       projectCustomProtectedAreasRelativePath,
@@ -99,33 +101,42 @@ export class ClonePieceRelativePathResolver {
     [ClonePiece.ProjectCustomFeatures]: () => projectCustomFeaturesRelativePath,
     [ClonePiece.ProjectPuvsprCalculations]: () =>
       projectPuvsprCalculationsRelativePath,
-    [ClonePiece.FeaturesSpecification]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
-      featuresSpecificationRelativePath,
-    ),
-    [ClonePiece.ScenarioMetadata]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
-      scenarioMetadataRelativePath,
-    ),
-    [ClonePiece.ScenarioPlanningUnitsData]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
-      scenarioPlanningUnitsDataRelativePath,
-    ),
-    [ClonePiece.ScenarioProtectedAreas]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
-      scenarioProtectedAreasRelativePath,
-    ),
-    [ClonePiece.ScenarioFeaturesData]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
-      scenarioFeaturesDataRelativePath,
-    ),
-    [ClonePiece.ScenarioRunResults]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
-      scenarioRunResultsRelativePath,
-    ),
-    [ClonePiece.ScenarioInputFolder]: ClonePieceRelativePathResolver.marxanDataScenarioPieceRelativePathResolver(
-      scenarioInputFolderRelativePath,
-    ),
-    [ClonePiece.ScenarioOutputFolder]: ClonePieceRelativePathResolver.marxanDataScenarioPieceRelativePathResolver(
-      scenarioOutputFolderRelativePath,
-    ),
-    [ClonePiece.MarxanExecutionMetadata]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
-      marxanExecutionMetadataRelativePath,
-    ),
+    [ClonePiece.FeaturesSpecification]:
+      ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
+        featuresSpecificationRelativePath,
+      ),
+    [ClonePiece.ScenarioMetadata]:
+      ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
+        scenarioMetadataRelativePath,
+      ),
+    [ClonePiece.ScenarioPlanningUnitsData]:
+      ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
+        scenarioPlanningUnitsDataRelativePath,
+      ),
+    [ClonePiece.ScenarioProtectedAreas]:
+      ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
+        scenarioProtectedAreasRelativePath,
+      ),
+    [ClonePiece.ScenarioFeaturesData]:
+      ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
+        scenarioFeaturesDataRelativePath,
+      ),
+    [ClonePiece.ScenarioRunResults]:
+      ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
+        scenarioRunResultsRelativePath,
+      ),
+    [ClonePiece.ScenarioInputFolder]:
+      ClonePieceRelativePathResolver.marxanDataScenarioPieceRelativePathResolver(
+        scenarioInputFolderRelativePath,
+      ),
+    [ClonePiece.ScenarioOutputFolder]:
+      ClonePieceRelativePathResolver.marxanDataScenarioPieceRelativePathResolver(
+        scenarioOutputFolderRelativePath,
+      ),
+    [ClonePiece.MarxanExecutionMetadata]:
+      ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
+        marxanExecutionMetadataRelativePath,
+      ),
   };
 
   static scenarioPieceRelativePathResolver(

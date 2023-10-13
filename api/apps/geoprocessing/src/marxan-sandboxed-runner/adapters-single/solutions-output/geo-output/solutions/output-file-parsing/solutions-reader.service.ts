@@ -34,13 +34,11 @@ export class SolutionsReaderService {
       },
       relations: ['projectPu'],
     });
-    const mapping: Record<
-      number,
-      string
-    > = planningUnits[0].reduce<PuToScenarioPu>((previousValue, pu) => {
-      previousValue[pu.projectPu.puid] = pu.id;
-      return previousValue;
-    }, {});
+    const mapping: Record<number, string> =
+      planningUnits[0].reduce<PuToScenarioPu>((previousValue, pu) => {
+        previousValue[pu.projectPu.puid] = pu.id;
+        return previousValue;
+      }, {});
     const duplex: Duplex<SolutionRowResult, string> = new PassThrough({
       objectMode: true,
     });

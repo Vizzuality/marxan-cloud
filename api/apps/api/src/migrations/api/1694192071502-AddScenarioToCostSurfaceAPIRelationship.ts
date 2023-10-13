@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddScenarioToCostSurfaceAPIRelationship1694192071502
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `ALTER TABLE cost_surfaces ADD COLUMN is_migrated boolean DEFAULT false;

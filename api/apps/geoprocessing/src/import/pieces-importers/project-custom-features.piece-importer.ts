@@ -21,7 +21,8 @@ import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/uti
 @Injectable()
 @PieceImportProvider()
 export class ProjectCustomFeaturesPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     ProjectCustomFeaturesPieceImporter.name,
   );

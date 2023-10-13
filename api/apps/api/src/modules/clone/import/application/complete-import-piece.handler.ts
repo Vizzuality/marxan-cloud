@@ -17,7 +17,8 @@ import { ImportRepository } from './import.repository.port';
 
 @CommandHandler(CompleteImportPiece)
 export class CompleteImportPieceHandler
-  implements IInferredCommandHandler<CompleteImportPiece> {
+  implements IInferredCommandHandler<CompleteImportPiece>
+{
   private readonly logger: Logger = new Logger(CompleteImportPieceHandler.name);
 
   constructor(
@@ -46,9 +47,8 @@ export class CompleteImportPieceHandler
         return;
       }
 
-      const importAggregate = this.eventPublisher.mergeObjectContext(
-        importInstance,
-      );
+      const importAggregate =
+        this.eventPublisher.mergeObjectContext(importInstance);
 
       const result = importAggregate.completePiece(componentId);
 

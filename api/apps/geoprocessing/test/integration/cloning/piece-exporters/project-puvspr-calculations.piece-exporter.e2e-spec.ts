@@ -65,9 +65,8 @@ describe(ProjectPuvsprCalculationsPieceExporter, () => {
   it('saves succesfully puvspr calculations for a custom feature ', async () => {
     const input = fixtures.GivenAProjectPuvsprCalculationsExportJob();
     await fixtures.GivenProjectExist();
-    const {
-      customFeature,
-    } = await fixtures.GivenACustomAndAPlatformFeatureForProject();
+    const { customFeature } =
+      await fixtures.GivenACustomAndAPlatformFeatureForProject();
     await fixtures.GivenProjectHasPuvsprCalculations(customFeature.id);
     await fixtures
       .WhenPieceExporterIsInvoked(input)
@@ -77,9 +76,8 @@ describe(ProjectPuvsprCalculationsPieceExporter, () => {
   it('saves succesfully puvspr calculations for a platform feature ', async () => {
     const input = fixtures.GivenAProjectPuvsprCalculationsExportJob();
     await fixtures.GivenProjectExist();
-    const {
-      platformFeature,
-    } = await fixtures.GivenACustomAndAPlatformFeatureForProject();
+    const { platformFeature } =
+      await fixtures.GivenACustomAndAPlatformFeatureForProject();
     await fixtures.GivenProjectHasPuvsprCalculations(platformFeature.id);
     await fixtures
       .WhenPieceExporterIsInvoked(input)
@@ -91,9 +89,8 @@ describe(ProjectPuvsprCalculationsPieceExporter, () => {
   it('saves succesfully a split derived feature from a platform feature', async () => {
     const input = fixtures.GivenAProjectPuvsprCalculationsExportJob();
     await fixtures.GivenProjectExist();
-    const {
-      platformFeature,
-    } = await fixtures.GivenACustomAndAPlatformFeatureForProject();
+    const { platformFeature } =
+      await fixtures.GivenACustomAndAPlatformFeatureForProject();
     const derivedFeature = await fixtures.GivenASplitDerivedFeatureForProject(
       platformFeature.id,
     );
@@ -108,9 +105,8 @@ describe(ProjectPuvsprCalculationsPieceExporter, () => {
   it('saves succesfully a split derived features from a custom feature', async () => {
     const input = fixtures.GivenAProjectPuvsprCalculationsExportJob();
     await fixtures.GivenProjectExist();
-    const {
-      customFeature,
-    } = await fixtures.GivenACustomAndAPlatformFeatureForProject();
+    const { customFeature } =
+      await fixtures.GivenACustomAndAPlatformFeatureForProject();
     const derivedFeature = await fixtures.GivenASplitDerivedFeatureForProject(
       customFeature.id,
     );
@@ -267,9 +263,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectPuvsprCalculationsContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ProjectPuvsprCalculationsContent>(savedStrem);
           expect(content.projectFeaturesGeoOperations).toEqual([]);
           expect(content.puvsprCalculations).toEqual([]);
         },
@@ -281,9 +276,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectPuvsprCalculationsContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ProjectPuvsprCalculationsContent>(savedStrem);
           expect(
             content.puvsprCalculations.every(
               ({ amount, featureName, isCustom, puid }) =>
@@ -306,12 +300,12 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectPuvsprCalculationsContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ProjectPuvsprCalculationsContent>(savedStrem);
           expect(content.projectFeaturesGeoOperations).toHaveLength(1);
           const derivedFeatureContent = content.projectFeaturesGeoOperations[0];
-          const derivedFeatureOperation = derivedFeature.from_geoprocessing_ops!;
+          const derivedFeatureOperation =
+            derivedFeature.from_geoprocessing_ops!;
           expect(derivedFeatureContent).toEqual({
             featureName: derivedFeature.feature_class_name,
             geoOperation: {

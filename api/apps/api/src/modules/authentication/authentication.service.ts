@@ -293,9 +293,8 @@ export class AuthenticationService {
     const issuedTokenModel = new IssuedAuthnToken();
     issuedTokenModel.exp = new Date(tokenExpiresAt);
     issuedTokenModel.userId = user.id as string;
-    const issuedToken = await this.issuedAuthnTokensRepository.save(
-      issuedTokenModel,
-    );
+    const issuedToken =
+      await this.issuedAuthnTokensRepository.save(issuedTokenModel);
 
     /**
      * And finally we use the db-generated unique id of the token issuance log

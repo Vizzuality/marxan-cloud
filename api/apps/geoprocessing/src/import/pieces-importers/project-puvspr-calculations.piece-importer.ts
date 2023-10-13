@@ -29,7 +29,8 @@ type FeatureSelectResult = {
 @Injectable()
 @PieceImportProvider()
 export class ProjectPuvsprCalculationsPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     ProjectPuvsprCalculationsPieceImporter.name,
   );
@@ -86,10 +87,11 @@ export class ProjectPuvsprCalculationsPieceImporter
         projectId,
       );
 
-      const parsedProjectFeaturesGeoOperations = await this.parseProjectFeaturesGeoOperations(
-        projectFeaturesGeoOperations,
-        projectId,
-      );
+      const parsedProjectFeaturesGeoOperations =
+        await this.parseProjectFeaturesGeoOperations(
+          projectFeaturesGeoOperations,
+          projectId,
+        );
 
       await this.geoEntityManager.transaction(async (em) => {
         const puvsprRepo = em.getRepository(PuvsprCalculationsEntity);
@@ -253,18 +255,20 @@ export class ProjectPuvsprCalculationsPieceImporter
       }
     });
 
-    const customSplitOperationsFeaturesMap = await this.getCustomFeaturesByFeatureName(
-      splitOperationsFeatures
-        .filter(({ isCustom }) => isCustom)
-        .map(({ featureName }) => featureName),
-      projectId,
-    );
+    const customSplitOperationsFeaturesMap =
+      await this.getCustomFeaturesByFeatureName(
+        splitOperationsFeatures
+          .filter(({ isCustom }) => isCustom)
+          .map(({ featureName }) => featureName),
+        projectId,
+      );
 
-    const platformSplitOperationsFeaturesMap = await this.getPlatformFeaturesByFeatureName(
-      splitOperationsFeatures
-        .filter(({ isCustom }) => !isCustom)
-        .map(({ featureName }) => featureName),
-    );
+    const platformSplitOperationsFeaturesMap =
+      await this.getPlatformFeaturesByFeatureName(
+        splitOperationsFeatures
+          .filter(({ isCustom }) => !isCustom)
+          .map(({ featureName }) => featureName),
+      );
 
     return projectFeaturesGeoOperations
       .filter(

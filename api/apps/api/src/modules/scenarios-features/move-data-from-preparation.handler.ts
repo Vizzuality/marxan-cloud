@@ -15,7 +15,8 @@ import { DataMovedFormPreparationEvent } from '@marxan-api/modules/scenarios-fea
 
 @CommandHandler(MoveDataFromPreparationCommand)
 export class MoveDataFromPreparationHandler
-  implements IInferredCommandHandler<MoveDataFromPreparationCommand> {
+  implements IInferredCommandHandler<MoveDataFromPreparationCommand>
+{
   constructor(
     @InjectEntityManager(DbConnections.geoprocessingDB)
     private readonly entityManager: EntityManager,

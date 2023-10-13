@@ -56,7 +56,8 @@ export class LegacyProjectImportComponentEntity {
   static fromSnapshot(
     snapshot: LegacyProjectImportComponentSnapshot,
   ): LegacyProjectImportComponentEntity {
-    const legacyProjectImportComponent = new LegacyProjectImportComponentEntity();
+    const legacyProjectImportComponent =
+      new LegacyProjectImportComponentEntity();
     legacyProjectImportComponent.errors = snapshot.errors;
     legacyProjectImportComponent.id = snapshot.id;
     legacyProjectImportComponent.kind = snapshot.kind;

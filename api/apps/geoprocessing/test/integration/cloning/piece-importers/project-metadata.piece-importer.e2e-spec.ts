@@ -74,9 +74,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenOrganization();
     await fixtures.GivenUser();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      marxanSource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(marxanSource);
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -89,9 +88,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenOrganization();
     await fixtures.GivenUser();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      legacySource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(legacySource);
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -105,9 +103,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenUser();
 
     const resourceName = 'custom project name!!';
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      marxanSource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(marxanSource);
     const input = fixtures.GivenJobInput(archiveLocation, resourceName);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -121,9 +118,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenUser();
     await fixtures.GivenProject();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      marxanSource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(marxanSource);
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -135,9 +131,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenUser();
     await fixtures.GivenProject();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      legacySource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(legacySource);
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -287,9 +282,7 @@ const getFixtures = async () => {
         ) => {
           await sut.run(input);
 
-          const [project]: [
-            ProjectSelectResult,
-          ] = await entityManager
+          const [project]: [ProjectSelectResult] = await entityManager
             .createQueryBuilder()
             .select()
             .from('projects', 'p')
@@ -307,9 +300,7 @@ const getFixtures = async () => {
           expect(project.created_by).toEqual(userId);
           expect(project.sources).toEqual(sources);
 
-          const [blmRange]: [
-            BlmRange,
-          ] = await entityManager
+          const [blmRange]: [BlmRange] = await entityManager
             .createQueryBuilder()
             .select()
             .from('project_blms', 'pblms')

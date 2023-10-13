@@ -34,9 +34,8 @@ describe('Protected Area - ACL', () => {
       'new pa name',
       viewOnlyProject,
     );
-    const result = await fixtures.WhenDeletingProtectedAreaName(
-      protectedAreaId,
-    );
+    const result =
+      await fixtures.WhenDeletingProtectedAreaName(protectedAreaId);
     await fixtures.ThenUpdateWasForbidden(
       result,
       `User not allowed to delete protected areas of the project`,

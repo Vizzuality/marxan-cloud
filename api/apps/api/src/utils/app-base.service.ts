@@ -57,16 +57,14 @@ export interface JSONAPISerializerAttributesConfig<Entity> {
     | 'CamelCase';
 }
 
-export type JSONAPISerializerConfig<
-  Entity
-> = JSONAPISerializerAttributesConfig<Entity> & Record<string, unknown>;
+export type JSONAPISerializerConfig<Entity> =
+  JSONAPISerializerAttributesConfig<Entity> & Record<string, unknown>;
 
 export abstract class AppBaseService<
-  // eslint-disable-next-line @typescript-eslint/ban-types
   Entity extends object,
   CreateModel,
   UpdateModel,
-  Info
+  Info,
 > extends BaseService<Entity, CreateModel, UpdateModel, Info> {
   constructor(
     protected readonly repository: Repository<Entity>,

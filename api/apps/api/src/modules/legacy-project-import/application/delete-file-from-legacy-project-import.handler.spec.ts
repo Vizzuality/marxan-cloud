@@ -37,7 +37,8 @@ beforeEach(async () => {
 });
 
 it('deletes a file from a legacy project import', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
   const fileId = await fixtures.GivenAFileHasBeenAddedToLegacyProjectImport({
@@ -66,7 +67,8 @@ it('fails if legacy project import is not found', async () => {
 });
 
 it('fails if a user tries to delete a file from a not owned legacy project import', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
   const fileId = await fixtures.GivenAFileHasBeenAddedToLegacyProjectImport({
@@ -85,7 +87,8 @@ it('fails if a user tries to delete a file from a not owned legacy project impor
 });
 
 it('fails if legacy project import aggregate cannot be persisted', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
   const fileId = await fixtures.GivenAFileHasBeenAddedToLegacyProjectImport({
@@ -104,9 +107,12 @@ it('fails if legacy project import aggregate cannot be persisted', async () => {
 });
 
 it('fails if legacy project import has already started', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
-    { isAcceptingFiles: false, files: [], pieces: [] },
-  );
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested({
+      isAcceptingFiles: false,
+      files: [],
+      pieces: [],
+    });
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -119,7 +125,8 @@ it('fails if legacy project import has already started', async () => {
 });
 
 it('does not fail when deleting a not existing file', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -269,13 +276,14 @@ const getFixtures = async () => {
 
           expect(result).toMatchObject({ left: forbiddenError });
         },
-        ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned: async () => {
-          const result = await sut.execute(command);
+        ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned:
+          async () => {
+            const result = await sut.execute(command);
 
-          expect(result).toMatchObject({
-            left: legacyProjectImportAlreadyStarted,
-          });
-        },
+            expect(result).toMatchObject({
+              left: legacyProjectImportAlreadyStarted,
+            });
+          },
         ThenLegacyProjectImportSaveErrorShouldBeReturned: async () => {
           const result = await sut.execute(command);
 

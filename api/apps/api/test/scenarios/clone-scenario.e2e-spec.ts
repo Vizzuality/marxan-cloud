@@ -255,9 +255,8 @@ export const getFixtures = async () => {
       });
     },
     WhenImportIsReady: async () => {
-      const allPiecesImportedEvent = await eventBusTestUtils.waitUntilEventIsPublished(
-        AllPiecesImported,
-      );
+      const allPiecesImportedEvent =
+        await eventBusTestUtils.waitUntilEventIsPublished(AllPiecesImported);
       return allPiecesImportedEvent.importId;
     },
     ThenImportIsCompleted: async (importId: ImportId) => {

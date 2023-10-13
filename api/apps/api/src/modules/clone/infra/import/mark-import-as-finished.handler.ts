@@ -7,7 +7,8 @@ import { MarkImportAsFinished } from './mark-import-as-finished.command';
 
 @CommandHandler(MarkImportAsFinished)
 export class MarkImportAsFinishedHandler
-  implements IInferredCommandHandler<MarkImportAsFinished> {
+  implements IInferredCommandHandler<MarkImportAsFinished>
+{
   private readonly logger: Logger = new Logger(
     MarkImportAsFinishedHandler.name,
   );

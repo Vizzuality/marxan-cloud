@@ -99,11 +99,8 @@ export class PublishedProjectService {
     // like it does not belong here at all anyways, but right now there
     // is not a better place to deal with this.
 
-    const {
-      featuredScenarioId,
-      config,
-      ...projectWithoutScenario
-    } = projectToPublish;
+    const { featuredScenarioId, config, ...projectWithoutScenario } =
+      projectToPublish;
 
     let pngDataResult: string | undefined;
 

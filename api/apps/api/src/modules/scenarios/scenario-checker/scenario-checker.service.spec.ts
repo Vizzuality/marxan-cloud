@@ -133,11 +133,10 @@ async function getFixtures() {
       throw new NotFoundException();
     }),
   };
-  const fakeScenariosRepo: jest.Mocked<
-    Pick<Repository<Scenario>, 'findOne'>
-  > = {
-    findOne: jest.fn((_: any) => Promise.resolve({} as Scenario)),
-  };
+  const fakeScenariosRepo: jest.Mocked<Pick<Repository<Scenario>, 'findOne'>> =
+    {
+      findOne: jest.fn((_: any) => Promise.resolve({} as Scenario)),
+    };
   const testingModule = await Test.createTestingModule({
     providers: [
       {

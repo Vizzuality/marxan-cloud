@@ -43,21 +43,19 @@ afterAll(async () => {
 
 describe(`when submitting a job`, () => {
   it(`should process the job by relevant worker`, async () => {
-    const onCompleteMockCallback = (resolve: (value?: any) => void) => (
-      result: any,
-    ) => {
-      expect(result).toEqual({
-        finish: initValue + addValue,
-      });
-      resolve();
-    };
+    const onCompleteMockCallback =
+      (resolve: (value?: any) => void) => (result: any) => {
+        expect(result).toEqual({
+          finish: initValue + addValue,
+        });
+        resolve();
+      };
 
-    const onFailedMockCallback = (
-      resolve: (value?: any) => void,
-      reject: (reason?: any) => void,
-    ) => () => {
-      reject('Fail callback called, not expected');
-    };
+    const onFailedMockCallback =
+      (resolve: (value?: any) => void, reject: (reason?: any) => void) =>
+      () => {
+        reject('Fail callback called, not expected');
+      };
 
     return new Promise(async (resolve, reject) => {
       processor.onFailedMock = jest.fn(onFailedMockCallback(resolve, reject));
@@ -88,7 +86,8 @@ class ModuleA {}
 
 @Injectable()
 class JobProcessor
-  implements WorkerProcessor<{ init: number }, { finish: number }> {
+  implements WorkerProcessor<{ init: number }, { finish: number }>
+{
   constructor(private readonly moduleADependency: ModuleADependency) {}
 
   process(

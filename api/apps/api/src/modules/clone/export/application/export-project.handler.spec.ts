@@ -145,9 +145,8 @@ const getFixtures = async () => {
 
 @Injectable()
 class FakePiecesProvider implements ExportResourcePieces {
-  resolveMock: jest.MockedFunction<
-    ExportResourcePieces['resolveForProject']
-  > = jest.fn();
+  resolveMock: jest.MockedFunction<ExportResourcePieces['resolveForProject']> =
+    jest.fn();
 
   async resolveForProject(
     id: ResourceId,

@@ -15,7 +15,8 @@ import { SpecificationRepository } from './specification.repository';
 
 @CommandHandler(SubmitSpecification)
 export class SubmitSpecificationHandler
-  implements IInferredCommandHandler<SubmitSpecification> {
+  implements IInferredCommandHandler<SubmitSpecification>
+{
   constructor(
     private readonly specificationRepository: SpecificationRepository,
     private readonly eventPublisher: EventPublisher,

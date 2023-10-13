@@ -61,10 +61,8 @@ it(`should return valid min/max while data available for scenario`, async () => 
 });
 it('should return valid min/max while data available for cost surface', async () => {
   const rangeService = fixtures.getRangeService();
-  const {
-    projectId,
-    costSurfaceId,
-  } = await fixtures.GivenProjectWithDefaultCostSurfaceExists();
+  const { projectId, costSurfaceId } =
+    await fixtures.GivenProjectWithDefaultCostSurfaceExists();
 
   await fixtures.GivenCostDataForProjectExists(projectId, costSurfaceId);
 
@@ -73,10 +71,8 @@ it('should return valid min/max while data available for cost surface', async ()
 });
 
 it('should update cost range', async () => {
-  const {
-    projectId,
-    costSurfaceId,
-  } = await fixtures.GivenProjectWithDefaultCostSurfaceExists();
+  const { projectId, costSurfaceId } =
+    await fixtures.GivenProjectWithDefaultCostSurfaceExists();
 
   await fixtures.GivenCostDataForProjectExists(projectId, costSurfaceId);
   await fixtures.WhenIUpdateTheRangeForAGivenCostSurface(costSurfaceId);
@@ -117,14 +113,13 @@ async function getFixtures() {
         scenarioId,
         3,
       );
-      const {
-        rows: secondScenarioPuData,
-      } = await GivenScenarioAndProjectPuData(
-        geoEntityManager,
-        anotherProjectId,
-        anotherScenarioId,
-        3,
-      );
+      const { rows: secondScenarioPuData } =
+        await GivenScenarioAndProjectPuData(
+          geoEntityManager,
+          anotherProjectId,
+          anotherScenarioId,
+          3,
+        );
 
       await scenarioPuCostRepo.save([
         scenarioPuCostRepo.create({
@@ -181,9 +176,8 @@ async function getFixtures() {
       await this.getRangeService().updateCostSurfaceRange(costSurfaceId);
     },
     async ThenTheRangeIsUpdatedForTheGivenCostSurface(costSurfaceId: string) {
-      const range = await this.getRangeService().getCostSurfaceRange(
-        costSurfaceId,
-      );
+      const range =
+        await this.getRangeService().getCostSurfaceRange(costSurfaceId);
       expect(range).toStrictEqual({ min: 0, max: 0 });
     },
     getRangeService(): CostRangeService {

@@ -57,22 +57,25 @@ export class PuvsprDatProcessor {
 
     const featuresIds = await this.getFeaturesIds(specification);
 
-    const featuresIdsWithSpeciesId = await this.puvsprCalculationsService.computeSpeciesId(
-      featuresIds,
-      scenarioId,
-    );
+    const featuresIdsWithSpeciesId =
+      await this.puvsprCalculationsService.computeSpeciesId(
+        featuresIds,
+        scenarioId,
+      );
 
-    const featuresAmountPerPlanningUnit = await this.getAmountPerPlanningUnitAndFeature(
-      isLegacy,
-      projectId,
-      scenarioId,
-      featuresIds,
-    );
+    const featuresAmountPerPlanningUnit =
+      await this.getAmountPerPlanningUnitAndFeature(
+        isLegacy,
+        projectId,
+        scenarioId,
+        featuresIds,
+      );
 
     return featuresIdsWithSpeciesId.flatMap(({ featureId, speciesId }) => {
-      const amountPerPlanningUnitOfFeature = featuresAmountPerPlanningUnit.filter(
-        (row) => row.featureId === featureId,
-      );
+      const amountPerPlanningUnitOfFeature =
+        featuresAmountPerPlanningUnit.filter(
+          (row) => row.featureId === featureId,
+        );
 
       return amountPerPlanningUnitOfFeature.map(({ amount, puId }) => ({
         speciesId,
@@ -83,9 +86,8 @@ export class PuvsprDatProcessor {
   }
 
   private async getSpecification(scenarioId: string) {
-    const scenarioSpecification = await this.scenarioSpecificationsRepo.find(
-      scenarioId,
-    );
+    const scenarioSpecification =
+      await this.scenarioSpecificationsRepo.find(scenarioId);
     if (!scenarioSpecification) {
       return left(false);
     }

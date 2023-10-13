@@ -231,9 +231,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioRunResultsContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioRunResultsContent>(savedStrem);
           const expectedMarxanResults = [1, 2, 3].map((value) => ({
             includedCount: 7,
             values: [false, true, false, true],

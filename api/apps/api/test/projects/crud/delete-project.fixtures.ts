@@ -50,9 +50,8 @@ export const getFixtures = async () => {
       expect(response.status).toEqual(403);
     },
     ThenProjectDeleteEventHasBeenSent: async () => {
-      const event = await eventBusTestUtils.waitUntilEventIsPublished(
-        ProjectDeleted,
-      );
+      const event =
+        await eventBusTestUtils.waitUntilEventIsPublished(ProjectDeleted);
 
       expect(event).toMatchObject({
         projectId,

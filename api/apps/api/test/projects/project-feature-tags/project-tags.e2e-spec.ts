@@ -325,9 +325,13 @@ describe('Projects Tag GET Features (e2e)', () => {
     const featureId14 = await fixtures.GivenFeatureOnProject(projectId1, 'f14');
     const featureId21 = await fixtures.GivenFeatureOnProject(projectId2, 'f21');
 
-    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
-      [featureId11, featureId12, featureId13, featureId14],
-    );
+    const mockedIntersectingProjectFeature =
+      fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock([
+        featureId11,
+        featureId12,
+        featureId13,
+        featureId14,
+      ]);
 
     await fixtures.GivenTagOnFeature(projectId1, featureId11, 'fire');
     await fixtures.GivenTagOnFeature(projectId1, featureId12, 'earth');
@@ -359,9 +363,12 @@ describe('Projects Tag GET Features (e2e)', () => {
     await fixtures.GivenTagOnFeature(projectId, featureId2, 'OneRepeatedTag');
     await fixtures.GivenTagOnFeature(projectId, featureId3, 'AnotherTag');
 
-    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
-      [featureId1, featureId2, featureId3],
-    );
+    const mockedIntersectingProjectFeature =
+      fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock([
+        featureId1,
+        featureId2,
+        featureId3,
+      ]);
 
     // ACT
     const response = await fixtures.WhenGettingFeaturesFromProject(projectId);
@@ -390,9 +397,12 @@ describe('Projects Tag GET Features (e2e)', () => {
     await fixtures.GivenTagOnFeature(projectId1, featureId1, 'someTAG');
     await fixtures.GivenTagOnFeature(projectId1, featureId2, 'another');
 
-    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
-      [featureId1, featureId2, featureId3],
-    );
+    const mockedIntersectingProjectFeature =
+      fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock([
+        featureId1,
+        featureId2,
+        featureId3,
+      ]);
 
     // ACT
     const response = await fixtures.WhenGettingFeaturesFromProject(
@@ -420,9 +430,12 @@ describe('Projects Tag GET Features (e2e)', () => {
     await fixtures.GivenTagOnFeature(projectId1, featureId1, 'someTAG');
     await fixtures.GivenTagOnFeature(projectId1, featureId2, 'another');
 
-    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
-      [featureId1, featureId2, featureId3],
-    );
+    const mockedIntersectingProjectFeature =
+      fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock([
+        featureId1,
+        featureId2,
+        featureId3,
+      ]);
 
     // ACT
     const response = await fixtures.WhenGettingFeaturesFromProject(
@@ -450,9 +463,12 @@ describe('Projects Tag GET Features (e2e)', () => {
     await fixtures.GivenTagOnFeature(projectId1, featureId1, 'another');
     await fixtures.GivenTagOnFeature(projectId1, featureId3, 'SomeTAG');
 
-    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
-      [featureId1, featureId2, featureId3],
-    );
+    const mockedIntersectingProjectFeature =
+      fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock([
+        featureId1,
+        featureId2,
+        featureId3,
+      ]);
 
     // ACT
     const response1 = await fixtures.WhenGettingFeaturesFromProject(

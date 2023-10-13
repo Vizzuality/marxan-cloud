@@ -25,13 +25,14 @@ export const projectCostSurfaceQueueProvider: FactoryProvider<
   },
   inject: [QueueBuilder],
 };
-export const projectCostSurfaceQueueEventsProvider: FactoryProvider<QueueEvents> = {
-  provide: projectCostSurfaceEventsToken,
-  useFactory: (eventsBuilder: QueueEventsBuilder) => {
-    return eventsBuilder.buildQueueEvents(projectCostSurfaceQueueName);
-  },
-  inject: [QueueEventsBuilder],
-};
+export const projectCostSurfaceQueueEventsProvider: FactoryProvider<QueueEvents> =
+  {
+    provide: projectCostSurfaceEventsToken,
+    useFactory: (eventsBuilder: QueueEventsBuilder) => {
+      return eventsBuilder.buildQueueEvents(projectCostSurfaceQueueName);
+    },
+    inject: [QueueEventsBuilder],
+  };
 
 export const projectCostSurfaceEventsFactoryProvider: FactoryProvider<
   CreateWithEventFactory<ProjectCostSurfaceJobInput>

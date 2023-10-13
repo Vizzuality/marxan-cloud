@@ -10,7 +10,8 @@ import {
 
 @CommandHandler(DeleteFileFromLegacyProjectImport)
 export class DeleteFileFromLegacyProjectImportHandler
-  implements IInferredCommandHandler<DeleteFileFromLegacyProjectImport> {
+  implements IInferredCommandHandler<DeleteFileFromLegacyProjectImport>
+{
   constructor(
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
     private readonly legacyProjectImportFilesRepo: LegacyProjectImportFilesRepository,

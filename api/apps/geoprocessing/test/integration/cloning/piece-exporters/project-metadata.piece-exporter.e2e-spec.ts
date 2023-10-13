@@ -207,9 +207,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectMetadataContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ProjectMetadataContent>(savedStrem);
           expect(content).toMatchObject(
             expectedContent(sources, {
               withProjectSummary: options?.withProjectSummary,

@@ -54,7 +54,7 @@ const geoFeatureFilterKeyNames = [
 ] as const;
 type GeoFeatureFilterKeys = keyof Pick<
   GeoFeature,
-  typeof geoFeatureFilterKeyNames[number]
+  (typeof geoFeatureFilterKeyNames)[number]
 >;
 type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 
@@ -211,10 +211,11 @@ export class GeoFeaturesService extends AppBaseService<
      */
     if (projectId) {
       if (info?.params?.bbox) {
-        const geoFeaturesWithinProjectBbox = await this.getIntersectingProjectFeatures(
-          info.params.bbox,
-          projectId,
-        );
+        const geoFeaturesWithinProjectBbox =
+          await this.getIntersectingProjectFeatures(
+            info.params.bbox,
+            projectId,
+          );
 
         // Only apply narrowing by intersection with project bbox if there are
         // features falling within said bbox; otherwise return an empty set
@@ -310,9 +311,10 @@ export class GeoFeaturesService extends AppBaseService<
     }
 
     if (!(omitFields && omitFields.includes('tag'))) {
-      extendedResults[0] = await this.geoFeatureTagsServices.extendFindAllGeoFeaturesWithTags(
-        extendedResults[0],
-      );
+      extendedResults[0] =
+        await this.geoFeatureTagsServices.extendFindAllGeoFeaturesWithTags(
+          extendedResults[0],
+        );
     }
 
     if (
@@ -344,9 +346,8 @@ export class GeoFeaturesService extends AppBaseService<
     let extendedResult = entity;
 
     if (!(omitFields && omitFields.includes('tag'))) {
-      extendedResult = await this.geoFeatureTagsServices.extendFindGeoFeatureWithTag(
-        entity,
-      );
+      extendedResult =
+        await this.geoFeatureTagsServices.extendFindGeoFeatureWithTag(entity);
     }
 
     if (
@@ -644,13 +645,14 @@ export class GeoFeaturesService extends AppBaseService<
      * Then narrow down the list of features relevant to the project to those
      * that effectively intersect the project's bbox.
      */
-    const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
-      .createQueryBuilder('geoFeatureGeometries')
-      .select('"geoFeatureGeometries"."feature_id"', 'featureId')
-      .distinctOn(['"geoFeatureGeometries"."feature_id"'])
-      .where(`feature_id IN (:...featureIds)`)
-      .andWhere(
-        `(st_intersects(
+    const geoFeaturesWithinProjectBbox =
+      await this.geoFeaturesGeometriesRepository
+        .createQueryBuilder('geoFeatureGeometries')
+        .select('"geoFeatureGeometries"."feature_id"', 'featureId')
+        .distinctOn(['"geoFeatureGeometries"."feature_id"'])
+        .where(`feature_id IN (:...featureIds)`)
+        .andWhere(
+          `(st_intersects(
               st_intersection(st_makeenvelope(:...eastBbox, 4326),
               ST_MakeEnvelope(0, -90, 180, 90, 4326)),
           "geoFeatureGeometries".the_geom
@@ -659,17 +661,17 @@ export class GeoFeaturesService extends AppBaseService<
             ST_MakeEnvelope(-180, -90, 0, 90, 4326)),
             "geoFeatureGeometries".the_geom
         ))`,
-        {
-          featureIds: publicOrProjectSpecificFeatures,
-          westBbox: westBbox,
-          eastBbox: eastBbox,
-        },
-      )
-      .getRawMany()
-      .then((result) => result.map((i) => i.featureId))
-      .catch((error) => {
-        throw new Error(error);
-      });
+          {
+            featureIds: publicOrProjectSpecificFeatures,
+            westBbox: westBbox,
+            eastBbox: eastBbox,
+          },
+        )
+        .getRawMany()
+        .then((result) => result.map((i) => i.featureId))
+        .catch((error) => {
+          throw new Error(error);
+        });
 
     return geoFeaturesWithinProjectBbox;
   }

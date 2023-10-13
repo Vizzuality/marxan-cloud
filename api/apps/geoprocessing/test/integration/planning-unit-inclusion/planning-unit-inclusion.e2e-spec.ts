@@ -44,7 +44,7 @@ describe(`when planning units exist for a scenario`, () => {
     });
 
     it(`marks relevant pu in desired state`, async () => {
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           include: {
@@ -57,7 +57,7 @@ describe(`when planning units exist for a scenario`, () => {
             geo: [makeAvailableSampleWithSingleFeature()],
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(await world.GetLockedInPlanningUnits()).toEqual(
         world.planningUnitsToBeIncluded(forCase),
@@ -85,15 +85,16 @@ describe(`when planning units exist for a scenario`, () => {
     });
 
     it(`marks relevant pu in desired state with setByUser = true`, async () => {
-      const availablePUsNotSetByUser = await world.GetAvailablePlanningUnitsNotSetByUser();
-      await sut.process(({
+      const availablePUsNotSetByUser =
+        await world.GetAvailablePlanningUnitsNotSetByUser();
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           makeAvailable: {
             pu: availablePUsNotSetByUser,
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(await world.GetAvailablePlanningUnitsChangedByUser()).toEqual(
         availablePUsNotSetByUser,
@@ -112,7 +113,7 @@ describe(`when planning units exist for a scenario`, () => {
     });
 
     it(`marks relevant pu in desired state`, async () => {
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           include: {
@@ -122,7 +123,7 @@ describe(`when planning units exist for a scenario`, () => {
             geo: [excludeSample()],
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(await world.GetLockedInPlanningUnits()).toEqual(
         world.planningUnitsToBeIncluded(forCase),
@@ -139,14 +140,14 @@ describe(`when planning units exist for a scenario`, () => {
        * First step - excluding selected PUs
        **/
 
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           exclude: {
             geo: [excludeSample()],
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(await world.GetLockedOutPlanningUnits()).toEqual(
         world.planningUnitsToBeExcluded(forCase),
@@ -155,14 +156,14 @@ describe(`when planning units exist for a scenario`, () => {
       /**
        * Second step - making available PUs initially excluded
        **/
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           makeAvailable: {
             geo: [excludeSample()],
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(await world.GetLockedOutPlanningUnits()).toEqual([]);
       // PUs initially excluded are now be available, with status changed by user equals to true
@@ -178,14 +179,15 @@ describe(`when planning units exist for a scenario`, () => {
        * are marked as locked in and value of lock status set by user is false
        **/
 
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       const lockedInPUs = await world.GetPlanningUnitsLockedInByProtectedArea();
-      const availablePUsSetByUser = await world.GetAvailablePlanningUnitsChangedByUser();
+      const availablePUsSetByUser =
+        await world.GetAvailablePlanningUnitsChangedByUser();
 
       expect(lockedInPUs.length).toEqual(7);
       expect(availablePUsSetByUser.length).toEqual(0);
@@ -193,14 +195,14 @@ describe(`when planning units exist for a scenario`, () => {
       /**
        * Changing status of first 3 locked-in by protected area PUs to available with makeAvailable claims
        **/
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           makeAvailable: {
             pu: lockedInPUs.slice(0, 3),
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(await world.GetPlanningUnitsLockedInByProtectedArea()).toEqual(
         lockedInPUs.slice(-4),
@@ -227,7 +229,7 @@ describe(`when planning units exist for a scenario`, () => {
         world.scenarioId,
       );
 
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           include: {
@@ -238,7 +240,7 @@ describe(`when planning units exist for a scenario`, () => {
             pu: puIdsToIncludeFromGeo.slice(0, 2),
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(await world.GetLockedInPlanningUnits()).toEqual(
         world.planningUnitsToBeIncluded(forCase),
@@ -253,7 +255,7 @@ describe(`when planning units exist for a scenario`, () => {
 
     it(`the operation should be rejected with an error when include and exclude PUs overlap`, async () => {
       await expect(
-        sut.process(({
+        sut.process({
           data: {
             scenarioId: world.scenarioId,
             include: {
@@ -263,13 +265,13 @@ describe(`when planning units exist for a scenario`, () => {
               geo: [excludeSample()],
             },
           },
-        } as unknown) as Job<JobInput>),
+        } as unknown as Job<JobInput>),
       ).rejects.toThrow(/Contrasting claims/);
     }, 10000);
 
     it(`the operation should be rejected with an error when makeAvailable and exclude PUs overlap`, async () => {
       await expect(
-        sut.process(({
+        sut.process({
           data: {
             scenarioId: world.scenarioId,
             makeAvailable: {
@@ -279,7 +281,7 @@ describe(`when planning units exist for a scenario`, () => {
               geo: [excludeSample()],
             },
           },
-        } as unknown) as Job<JobInput>),
+        } as unknown as Job<JobInput>),
       ).rejects.toThrow(/Contrasting claims/);
     }, 10000);
   });
@@ -297,7 +299,7 @@ describe(`when planning units exist for a scenario`, () => {
     it(`clears out PUs statuses by kind`, async () => {
       /** Locking and locking out PUs **/
 
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           include: {
@@ -307,7 +309,7 @@ describe(`when planning units exist for a scenario`, () => {
             geo: [excludeSample()],
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       const lockedInPUs = await world.GetLockedInPlanningUnits();
       const lockedOutPUs = await world.GetLockedOutPlanningUnits();
@@ -317,7 +319,7 @@ describe(`when planning units exist for a scenario`, () => {
 
       /** Clearing locked in PUs statuses **/
 
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           exclude: {
@@ -327,11 +329,13 @@ describe(`when planning units exist for a scenario`, () => {
             pu: [],
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       const PUsLockedInByUser = await world.GetPlanningUnitsLockedInByUser();
-      const PUsLockedInByProtectedArea = await world.GetPlanningUnitsLockedInByProtectedArea();
-      const lockedOutPUsAfterClearingIncluded = await world.GetLockedOutPlanningUnits();
+      const PUsLockedInByProtectedArea =
+        await world.GetPlanningUnitsLockedInByProtectedArea();
+      const lockedOutPUsAfterClearingIncluded =
+        await world.GetLockedOutPlanningUnits();
 
       /** Now excluded PUs should remain as set by user and included PUs should be cleared,
        * leaving as locked in only PUs within protecting area that have setByUser value as false*/
@@ -345,7 +349,7 @@ describe(`when planning units exist for a scenario`, () => {
 
       /** Clearing locked out PUs statuses **/
 
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           include: {
@@ -355,9 +359,10 @@ describe(`when planning units exist for a scenario`, () => {
             pu: [],
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
-      const lockedOutPUsAfterClearingExcluded = await world.GetLockedOutPlanningUnits();
+      const lockedOutPUsAfterClearingExcluded =
+        await world.GetLockedOutPlanningUnits();
 
       expect(lockedOutPUsAfterClearingExcluded).toEqual([]);
     }, 10000);
@@ -368,14 +373,15 @@ describe(`when planning units exist for a scenario`, () => {
        * are marked as locked in and value of lock status set by user is false
        **/
 
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       const lockedInPUs = await world.GetPlanningUnitsLockedInByProtectedArea();
-      const availablePUsSetByUser = await world.GetAvailablePlanningUnitsChangedByUser();
+      const availablePUsSetByUser =
+        await world.GetAvailablePlanningUnitsChangedByUser();
 
       expect(lockedInPUs.length).toEqual(7);
       expect(availablePUsSetByUser.length).toEqual(0);
@@ -383,14 +389,14 @@ describe(`when planning units exist for a scenario`, () => {
       /**
        * Making all protectedByDefault PUs available
        **/
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           makeAvailable: {
             pu: lockedInPUs,
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(
         await world.GetPlanningUnitsLockedInByProtectedArea(),
@@ -400,11 +406,11 @@ describe(`when planning units exist for a scenario`, () => {
       );
 
       // Clearing makeAvailable selection
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(
         await world.GetPlanningUnitsLockedInByProtectedArea(),

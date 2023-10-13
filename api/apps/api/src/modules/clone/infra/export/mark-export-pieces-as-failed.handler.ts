@@ -8,7 +8,8 @@ import { Logger } from '@nestjs/common';
 
 @CommandHandler(MarkExportPiecesAsFailed)
 export class MarkExportPiecesAsFailedHandler
-  implements IInferredCommandHandler<MarkExportPiecesAsFailed> {
+  implements IInferredCommandHandler<MarkExportPiecesAsFailed>
+{
   private readonly logger: Logger = new Logger(
     MarkExportPiecesAsFailedHandler.name,
   );

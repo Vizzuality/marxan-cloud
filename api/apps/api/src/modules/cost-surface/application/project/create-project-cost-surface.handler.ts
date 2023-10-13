@@ -13,7 +13,8 @@ import {
 
 @CommandHandler(CreateProjectCostSurface)
 export class CreateProjectCostSurfaceHandler
-  implements IInferredCommandHandler<CreateProjectCostSurface> {
+  implements IInferredCommandHandler<CreateProjectCostSurface>
+{
   private readonly logger: Logger = new Logger(
     CreateProjectCostSurfaceHandler.name,
   );
