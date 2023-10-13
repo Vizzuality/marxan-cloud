@@ -22,12 +22,13 @@ export const intersectFeaturesWithPuQueueEventsToken = Symbol(
   `intersect features with pu queue events token`,
 );
 
-export const intersectFeaturesWithPuQueueEventsProvider: FactoryProvider<QueueEvents> = {
-  provide: intersectFeaturesWithPuQueueEventsToken,
-  useFactory: (queueEventsBuilder: QueueEventsBuilder) =>
-    queueEventsBuilder.buildQueueEvents(queueName),
-  inject: [QueueEventsBuilder],
-};
+export const intersectFeaturesWithPuQueueEventsProvider: FactoryProvider<QueueEvents> =
+  {
+    provide: intersectFeaturesWithPuQueueEventsToken,
+    useFactory: (queueEventsBuilder: QueueEventsBuilder) =>
+      queueEventsBuilder.buildQueueEvents(queueName),
+    inject: [QueueEventsBuilder],
+  };
 
 export const intersectFeaturesWithPuQueueEventsFactoryToken = Symbol(
   `intersect features with pu queue events factory token`,

@@ -35,7 +35,8 @@ import {
 
 @CommandHandler(GenerateExportFromZipFile)
 export class GenerateExportFromZipFileHandler
-  implements IInferredCommandHandler<GenerateExportFromZipFile> {
+  implements IInferredCommandHandler<GenerateExportFromZipFile>
+{
   private readonly logger: Logger = new Logger(
     GenerateExportFromZipFileHandler.name,
   );
@@ -218,12 +219,10 @@ export class GenerateExportFromZipFileHandler
     const manifestFilePath = `${exportFilesFolder}/${manifestFileRelativePath}`;
     const signatureFilePath = `${exportFilesFolder}/${signatureFileRelativePath}`;
 
-    const manifestFileReadable = await this.fileRepository.get(
-      manifestFilePath,
-    );
-    const signatureFileReadable = await this.fileRepository.get(
-      signatureFilePath,
-    );
+    const manifestFileReadable =
+      await this.fileRepository.get(manifestFilePath);
+    const signatureFileReadable =
+      await this.fileRepository.get(signatureFilePath);
 
     if (isLeft(manifestFileReadable) || isLeft(signatureFileReadable)) {
       return left(invalidExportZipFile);
@@ -232,19 +231,19 @@ export class GenerateExportFromZipFileHandler
     const manifestFile = await readableToBuffer(manifestFileReadable.right);
     const signatureFile = await readableToBuffer(signatureFileReadable.right);
 
-    const signatureVerificationResult = await this.manifestFileService.verifyManifestFileSignature(
-      manifestFile,
-      signatureFile,
-    );
+    const signatureVerificationResult =
+      await this.manifestFileService.verifyManifestFileSignature(
+        manifestFile,
+        signatureFile,
+      );
 
     if (isLeft(signatureVerificationResult)) {
       await this.fileRepository.deleteExportFolder(exportId.value);
       return signatureVerificationResult;
     }
 
-    const integrityCheckResult = this.manifestFileService.performIntegrityCheck(
-      manifestFilePath,
-    );
+    const integrityCheckResult =
+      this.manifestFileService.performIntegrityCheck(manifestFilePath);
 
     if (isLeft(integrityCheckResult)) {
       await this.fileRepository.deleteExportFolder(exportId.value);

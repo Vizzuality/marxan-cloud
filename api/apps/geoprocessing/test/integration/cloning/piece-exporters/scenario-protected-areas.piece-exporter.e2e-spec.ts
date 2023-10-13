@@ -171,9 +171,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioProtectedAreasContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioProtectedAreasContent>(savedStrem);
           expect(content).toEqual({
             wdpa: [],
             customProtectedAreas: [],
@@ -186,9 +185,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioProtectedAreasContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioProtectedAreasContent>(savedStrem);
           expect(content.threshold).toBe(1);
           expect(content.wdpa.sort()).toEqual(
             commonProtectedAreasWdpaids.sort(),

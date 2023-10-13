@@ -9,17 +9,16 @@ export class AdminPlanningAreasRepository {
   constructor(private readonly adminAreasService: AdminAreasService) {}
 
   async findAdminAreaIdByLevelId(adminAreaId: string) {
-    const foundId:
-      | Pick<AdminArea, 'id'>
-      | NotFound = await this.adminAreasService
-      .getByLevel1OrLevel2Id(adminAreaId, {
-        fields: ['id'],
-      })
-      .then(({ id }) => {
-        assertDefined(id);
-        return { id };
-      })
-      .catch(AdminPlanningAreasRepository.catchNotFound);
+    const foundId: Pick<AdminArea, 'id'> | NotFound =
+      await this.adminAreasService
+        .getByLevel1OrLevel2Id(adminAreaId, {
+          fields: ['id'],
+        })
+        .then(({ id }) => {
+          assertDefined(id);
+          return { id };
+        })
+        .catch(AdminPlanningAreasRepository.catchNotFound);
     return foundId;
   }
 

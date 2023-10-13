@@ -46,11 +46,12 @@ export class ProjectProtectedAreasService {
       return left(projectNotFound);
     }
 
-    const projectCustomAreas = await this.protectedAreasCrudService.listForProject(
-      projectResponse.right,
-      fetchSpecification,
-      { ...info, params: { ...info.params, project: projectResponse.right } },
-    );
+    const projectCustomAreas =
+      await this.protectedAreasCrudService.listForProject(
+        projectResponse.right,
+        fetchSpecification,
+        { ...info, params: { ...info.params, project: projectResponse.right } },
+      );
 
     return right(projectCustomAreas);
   }

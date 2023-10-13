@@ -16,7 +16,8 @@ import { CostSurfaceDeleted } from '@marxan-api/modules/cost-surface/events/cost
 
 @CommandHandler(DeleteCostSurfaceCommand)
 export class DeleteCostSurfaceHandler
-  implements IInferredCommandHandler<DeleteCostSurfaceCommand> {
+  implements IInferredCommandHandler<DeleteCostSurfaceCommand>
+{
   constructor(
     @InjectRepository(CostSurface)
     private readonly costSurfaceRepo: Repository<CostSurface>,

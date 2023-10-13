@@ -16,7 +16,8 @@ import { AsyncJobsGarbageCollector } from './async-jobs.garbage-collector';
 
 @Injectable()
 export class ScenarioAsyncJobsGarbageCollector
-  implements AsyncJobsGarbageCollector {
+  implements AsyncJobsGarbageCollector
+{
   constructor(
     private readonly calibrationAsyncJob: CalibrationAsyncJob,
     private readonly costSurfaceAsyncJob: CostSurfaceAsyncJob,

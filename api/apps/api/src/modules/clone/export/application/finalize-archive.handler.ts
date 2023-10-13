@@ -33,7 +33,8 @@ type ManifestAndSignatureFilesUris = {
 
 @CommandHandler(FinalizeArchive)
 export class FinalizeArchiveHandler
-  implements IInferredCommandHandler<FinalizeArchive> {
+  implements IInferredCommandHandler<FinalizeArchive>
+{
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(
@@ -64,21 +65,20 @@ export class FinalizeArchiveHandler
       ManifestAndSignatureFilesUris
     >
   > {
-    const exportFolder = this.cloningFilesRepository.getFilesFolderFor(
-      exportId,
-    );
+    const exportFolder =
+      this.cloningFilesRepository.getFilesFolderFor(exportId);
 
-    const manifestFile = await this.manifestFileService.generateManifestFileFor(
-      exportFolder,
-    );
+    const manifestFile =
+      await this.manifestFileService.generateManifestFileFor(exportFolder);
 
     if (isLeft(manifestFile)) {
       return manifestFile;
     }
 
-    const signatureFile = await this.manifestFileService.generateSignatureFileFor(
-      manifestFile.right,
-    );
+    const signatureFile =
+      await this.manifestFileService.generateSignatureFileFor(
+        manifestFile.right,
+      );
 
     if (isLeft(signatureFile)) {
       return signatureFile;
@@ -126,9 +126,8 @@ export class FinalizeArchiveHandler
       return;
     }
 
-    const manifestAndSignatureFilesUris = await this.generateManifestAndSignatureFiles(
-      exportId.value,
-    );
+    const manifestAndSignatureFilesUris =
+      await this.generateManifestAndSignatureFiles(exportId.value);
 
     if (isLeft(manifestAndSignatureFilesUris)) {
       this.logErrorAndMarkExportAsFailed(
@@ -137,10 +136,8 @@ export class FinalizeArchiveHandler
       );
       return;
     }
-    const {
-      manifestFileDestination,
-      signatureFileDestination,
-    } = manifestAndSignatureFilesUris.right;
+    const { manifestFileDestination, signatureFileDestination } =
+      manifestAndSignatureFilesUris.right;
 
     const pieces = exportInstance
       .toSnapshot()
@@ -165,9 +162,8 @@ export class FinalizeArchiveHandler
       return;
     }
 
-    const exportAggregate = this.eventPublisher.mergeObjectContext(
-      exportInstance,
-    );
+    const exportAggregate =
+      this.eventPublisher.mergeObjectContext(exportInstance);
 
     const result = exportAggregate.complete(archiveResult.right);
 

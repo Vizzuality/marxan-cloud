@@ -19,7 +19,8 @@ type EventKind = { event: API_EVENT_KINDS };
 
 @Injectable()
 export class ProjectCostSurfaceEventsHandler
-  implements EventFactory<ProjectCostSurfaceJobInput, true> {
+  implements EventFactory<ProjectCostSurfaceJobInput, true>
+{
   private queueEvents: QueueEventsAdapter<ProjectCostSurfaceJobInput, true>;
 
   // TODO!!! Create proper events

@@ -19,7 +19,8 @@ import {
 
 @Injectable()
 export class CustomPlanningAreasService
-  implements AbstractPlanningAreasService {
+  implements AbstractPlanningAreasService
+{
   constructor(private readonly repository: CustomPlanningAreaRepository) {}
 
   async getPlanningAreaIdAndName(ids: {

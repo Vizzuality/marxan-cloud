@@ -1,25 +1,30 @@
 import {
   BadRequestException,
   Body,
-  Controller, ForbiddenException,
-  Get, InternalServerErrorException,
+  Controller,
+  ForbiddenException,
+  Get,
+  InternalServerErrorException,
   NotFoundException,
-  Param, Patch, Req, UseGuards
+  Param,
+  Patch,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 
 import { projectResource } from './project.api.entity';
 import {
-  ApiBearerAuth, ApiOkResponse,
+  ApiBearerAuth,
+  ApiOkResponse,
   ApiOperation,
-  ApiParam, ApiTags
+  ApiParam,
+  ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import {
-  ProjectsService
-} from './projects.service';
+import { ProjectsService } from './projects.service';
 import { isLeft } from 'fp-ts/Either';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 import { UpdateProjectBlmRangeDTO } from '@marxan-api/modules/projects/dto/update-project-blm-range.dto';
@@ -34,18 +39,14 @@ import {
   projectNotFound as blmProjectNotFound,
   unknownError as blmUnknownError,
 } from '../blm';
-import {
-  ImplementsAcl
-} from '@marxan-api/decorators/acl.decorator';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags('Project - BLM')
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectBLMController {
-  constructor(
-    private readonly projectsService: ProjectsService,
-  ) {}
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @ImplementsAcl()
   @ApiOperation({

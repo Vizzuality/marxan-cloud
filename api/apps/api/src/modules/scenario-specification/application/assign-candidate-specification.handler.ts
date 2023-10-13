@@ -10,7 +10,8 @@ import { ScenarioSpecificationRepo } from './scenario-specification.repo';
 
 @CommandHandler(AssignCandidateSpecification)
 export class AssignCandidateSpecificationHandler
-  implements IInferredCommandHandler<AssignCandidateSpecification> {
+  implements IInferredCommandHandler<AssignCandidateSpecification>
+{
   constructor(
     private readonly scenarioSpecificationRepo: ScenarioSpecificationRepo,
     private readonly eventPublisher: EventPublisher,

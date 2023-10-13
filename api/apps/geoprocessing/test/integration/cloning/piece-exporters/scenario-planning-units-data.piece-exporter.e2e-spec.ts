@@ -149,9 +149,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioPlanningUnitsDataContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioPlanningUnitsDataContent>(savedStrem);
           expect(content.planningUnitsData).toHaveLength(3);
           expect(
             content.planningUnitsData.every(

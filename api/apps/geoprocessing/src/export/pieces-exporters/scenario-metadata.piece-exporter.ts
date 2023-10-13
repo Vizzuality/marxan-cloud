@@ -53,9 +53,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const scenarioId = input.resourceId;
 
-    const [scenario]: [
-      SelectScenarioResult,
-    ] = await this.entityManager
+    const [scenario]: [SelectScenarioResult] = await this.entityManager
       .createQueryBuilder()
       .select([
         'name',
@@ -79,9 +77,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const [blmRange]: [
-      SelectScenarioBlmResult,
-    ] = await this.entityManager
+    const [blmRange]: [SelectScenarioBlmResult] = await this.entityManager
       .createQueryBuilder()
       .select(['values', 'defaults', 'range'])
       .from('scenario_blms', 'pblms')

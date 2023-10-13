@@ -16,7 +16,8 @@ import { LegacyProjectImportEntity } from './entities/legacy-project-import.api.
 
 @Injectable()
 export class LegacyProjectImportTypeormRepository
-  implements LegacyProjectImportRepository {
+  implements LegacyProjectImportRepository
+{
   private inTransaction = false;
 
   constructor(

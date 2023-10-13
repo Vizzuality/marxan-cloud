@@ -14,7 +14,8 @@ import { MarkImportPieceAsFailed } from './mark-import-piece-as-failed.command';
 
 @CommandHandler(MarkImportPieceAsFailed)
 export class MarkImportPieceAsFailedHandler
-  implements IInferredCommandHandler<MarkImportPieceAsFailed> {
+  implements IInferredCommandHandler<MarkImportPieceAsFailed>
+{
   private readonly logger: Logger = new Logger(
     MarkImportPieceAsFailedHandler.name,
   );
@@ -48,9 +49,8 @@ export class MarkImportPieceAsFailedHandler
         return;
       }
 
-      const importAggregate = this.eventPublisher.mergeObjectContext(
-        importInstance,
-      );
+      const importAggregate =
+        this.eventPublisher.mergeObjectContext(importInstance);
 
       const result = importAggregate.markPieceAsFailed(componentId);
 

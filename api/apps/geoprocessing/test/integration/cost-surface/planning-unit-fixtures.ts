@@ -16,9 +16,8 @@ export const getFixtures = async (app: INestApplication) => {
   const projectId = v4();
   const scenarioId = v4();
   const entityManager = app.get(getEntityManagerToken());
-  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
-    ProjectsPuEntity,
-  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> =
+    entityManager.getRepository(ProjectsPuEntity);
   const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom),
   );

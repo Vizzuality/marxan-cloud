@@ -18,7 +18,8 @@ import { ProtectedAreaForProjectCreatedEvent } from '@marxan/protected-areas/pro
 
 @Injectable()
 export class AddProtectedAreaHandler
-  implements EventFactory<JobInput, JobOutput> {
+  implements EventFactory<JobInput, JobOutput>
+{
   private queueEvents: QueueEventsAdapter<JobInput, JobOutput>;
 
   constructor(

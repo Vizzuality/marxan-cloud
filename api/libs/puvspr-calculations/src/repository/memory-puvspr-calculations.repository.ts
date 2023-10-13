@@ -6,16 +6,15 @@ import {
 
 @Injectable()
 export class MemoryPuvsprCalculationsRepository
-  implements PuvsprCalculationsRepository {
+  implements PuvsprCalculationsRepository
+{
   public memory: Record<string, FeatureAmountPerProjectPlanningUnit[]> = {};
   async areAmountPerPlanningUnitAndFeatureSaved(
     projectId: string,
     featureId: string,
   ): Promise<boolean> {
-    const amountPerPlanningUnitOfFeature = await this.getAmountPerPlanningUnitAndFeature(
-      projectId,
-      [featureId],
-    );
+    const amountPerPlanningUnitOfFeature =
+      await this.getAmountPerPlanningUnitAndFeature(projectId, [featureId]);
 
     return Boolean(amountPerPlanningUnitOfFeature.length);
   }

@@ -18,7 +18,8 @@ import { SchedulePieceImport } from './schedule-piece-import.command';
 
 @CommandHandler(SchedulePieceImport)
 export class SchedulePieceImportHandler
-  implements IInferredCommandHandler<SchedulePieceImport> {
+  implements IInferredCommandHandler<SchedulePieceImport>
+{
   private readonly logger: Logger = new Logger(SchedulePieceImportHandler.name);
 
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
@@ -49,13 +50,8 @@ export class SchedulePieceImportHandler
       );
       return;
     }
-    const {
-      resourceKind,
-      projectId,
-      importPieces,
-      ownerId,
-      resourceName,
-    } = importInstance.toSnapshot();
+    const { resourceKind, projectId, importPieces, ownerId, resourceName } =
+      importInstance.toSnapshot();
 
     const component = importPieces.find(
       (piece) => piece.id === componentId.value,

@@ -22,9 +22,8 @@ export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
     constraints: AdjustPlanningUnitsInput,
   ): Promise<void> {
     await this.apiEvents.event(scenarioId, UpdatePlanningUnitsState.Submitted);
-    const targetPuIds: string[] = this.getAllPlanningUnitsAffectedByStatusClaims(
-      constraints,
-    );
+    const targetPuIds: string[] =
+      this.getAllPlanningUnitsAffectedByStatusClaims(constraints);
     if (targetPuIds.length > 0) {
       const { errors } = await this.puUuidValidator.validate(
         scenarioId,

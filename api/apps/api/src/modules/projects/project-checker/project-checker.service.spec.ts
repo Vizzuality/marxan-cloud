@@ -297,9 +297,8 @@ it(`hasPendingBlmCalibration() should return false for a project without scenari
     { id: 'scenario-2' },
   ]);
   // and
-  const hasPendingBlmCalibration = await service.hasPendingBlmCalibration(
-    projectId,
-  );
+  const hasPendingBlmCalibration =
+    await service.hasPendingBlmCalibration(projectId);
 
   // then
   expect(hasPendingBlmCalibration).toEqual({
@@ -320,9 +319,8 @@ it(`hasPendingBlmCalibration() should return true for a project with a scenario 
   ]);
   fixtures.GivenScenarioIsRunningBlmCalibration('scenario-1');
   // and
-  const hasPendingBlmCalibration = await service.hasPendingBlmCalibration(
-    projectId,
-  );
+  const hasPendingBlmCalibration =
+    await service.hasPendingBlmCalibration(projectId);
   // then
   expect(hasPendingBlmCalibration).toEqual({
     _tag: 'Right',
@@ -336,9 +334,8 @@ it(`hasPendingBlmCalibration() should return doesntExist if the project does not
   // and
   fixtures.GivenProjectDoesntExist();
   // and
-  const hasPendingBlmCalibration = await service.hasPendingBlmCalibration(
-    `projectId`,
-  );
+  const hasPendingBlmCalibration =
+    await service.hasPendingBlmCalibration(`projectId`);
   // then
   expect(hasPendingBlmCalibration).toEqual({
     _tag: 'Left',
@@ -408,17 +405,15 @@ async function getFixtures() {
       throw new NotFoundException();
     }),
   };
-  const fakeProjectsService: jest.Mocked<
-    Pick<Repository<Project>, 'findOne'>
-  > = {
-    findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
-  };
+  const fakeProjectsService: jest.Mocked<Pick<Repository<Project>, 'findOne'>> =
+    {
+      findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
+    };
 
-  const fakeScenariosRepo: jest.Mocked<
-    Pick<Repository<Scenario>, 'findOne'>
-  > = {
-    findOne: jest.fn((_: any) => Promise.resolve({} as Scenario)),
-  };
+  const fakeScenariosRepo: jest.Mocked<Pick<Repository<Scenario>, 'findOne'>> =
+    {
+      findOne: jest.fn((_: any) => Promise.resolve({} as Scenario)),
+    };
 
   const fakePlaningAreaFacade = {
     locatePlanningAreaEntity: jest.fn(),

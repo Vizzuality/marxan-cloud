@@ -46,7 +46,8 @@ type FeaturesDataSelectResult = {
 @Injectable()
 @PieceExportProvider()
 export class ProjectCustomFeaturesPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     ProjectCustomFeaturesPieceExporter.name,
   );
@@ -67,24 +68,25 @@ export class ProjectCustomFeaturesPieceExporter
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const customFeatures: ProjectCustomFeaturesSelectResult[] = await this.apiEntityManager
-      .createQueryBuilder()
-      .select([
-        'f.id',
-        'f.feature_class_name',
-        'f.alias',
-        'f.description',
-        'f.property_name',
-        'f.intersection',
-        'f.creation_status',
-        'f.list_property_keys',
-        'f.is_legacy',
-        'pft.tag',
-      ])
-      .from('features', 'f')
-      .leftJoin('project_feature_tags', 'pft', 'pft.feature_id = f.id')
-      .where('f.project_id = :projectId', { projectId: input.resourceId })
-      .execute();
+    const customFeatures: ProjectCustomFeaturesSelectResult[] =
+      await this.apiEntityManager
+        .createQueryBuilder()
+        .select([
+          'f.id',
+          'f.feature_class_name',
+          'f.alias',
+          'f.description',
+          'f.property_name',
+          'f.intersection',
+          'f.creation_status',
+          'f.list_property_keys',
+          'f.is_legacy',
+          'pft.tag',
+        ])
+        .from('features', 'f')
+        .leftJoin('project_feature_tags', 'pft', 'pft.feature_id = f.id')
+        .where('f.project_id = :projectId', { projectId: input.resourceId })
+        .execute();
 
     const customFeaturesIds = customFeatures.map((feature) => feature.id);
     let customFeaturesData: FeaturesDataSelectResult[] = [];

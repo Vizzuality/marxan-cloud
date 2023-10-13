@@ -19,7 +19,8 @@ import { ExportResourcePieces } from './export-resource-pieces.port';
 
 @CommandHandler(ExportProject)
 export class ExportProjectHandler
-  implements IInferredCommandHandler<ExportProject> {
+  implements IInferredCommandHandler<ExportProject>
+{
   constructor(
     private readonly resourcePieces: ExportResourcePieces,
     private readonly exportRepository: ExportRepository,

@@ -13,7 +13,8 @@ import {
 
 @CommandHandler(UpdateSolutionsAreLocked)
 export class UpdateSolutionsAreLockedHandler
-  implements IInferredCommandHandler<UpdateSolutionsAreLocked> {
+  implements IInferredCommandHandler<UpdateSolutionsAreLocked>
+{
   constructor(
     @InjectRepository(Project)
     private readonly projectRepo: Repository<Project>,
@@ -28,9 +29,8 @@ export class UpdateSolutionsAreLockedHandler
   }: UpdateSolutionsAreLocked): Promise<UpdateSolutionsAreLockedResponse> {
     if (!solutionsAreLocked) return right(true);
 
-    const legacyProjectImportOrError = await this.legacyProjectImportRepository.find(
-      projectId,
-    );
+    const legacyProjectImportOrError =
+      await this.legacyProjectImportRepository.find(projectId);
 
     if (isLeft(legacyProjectImportOrError)) return legacyProjectImportOrError;
 

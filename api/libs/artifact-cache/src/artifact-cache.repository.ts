@@ -35,14 +35,13 @@ export class ArtifactCacheRepository {
   async save(
     entityToSave: Pick<
       ArtifactCache,
-      typeof createProjectTemplateFileCacheFields[number]
+      (typeof createProjectTemplateFileCacheFields)[number]
     >,
     artifactStream: Readable,
   ): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const repository = transactionalEntityManager.getRepository(
-        ArtifactCache,
-      );
+      const repository =
+        transactionalEntityManager.getRepository(ArtifactCache);
       const existingEntity = await repository.findOne({
         where: {
           projectId: entityToSave.projectId,
@@ -78,9 +77,8 @@ export class ArtifactCacheRepository {
     output: Writable,
   ): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const repository = transactionalEntityManager.getRepository(
-        ArtifactCache,
-      );
+      const repository =
+        transactionalEntityManager.getRepository(ArtifactCache);
       const cacheEntity = await repository.findOne({
         where: {
           projectId,
@@ -96,13 +94,11 @@ export class ArtifactCacheRepository {
       const largeObjectManager = await this.createLargeObjectManager(
         transactionalEntityManager,
       );
-      const [
-        ,
-        artifactStream,
-      ] = await largeObjectManager.openAndReadableStreamAsync(
-        artifactOid,
-        this.#bufferSize,
-      );
+      const [, artifactStream] =
+        await largeObjectManager.openAndReadableStreamAsync(
+          artifactOid,
+          this.#bufferSize,
+        );
       await new Promise((resolve, reject) => {
         artifactStream.on('end', resolve).on('error', reject).pipe(output);
       });
@@ -111,9 +107,8 @@ export class ArtifactCacheRepository {
 
   async remove(projectId: string, artifactType: ArtifactType): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const repository = transactionalEntityManager.getRepository(
-        ArtifactCache,
-      );
+      const repository =
+        transactionalEntityManager.getRepository(ArtifactCache);
       const cacheEntity = await repository.findOne({
         where: {
           projectId,
@@ -140,10 +135,8 @@ export class ArtifactCacheRepository {
     repository: Repository<ArtifactCache>,
     savedEntityId: string,
   ) {
-    const [
-      oid,
-      largeObjectStream,
-    ] = await largeObjectManager.createAndWritableStreamAsync(this.#bufferSize);
+    const [oid, largeObjectStream] =
+      await largeObjectManager.createAndWritableStreamAsync(this.#bufferSize);
     await new Promise((resolve, reject) => {
       largeObjectStream.on('finish', resolve).on('error', reject);
       artifactStream.pipe(largeObjectStream);

@@ -49,13 +49,8 @@ export class PlanningUnitsService {
     tileSpecification: tileSpecification,
     filters?: PlanningUnitsFilters,
   ): Promise<Buffer> {
-    const {
-      z,
-      x,
-      y,
-      planningUnitGridShape,
-      planningUnitAreakm2,
-    } = tileSpecification;
+    const { z, x, y, planningUnitGridShape, planningUnitAreakm2 } =
+      tileSpecification;
 
     const inputProjection = 3857;
 
@@ -99,9 +94,8 @@ export class PlanningUnitsService {
     filters?: PlanningUnitsFilters,
   ): string {
     const gridShapeFn = gridShapeFnMapping[planningUnitGridShape];
-    const gridSize = calculateGridSize[planningUnitGridShape](
-      planningUnitAreakm2,
-    );
+    const gridSize =
+      calculateGridSize[planningUnitGridShape](planningUnitAreakm2);
     // 156412 references to m per pixel at z level 0 at the equator in EPSG:3857
     const ratioPixelExtent = gridSize / (156412 / 2 ** z);
     /**

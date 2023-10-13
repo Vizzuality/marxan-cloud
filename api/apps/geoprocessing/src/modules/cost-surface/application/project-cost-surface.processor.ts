@@ -14,7 +14,8 @@ import { ProjectCostSurfacePersistencePort } from '@marxan-geoprocessing/modules
 
 @Injectable()
 export class ProjectCostSurfaceProcessor
-  implements WorkerProcessor<ProjectCostSurfaceJobInput, true> {
+  implements WorkerProcessor<ProjectCostSurfaceJobInput, true>
+{
   constructor(
     private readonly repo: ProjectCostSurfacePersistencePort,
     private readonly puExtractor: PuExtractorPort,
@@ -51,7 +52,7 @@ export class ProjectCostSurfaceProcessor
             projectsPuId: projectPlanningUnitsByPuid[record.puid],
             cost: record.cost,
             costSurfaceId: job.data.costSurfaceId,
-          } as CostSurfacePuDataEntity),
+          }) as CostSurfacePuDataEntity,
       ),
     );
     await this.repo.updateCostSurfaceRange(job.data.costSurfaceId);

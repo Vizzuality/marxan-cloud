@@ -7,7 +7,8 @@ import { MarkCloneAsFinished } from './mark-clone-as-finished.command';
 
 @CommandHandler(MarkCloneAsFinished)
 export class MarkCloneAsFinishedHandler
-  implements IInferredCommandHandler<MarkCloneAsFinished> {
+  implements IInferredCommandHandler<MarkCloneAsFinished>
+{
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__clone__finished__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__clone__finished__v1__alpha,

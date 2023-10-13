@@ -42,9 +42,8 @@ describe('ExportConfigReader', () => {
       description: 'description',
       exportId: v4(),
     };
-    const zipFile = await fixtures.GivenArchiveWithInvalidExportConfig(
-      invalidExportConfig,
-    );
+    const zipFile =
+      await fixtures.GivenArchiveWithInvalidExportConfig(invalidExportConfig);
     const result = await fixtures.WhenReadingExportConfig(zipFile);
     fixtures.ThenInvalidExportConfigFileErrorShouldBeReturned(result);
   });
@@ -66,9 +65,8 @@ describe('ExportConfigReader', () => {
       description: 'description',
       exportId: v4(),
     };
-    const zipFile = await fixtures.GivenArchiveWithInvalidExportConfig(
-      invalidExportConfig,
-    );
+    const zipFile =
+      await fixtures.GivenArchiveWithInvalidExportConfig(invalidExportConfig);
     const result = await fixtures.WhenReadingExportConfig(zipFile);
     fixtures.ThenInvalidExportConfigFileErrorShouldBeReturned(result);
   });
@@ -85,9 +83,8 @@ describe('ExportConfigReader', () => {
       description: 'description',
       exportId: v4(),
     };
-    const zipFile = await fixtures.GivenArchiveWithInvalidExportConfig(
-      invalidExportConfig,
-    );
+    const zipFile =
+      await fixtures.GivenArchiveWithInvalidExportConfig(invalidExportConfig);
     const result = await fixtures.WhenReadingExportConfig(zipFile);
     fixtures.ThenInvalidExportConfigFileErrorShouldBeReturned(result);
   });

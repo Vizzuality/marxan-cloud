@@ -4,7 +4,8 @@ import { IsNumber, Min, Max, Equals } from 'class-validator';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 
 export class ScenarioRunProgressV1Alpha1DTO
-  implements ScenarioRunProgressV1Alpha1 {
+  implements ScenarioRunProgressV1Alpha1
+{
   @ApiProperty()
   @IsNumber()
   @Min(0)

@@ -20,7 +20,7 @@ import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
   Scenario,
-  typeof scenarioFilterKeyNames[number]
+  (typeof scenarioFilterKeyNames)[number]
 >;
 type ScenarioFilters = Record<ScenarioFilterKeys, string[]>;
 

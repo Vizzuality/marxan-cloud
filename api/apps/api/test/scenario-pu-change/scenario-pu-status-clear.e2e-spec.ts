@@ -31,7 +31,8 @@ describe(`when requesting to clear PUs statuses by kind`, () => {
   });
 
   it(`sending incorrect kind returns error`, async () => {
-    const result = await world.WhenClearingAvailablePUsStatusWithIncorrectStatusType();
+    const result =
+      await world.WhenClearingAvailablePUsStatusWithIncorrectStatusType();
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].meta.rawError.response.message[0]).toEqual(
       'kind must be a valid enum value',

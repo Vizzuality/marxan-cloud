@@ -9,7 +9,8 @@ import { ProjectCostSurfacePersistencePort } from '@marxan-geoprocessing/modules
 
 @Injectable()
 export class TypeormProjectCostSurface
-  implements ProjectCostSurfacePersistencePort {
+  implements ProjectCostSurfacePersistencePort
+{
   constructor(
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,

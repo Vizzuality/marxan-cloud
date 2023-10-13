@@ -12,7 +12,8 @@ import {
  */
 @Injectable()
 export class AvailablePlanningUnitsRepository
-  implements GetAvailablePlanningUnits {
+  implements GetAvailablePlanningUnits
+{
   constructor(
     @InjectRepository(ScenariosPuPaDataGeo)
     private readonly repo: Repository<ScenariosPuPaDataGeo>,

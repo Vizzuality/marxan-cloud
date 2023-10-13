@@ -5,9 +5,10 @@ import { FeatureAmountPerProjectPlanningUnit } from './repository/puvspr-calcula
 
 export const geoEntityManagerToken = Symbol('geo entity manager token');
 
-export type ComputeFeatureAmountPerPlanningUnit = FeatureAmountPerProjectPlanningUnit & {
-  puId: number;
-};
+export type ComputeFeatureAmountPerPlanningUnit =
+  FeatureAmountPerProjectPlanningUnit & {
+    puId: number;
+  };
 
 @Injectable()
 export class PuvsprCalculationsService {

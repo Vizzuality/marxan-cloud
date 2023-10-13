@@ -51,7 +51,8 @@ describe(ProjectCustomFeaturesPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoProjectCustomFeaturesFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoProjectCustomFeaturesFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -209,7 +210,8 @@ const getFixtures = async () => {
           .map((_, featureIndex) => ({
             alias: '',
             feature_class_name: `${projectId}-${featureIndex + 1}`,
-            creation_status: 'created' as ProjectCustomFeature['creation_status'],
+            creation_status:
+              'created' as ProjectCustomFeature['creation_status'],
             description: '',
             intersection: [],
             list_property_keys: [],
@@ -218,9 +220,10 @@ const getFixtures = async () => {
             data: Array(recordsOfDataForEachCustomFeature)
               .fill(0)
               .map((_, dataIndex) => ({
-                the_geom: geometries[
-                  featureIndex * recordsOfDataForEachCustomFeature + dataIndex
-                ].toString('hex'),
+                the_geom:
+                  geometries[
+                    featureIndex * recordsOfDataForEachCustomFeature + dataIndex
+                  ].toString('hex'),
                 properties: { featureIndex, dataIndex },
                 source: GeometrySource.user_imported,
               })),

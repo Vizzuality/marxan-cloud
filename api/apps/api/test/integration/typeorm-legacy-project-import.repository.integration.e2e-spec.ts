@@ -42,7 +42,8 @@ describe(LegacyProjectImportTypeormRepository, () => {
 
   it('should expose methods for storing and getting legacy project imports by project id', async () => {
     await fixtures.GivenLegacyProjectImportWasRequested();
-    const legacyProjectImport = await fixtures.WhenReadingLegacyProjectImportFromRepository();
+    const legacyProjectImport =
+      await fixtures.WhenReadingLegacyProjectImportFromRepository();
     await fixtures.ThenLegacyProjectImportDataShouldBeOk({
       legacyProjectImport,
       atLeastAComponentIsCompleted: false,
@@ -52,7 +53,8 @@ describe(LegacyProjectImportTypeormRepository, () => {
   it('should update an import when a nested piece is completed', async () => {
     await fixtures.GivenLegacyProjectImportWasRequested();
     await fixtures.WhenAComponentIsCompleted();
-    const legacyProjectImport = await fixtures.WhenReadingLegacyProjectImportFromRepository();
+    const legacyProjectImport =
+      await fixtures.WhenReadingLegacyProjectImportFromRepository();
     await fixtures.ThenLegacyProjectImportDataShouldBeOk({
       legacyProjectImport,
       atLeastAComponentIsCompleted: true,
@@ -62,7 +64,8 @@ describe(LegacyProjectImportTypeormRepository, () => {
   it('should save entities working with transaction', async () => {
     await fixtures.GivenLegacyProjectImportWasRequested();
     await fixtures.WhenAllComponentsAreCompletedConcurrentlyWithTransactions();
-    const legacyProjectImport = await fixtures.WhenReadingLegacyProjectImportFromRepository();
+    const legacyProjectImport =
+      await fixtures.WhenReadingLegacyProjectImportFromRepository();
     fixtures.ThenAllImportComponentsShouldBeFinished({
       legacyProjectImport,
     });

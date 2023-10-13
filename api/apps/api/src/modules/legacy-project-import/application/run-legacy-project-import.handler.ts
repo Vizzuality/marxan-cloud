@@ -16,7 +16,8 @@ import {
 
 @CommandHandler(RunLegacyProjectImport)
 export class RunLegacyProjectImportHandler
-  implements IInferredCommandHandler<RunLegacyProjectImport> {
+  implements IInferredCommandHandler<RunLegacyProjectImport>
+{
   constructor(
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
     @InjectRepository(UsersProjectsApiEntity)
@@ -28,9 +29,8 @@ export class RunLegacyProjectImportHandler
     projectId,
     userId,
   }: RunLegacyProjectImport): Promise<RunLegacyProjectImportResponse> {
-    const legacyProjectImportOrError = await this.legacyProjectImportRepository.find(
-      projectId,
-    );
+    const legacyProjectImportOrError =
+      await this.legacyProjectImportRepository.find(projectId);
 
     if (isLeft(legacyProjectImportOrError)) return legacyProjectImportOrError;
 
@@ -46,9 +46,8 @@ export class RunLegacyProjectImportHandler
 
     if (isLeft(result)) return result;
 
-    const legacyProjectImportSaveError = await this.legacyProjectImportRepository.save(
-      legacyProjectImport,
-    );
+    const legacyProjectImportSaveError =
+      await this.legacyProjectImportRepository.save(legacyProjectImport);
 
     if (isLeft(legacyProjectImportSaveError))
       return legacyProjectImportSaveError;

@@ -19,7 +19,8 @@ import { MarkLegacyProjectImportAsFinished } from './mark-legacy-project-import-
 
 @CommandHandler(MarkLegacyProjectImportAsFinished)
 export class MarkLegacyProjectImportAsFinishedHandler
-  implements IInferredCommandHandler<MarkLegacyProjectImportAsFinished> {
+  implements IInferredCommandHandler<MarkLegacyProjectImportAsFinished>
+{
   private readonly logger: Logger = new Logger(
     MarkLegacyProjectImportAsFinishedHandler.name,
   );
@@ -80,9 +81,8 @@ export class MarkLegacyProjectImportAsFinishedHandler
   async execute({
     projectId,
   }: MarkLegacyProjectImportAsFinished): Promise<void> {
-    const legacyProjectImport = await this.legacyProjectImportRepository.find(
-      projectId,
-    );
+    const legacyProjectImport =
+      await this.legacyProjectImportRepository.find(projectId);
 
     if (isLeft(legacyProjectImport)) {
       await this.markLegacyProjectImportAsFailed(

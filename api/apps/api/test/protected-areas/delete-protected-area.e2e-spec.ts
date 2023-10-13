@@ -15,9 +15,8 @@ afterEach(async () => {
 describe('Protected Area - delete', () => {
   test('should return NotFound error when protected area does not exist', async () => {
     const protectedAreaId = v4();
-    const result = await fixtures.WhenDeletingProtectedAreaName(
-      protectedAreaId,
-    );
+    const result =
+      await fixtures.WhenDeletingProtectedAreaName(protectedAreaId);
     await fixtures.ThenProtectedWasNotFound(result);
   });
 
@@ -25,9 +24,8 @@ describe('Protected Area - delete', () => {
     const protectedAreaId = await fixtures.GivenBaseProtectedArea(
       'global protected area',
     );
-    const result = await fixtures.WhenDeletingProtectedAreaName(
-      protectedAreaId,
-    );
+    const result =
+      await fixtures.WhenDeletingProtectedAreaName(protectedAreaId);
     await fixtures.ThenUpdateWasForbidden(
       result,
       `Global protected areas can not be deleted.`,
@@ -41,9 +39,8 @@ describe('Protected Area - delete', () => {
       projectId,
       protectedAreaId,
     );
-    const result = await fixtures.WhenDeletingProtectedAreaName(
-      protectedAreaId,
-    );
+    const result =
+      await fixtures.WhenDeletingProtectedAreaName(protectedAreaId);
     await fixtures.ThenUpdateWasForbidden(
       result,
       `Custom protected area is used in one or more scenarios cannot be deleted.`,

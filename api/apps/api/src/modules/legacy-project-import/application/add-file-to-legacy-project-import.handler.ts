@@ -21,7 +21,8 @@ import {
 
 @CommandHandler(AddFileToLegacyProjectImport)
 export class AddFileToLegacyProjectImportHandler
-  implements IInferredCommandHandler<AddFileToLegacyProjectImport> {
+  implements IInferredCommandHandler<AddFileToLegacyProjectImport>
+{
   constructor(
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
     private readonly legacyProjectImportFilesRepo: LegacyProjectImportFilesRepository,
@@ -48,9 +49,8 @@ export class AddFileToLegacyProjectImportHandler
           return forbiddenError;
         }
 
-        const legacyProjectImportAggregate = this.eventPublisher.mergeObjectContext(
-          legacyProjectImport.right,
-        );
+        const legacyProjectImportAggregate =
+          this.eventPublisher.mergeObjectContext(legacyProjectImport.right);
 
         const pathOrError = await this.legacyProjectImportFilesRepo.saveFile(
           projectId.value,

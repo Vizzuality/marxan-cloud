@@ -225,8 +225,8 @@ export const getGeoFeatureFixtures = async (app: INestApplication) => {
           (feature_class_name, alias, description, project_id, property_name,  intersection, creation_status, created_by)
           VALUES
              ('${name}', '${name}', null,'${
-        projectId ? projectId : 'null'
-      }', ' name', null, 'created', (SELECT id FROM users WHERE email = 'aa@example.com'))
+               projectId ? projectId : 'null'
+             }', ' name', null, 'created', (SELECT id FROM users WHERE email = 'aa@example.com'))
               RETURNING feature_class_name, id;
           `);
 

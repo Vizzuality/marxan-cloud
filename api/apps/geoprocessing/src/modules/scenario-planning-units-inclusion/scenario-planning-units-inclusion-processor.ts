@@ -14,7 +14,8 @@ import {
 
 @Injectable()
 export class ScenarioPlanningUnitsInclusionProcessor
-  implements WorkerProcessor<JobInput, true> {
+  implements WorkerProcessor<JobInput, true>
+{
   constructor(
     @InjectRepository(ScenariosPlanningUnitGeoEntity)
     private readonly scenarioPlanningUnitsRepo: Repository<ScenariosPlanningUnitGeoEntity>,

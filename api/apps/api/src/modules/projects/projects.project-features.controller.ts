@@ -48,10 +48,7 @@ import {
   GeoFeatureResult,
 } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
-import {
-  projectNotFound,
-  ProjectsService,
-} from './projects.service';
+import { projectNotFound, ProjectsService } from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { isLeft } from 'fp-ts/Either';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
@@ -156,11 +153,12 @@ export class ProjectFeaturesController {
       throw new BadRequestException(`Only FeatureCollection is supported.`);
     }
 
-    const newFeatureOrError = await this.geoFeatureService.createFeaturesForShapefile(
-      projectId,
-      body,
-      data.features,
-    );
+    const newFeatureOrError =
+      await this.geoFeatureService.createFeaturesForShapefile(
+        projectId,
+        body,
+        data.features,
+      );
 
     if (isLeft(newFeatureOrError)) {
       // @debt Use mapDomainToHttpException() instead

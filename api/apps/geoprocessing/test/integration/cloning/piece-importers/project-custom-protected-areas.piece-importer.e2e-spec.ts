@@ -44,7 +44,8 @@ describe(ProjectCustomProtectedAreasPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoProjectCustomProtectedAreasFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoProjectCustomProtectedAreasFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -52,7 +53,8 @@ describe(ProjectCustomProtectedAreasPieceImporter, () => {
   });
 
   it('imports project custom protected areas', async () => {
-    const archiveLocation = await fixtures.GivenValidProjectCustomProtectedAreasFile();
+    const archiveLocation =
+      await fixtures.GivenValidProjectCustomProtectedAreasFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)

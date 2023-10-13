@@ -38,7 +38,8 @@ beforeEach(async () => {
 });
 
 it('cancels a running legacy project import', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -50,13 +51,12 @@ it('cancels a running legacy project import', async () => {
 });
 
 it('cancels a not started legacy project import', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
-    {
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested({
       status: LegacyProjectImportStatuses.AcceptingFiles,
       files: [],
       pieces: [],
-    },
-  );
+    });
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -68,9 +68,12 @@ it('cancels a not started legacy project import', async () => {
 });
 
 it('does not fail when canceling a legacy project import already canceled', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
-    { status: LegacyProjectImportStatuses.Canceled, files: [], pieces: [] },
-  );
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested({
+      status: LegacyProjectImportStatuses.Canceled,
+      files: [],
+      pieces: [],
+    });
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -92,7 +95,8 @@ it('fails if legacy project import is not found', async () => {
 });
 
 it('fails if a user tries to cancel a not owned legacy project import', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -105,7 +109,8 @@ it('fails if a user tries to cancel a not owned legacy project import', async ()
 });
 
 it('fails if legacy project import aggregate cannot be persisted', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -118,9 +123,12 @@ it('fails if legacy project import aggregate cannot be persisted', async () => {
 });
 
 it('fails if legacy project import has already completed', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
-    { status: LegacyProjectImportStatuses.Completed, files: [], pieces: [] },
-  );
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested({
+      status: LegacyProjectImportStatuses.Completed,
+      files: [],
+      pieces: [],
+    });
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -132,9 +140,12 @@ it('fails if legacy project import has already completed', async () => {
 });
 
 it('fails if legacy project import has already failed', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
-    { status: LegacyProjectImportStatuses.Failed, files: [], pieces: [] },
-  );
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested({
+      status: LegacyProjectImportStatuses.Failed,
+      files: [],
+      pieces: [],
+    });
   const { projectId } = legacyProjectImport.toSnapshot();
   const resourceId = new ResourceId(projectId);
 
@@ -252,13 +263,14 @@ const getFixtures = async () => {
 
           expect(result).toMatchObject({ left: forbiddenError });
         },
-        ThenLegacyProjectImportAlreadyFinishedErrorShouldBeReturned: async () => {
-          const result = await sut.execute(command);
+        ThenLegacyProjectImportAlreadyFinishedErrorShouldBeReturned:
+          async () => {
+            const result = await sut.execute(command);
 
-          expect(result).toMatchObject({
-            left: legacyProjectImportAlreadyFinished,
-          });
-        },
+            expect(result).toMatchObject({
+              left: legacyProjectImportAlreadyFinished,
+            });
+          },
         ThenLegacyProjectImportSaveErrorShouldBeReturned: async () => {
           const result = await sut.execute(command);
 

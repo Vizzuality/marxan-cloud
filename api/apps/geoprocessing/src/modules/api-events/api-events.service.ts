@@ -12,9 +12,9 @@ export class ApiEventsService {
   constructor(private readonly http: HttpService) {
     // TODO debt: config shall be injected (nestjs/config); it isn't really unit-testable
     // will throw if not provided
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     this.#secret = AppConfig.get<string>('auth.xApiKey.secret')!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     this.#apiUrl = AppConfig.get<string>('api.url')!;
   }
 

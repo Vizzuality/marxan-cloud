@@ -49,7 +49,7 @@ const protectedAreaFilterKeyNames = [
 ] as const;
 type ProtectedAreaFilterKeys = keyof Pick<
   ProtectedArea,
-  typeof protectedAreaFilterKeyNames[number]
+  (typeof protectedAreaFilterKeyNames)[number]
 >;
 type ProtectedAreaBaseFilters = Record<ProtectedAreaFilterKeys, string[]>;
 
@@ -302,13 +302,14 @@ export class ProtectedAreasCrudService extends AppBaseService<
       })
       .then((scenarios) =>
         groupBy(
-          scenarios.flatMap((scenario) =>
-            scenario.protectedAreaFilterByIds
-              ?.filter(isDefined)
-              .map((protectedAreaId) => ({
-                scenarioId: scenario.id,
-                protectedAreaId,
-              })),
+          scenarios.flatMap(
+            (scenario) =>
+              scenario.protectedAreaFilterByIds
+                ?.filter(isDefined)
+                .map((protectedAreaId) => ({
+                  scenarioId: scenario.id,
+                  protectedAreaId,
+                })),
           ),
           'protectedAreaId',
         ),
@@ -322,9 +323,8 @@ export class ProtectedAreasCrudService extends AppBaseService<
 
     info!.params.project = project;
 
-    let projectProtectedAreas = await this.selectionGetService.getForProject(
-      project,
-    );
+    let projectProtectedAreas =
+      await this.selectionGetService.getForProject(project);
 
     if (info?.params?.fullNameAndCategoryFilter) {
       projectProtectedAreas = this.applySearchToProtectedAreas(

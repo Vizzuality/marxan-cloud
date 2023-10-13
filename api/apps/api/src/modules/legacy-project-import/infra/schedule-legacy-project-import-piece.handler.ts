@@ -18,7 +18,8 @@ import { ScheduleLegacyProjectImportPiece } from './schedule-legacy-project-impo
 
 @CommandHandler(ScheduleLegacyProjectImportPiece)
 export class ScheduleLegacyProjectImportPieceHandler
-  implements IInferredCommandHandler<ScheduleLegacyProjectImportPiece> {
+  implements IInferredCommandHandler<ScheduleLegacyProjectImportPiece>
+{
   private readonly logger: Logger = new Logger(
     ScheduleLegacyProjectImportPieceHandler.name,
   );
@@ -38,9 +39,8 @@ export class ScheduleLegacyProjectImportPieceHandler
     const kind =
       API_EVENT_KINDS.project__legacy__import__piece__submitted__v1__alpha;
 
-    const legacyProjectImportOrError = await this.legacyProjectImportRepository.find(
-      projectId,
-    );
+    const legacyProjectImportOrError =
+      await this.legacyProjectImportRepository.find(projectId);
 
     if (isLeft(legacyProjectImportOrError)) {
       const errorMsg = `Legacy project import with project ID ${projectId.value} not found`;
@@ -52,12 +52,8 @@ export class ScheduleLegacyProjectImportPieceHandler
     }
     const legacyProjectImportInstance = legacyProjectImportOrError.right;
 
-    const {
-      pieces,
-      files,
-      scenarioId,
-      ownerId,
-    } = legacyProjectImportInstance.toSnapshot();
+    const { pieces, files, scenarioId, ownerId } =
+      legacyProjectImportInstance.toSnapshot();
 
     const component = pieces.find((piece) => piece.id === componentId.value);
     if (!component) {

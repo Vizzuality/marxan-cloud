@@ -15,9 +15,8 @@ describe('Cost Surface', () => {
 
   describe('Default Cost Surface', () => {
     it(`should create a default Cost Surface`, async () => {
-      const { projectId } = await fixtures.WhenCreatingAProject(
-        'my awesome project',
-      );
+      const { projectId } =
+        await fixtures.WhenCreatingAProject('my awesome project');
       await fixtures.ThenADefaultCostSurfaceWasCreated(projectId);
     });
   });
@@ -26,9 +25,8 @@ describe('Cost Surface', () => {
       // ARRANGE
       const projectId1 = await fixtures.GivenProject('someProject 1');
       const projectId2 = await fixtures.GivenProject('the REAL project');
-      const default2 = await fixtures.GivenDefaultCostSurfaceForProject(
-        projectId1,
-      );
+      const default2 =
+        await fixtures.GivenDefaultCostSurfaceForProject(projectId1);
       const costSurface11 = await fixtures.GivenCostSurfaceMetadataForProject(
         projectId1,
         'costSurface 1 1',
@@ -75,12 +73,10 @@ describe('Cost Surface', () => {
       // ARRANGE
       const projectId1 = await fixtures.GivenProject('someProject 1');
       const projectId2 = await fixtures.GivenProject('the REAL project');
-      const default1 = await fixtures.GivenDefaultCostSurfaceForProject(
-        projectId1,
-      );
-      const default2 = await fixtures.GivenDefaultCostSurfaceForProject(
-        projectId2,
-      );
+      const default1 =
+        await fixtures.GivenDefaultCostSurfaceForProject(projectId1);
+      const default2 =
+        await fixtures.GivenDefaultCostSurfaceForProject(projectId2);
       const costSurface11 = await fixtures.GivenCostSurfaceMetadataForProject(
         projectId1,
         'costSurface 1 1',
@@ -142,12 +138,10 @@ describe('Cost Surface', () => {
       ];
 
       // ACT
-      const response1 = await fixtures.WhenGettingCostSurfacesForProject(
-        projectId1,
-      );
-      const response2 = await fixtures.WhenGettingCostSurfacesForProject(
-        projectId2,
-      );
+      const response1 =
+        await fixtures.WhenGettingCostSurfacesForProject(projectId1);
+      const response2 =
+        await fixtures.WhenGettingCostSurfacesForProject(projectId2);
 
       // ASSERT
       await fixtures.ThenReponseHasCostSurfaceList(
@@ -184,11 +178,12 @@ describe('Cost Surface', () => {
       const shapefilePath = fixtures.GivenMockCostSurfaceShapefile();
 
       // ACT
-      const response = await fixtures.WhenUploadingCostSurfaceShapefileForProject(
-        projectId,
-        '',
-        shapefilePath,
-      );
+      const response =
+        await fixtures.WhenUploadingCostSurfaceShapefileForProject(
+          projectId,
+          '',
+          shapefilePath,
+        );
 
       // ASSERT
       await fixtures.ThenEmptyErrorWasReturned(response);
@@ -334,9 +329,8 @@ describe('Cost Surface', () => {
     it(`should return error if the CostSurface is the Project's default`, async () => {
       // ARRANGE
       const projectId = await fixtures.GivenProject('someProject');
-      const costSurface = await fixtures.GivenDefaultCostSurfaceForProject(
-        projectId,
-      );
+      const costSurface =
+        await fixtures.GivenDefaultCostSurfaceForProject(projectId);
 
       // ACT
       const response = await fixtures.WhenDeletingCostSurface(

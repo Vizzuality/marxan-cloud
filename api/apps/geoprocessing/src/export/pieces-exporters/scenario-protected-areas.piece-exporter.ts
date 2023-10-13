@@ -37,7 +37,8 @@ type SelectWdpaResult = WdpaProtectedArea | CustomProtectedArea;
 @Injectable()
 @PieceExportProvider()
 export class ScenarioProtectedAreasPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     ScenarioProtectedAreasPieceExporter.name,
   );

@@ -22,7 +22,8 @@ class FeatureRepository {
 // draft
 @EventsHandler(SpecificationPublished)
 export class SpecificationPublishedHandler
-  implements IEventHandler<SpecificationPublished> {
+  implements IEventHandler<SpecificationPublished>
+{
   constructor(
     private readonly featureRepository: FeatureRepository,
     private readonly runService: RunService,

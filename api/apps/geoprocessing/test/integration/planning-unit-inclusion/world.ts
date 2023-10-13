@@ -25,15 +25,12 @@ export const createWorld = async (app: INestApplication) => {
   const projectId = v4();
   const scenarioId = v4();
   const dataSource = app.get<DataSource>(DataSource);
-  const projectsPuRepo: Repository<ProjectsPuEntity> = await dataSource.getRepository(
-    ProjectsPuEntity,
-  );
-  const puGeometryRepo: Repository<PlanningUnitsGeom> = await dataSource.getRepository(
-    PlanningUnitsGeom,
-  );
-  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = await dataSource.getRepository(
-    ScenariosPlanningUnitGeoEntity,
-  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> =
+    await dataSource.getRepository(ProjectsPuEntity);
+  const puGeometryRepo: Repository<PlanningUnitsGeom> =
+    await dataSource.getRepository(PlanningUnitsGeom);
+  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> =
+    await dataSource.getRepository(ScenariosPlanningUnitGeoEntity);
 
   let geometriesByCase: {
     [k in ForCase]: {

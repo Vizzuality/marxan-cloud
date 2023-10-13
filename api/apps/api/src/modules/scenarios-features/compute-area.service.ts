@@ -25,17 +25,19 @@ export class ComputeArea {
 
     if (isLegacyProject) return;
 
-    const alreadyComputed = await this.puvsprCalculationsRepo.areAmountPerPlanningUnitAndFeatureSaved(
-      projectId,
-      featureId,
-    );
+    const alreadyComputed =
+      await this.puvsprCalculationsRepo.areAmountPerPlanningUnitAndFeatureSaved(
+        projectId,
+        featureId,
+      );
 
     if (alreadyComputed) return;
 
-    const amountPerPlanningUnitOfFeature = await this.puvsprCalculations.computeMarxanAmountPerPlanningUnit(
-      featureId,
-      scenarioId,
-    );
+    const amountPerPlanningUnitOfFeature =
+      await this.puvsprCalculations.computeMarxanAmountPerPlanningUnit(
+        featureId,
+        scenarioId,
+      );
 
     return this.puvsprCalculationsRepo.saveAmountPerPlanningUnitAndFeature(
       projectId,

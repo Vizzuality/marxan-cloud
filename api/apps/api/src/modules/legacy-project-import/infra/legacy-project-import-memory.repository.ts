@@ -11,7 +11,8 @@ import { LegacyProjectImportEntity } from './entities/legacy-project-import.api.
 
 @Injectable()
 export class LegacyProjectImportMemoryRepository
-  implements LegacyProjectImportRepository {
+  implements LegacyProjectImportRepository
+{
   private readonly legacyProjectImports: Record<
     string,
     LegacyProjectImportEntity
@@ -35,11 +36,8 @@ export class LegacyProjectImportMemoryRepository
 
     const { projectId } = legacyProjectImport.toSnapshot();
 
-    this.legacyProjectImports[
-      projectId
-    ] = LegacyProjectImportEntity.fromSnapshot(
-      legacyProjectImport.toSnapshot(),
-    );
+    this.legacyProjectImports[projectId] =
+      LegacyProjectImportEntity.fromSnapshot(legacyProjectImport.toSnapshot());
     return right(true);
   }
 

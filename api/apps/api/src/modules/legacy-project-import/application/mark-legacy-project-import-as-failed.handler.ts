@@ -9,7 +9,8 @@ import { MarkLegacyProjectImportAsFailed } from './mark-legacy-project-import-as
 
 @CommandHandler(MarkLegacyProjectImportAsFailed)
 export class MarkLegacyProjectImportAsFailedHandler
-  implements IInferredCommandHandler<MarkLegacyProjectImportAsFailed> {
+  implements IInferredCommandHandler<MarkLegacyProjectImportAsFailed>
+{
   private readonly logger: Logger = new Logger(
     MarkLegacyProjectImportAsFailedHandler.name,
   );
@@ -42,9 +43,8 @@ export class MarkLegacyProjectImportAsFailedHandler
     projectId,
     reason,
   }: MarkLegacyProjectImportAsFailed): Promise<void> {
-    const legacyProjectImport = await this.legacyProjectImportRepository.find(
-      projectId,
-    );
+    const legacyProjectImport =
+      await this.legacyProjectImportRepository.find(projectId);
 
     let ownerId: string | undefined;
     let scenarioId: string | undefined;

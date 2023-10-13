@@ -11,7 +11,8 @@ describe(`When getting scenario best solution`, () => {
   });
 
   it(`should return the correct response when the given scenario id does not exists`, async () => {
-    const response = await fixtures.WhenGettingBestSolutionForAnScenarioThatDoesNotExists();
+    const response =
+      await fixtures.WhenGettingBestSolutionForAnScenarioThatDoesNotExists();
 
     fixtures.ThenScenarioNotFoundShouldBeResolved(response);
   });

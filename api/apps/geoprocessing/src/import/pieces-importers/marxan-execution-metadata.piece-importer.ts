@@ -24,7 +24,8 @@ type MetadataFolderBuffers = Record<string, Buffer>;
 @Injectable()
 @PieceImportProvider()
 export class MarxanExecutionMetadataPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     MarxanExecutionMetadataPieceImporter.name,
   );
@@ -100,11 +101,8 @@ export class MarxanExecutionMetadataPieceImporter
       const buffer = await readableToBuffer(readableOrError.right);
       const stringMarxanExecutionMetadata = buffer.toString();
 
-      const {
-        marxanExecutionMetadata,
-      }: MarxanExecutionMetadataContent = JSON.parse(
-        stringMarxanExecutionMetadata,
-      );
+      const { marxanExecutionMetadata }: MarxanExecutionMetadataContent =
+        JSON.parse(stringMarxanExecutionMetadata);
 
       const foldersUris = uris.filter(
         (uri) =>

@@ -36,12 +36,14 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('Creating a scenario with minimum required data should succeed', async () => {
-    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
+    const response =
+      await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
     fixtures.ThenScenarioIsCreatedAndNoJobHasBeenSubmitted(response);
   });
 
   it('Creating a scenario has its internal project-scope id properly informed', async () => {
-    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
+    const response =
+      await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
     //ProjectScenarioId will be one because it's the first Scenario in the project
     fixtures.ThenScenarioIsCreatedWithProjectScenarioId(response, 1);
   });
@@ -52,7 +54,8 @@ describe('ScenariosModule (e2e)', () => {
       'existing',
       projectScenarioIdPreviousMax,
     );
-    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
+    const response =
+      await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
     //ProjectScenarioId will be one because it's the first Scenario in the project
     fixtures.ThenScenarioIsCreatedWithProjectScenarioId(
       response,
@@ -66,15 +69,15 @@ describe('ScenariosModule (e2e)', () => {
       'existing',
       projectScenarioIdPreviousMax,
     );
-    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner(
-      false,
-    );
+    const response =
+      await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner(false);
     fixtures.ThenScenarioCouldNotBeCreatedMessageIsReturned(response);
   });
 
   it('Creating a scenario will succeed because the user is a project contributor', async () => {
     await fixtures.GivenContributorWasAddedToProject();
-    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsContributor();
+    const response =
+      await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsContributor();
     fixtures.ThenScenarioIsCreated(response);
   });
 
@@ -86,14 +89,14 @@ describe('ScenariosModule (e2e)', () => {
 
   it('Creating a scenario will fail because the associated project does not have a default cost surface', async () => {
     await fixtures.GivenProjectHasNoDefaultCostSurface();
-    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner(
-      false,
-    );
+    const response =
+      await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner(false);
     fixtures.ThenCostSurfaceNotFoundMessageIsReturned(response);
   });
 
   it('Creating a scenario with complete data should succeed', async () => {
-    const response = await fixtures.WhenCreatingAScenarioWithCompleteDataAsOwner();
+    const response =
+      await fixtures.WhenCreatingAScenarioWithCompleteDataAsOwner();
     fixtures.ThenScenarioAndJobAreCreated(response);
   });
 
@@ -129,7 +132,8 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('Gets scenarios (paginated; pages of up to 5 items, first page)', async () => {
-    const response = await fixtures.WhenGettingPaginatedScenariosWithPageNumberAsOwner();
+    const response =
+      await fixtures.WhenGettingPaginatedScenariosWithPageNumberAsOwner();
     fixtures.ThenProperLengthIsReturned(response);
   });
 
@@ -138,16 +142,16 @@ describe('ScenariosModule (e2e)', () => {
     const partialName = 'Fin';
     const scenarioId = await fixtures.GivenScenarioWasCreated(name);
 
-    const response = await fixtures.WhenGettingScenariosWithFreeSearchAsOwner(
-      partialName,
-    );
+    const response =
+      await fixtures.WhenGettingScenariosWithFreeSearchAsOwner(partialName);
 
     fixtures.ThenCorrectScenariosAreReturned(response, { scenarioId, name });
   });
 
   it('Getting scenario by id response includes cost surface name', async () => {
     await fixtures.GivenScenarioWasCreated('test singular');
-    const response = await fixtures.WhenGettingScenarioByIdWithCostSurfaceInfo();
+    const response =
+      await fixtures.WhenGettingScenarioByIdWithCostSurfaceInfo();
     fixtures.ThenCostSurfaceNameIsIncludedInSingularResponse(response);
   });
   it('Getting scenarios response includes cost surface name', async () => {
@@ -181,7 +185,8 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('should not allow to create scenario with invalid marxan properties', async () => {
-    const response = await fixtures.WhenCreatingScenarioWithInvalidMarxanProperties();
+    const response =
+      await fixtures.WhenCreatingScenarioWithInvalidMarxanProperties();
     fixtures.ThenInvalidEnumValueMessageIsReturned(response);
   });
 });

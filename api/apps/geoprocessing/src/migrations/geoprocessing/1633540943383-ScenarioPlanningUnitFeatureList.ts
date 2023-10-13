@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class ScenarioPlanningUnitFeatureList1633540943383
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   name = 'ScenarioPlanningUnitFeatureList1633540943383';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

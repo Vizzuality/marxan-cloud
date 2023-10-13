@@ -32,18 +32,16 @@ export class SplitOperation {
       kind: API_EVENT_KINDS.scenario__geofeatureSplit__submitted__v1__alpha1,
     });
     try {
-      const {
-        project,
-        protectedAreaFilterByIds,
-        planningAreaLocation,
-      } = await this.splitDataProvider.prepareData({
-        scenarioId: data.scenarioId,
-      });
+      const { project, protectedAreaFilterByIds, planningAreaLocation } =
+        await this.splitDataProvider.prepareData({
+          scenarioId: data.scenarioId,
+        });
 
-      const singleSplitFeaturesWithId = await this.splitCreateFeatures.createSplitFeatures(
-        data.input,
-        project.id,
-      );
+      const singleSplitFeaturesWithId =
+        await this.splitCreateFeatures.createSplitFeatures(
+          data.input,
+          project.id,
+        );
 
       const scenarioFeaturePreparationIds: { id: string }[] = [];
 

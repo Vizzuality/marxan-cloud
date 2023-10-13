@@ -70,7 +70,8 @@ describe(ScenarioRunResultsPieceImporter, () => {
   it('fails if projects planning units amount does not match', async () => {
     await fixtures.GivenScenario();
     await fixtures.GivenScenarioPuData();
-    const archiveLocation = await fixtures.GivenScenarioRunResultsFileWithLeastProjectsPu();
+    const archiveLocation =
+      await fixtures.GivenScenarioRunResultsFileWithLeastProjectsPu();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -277,10 +278,8 @@ const getFixtures = async () => {
       );
       const invalidScenarioRunResultsFileContent: ScenarioRunResultsContent = {
         blmResults: validScenarioRunResultsFileContent.blmResults,
-        marxanRunResults: validScenarioRunResultsFileContent.marxanRunResults.slice(
-          0,
-          1,
-        ),
+        marxanRunResults:
+          validScenarioRunResultsFileContent.marxanRunResults.slice(0, 1),
         outputSummaries: validScenarioRunResultsFileContent.outputSummaries,
       };
 

@@ -18,7 +18,8 @@ import { UpdateCostSurface } from './update-cost-surface.command';
  */
 @CommandHandler(UpdateCostSurface)
 export class UpdateCostSurfaceHandler
-  implements IInferredCommandHandler<UpdateCostSurface> {
+  implements IInferredCommandHandler<UpdateCostSurface>
+{
   private readonly logger: Logger = new Logger(UpdateCostSurfaceHandler.name);
 
   constructor(

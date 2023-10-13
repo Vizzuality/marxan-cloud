@@ -9,7 +9,8 @@ import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 
 @Injectable()
 export class AvailableProjectPlanningUnitsRepository
-  implements GetAvailablePlanningUnits {
+  implements GetAvailablePlanningUnits
+{
   constructor(
     @InjectRepository(ProjectsPuEntity)
     private readonly repo: Repository<ProjectsPuEntity>,

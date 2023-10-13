@@ -17,7 +17,8 @@ import {
 
 @CommandHandler(CompleteLegacyProjectImportPiece)
 export class CompleteLegacyProjectImportPieceHandler
-  implements IInferredCommandHandler<CompleteLegacyProjectImportPiece> {
+  implements IInferredCommandHandler<CompleteLegacyProjectImportPiece>
+{
   private readonly logger: Logger = new Logger(
     CompleteLegacyProjectImportPieceHandler.name,
   );

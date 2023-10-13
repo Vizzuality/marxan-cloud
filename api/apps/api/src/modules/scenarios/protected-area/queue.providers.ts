@@ -29,13 +29,14 @@ export const scenarioProtectedAreaQueueProvider: FactoryProvider<
 export const scenarioProtectedAreaQueueEventsToken = Symbol(
   'add custom protected-area to scenario-project queue events token',
 );
-export const scenarioProtectedAreaQueueEventsProvider: FactoryProvider<QueueEvents> = {
-  provide: scenarioProtectedAreaQueueEventsToken,
-  useFactory: (queueEventsBuilder: QueueEventsBuilder) => {
-    return queueEventsBuilder.buildQueueEvents(addProtectedAreaQueueName);
-  },
-  inject: [QueueEventsBuilder],
-};
+export const scenarioProtectedAreaQueueEventsProvider: FactoryProvider<QueueEvents> =
+  {
+    provide: scenarioProtectedAreaQueueEventsToken,
+    useFactory: (queueEventsBuilder: QueueEventsBuilder) => {
+      return queueEventsBuilder.buildQueueEvents(addProtectedAreaQueueName);
+    },
+    inject: [QueueEventsBuilder],
+  };
 
 export const scenarioProtectedAreaEventsFactoryToken = Symbol(
   'add custom protected-area to scenario-project event factory token',

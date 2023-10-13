@@ -24,9 +24,8 @@ test(`custom feature csv upload`, async () => {
 
 test('custom feature csv upload when project not found', async () => {
   const falseProjectId = v4();
-  const response = await fixtures.WhenUploadingCsvWhenProjectNotFound(
-    falseProjectId,
-  );
+  const response =
+    await fixtures.WhenUploadingCsvWhenProjectNotFound(falseProjectId);
   await fixtures.ThenProjectNotFoundErrorIsReturned(response, falseProjectId);
   await fixtures.AndNoFeatureUploadIsRegistered();
 });
@@ -49,7 +48,8 @@ test('custom feature csv upload with duplicated puids', async () => {
 });
 
 test('custom feature csv with puids not present in the project', async () => {
-  const response = await fixtures.WhenUploadingCsvWithPuidsNotPresentITheProject();
+  const response =
+    await fixtures.WhenUploadingCsvWithPuidsNotPresentITheProject();
   await fixtures.ThenPuidsNotPresentErrorIsReturned(response);
   await fixtures.AndNoFeatureUploadIsRegistered();
 });

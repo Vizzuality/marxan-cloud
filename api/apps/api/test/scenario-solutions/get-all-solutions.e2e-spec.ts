@@ -13,7 +13,8 @@ describe(`When getting scenario solution results`, () => {
   });
 
   it(`should return the correct response when the given scenario id does not exists`, async () => {
-    const response = await fixtures.WhenGettingSolutionsForAnScenarioThatDoesNotExists();
+    const response =
+      await fixtures.WhenGettingSolutionsForAnScenarioThatDoesNotExists();
 
     fixtures.ThenScenarioNotFoundShouldBeResolved(response);
   });

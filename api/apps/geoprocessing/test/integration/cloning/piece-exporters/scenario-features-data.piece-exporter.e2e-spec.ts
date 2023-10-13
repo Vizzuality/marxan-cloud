@@ -179,9 +179,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioFeaturesDataContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioFeaturesDataContent>(savedStrem);
           expect(content.featuresData).toEqual([]);
         },
         ThenAScenarioFeaturesDataFileIsSaved: async () => {
@@ -190,9 +189,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioFeaturesDataContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioFeaturesDataContent>(savedStrem);
 
           expect(content.featuresData).toHaveLength(
             amountOfCustomFeatures * recordsOfDataForEachFeature +

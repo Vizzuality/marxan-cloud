@@ -247,9 +247,10 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const [firstSpecification] = await readSavedFile<
-            ScenarioFeaturesSpecificationContent[]
-          >(savedStrem);
+          const [firstSpecification] =
+            await readSavedFile<ScenarioFeaturesSpecificationContent[]>(
+              savedStrem,
+            );
           const featureName = getFeatureName(opts);
           const expectedRaw = {
             status: 'any',

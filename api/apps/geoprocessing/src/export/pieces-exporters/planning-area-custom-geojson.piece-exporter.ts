@@ -21,7 +21,8 @@ type PlanningAreaGeojsonSelectResult = {
 @Injectable()
 @PieceExportProvider()
 export class PlanningAreaCustomGeojsonPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     PlanningAreaCustomGeojsonPieceExporter.name,
   );
@@ -41,14 +42,13 @@ export class PlanningAreaCustomGeojsonPieceExporter
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const projectId = input.resourceId;
-    const [planningArea]: [
-      PlanningAreaGeojsonSelectResult,
-    ] = await this.geoprocessingEntityManager
-      .createQueryBuilder()
-      .select('ST_AsGeoJSON(the_geom)', 'geojson')
-      .from(PlanningArea, 'pa')
-      .where('project_id = :projectId', { projectId })
-      .execute();
+    const [planningArea]: [PlanningAreaGeojsonSelectResult] =
+      await this.geoprocessingEntityManager
+        .createQueryBuilder()
+        .select('ST_AsGeoJSON(the_geom)', 'geojson')
+        .from(PlanningArea, 'pa')
+        .where('project_id = :projectId', { projectId })
+        .execute();
 
     if (!planningArea) {
       const errorMessage = `Custom planning area not found for project with ID: ${projectId}`;

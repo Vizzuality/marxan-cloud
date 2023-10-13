@@ -15,7 +15,8 @@ import { BlmValuesPolicyFactory } from '@marxan-api/modules/projects/blm/blm-val
 
 @CommandHandler(ChangeScenarioBlmRange)
 export class ChangeScenarioBlmRangeHandler
-  implements IInferredCommandHandler<ChangeScenarioBlmRange> {
+  implements IInferredCommandHandler<ChangeScenarioBlmRange>
+{
   private readonly logger: Logger = new Logger(ChangeScenarioBlmRange.name);
 
   constructor(

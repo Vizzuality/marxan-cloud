@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddRoleIdUsersScenariosTable1640175714642
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
         ALTER TABLE users_scenarios ADD COLUMN role_id varchar NOT NULL references roles(name),

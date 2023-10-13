@@ -28,7 +28,8 @@ type SelectResult = {
 @Injectable()
 @PieceExportProvider()
 export class ScenarioPlanningUnitsDataPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     ScenarioPlanningUnitsDataPieceExporter.name,
   );

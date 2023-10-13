@@ -10,7 +10,8 @@ import {
 
 @Injectable()
 export class MarxanLegacyProjectImportChecker
-  implements LegacyProjectImportChecker {
+  implements LegacyProjectImportChecker
+{
   constructor(
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
   ) {}

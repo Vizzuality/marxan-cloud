@@ -1,32 +1,34 @@
 import {
-  BadRequestException, Controller, ForbiddenException,
-  Get, InternalServerErrorException, Param,
+  BadRequestException,
+  Controller,
+  ForbiddenException,
+  Get,
+  InternalServerErrorException,
+  Param,
   ParseIntPipe,
-  ParseUUIDPipe, Post,
+  ParseUUIDPipe,
+  Post,
   Req,
   Res,
   UploadedFile,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 
 import { projectResource } from './project.api.entity';
 import {
   ApiBearerAuth,
-  ApiCreatedResponse, ApiOperation,
-  ApiParam, ApiTags
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import {
-  ensureShapefileHasRequiredFiles,
-} from '@marxan-api/utils/file-uploads.utils';
+import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
-import {
-  ProjectsService,
-  validationFailed,
-} from './projects.service';
+import { ProjectsService, validationFailed } from './projects.service';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
@@ -91,11 +93,10 @@ export class ProjectPlanningAreaAndGridController {
   ): Promise<PlanningAreaResponseDto> {
     await ensureShapefileHasRequiredFiles(file);
 
-    const result = await this.projectsService.savePlanningAreaFromShapefile(
-      file,
-    );
+    const result =
+      await this.projectsService.savePlanningAreaFromShapefile(file);
     if (isLeft(result)) {
-      const mapping: Record<typeof result['left'], () => never> = {
+      const mapping: Record<(typeof result)['left'], () => never> = {
         [validationFailed]: () => {
           throw new BadRequestException();
         },
@@ -125,10 +126,11 @@ export class ProjectPlanningAreaAndGridController {
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) planningAreaId: string,
   ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      planningAreaId,
-      req.user.id,
-    );
+    const checkPlanningAreaBelongsToProject =
+      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+        planningAreaId,
+        req.user.id,
+      );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
@@ -153,10 +155,11 @@ export class ProjectPlanningAreaAndGridController {
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) planningAreaId: string,
   ): Promise<void> {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      planningAreaId,
-      req.user.id,
-    );
+    const checkPlanningAreaBelongsToProject =
+      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+        planningAreaId,
+        req.user.id,
+      );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
@@ -185,21 +188,23 @@ export class ProjectPlanningAreaAndGridController {
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
   ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      projectId,
-      req.user.id,
-    );
+    const checkPlanningAreaBelongsToProject =
+      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+        projectId,
+        req.user.id,
+      );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
 
-    const result = await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
-      projectId,
-      req.user.id,
-      z,
-      x,
-      y,
-    );
+    const result =
+      await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
+        projectId,
+        req.user.id,
+        z,
+        x,
+        y,
+      );
 
     if (isLeft(result)) {
       throw new ForbiddenException();
@@ -234,21 +239,23 @@ export class ProjectPlanningAreaAndGridController {
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
   ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      projectId,
-      req.user.id,
-    );
+    const checkPlanningAreaBelongsToProject =
+      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+        projectId,
+        req.user.id,
+      );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
 
-    const result = await this.projectsService.getActualUrlForProjectPlanningGridTiles(
-      projectId,
-      req.user.id,
-      z,
-      x,
-      y,
-    );
+    const result =
+      await this.projectsService.getActualUrlForProjectPlanningGridTiles(
+        projectId,
+        req.user.id,
+        z,
+        x,
+        y,
+      );
 
     if (isLeft(result)) {
       throw new ForbiddenException();

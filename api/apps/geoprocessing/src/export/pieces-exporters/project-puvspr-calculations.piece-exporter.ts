@@ -37,7 +37,8 @@ type FeatureByIdMap = Record<string, Omit<FeaturesSelectResult, 'id'>>;
 @Injectable()
 @PieceExportProvider()
 export class ProjectPuvsprCalculationsPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     ProjectPuvsprCalculationsPieceExporter.name,
   );
@@ -61,18 +62,19 @@ export class ProjectPuvsprCalculationsPieceExporter
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const projectId = input.resourceId;
 
-    const featureAmountPerPlanningUnit = await this.puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeatureInProject(
-      projectId,
-    );
+    const featureAmountPerPlanningUnit =
+      await this.puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeatureInProject(
+        projectId,
+      );
 
-    const featuresAmountPerPlanningUnitParsed = await this.parseFeatureAmountPerPlanningUnit(
-      featureAmountPerPlanningUnit,
-      projectId,
-    );
+    const featuresAmountPerPlanningUnitParsed =
+      await this.parseFeatureAmountPerPlanningUnit(
+        featureAmountPerPlanningUnit,
+        projectId,
+      );
 
-    const projectFeaturesGeoOperations = await this.getProjectFeaturesGeoOperations(
-      projectId,
-    );
+    const projectFeaturesGeoOperations =
+      await this.getProjectFeaturesGeoOperations(projectId);
 
     const fileContent: ProjectPuvsprCalculationsContent = {
       puvsprCalculations: featuresAmountPerPlanningUnitParsed,
@@ -161,14 +163,15 @@ export class ProjectPuvsprCalculationsPieceExporter
   }
 
   private async getProjectFeaturesGeoOperations(projectId: string) {
-    const derivedFeatures: ProjectFeaturesSelectResult[] = await this.apiEntityManager
-      .createQueryBuilder()
-      .select('feature_class_name', 'featureName')
-      .addSelect('from_geoprocessing_ops', 'geoOperation')
-      .from('features', 'f')
-      .where('project_id = :projectId', { projectId })
-      .andWhere('from_geoprocessing_ops IS NOT NULL')
-      .execute();
+    const derivedFeatures: ProjectFeaturesSelectResult[] =
+      await this.apiEntityManager
+        .createQueryBuilder()
+        .select('feature_class_name', 'featureName')
+        .addSelect('from_geoprocessing_ops', 'geoOperation')
+        .from('features', 'f')
+        .where('project_id = :projectId', { projectId })
+        .andWhere('from_geoprocessing_ops IS NOT NULL')
+        .execute();
 
     const dataFeatureIds = derivedFeatures.map(({ geoOperation }) => {
       if (geoOperation.operation !== SpecificationOperation.Split) {

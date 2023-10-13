@@ -14,7 +14,8 @@ describe(StripSingleSplitConfigFeatureValue, () => {
     fixtures = await getFixtures();
   });
   it('strips single split feature value ', () => {
-    const singleSplitFeatureValue = fixtures.GivenSingleSplitConfigFeatureValue();
+    const singleSplitFeatureValue =
+      fixtures.GivenSingleSplitConfigFeatureValue();
 
     const result = fixtures.WhenStrippingSingleSplitConfigFeatureValue(
       singleSplitFeatureValue,

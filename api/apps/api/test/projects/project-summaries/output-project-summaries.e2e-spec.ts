@@ -110,14 +110,16 @@ describe('when generating output summary metadata for a project', () => {
   it('should generate zip files', async () => {
     // This test will arrange 2 scenarios, with 5 runs, and 5 Planning Units
     const projectId = await fixtures.GivenProjectExistsOnAPI('project');
-    const scenario1Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
-      'scenario1Name',
-      projectId,
-    );
-    const scenario2Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
-      'scenario2Name',
-      projectId,
-    );
+    const scenario1Id =
+      await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
+        'scenario1Name',
+        projectId,
+      );
+    const scenario2Id =
+      await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
+        'scenario2Name',
+        projectId,
+      );
 
     const scenarioIdToNameMapping = [
       {
@@ -168,9 +170,8 @@ describe('when generating output summary metadata for a project', () => {
 
     await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
 
-    const summaryEntity = await fixtures.ThenOutputSummaryForProjectIsPersisted(
-      projectId,
-    );
+    const summaryEntity =
+      await fixtures.ThenOutputSummaryForProjectIsPersisted(projectId);
 
     await fixtures.ThenSummaryCSVWasProperlyGenerated(
       summaryEntity,
@@ -185,14 +186,16 @@ describe('when generating output summary metadata for a project', () => {
   it('should generate zip files for any subsequent scenario runs', async () => {
     // This test will arrange 2 scenarios, with 5 runs, and 5 Planning Units
     const projectId = await fixtures.GivenProjectExistsOnAPI('project');
-    const scenario1Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
-      'scenario1Name',
-      projectId,
-    );
-    const scenario2Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
-      'scenario2Name',
-      projectId,
-    );
+    const scenario1Id =
+      await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
+        'scenario1Name',
+        projectId,
+      );
+    const scenario2Id =
+      await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
+        'scenario2Name',
+        projectId,
+      );
 
     const scenarioIdToNameMapping = [
       {
@@ -244,9 +247,8 @@ describe('when generating output summary metadata for a project', () => {
     // Simulate saving output metadata after running a scenario
     await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
 
-    const summaryEntityRun1 = await fixtures.ThenOutputSummaryForProjectIsPersisted(
-      projectId,
-    );
+    const summaryEntityRun1 =
+      await fixtures.ThenOutputSummaryForProjectIsPersisted(projectId);
 
     await fixtures.ThenSummaryCSVWasProperlyGenerated(
       summaryEntityRun1,
@@ -260,9 +262,8 @@ describe('when generating output summary metadata for a project', () => {
     // Simulate saving output metadata after running a scenario again (or another scenario)
     await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
 
-    const summaryEntityRun2 = await fixtures.ThenOutputSummaryForProjectIsPersisted(
-      projectId,
-    );
+    const summaryEntityRun2 =
+      await fixtures.ThenOutputSummaryForProjectIsPersisted(projectId);
 
     await fixtures.ThenSummaryCSVWasProperlyGenerated(
       summaryEntityRun2,
@@ -276,19 +277,22 @@ describe('when generating output summary metadata for a project', () => {
 
   it('should only generate zip files for scenarios that have been run', async () => {
     const projectId = await fixtures.GivenProjectExistsOnAPI('project');
-    const scenario1Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
-      'scenario1Name',
-      projectId,
-    );
-    const scenario2Id = await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
-      'scenario2Name',
-      projectId,
-    );
+    const scenario1Id =
+      await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
+        'scenario1Name',
+        projectId,
+      );
+    const scenario2Id =
+      await fixtures.GivenScenarioWithAtLeastOneRunExistsOnAPI(
+        'scenario2Name',
+        projectId,
+      );
 
-    const scenarioWithNoRunId = await fixtures.GivenScenarioWithNoRunsExistsOnAPI(
-      'scenarioWithNorun',
-      projectId,
-    );
+    const scenarioWithNoRunId =
+      await fixtures.GivenScenarioWithNoRunsExistsOnAPI(
+        'scenarioWithNorun',
+        projectId,
+      );
 
     const projectPus = await fixtures.GivenProjectPuDataExists(projectId);
     await fixtures.GivenScenarioPuDataExists(
@@ -326,9 +330,8 @@ describe('when generating output summary metadata for a project', () => {
 
     await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
 
-    const summaryEntityRun1 = await fixtures.ThenOutputSummaryForProjectIsPersisted(
-      projectId,
-    );
+    const summaryEntityRun1 =
+      await fixtures.ThenOutputSummaryForProjectIsPersisted(projectId);
     await fixtures.ThenSummaryCSVWasProperlyGenerated(
       summaryEntityRun1,
       marxanSummaryDataForProject,
@@ -336,9 +339,8 @@ describe('when generating output summary metadata for a project', () => {
 
     await fixtures.WhenSavingOutputMetadataForProject(scenario1Id);
 
-    const summaryEntityRun2 = await fixtures.ThenOutputSummaryForProjectIsPersisted(
-      projectId,
-    );
+    const summaryEntityRun2 =
+      await fixtures.ThenOutputSummaryForProjectIsPersisted(projectId);
 
     await fixtures.ThenOutputCSVDoesNotContainScenarioWith(
       summaryEntityRun2,
@@ -509,9 +511,7 @@ const getFixtures = async () => {
     },
 
     ThenOutputSummaryForProjectIsPersisted: async (projectId: string) => {
-      const [
-        outputSummary,
-      ] = await apiEntityManager
+      const [outputSummary] = await apiEntityManager
         .createQueryBuilder()
         .select()
         .from('output_project_summaries', 's')

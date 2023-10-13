@@ -55,7 +55,8 @@ export const retriesIntervalForSpecificationStatusInSeconds = 30;
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class FeaturesSpecificationLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     FeaturesSpecificationLegacyProjectPieceImporter.name,
   );
@@ -106,9 +107,8 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       LegacyProjectImportFileType.SpecDat,
     );
 
-    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      firstLineReadable,
-    );
+    const delimiterOrError =
+      await this.datFileDelimiterFinder.findDelimiter(firstLineReadable);
     if (isLeft(delimiterOrError))
       this.logAndThrow(
         `Invalid delimiter in spec.dat file. Use either comma or tabulator as your file delimiter.`,
@@ -135,9 +135,8 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       LegacyProjectImportFileType.PuvsprDat,
     );
 
-    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      firstLineReadable,
-    );
+    const delimiterOrError =
+      await this.datFileDelimiterFinder.findDelimiter(firstLineReadable);
     if (isLeft(delimiterOrError))
       this.logAndThrow(
         `Invalid delimiter in puvspr.dat file. Use either comma or tabulator as your file delimiter.`,
@@ -295,9 +294,8 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     scenarioId: string,
     retries?: number,
   ): Promise<void> {
-    const featureIdByIntegerId = await this.getFeatureIdByIntegerIdMap(
-      projectId,
-    );
+    const featureIdByIntegerId =
+      await this.getFeatureIdByIntegerIdMap(projectId);
 
     const response: Observable<AxiosResponse<any, any>> = this.httpService.post(
       `${AppConfig.get<string>(
@@ -345,13 +343,12 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     specRows: PropSpecDatRow[],
     scenarioId: string,
   ): Promise<void> {
-    const scenarioFeaturesData: ScenarioFeaturesData[] = await this.scenarioFeaturesDataRepo.find(
-      {
+    const scenarioFeaturesData: ScenarioFeaturesData[] =
+      await this.scenarioFeaturesDataRepo.find({
         select: ['id', 'featureData'],
         where: { scenarioId },
         relations: ['featureData'],
-      },
-    );
+      });
     const propertiesByIntegerId: Record<number, PropSpecDatRow> = {};
 
     specRows.forEach((row) => {
@@ -389,10 +386,9 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
        * size smaller than the default one, but keeping as is for the time
        * being.
        */
-      chunk(
-        updateValues,
-        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS / 4,
-      ).map((values) => this.scenarioFeaturesDataRepo.save(values)),
+      chunk(updateValues, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS / 4).map(
+        (values) => this.scenarioFeaturesDataRepo.save(values),
+      ),
     );
   }
 

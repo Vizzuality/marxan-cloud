@@ -1,5 +1,8 @@
 import { bootstrapApplication } from '../../utils/api-application';
-import { GivenUserIsLoggedIn, userObj } from '../../steps/given-user-is-logged-in';
+import {
+  GivenUserIsLoggedIn,
+  userObj,
+} from '../../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../../steps/given-project';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -39,9 +42,8 @@ async function getFixtures() {
 
   const { projectId } = await GivenProjectExists(app, ownerToken);
 
-  const outputProjectSummariesRepo: Repository<OutputProjectSummaryApiEntity> = app.get(
-    getRepositoryToken(OutputProjectSummaryApiEntity),
-  );
+  const outputProjectSummariesRepo: Repository<OutputProjectSummaryApiEntity> =
+    app.get(getRepositoryToken(OutputProjectSummaryApiEntity));
 
   const projectRepo: Repository<Project> = app.get(getRepositoryToken(Project));
 

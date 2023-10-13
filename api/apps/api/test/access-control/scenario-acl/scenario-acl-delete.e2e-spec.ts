@@ -15,15 +15,14 @@ test(`delete every type of user from the scenario as owner`, async () => {
   await fixtures.GivenViewerWasAddedToScenario(scenarioId);
   await fixtures.GivenContributorWasAddedToScenario(scenarioId);
   await fixtures.GivenOwnerWasAddedToScenario(scenarioId);
-  const viewerRevokeResponse = await fixtures.WhenRevokingAccessToViewerFromScenarioAsOwner(
-    scenarioId,
-  );
-  const contributorRevokeResponse = await fixtures.WhenRevokingAccessToContributorFromScenarioAsOwner(
-    scenarioId,
-  );
-  const ownerRevokeResponse = await fixtures.WhenRevokingAccessToOwnerFromScenarioAsOwner(
-    scenarioId,
-  );
+  const viewerRevokeResponse =
+    await fixtures.WhenRevokingAccessToViewerFromScenarioAsOwner(scenarioId);
+  const contributorRevokeResponse =
+    await fixtures.WhenRevokingAccessToContributorFromScenarioAsOwner(
+      scenarioId,
+    );
+  const ownerRevokeResponse =
+    await fixtures.WhenRevokingAccessToOwnerFromScenarioAsOwner(scenarioId);
   /* This part of the test is done by using the GET endpoint from MARXAN-1079
      so this will be uncommented when everything is merged into MARXAN-1016
   */
@@ -38,8 +37,7 @@ test(`delete every type of user from the scenario as owner`, async () => {
 
 test(`delete last owner as the only owner`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated();
-  const revokeResponse = await fixtures.WhenRevokingAccessToLastOwnerFromScenarioAsOwner(
-    scenarioId,
-  );
+  const revokeResponse =
+    await fixtures.WhenRevokingAccessToLastOwnerFromScenarioAsOwner(scenarioId);
   fixtures.ThenForbiddenIsReturned(revokeResponse);
 });

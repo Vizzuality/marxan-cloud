@@ -6,7 +6,8 @@ import { MarkCloneAsSubmitted } from './mark-clone-as-submitted.command';
 
 @CommandHandler(MarkCloneAsSubmitted)
 export class MarkCloneAsSubmittedHandler
-  implements IInferredCommandHandler<MarkCloneAsSubmitted> {
+  implements IInferredCommandHandler<MarkCloneAsSubmitted>
+{
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__clone__submitted__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__clone__submitted__v1__alpha,

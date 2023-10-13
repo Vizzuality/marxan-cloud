@@ -8,7 +8,8 @@ import { ScheduleDbCleanupForFailedImport } from './schedule-db-cleanup-for-fail
 
 @CommandHandler(ScheduleDbCleanupForFailedImport)
 export class ScheduleDbCleanupForFailedImportHandler
-  implements IInferredCommandHandler<ScheduleDbCleanupForFailedImport> {
+  implements IInferredCommandHandler<ScheduleDbCleanupForFailedImport>
+{
   private readonly logger: Logger = new Logger(
     ScheduleDbCleanupForFailedImportHandler.name,
   );

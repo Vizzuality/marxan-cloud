@@ -9,16 +9,15 @@ import {
 @Injectable()
 export class UpdatePlanningUnitsApiEvents
   extends ApiEventsService
-  implements UpdatePlanningUnitsEventsPort {
-  private readonly eventMap: Record<
-    UpdatePlanningUnitsState,
-    API_EVENT_KINDS
-  > = {
-    [UpdatePlanningUnitsState.Submitted]:
-      API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1,
-    [UpdatePlanningUnitsState.Failed]:
-      API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1,
-  };
+  implements UpdatePlanningUnitsEventsPort
+{
+  private readonly eventMap: Record<UpdatePlanningUnitsState, API_EVENT_KINDS> =
+    {
+      [UpdatePlanningUnitsState.Submitted]:
+        API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1,
+      [UpdatePlanningUnitsState.Failed]:
+        API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1,
+    };
 
   async event(
     scenarioId: string,

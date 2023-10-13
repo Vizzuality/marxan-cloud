@@ -12,7 +12,8 @@ export const LegacyProjectImportPieceProcessorToken = Symbol(
 export const LegacyProjectImportPieceProcessorProvider = () =>
   SetMetadata(LegacyProjectImportPieceProcessorToken, true);
 
-export type LegacyProjectImportPieceProcessor = LegacyProjectImportPieceProcessorPort<
-  LegacyProjectImportJobInput,
-  LegacyProjectImportJobOutput
->;
+export type LegacyProjectImportPieceProcessor =
+  LegacyProjectImportPieceProcessorPort<
+    LegacyProjectImportJobInput,
+    LegacyProjectImportJobOutput
+  >;

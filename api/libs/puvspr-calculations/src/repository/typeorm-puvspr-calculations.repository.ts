@@ -9,7 +9,8 @@ import {
 
 @Injectable()
 export class TypeOrmPuvsprCalculationsRepository
-  implements PuvsprCalculationsRepository {
+  implements PuvsprCalculationsRepository
+{
   constructor(
     @Inject(geoEntityManagerToken)
     private readonly geoEntityManager: EntityManager,

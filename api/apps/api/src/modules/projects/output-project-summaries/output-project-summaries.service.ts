@@ -57,16 +57,13 @@ export class OutputProjectSummariesService {
       where: { projectId, numberOfRuns: Not(IsNull()) },
     });
 
-    const bestSolutionData = await this.getBestSolutionDataForScenarios(
-      scenarios,
-    );
-    const summedSolutionData = await this.getSummedSolutionDataForScenarios(
-      scenarios,
-    );
+    const bestSolutionData =
+      await this.getBestSolutionDataForScenarios(scenarios);
+    const summedSolutionData =
+      await this.getSummedSolutionDataForScenarios(scenarios);
 
-    const workingDirectory = OutputProjectSummariesService.getProjectTempFolder(
-      projectId,
-    );
+    const workingDirectory =
+      OutputProjectSummariesService.getProjectTempFolder(projectId);
     const csvPath = joinPath(workingDirectory, outputProjectSummaryFolder);
     await this.createCSVFolder(csvPath);
 
@@ -196,9 +193,8 @@ export class OutputProjectSummariesService {
   ): Promise<ProjectScenarioBestSolutionMapping> {
     const data = await Promise.all(
       scenarios.map(async ({ id, projectScenarioId }) => {
-        const bestsolutionData = await this.bestSolutionsDataService.getBestSolutionData(
-          id,
-        );
+        const bestsolutionData =
+          await this.bestSolutionsDataService.getBestSolutionData(id);
         const dataMapping = bestsolutionData.reduce(
           (acc, { planning_unit, selected }) => {
             acc[planning_unit] = selected;

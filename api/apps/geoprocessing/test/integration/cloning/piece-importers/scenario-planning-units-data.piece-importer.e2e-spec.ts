@@ -51,7 +51,8 @@ describe(ScenarioPlanningUnitsDataPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoScenarioPlanningUnitsDataFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoScenarioPlanningUnitsDataFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -60,7 +61,8 @@ describe(ScenarioPlanningUnitsDataPieceImporter, () => {
 
   it('imports scenario planning units data', async () => {
     await fixtures.GivenProjectPus();
-    const archiveLocation = await fixtures.GivenValidScenarioPlanningUnitsDataFile();
+    const archiveLocation =
+      await fixtures.GivenValidScenarioPlanningUnitsDataFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -119,11 +121,12 @@ const getFixtures = async () => {
 
   const scenarioPlanningUnitsAmount = 4;
 
-  const validScenarioPlanningUnitsDataFileContent: ScenarioPlanningUnitsDataContent = {
-    planningUnitsData: Array(scenarioPlanningUnitsAmount)
-      .fill(0)
-      .map((_, index) => getPlanningUnitData(index + 1)),
-  };
+  const validScenarioPlanningUnitsDataFileContent: ScenarioPlanningUnitsDataContent =
+    {
+      planningUnitsData: Array(scenarioPlanningUnitsAmount)
+        .fill(0)
+        .map((_, index) => getPlanningUnitData(index + 1)),
+    };
 
   return {
     cleanUp: async () => {

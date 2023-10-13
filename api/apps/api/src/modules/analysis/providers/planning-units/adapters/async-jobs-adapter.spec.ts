@@ -13,11 +13,11 @@ beforeEach(async () => {
     providers: [
       {
         provide: QueueService,
-        useValue: ({
-          queue: ({
+        useValue: {
+          queue: {
             add: addJobMock,
-          } as unknown) as Queue,
-        } as unknown) as QueueService<JobInput>,
+          } as unknown as Queue,
+        } as unknown as QueueService<JobInput>,
       },
       AsyncJobsAdapter,
     ],

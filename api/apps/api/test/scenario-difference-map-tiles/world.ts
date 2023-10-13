@@ -40,12 +40,13 @@ export const createWorld = async (app: INestApplication) => {
     })
   ).data.id;
 
-  const scenariosPuData: Repository<ScenariosPlanningUnitGeoEntity> = await app.get(
-    getRepositoryToken(
-      ScenariosPlanningUnitGeoEntity,
-      DbConnections.geoprocessingDB,
-    ),
-  );
+  const scenariosPuData: Repository<ScenariosPlanningUnitGeoEntity> =
+    await app.get(
+      getRepositoryToken(
+        ScenariosPlanningUnitGeoEntity,
+        DbConnections.geoprocessingDB,
+      ),
+    );
 
   return {
     scenarioIdA,

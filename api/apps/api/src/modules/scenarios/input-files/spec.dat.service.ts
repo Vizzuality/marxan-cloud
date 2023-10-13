@@ -30,8 +30,9 @@ export class SpecDatService {
   ) {}
 
   async getSpecDatContent(scenarioId: string): Promise<string> {
-    const rows: ScenarioFeaturesDataForSpecDat[] = await this.scenarioFeaturesData.query(
-      `
+    const rows: ScenarioFeaturesDataForSpecDat[] =
+      await this.scenarioFeaturesData.query(
+        `
       with grouped_feature as (
         select min(sfd.feature_id) as min_feature_id
         from public.scenario_features_data as sfd
@@ -60,8 +61,8 @@ export class SpecDatService {
       left join scenario_features_data as sfd on feature_id = grouped_feature.min_feature_id AND sfd.scenario_id = $1
       order by feature_id
     `,
-      [scenarioId],
-    );
+        [scenarioId],
+      );
 
     /**
      * Add feature names to exported data: mainly meant to be useful when users
@@ -72,9 +73,8 @@ export class SpecDatService {
      * any case (even when generating spec.dat files to feed to the Marxan
      * solver within the platform).
      */
-    const rowsWithFeatureNames = await this.extendSpecDatContentWithFeatureNames(
-      rows,
-    );
+    const rowsWithFeatureNames =
+      await this.extendSpecDatContentWithFeatureNames(rows);
 
     const specDatFile = new SpecDataTsvFile();
     for (const row of rowsWithFeatureNames) {

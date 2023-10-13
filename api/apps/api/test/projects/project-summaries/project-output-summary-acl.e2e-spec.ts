@@ -1,5 +1,8 @@
 import { bootstrapApplication } from '../../utils/api-application';
-import { GivenUserIsLoggedIn, userObj } from '../../steps/given-user-is-logged-in';
+import {
+  GivenUserIsLoggedIn,
+  userObj,
+} from '../../steps/given-user-is-logged-in';
 import { GivenUserIsCreated } from '../../steps/given-user-is-created';
 import { GivenProjectExists } from '../../steps/given-project';
 import { Repository } from 'typeorm';
@@ -38,9 +41,8 @@ async function getFixtures() {
   const { projectId } = await GivenProjectExists(app, ownerToken);
 
   const projectRepo: Repository<Project> = app.get(getRepositoryToken(Project));
-  const outputProjectSummariesRepo: Repository<OutputProjectSummaryApiEntity> = app.get(
-    getRepositoryToken(OutputProjectSummaryApiEntity),
-  );
+  const outputProjectSummariesRepo: Repository<OutputProjectSummaryApiEntity> =
+    app.get(getRepositoryToken(OutputProjectSummaryApiEntity));
 
   return {
     cleanup: async () => {

@@ -151,11 +151,12 @@ export class SelectionGetService {
       };
     }
 
-    const wdpaAreas = await this.findAllWDPAProtectedAreasInPlanningAreaByIUCNCategory(
-      res.id,
-      res.tableName,
-      wdpaCategories,
-    );
+    const wdpaAreas =
+      await this.findAllWDPAProtectedAreasInPlanningAreaByIUCNCategory(
+        res.id,
+        res.tableName,
+        wdpaCategories,
+      );
 
     /**
      * There may be multiple WDPA Areas per single WDPA Category

@@ -35,9 +35,8 @@ export class BlmPartialResultsRepository {
       blmValue,
     );
 
-    const puidList = await this.blmPuidsBestService.getPuidFromBestRun(
-      workspace,
-    );
+    const puidList =
+      await this.blmPuidsBestService.getPuidFromBestRun(workspace);
 
     const filteredPuidList = puidList
       .filter((puidRow) => puidRow.solution !== 0)

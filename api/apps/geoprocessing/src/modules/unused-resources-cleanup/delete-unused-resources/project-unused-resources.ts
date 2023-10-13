@@ -13,7 +13,8 @@ export type ProjectUnusedResourcesData = { projectCustomFeaturesIds: string[] };
 
 @Injectable()
 export class ProjectUnusedResources
-  implements UnusedResources<ProjectUnusedResourcesData> {
+  implements UnusedResources<ProjectUnusedResourcesData>
+{
   constructor(
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,

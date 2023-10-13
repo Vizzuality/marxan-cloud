@@ -18,9 +18,10 @@ export class LegacyProjectImportPiecesModule implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const legacyProjectPieceImporterProviders = await this.discovery.providersWithMetaAtKey<symbol>(
-      LegacyProjectImportPieceProcessorToken,
-    );
+    const legacyProjectPieceImporterProviders =
+      await this.discovery.providersWithMetaAtKey<symbol>(
+        LegacyProjectImportPieceProcessorToken,
+      );
 
     // TODO: should ensure this is a class instance that implements PieceProcessor
     // shouldn't happen tho if decorator is used as intended.

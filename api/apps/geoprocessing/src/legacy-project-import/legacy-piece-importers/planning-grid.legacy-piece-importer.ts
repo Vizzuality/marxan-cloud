@@ -31,7 +31,8 @@ type GeomIdAndPuid = {
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class PlanningGridLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     PlanningGridLegacyProjectPieceImporter.name,
   );

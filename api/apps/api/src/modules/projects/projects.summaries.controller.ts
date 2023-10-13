@@ -1,27 +1,28 @@
 import {
-  Controller, Get,
-  Header, Param, Req,
-  Res, UseGuards
+  Controller,
+  Get,
+  Header,
+  Param,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
 
 import {
-  ApiBearerAuth, ApiOperation,
+  ApiBearerAuth,
+  ApiOperation,
   ApiParam,
   ApiProduces,
-  ApiTags
+  ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
-import {
-  ProjectsService
-} from './projects.service';
+import { ProjectsService } from './projects.service';
 import { isLeft } from 'fp-ts/Either';
 import { Response } from 'express';
-import {
-  ImplementsAcl
-} from '@marxan-api/decorators/acl.decorator';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { outputProjectSummaryResource } from './output-project-summaries/output-project-summary.api.entity';
 
@@ -30,9 +31,7 @@ import { outputProjectSummaryResource } from './output-project-summaries/output-
 @ApiTags('Project - Marxan summaries')
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectSummariesController {
-  constructor(
-    private readonly projectsService: ProjectsService,
-  ) {}
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @ImplementsAcl()
   @ApiOperation({

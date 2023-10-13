@@ -177,9 +177,7 @@ export class TestClientApi {
       jwt: string,
       data = E2E_CONFIG.projects.valid.minimal(),
     ): Promise<ProjectResultSingular> => {
-      const {
-        body: organizationResponse,
-      } = await this.requests.organizations
+      const { body: organizationResponse } = await this.requests.organizations
         .createOrganization(jwt, E2E_CONFIG.organizations.valid.minimal())
         .expect(HttpStatus.CREATED);
 
@@ -199,9 +197,7 @@ export class TestClientApi {
       projectData = E2E_CONFIG.projects.valid.minimal(),
       scenarioData = E2E_CONFIG.scenarios.valid.minimal(),
     ) => {
-      const {
-        body: organizationResponse,
-      } = await this.requests.organizations
+      const { body: organizationResponse } = await this.requests.organizations
         .createOrganization(jwt, E2E_CONFIG.organizations.valid.minimal())
         .expect(HttpStatus.CREATED);
 

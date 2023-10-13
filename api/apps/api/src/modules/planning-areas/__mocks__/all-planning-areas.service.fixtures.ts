@@ -15,7 +15,8 @@ import { CountryPlanningAreasService } from '../country-planning-areas.service';
 
 export async function getFixtures() {
   class FakeCustomPlanningAreaRepository
-    implements FieldsOf<CustomPlanningAreaRepository> {
+    implements FieldsOf<CustomPlanningAreaRepository>
+  {
     db: Record<string, { bbox: BBox; projectId?: string }> = {};
 
     async getBBox(id: string) {
@@ -42,7 +43,8 @@ export async function getFixtures() {
   >;
 
   class FakeAdminPlanningAreasRepository
-    implements FieldsOf<AdminPlanningAreasRepository> {
+    implements FieldsOf<AdminPlanningAreasRepository>
+  {
     db: Record<string, FakeAdminArea> = {};
 
     async findAdminAreaGidsAndBBox(id: string) {
@@ -61,7 +63,8 @@ export async function getFixtures() {
   type FakeCountry = Pick<Country, 'gid0' | 'name0' | 'bbox' | 'id'>;
 
   class FakeCountriesService
-    implements Pick<CountriesService, 'getIdAndNameByGid0' | 'getBBoxByGid0'> {
+    implements Pick<CountriesService, 'getIdAndNameByGid0' | 'getBBoxByGid0'>
+  {
     db: Record<string, FakeCountry> = {};
 
     async getIdAndNameByGid0(country: string) {

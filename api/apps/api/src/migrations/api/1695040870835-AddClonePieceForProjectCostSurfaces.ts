@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddClonePieceForProjectCostSurfaces1695040870835
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `ALTER TYPE clone_piece_enum ADD VALUE 'project-cost-surfaces'`,

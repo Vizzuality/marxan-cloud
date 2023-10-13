@@ -18,7 +18,8 @@ import {
 } from '../domain/legacy-project-import-files.repository';
 
 export class LegacyProjectImportFilesLocalRepository
-  implements LegacyProjectImportFilesRepository {
+  implements LegacyProjectImportFilesRepository
+{
   constructor(
     @Inject(LegacyProjectImportStoragePath)
     private readonly storagePath: string,

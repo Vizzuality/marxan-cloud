@@ -143,13 +143,17 @@ export class PublishedProjectCrudService extends AppBaseService<
       return entitiesAndCount;
     }
 
-    const extendedEntities: PublishedProject[] = await removeExportIdsForUnfinishedExports(
-      entitiesAndCount[0],
-      this.exportRepo,
-    ).then(
-      async (exportIdProcessedEntities) =>
-        await addOwnerEmails(exportIdProcessedEntities, this.usersProjectsRepo),
-    );
+    const extendedEntities: PublishedProject[] =
+      await removeExportIdsForUnfinishedExports(
+        entitiesAndCount[0],
+        this.exportRepo,
+      ).then(
+        async (exportIdProcessedEntities) =>
+          await addOwnerEmails(
+            exportIdProcessedEntities,
+            this.usersProjectsRepo,
+          ),
+      );
 
     return [extendedEntities, entitiesAndCount[1]];
   }

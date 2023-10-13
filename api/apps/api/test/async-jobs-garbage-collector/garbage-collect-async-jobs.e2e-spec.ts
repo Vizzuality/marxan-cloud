@@ -203,27 +203,23 @@ const getFixtures = async () => {
       );
     },
     ThenFailedApiEventsHasBeenSendForAsyncJobs: async (projectId: string) => {
-      const projectFailedApiEventsFound = await getProjectFailedApiEvents(
-        projectId,
-      );
+      const projectFailedApiEventsFound =
+        await getProjectFailedApiEvents(projectId);
       expect(projectFailedApiEventsFound).toHaveLength(
         projectFailedApiEvents.length,
       );
-      const scenarioFailedApiEventsFound = await getScenarioFailedApiEvents(
-        scenarioId,
-      );
+      const scenarioFailedApiEventsFound =
+        await getScenarioFailedApiEvents(scenarioId);
       expect(scenarioFailedApiEventsFound).toHaveLength(
         scenarioFailedApiEvents.length,
       );
     },
     ThenNoFailedApiEventsHasBeenSendForAsyncJobs: async (projectId: string) => {
-      const projectFailedApiEventsFound = await getProjectFailedApiEvents(
-        projectId,
-      );
+      const projectFailedApiEventsFound =
+        await getProjectFailedApiEvents(projectId);
       expect(projectFailedApiEventsFound).toHaveLength(0);
-      const scenarioFailedApiEventsFound = await getScenarioFailedApiEvents(
-        scenarioId,
-      );
+      const scenarioFailedApiEventsFound =
+        await getScenarioFailedApiEvents(scenarioId);
       expect(scenarioFailedApiEventsFound).toHaveLength(0);
     },
   };

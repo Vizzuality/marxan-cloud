@@ -16,9 +16,9 @@ export const getFromShapeFileJob = (
     } as Express.Multer.File,
     scenarioId,
   };
-  return ({
+  return {
     data: input,
-  } as unknown) as Job<FromShapefileJobInput, true>;
+  } as unknown as Job<FromShapefileJobInput, true>;
 };
 
 export const getInitialCostJob = (
@@ -27,11 +27,11 @@ export const getInitialCostJob = (
   const input: InitialCostJobInput = {
     scenarioId,
   };
-  return ({
+  return {
     data: input,
-  } as unknown) as Job<InitialCostJobInput, true>;
+  } as unknown as Job<InitialCostJobInput, true>;
 };
 
 export const getUnknownJob = (): Job<JobInput, true> => {
-  return ({ data: {} } as unknown) as Job<JobInput, true>;
+  return { data: {} } as unknown as Job<JobInput, true>;
 };

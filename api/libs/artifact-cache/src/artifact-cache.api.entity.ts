@@ -55,4 +55,5 @@ export const createProjectTemplateFileCacheFields = [
 ] as const;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const typecheckFields: readonly (keyof ArtifactCache)[] = createProjectTemplateFileCacheFields;
+const typecheckFields: readonly (keyof ArtifactCache)[] =
+  createProjectTemplateFileCacheFields;

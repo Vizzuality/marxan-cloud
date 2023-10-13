@@ -67,10 +67,8 @@ describe('Typeorm export repository', () => {
     const projectId = fixtures.GivenProject();
     await fixtures.GivenMultipleExports(projectId);
 
-    const {
-      threeLatestExports,
-      tenLatestExports,
-    } = await fixtures.WhenRequestingLatestStandaloneExports(projectId);
+    const { threeLatestExports, tenLatestExports } =
+      await fixtures.WhenRequestingLatestStandaloneExports(projectId);
 
     fixtures.ThenFilteredExportsShouldBeReturned(
       threeLatestExports,
@@ -79,10 +77,8 @@ describe('Typeorm export repository', () => {
   });
 
   it('should delete an import when export is deleted', async () => {
-    const {
-      exportId,
-      importId,
-    } = await fixtures.GivenExportWithImportWasRequested();
+    const { exportId, importId } =
+      await fixtures.GivenExportWithImportWasRequested();
     await fixtures.WhenExportIsDeleted(exportId, importId);
     await fixtures.ThenExportAndImportDoesNotExist(exportId, importId);
   });

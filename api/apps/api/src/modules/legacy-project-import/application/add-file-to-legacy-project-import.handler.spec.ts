@@ -36,7 +36,8 @@ beforeEach(async () => {
 });
 
 it('adds a file to legacy project import', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
 
   await fixtures
@@ -49,7 +50,8 @@ it('adds a file to legacy project import', async () => {
 });
 
 it('overrides a file of legacy project import', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
 
   const fileType = LegacyProjectImportFileType.InputDat;
@@ -82,7 +84,8 @@ it('fails if legacy project import is not found', async () => {
 });
 
 it('fails if a user tries to add a file to a not owned legacy project import', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
 
   await fixtures
@@ -96,7 +99,8 @@ it('fails if a user tries to add a file to a not owned legacy project import', a
 });
 
 it('fails if given file cannot be stored', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
 
   await fixtures
@@ -110,9 +114,12 @@ it('fails if given file cannot be stored', async () => {
 });
 
 it('fails if legacy project import has already started', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
-    { files: [], isAcceptingFiles: false, pieces: [] },
-  );
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested({
+      files: [],
+      isAcceptingFiles: false,
+      pieces: [],
+    });
   const { projectId } = legacyProjectImport.toSnapshot();
 
   await fixtures
@@ -125,7 +132,8 @@ it('fails if legacy project import has already started', async () => {
 });
 
 it('fails if legacy project import aggregate cannot be persisted', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const legacyProjectImport =
+    await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
 
   await fixtures
@@ -265,13 +273,14 @@ const getFixtures = async () => {
 
           expect(result).toMatchObject({ left: unknownError });
         },
-        ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned: async () => {
-          const result = await sut.execute(command);
+        ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned:
+          async () => {
+            const result = await sut.execute(command);
 
-          expect(result).toMatchObject({
-            left: legacyProjectImportAlreadyStarted,
-          });
-        },
+            expect(result).toMatchObject({
+              left: legacyProjectImportAlreadyStarted,
+            });
+          },
         ThenLegacyProjectImportSaveErrorShouldBeReturned: async () => {
           const result = await sut.execute(command);
 

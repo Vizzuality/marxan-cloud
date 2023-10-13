@@ -8,7 +8,8 @@ import { MarkImportAsSubmitted } from './mark-import-as-submitted.command';
 
 @CommandHandler(MarkImportAsSubmitted)
 export class MarkImportAsSubmittedHandler
-  implements IInferredCommandHandler<MarkImportAsSubmitted> {
+  implements IInferredCommandHandler<MarkImportAsSubmitted>
+{
   private readonly logger: Logger = new Logger(
     MarkImportAsSubmittedHandler.name,
   );

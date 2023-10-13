@@ -94,14 +94,15 @@ export class GeoFeaturePropertySetService {
     const idsOfFeaturesInGeoprocessingOperations = new Set(
       flatten(
         specification.features
-          .map((feature) =>
-            feature.geoprocessingOperations
-              ?.map((op) => {
-                if (op.kind === 'stratification/v1') {
-                  return op.intersectWith.featureId;
-                }
-              })
-              .filter((id): id is string => !!id),
+          .map(
+            (feature) =>
+              feature.geoprocessingOperations
+                ?.map((op) => {
+                  if (op.kind === 'stratification/v1') {
+                    return op.intersectWith.featureId;
+                  }
+                })
+                .filter((id): id is string => !!id),
           )
           .filter((id): id is string[] => !!id),
       ),
@@ -119,14 +120,16 @@ export class GeoFeaturePropertySetService {
       where: { id: In(idsOfFeaturesInSpecification) },
     });
     Logger.debug(inspect(featuresInSpecification));
-    const metadataForFeaturesInSpecification = await this.getFeaturePropertySetsForFeatures(
-      idsOfFeaturesInSpecification,
-      project?.bbox,
-    );
-    const featuresInSpecificationWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
-      featuresInSpecification,
-      metadataForFeaturesInSpecification,
-    );
+    const metadataForFeaturesInSpecification =
+      await this.getFeaturePropertySetsForFeatures(
+        idsOfFeaturesInSpecification,
+        project?.bbox,
+      );
+    const featuresInSpecificationWithPropertiesMetadata =
+      this.extendGeoFeaturesWithPropertiesFromPropertySets(
+        featuresInSpecification,
+        metadataForFeaturesInSpecification,
+      );
     return {
       status: specification.status,
       features: specification.features.map((feature) => {

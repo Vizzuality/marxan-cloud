@@ -56,12 +56,8 @@ export class FeatureAmountUploadService {
       );
       await this.events.createEvent(data);
       // saving feature data to temporary table
-      const featuresRegistry:
-        | Left<any>
-        | Right<FeatureAmountUploadRegistry> = await this.saveCsvToRegistry(
-        data,
-        apiQueryRunner,
-      );
+      const featuresRegistry: Left<any> | Right<FeatureAmountUploadRegistry> =
+        await this.saveCsvToRegistry(data, apiQueryRunner);
 
       if (isLeft(featuresRegistry)) {
         // Some validations done while parsing csv in stream return nested Left object when being rejected as left
@@ -367,9 +363,7 @@ export class FeatureAmountUploadService {
     return maxInputPuid <= maxDbPuid.maxPuid;
   }
 
-  private getFeatureNamesAndPuids(
-    parsedCsv: FeatureAmountCSVDto[],
-  ): {
+  private getFeatureNamesAndPuids(parsedCsv: FeatureAmountCSVDto[]): {
     featureNames: string[];
     puids: number[];
   } {

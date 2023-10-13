@@ -13,7 +13,8 @@ export const queueName = 'project-template-creation';
 
 @Injectable()
 export class ProjectTemplateWorkerProcessor
-  implements WorkerProcessor<void, void> {
+  implements WorkerProcessor<void, void>
+{
   private readonly worker: Worker;
   private readonly logger = new Logger(this.constructor.name);
 

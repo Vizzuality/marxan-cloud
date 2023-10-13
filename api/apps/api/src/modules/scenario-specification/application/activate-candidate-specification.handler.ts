@@ -16,7 +16,8 @@ import { ScenarioSpecificationRepo } from './scenario-specification.repo';
 
 @CommandHandler(ActivateCandidateSpecification)
 export class ActivateCandidateSpecificationHandler
-  implements IInferredCommandHandler<ActivateCandidateSpecification> {
+  implements IInferredCommandHandler<ActivateCandidateSpecification>
+{
   constructor(
     private readonly scenarioSpecificationRepo: ScenarioSpecificationRepo,
     private readonly eventPublisher: EventPublisher,
@@ -26,16 +27,14 @@ export class ActivateCandidateSpecificationHandler
     specificationId,
     scenarioId,
   }: ActivateCandidateSpecification): Promise<Either<ActivateError, void>> {
-    const targetSpecification = await this.scenarioSpecificationRepo.find(
-      scenarioId,
-    );
+    const targetSpecification =
+      await this.scenarioSpecificationRepo.find(scenarioId);
 
     if (!targetSpecification) {
       return left(scenarioSpecificationNotFound);
     }
-    const scenarioSpecification = this.eventPublisher.mergeObjectContext(
-      targetSpecification,
-    );
+    const scenarioSpecification =
+      this.eventPublisher.mergeObjectContext(targetSpecification);
     const result = scenarioSpecification.activateCandidateSpecification(
       new SpecificationId(specificationId),
     );

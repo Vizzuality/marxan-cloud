@@ -190,14 +190,13 @@ const getFixtures = async () => {
             },
           });
 
-          const [project]: [
-            { planning_area_geometry_id: string },
-          ] = await entityManager
-            .createQueryBuilder()
-            .select()
-            .from('projects', 'p')
-            .where('id = :projectId', { projectId: input.projectId })
-            .execute();
+          const [project]: [{ planning_area_geometry_id: string }] =
+            await entityManager
+              .createQueryBuilder()
+              .select()
+              .from('projects', 'p')
+              .where('id = :projectId', { projectId: input.projectId })
+              .execute();
 
           expect(project).toBeDefined();
           expect(project.planning_area_geometry_id).toEqual(planningArea.id);

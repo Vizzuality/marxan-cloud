@@ -191,7 +191,8 @@ async function getFixtures() {
         id: v4(),
         singleSplitFeature: {
           baseFeatureId,
-          operation: SpecificationOperation.Split as SpecificationOperation.Split,
+          operation:
+            SpecificationOperation.Split as SpecificationOperation.Split,
           splitByProperty,
           subset,
         },

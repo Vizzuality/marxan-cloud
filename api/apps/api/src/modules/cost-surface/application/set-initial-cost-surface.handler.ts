@@ -21,7 +21,8 @@ import {
  */
 @CommandHandler(SetInitialCostSurface)
 export class SetInitialCostSurfaceHandler
-  implements IInferredCommandHandler<SetInitialCostSurface> {
+  implements IInferredCommandHandler<SetInitialCostSurface>
+{
   private readonly logger: Logger = new Logger(
     SetInitialCostSurfaceHandler.name,
   );

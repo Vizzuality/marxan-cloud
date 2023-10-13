@@ -17,7 +17,8 @@ import {
 @Injectable()
 @PieceImportProvider()
 export class ProjectCustomProtectedAreasPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
   private readonly logger: Logger = new Logger(
     ProjectCustomProtectedAreasPieceImporter.name,
   );
@@ -58,9 +59,8 @@ export class ProjectCustomProtectedAreasPieceImporter
       const buffer = await readableToBuffer(readableOrError.right);
       const customProjectProtectedAreasrError = buffer.toString();
 
-      const customProjectProtectedAreas: ProjectCustomProtectedAreasContent[] = JSON.parse(
-        customProjectProtectedAreasrError,
-      );
+      const customProjectProtectedAreas: ProjectCustomProtectedAreasContent[] =
+        JSON.parse(customProjectProtectedAreasrError);
 
       if (customProjectProtectedAreas.length) {
         await this.geoprocessingEntityManager.transaction(async (em) => {
