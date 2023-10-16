@@ -1,3 +1,4 @@
+
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddTokenIdColumnToLocks1645026803969

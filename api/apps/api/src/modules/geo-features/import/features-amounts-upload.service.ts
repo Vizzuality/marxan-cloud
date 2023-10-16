@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { DataSource, EntityManager, QueryRunner } from 'typeorm';
 import { InjectDataSource, InjectEntityManager } from '@nestjs/typeorm';
@@ -6,6 +12,7 @@ import { featureAmountCsvParser } from '@marxan-api/modules/geo-features/import/
 import { FeatureAmountCSVDto } from '@marxan-api/modules/geo-features/dto/feature-amount-csv.dto';
 import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
 import {
+  GeoFeaturesService,
   importedFeatureNameAlreadyExist,
   unknownPuidsInFeatureAmountCsvUpload,
 } from '@marxan-api/modules/geo-features/geo-features.service';
@@ -19,6 +26,7 @@ import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-s
 import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/features-amounts-data.api.entity';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { ProjectSourcesEnum } from '@marxan/projects';
+import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -33,6 +41,8 @@ export class FeatureAmountUploadService {
     @InjectEntityManager(DbConnections.default)
     private readonly apiEntityManager: EntityManager,
     private readonly events: FeatureImportEventsService,
+    @Inject(forwardRef(() => GeoFeaturesService))
+    private readonly geoFeaturesService: GeoFeaturesService,
   ) {}
 
   async uploadFeatureFromCsv(data: {
@@ -105,6 +115,12 @@ export class FeatureAmountUploadService {
         data.projectId,
         ProjectSourcesEnum.legacyImport,
         apiQueryRunner.manager,
+      );
+
+      this.logger.log(`Saving min and max amounts for new features...`);
+
+      await this.geoFeaturesService.saveAmountRangeForFeatures(
+        newFeaturesFromCsvUpload.map((feature) => feature.id),
       );
 
       this.logger.log(`Csv file upload process finished successfully`);
@@ -211,7 +227,7 @@ export class FeatureAmountUploadService {
     queryRunner: QueryRunner,
     uploadId: string,
     projectId: string,
-  ) {
+  ): Promise<GeoFeature[]> {
     const newFeaturesToCreate = (
       await queryRunner.manager
         .createQueryBuilder()

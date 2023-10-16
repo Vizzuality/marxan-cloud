@@ -178,16 +178,28 @@ export class ProjectsService {
       return project;
     }
 
-    return right(
-      await this.geoCrud.findAllPaginated(fetchSpec, {
-        ...appInfo,
-        params: {
-          ...appInfo.params,
-          projectId: project.right.id,
-          bbox: project.right.bbox,
-        },
+    const result = await this.geoCrud.findAllPaginated(fetchSpec, {
+      ...appInfo,
+      params: {
+        ...appInfo.params,
+        projectId: project.right.id,
+        bbox: project.right.bbox,
+      },
+    });
+
+    const resultWithMappedAmountRange = {
+      data: result.data.map((feature) => {
+        if (feature?.amountMax || feature?.amountMin) {
+          return {
+            ...feature,
+            amountRange: { min: feature.amountMin, max: feature.amountMax },
+          };
+        }
       }),
-    );
+      metadata: result.metadata,
+    };
+
+    return right(resultWithMappedAmountRange);
   }
 
   async findAll(fetchSpec: FetchSpecification, info: ProjectsServiceRequest) {
