@@ -32,6 +32,8 @@ type ProjectCustomFeaturesSelectResult = {
   list_property_keys: string[];
   is_legacy: boolean;
   tag: string;
+  amount_min: number | null;
+  amount_max: number | null;
 };
 
 type FeaturesDataSelectResult = {
@@ -81,6 +83,8 @@ export class ProjectCustomFeaturesPieceExporter
           'f.creation_status',
           'f.list_property_keys',
           'f.is_legacy',
+          'f.min_amount',
+          'f.max_amount',
           'pft.tag',
         ])
         .from('features', 'f')
