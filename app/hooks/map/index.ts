@@ -403,11 +403,11 @@ export function useTargetedPreviewLayers({
       const ID = splitted ? parentId : id;
 
       const COLOR =
-        selectedFeatures.length > COLORS['features-preview'].ramp.length
-          ? chroma.scale(COLORS['features-preview'].ramp).colors(selectedFeatures.length)[
+        selectedFeatures.length > COLORS.features.ramp.length
+          ? chroma.scale(COLORS.features.ramp).colors(selectedFeatures.length)[
               selectedFeatures.length - 1 - index
             ]
-          : COLORS['features-preview'].ramp[selectedFeatures.length - 1 - index];
+          : COLORS.features.ramp[selectedFeatures.length - 1 - index];
 
       return {
         id: `feature-${id}-targeted-preview-layer-${cache}`,
@@ -770,8 +770,12 @@ export function usePUGridLayer({
                       ['get', 'costValue'],
                       cost.min === cost.max ? 0 : cost.min,
                       COLORS.cost[0],
-                      cost.max,
+                      cost.max * 0.33,
                       COLORS.cost[1],
+                      cost.max * 0.66,
+                      COLORS.cost[2],
+                      cost.max,
+                      COLORS.cost[3],
                     ],
                     'fill-opacity': 0.75 * CostOpacity,
                   },
@@ -902,7 +906,7 @@ export function usePUGridLayer({
                   },
                   filter: ['all', ['in', `-${runId}-`, ['get', 'valuePosition']]],
                   paint: {
-                    'fill-color': COLORS.primary,
+                    'fill-color': COLORS.solution,
                     'fill-opacity': 0.75 * SolutionOpacity,
                   },
                 },

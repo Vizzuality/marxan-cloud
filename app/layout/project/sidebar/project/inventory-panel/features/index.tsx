@@ -57,9 +57,9 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
       select: ({ data }) => {
         return data?.map((feature, index) => {
           const color =
-            data.length > COLORS['features-preview'].ramp.length
-              ? chroma.scale(COLORS['features-preview'].ramp).colors(data.length)[index]
-              : COLORS['features-preview'].ramp[index];
+            data.length > COLORS.features.ramp.length
+              ? chroma.scale(COLORS.features.ramp).colors(data.length)[index]
+              : COLORS.features.ramp[index];
 
           return {
             id: feature.id,

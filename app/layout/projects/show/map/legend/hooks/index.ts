@@ -115,9 +115,9 @@ export const useFeatureAbundanceLegend = () => {
     projectFeaturesQuery.data?.map(
       ({ id, featureClassName, amountRange = { min: 5000, max: 100000 } }, index) => {
         const color =
-          totalItems > COLORS['features-preview'].ramp.length
-            ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
-            : COLORS['features-preview'].ramp[index];
+          totalItems > COLORS.features.ramp.length
+            ? chroma.scale(COLORS.features.ramp).colors(totalItems)[index]
+            : COLORS.features.ramp[index];
 
         return {
           id,
@@ -166,9 +166,9 @@ export const useFeaturesLegend = () => {
   const items =
     projectFeaturesQuery.data?.map(({ id, featureClassName }, index) => {
       const color =
-        totalItems > COLORS['features-preview'].ramp.length
-          ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
-          : COLORS['features-preview'].ramp[index];
+        totalItems > COLORS.features.ramp.length
+          ? chroma.scale(COLORS.features.ramp).colors(totalItems)[index]
+          : COLORS.features.ramp[index];
 
       return {
         id,
