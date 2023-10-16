@@ -1,7 +1,11 @@
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedFeatures, setLayerSettings } from 'store/slices/projects/[id]';
+import {
+  setSelectedFeatures,
+  setLayerSettings,
+  setSelectedWDPAs as setVisibleWDPAs,
+} from 'store/slices/projects/[id]';
 
 import chroma from 'chroma-js';
 
@@ -69,7 +73,9 @@ export const useConservationAreasLegend = () => {
   const { query } = useRouter();
   const { pid } = query as { pid: string };
   const dispatch = useAppDispatch();
-  const { layerSettings } = useAppSelector((state) => state['/projects/[id]']);
+  const { layerSettings, selectedWDPAs: visibleWDPAs } = useAppSelector(
+    (state) => state['/projects/[id]']
+  );
 
   const protectedAreaQuery = useProjectWDPAs(
     pid,
@@ -82,6 +88,16 @@ export const useConservationAreasLegend = () => {
   return LEGEND_LAYERS['designated-areas']({
     items: protectedAreaQuery?.data,
     onChangeVisibility: (WDPAId: WDPA['id']) => {
+      const newSelectedWDPAs = [...visibleWDPAs];
+      const isIncluded = newSelectedWDPAs.includes(WDPAId);
+      if (!isIncluded) {
+        newSelectedWDPAs.push(WDPAId);
+      } else {
+        const i = newSelectedWDPAs.indexOf(WDPAId);
+        newSelectedWDPAs.splice(i, 1);
+      }
+
+      dispatch(setVisibleWDPAs(newSelectedWDPAs));
       dispatch(
         setLayerSettings({
           id: WDPAId,
@@ -107,7 +123,9 @@ export const useFeatureAbundanceLegend = () => {
     }
   );
 
-  const { layerSettings } = useAppSelector((state) => state['/projects/[id]']);
+  const { layerSettings, selectedFeatures: visibleFeatures } = useAppSelector(
+    (state) => state['/projects/[id]']
+  );
 
   const totalItems = projectFeaturesQuery.data?.length || 0;
 
@@ -132,6 +150,16 @@ export const useFeatureAbundanceLegend = () => {
     items,
     onChangeVisibility: (featureId: Feature['id']) => {
       const { color, amountRange } = items.find(({ id }) => id === featureId) || {};
+
+      const newSelectedFeatures = [...visibleFeatures];
+      const isIncluded = newSelectedFeatures.includes(featureId);
+      if (!isIncluded) {
+        newSelectedFeatures.push(featureId);
+      } else {
+        const i = newSelectedFeatures.indexOf(featureId);
+        newSelectedFeatures.splice(i, 1);
+      }
+      dispatch(setSelectedFeatures(newSelectedFeatures));
 
       dispatch(
         setLayerSettings({

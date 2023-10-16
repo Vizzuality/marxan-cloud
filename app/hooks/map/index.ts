@@ -688,37 +688,6 @@ export function usePUGridLayer({
           // ANALYSIS - GAP ANALYSIS
           ...(sublayers.includes('features')
             ? [
-                // ...(features?.length
-                //   ? [
-                //       {
-                //         type: 'fill',
-                //         'source-layer': 'layer0',
-                //         layout: {
-                //           visibility: getLayerVisibility(FeaturesVisibility),
-                //         },
-                //         // ...runId && {
-                //         //   filter: [
-                //         //     'all',
-                //         //     ['in', `-${runId}-`, ['get', 'valuePosition']],
-                //         //   ],
-                //         // },
-                //         paint: {
-                //           'fill-color': COLORS.features,
-                //           'fill-opacity': [
-                //             'case',
-                //             [
-                //               'any',
-                //               ...features.map((id) => {
-                //                 return ['in', id, ['get', 'featureList']];
-                //               }),
-                //             ],
-                //             0.5 * FeaturesOpacity,
-                //             0,
-                //           ],
-                //         },
-                //       },
-                //     ]
-                //   : []),
                 ...preHighlightFeatures.map((id) => ({
                   type: 'fill',
                   'source-layer': 'layer0',
