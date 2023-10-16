@@ -33,7 +33,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
           className={cn({
             'my-4 text-sm sm:pr-32': true,
             'text-black underline': !!danger,
-            'text-gray-100': !danger,
+            'text-gray-900': !danger,
           })}
         >
           {description}

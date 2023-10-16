@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { setSelectedWDPAs as setVisibleWDPAs } from 'store/slices/projects/[id]';
+import { setSelectedWDPAs as setVisibleWDPAs, setLayerSettings } from 'store/slices/projects/[id]';
 
 import { useProjectWDPAs } from 'hooks/wdpa';
 
@@ -28,9 +28,11 @@ const InventoryPanelProtectedAreas = ({
 }): JSX.Element => {
   const dispatch = useAppDispatch();
 
-  const { selectedWDPAs: visibleWDPAs, search } = useAppSelector(
-    (state) => state['/projects/[id]']
-  );
+  const {
+    selectedWDPAs: visibleWDPAs,
+    search,
+    layerSettings,
+  } = useAppSelector((state) => state['/projects/[id]']);
 
   const { query } = useRouter();
   const { pid } = query as { pid: string };
@@ -78,13 +80,23 @@ const InventoryPanelProtectedAreas = ({
   const toggleSeeOnMap = useCallback(
     (WDPAId: WDPA['id']) => {
       const newSelectedWDPAs = [...visibleWDPAs];
-      if (!newSelectedWDPAs.includes(WDPAId)) {
+      const isIncluded = newSelectedWDPAs.includes(WDPAId);
+      if (!isIncluded) {
         newSelectedWDPAs.push(WDPAId);
       } else {
         const i = newSelectedWDPAs.indexOf(WDPAId);
         newSelectedWDPAs.splice(i, 1);
       }
       dispatch(setVisibleWDPAs(newSelectedWDPAs));
+
+      dispatch(
+        setLayerSettings({
+          id: WDPAId,
+          settings: {
+            visibility: !isIncluded,
+          },
+        })
+      );
     },
     [dispatch, visibleWDPAs]
   );
@@ -108,7 +120,7 @@ const InventoryPanelProtectedAreas = ({
     name: wdpa.name,
     scenarios: wdpa.scenarioUsageCount,
     isCustom: wdpa.isCustom,
-    isVisibleOnMap: visibleWDPAs?.includes(wdpa.id),
+    isVisibleOnMap: layerSettings[wdpa.id]?.visibility ?? false,
   }));
 
   return (
