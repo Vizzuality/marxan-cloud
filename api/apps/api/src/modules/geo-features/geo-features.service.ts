@@ -41,7 +41,6 @@ import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features'
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
-import { isLeft } from 'fp-ts/Either';
 import { isNil } from 'lodash';
 
 const geoFeatureFilterKeyNames = [
@@ -138,6 +137,7 @@ export class GeoFeaturesService extends AppBaseService<
         'isCustom',
         'tag',
         'scenarioUsageCount',
+        'amountRange',
       ],
       keyForAttribute: 'camelCase',
     };
@@ -833,5 +833,25 @@ export class GeoFeaturesService extends AppBaseService<
       ...feature,
       scenarioUsageCount: usage ? Number(usage.count) : 0,
     } as GeoFeature;
+  }
+
+  async saveAmountRangeForFeatures(featureIds: string[]) {
+    for (const featureId of featureIds) {
+      const minAndMaxAmount = await this.geoEntityManager
+        .createQueryBuilder()
+        .select('MIN(amount)', 'min')
+        .addSelect('MAX(amount)', 'max')
+        .from('puvspr_calculations', 'puvspr')
+        .where('puvspr.feature_id = :featureId', { featureId })
+        .getOneOrFail();
+
+      await this.geoFeaturesRepository.update(
+        { id: featureId },
+        {
+          amountMin: minAndMaxAmount.min,
+          amountMax: minAndMaxAmount.max,
+        },
+      );
+    }
   }
 }

@@ -56,7 +56,6 @@ import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 )
 export class GeoFeaturesController {
   constructor(
-    public readonly service: GeoFeaturesService,
     private readonly geoFeatureService: GeoFeaturesService,
     public readonly geoFeaturesTagService: GeoFeatureTagsService,
     private readonly proxyService: ProxyService,
@@ -75,8 +74,10 @@ export class GeoFeaturesController {
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<GeoFeatureResult> {
-    const results = await this.service.findAllPaginated(fetchSpecification);
-    return this.service.serialize(results.data, results.metadata);
+    const results = await this.geoFeatureService.findAllPaginated(
+      fetchSpecification,
+    );
+    return this.geoFeatureService.serialize(results.data, results.metadata);
   }
 
   @ImplementsAcl()

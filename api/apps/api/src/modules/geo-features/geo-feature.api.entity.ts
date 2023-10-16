@@ -27,6 +27,11 @@ export interface GeoFeatureProperty {
   distinctValues: Array<string | number>;
 }
 
+export type FeatureAmountRange = {
+  min: number | undefined;
+  max: number | undefined;
+};
+
 @Entity('features')
 export class GeoFeature extends BaseEntity {
   @ApiProperty()
@@ -95,6 +100,12 @@ export class GeoFeature extends BaseEntity {
   @Column('boolean', { name: 'is_custom' })
   isCustom?: boolean;
 
+  @Column('float8', { name: 'amount_min' })
+  amountMin?: number;
+
+  @Column('float8', { name: 'amount_max' })
+  amountMax?: number;
+
   @Column('boolean', { name: 'is_legacy' })
   isLegacy!: boolean;
 
@@ -109,6 +120,9 @@ export class GeoFeature extends BaseEntity {
 
   @ApiPropertyOptional()
   scenarioUsageCount?: number;
+
+  @ApiPropertyOptional()
+  amountRange?: FeatureAmountRange;
 }
 
 export class JSONAPIGeoFeaturesData {
