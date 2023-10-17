@@ -17,7 +17,7 @@ export function bulkDeleteCostSurfaceFromProject(
     pid: Project['id'];
     csid: CostSurface['id'];
   }) => {
-    return PROJECTS.delete(`/${pid}/cost-surface/${csid}`, {
+    return PROJECTS.delete(`/${pid}/cost-surfaces/${csid}`, {
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },

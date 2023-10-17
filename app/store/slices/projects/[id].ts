@@ -76,7 +76,7 @@ const projectsDetailSlice = createSlice({
       state.selectedFeatures = action.payload;
     },
     // COST SURFACE
-    setSelectedCostSurfaces: (
+    setSelectedCostSurface: (
       state,
       action: PayloadAction<ProjectShowStateProps['selectedCostSurface']>
     ) => {
@@ -95,7 +95,7 @@ export const {
   setSort,
   setLayerSettings,
   setSelectedFeatures,
-  setSelectedCostSurfaces,
+  setSelectedCostSurface,
   setSelectedWDPAs,
   setSidebarVisibility,
 } = projectsDetailSlice.actions;

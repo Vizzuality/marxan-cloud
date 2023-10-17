@@ -20,6 +20,7 @@ import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
+import { CostSurface } from 'types/api/cost-surface';
 import { Job } from 'types/api/job';
 import { Project } from 'types/api/project';
 import { Scenario } from 'types/api/scenario';
@@ -474,11 +475,11 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   ]);
 }
 
-export function useScenario(id: Scenario['id']) {
+export function useScenario(id: Scenario['id'], params = {}) {
   const { data: session } = useSession();
 
   return useQuery({
-    queryKey: ['scenario', id],
+    queryKey: ['scenario', id, params],
     queryFn: async () =>
       SCENARIOS.request<{ data: Scenario }>({
         method: 'GET',
@@ -486,6 +487,7 @@ export function useScenario(id: Scenario['id']) {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
+        params,
       }).then((response) => response.data),
     enabled: !!id,
     placeholderData: {
@@ -1077,6 +1079,48 @@ export function useDownloadSolutionsSummary() {
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useLinkScenarioToCostSurface() {
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
+
+  const linkScenario = ({ sid, csid }: { sid: Scenario['id']; csid: CostSurface['id'] }) => {
+    return SCENARIOS.request<unknown>({
+      method: 'POST',
+      url: `/${sid}/cost-surface/${csid}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(linkScenario, {
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries(['scenario', variables.sid]);
+    },
+  });
+}
+
+export function useUnlinkScenarioToCostSurface() {
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
+
+  const unlinkScenario = ({ sid }: { sid: Scenario['id'] }) => {
+    return SCENARIOS.request<unknown>({
+      method: 'DELETE',
+      url: `/${sid}/cost-surface`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(unlinkScenario, {
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries(['scenario', variables.sid]);
     },
   });
 }

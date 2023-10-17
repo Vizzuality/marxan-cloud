@@ -5,7 +5,7 @@ import {
   setSelectedFeatures,
   setLayerSettings,
   setSelectedWDPAs as setVisibleWDPAs,
-  setSelectedCostSurfaces as setVisibleCostSurface,
+  setSelectedCostSurface as setVisibleCostSurface,
 } from 'store/slices/projects/[id]';
 
 import chroma from 'chroma-js';

@@ -11,6 +11,7 @@ import { sortBy } from 'lodash';
 import { FiLayers } from 'react-icons/fi';
 
 import { useAccessToken } from 'hooks/auth';
+import { useProjectCostSurface } from 'hooks/cost-surface';
 import { useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
@@ -22,6 +23,7 @@ import {
   // useLegend,
   useBBOX,
   useTargetedPreviewLayers,
+  useCostSurfaceLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario, useScenarioPU } from 'hooks/scenarios';
@@ -49,6 +51,9 @@ import { cn } from 'utils/cn';
 import { centerMap } from 'utils/map';
 
 import { useScenarioLegend } from './legend/hooks';
+
+const minZoom = 2;
+const maxZoom = 20;
 
 export const ScenariosEditMap = (): JSX.Element => {
   const [open, setOpen] = useState(true);
@@ -200,8 +205,8 @@ export const ScenariosEditMap = (): JSX.Element => {
   });
   const bestSolution = bestSolutionData;
 
-  const minZoom = 2;
-  const maxZoom = 20;
+  const costSurfaceQuery = useProjectCostSurface(pid, selectedCostSurface);
+
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState<MapProps['bounds']>(null);
 
@@ -307,32 +312,26 @@ export const ScenariosEditMap = (): JSX.Element => {
     },
   });
 
+  const costSurfaceLayer = useCostSurfaceLayer({
+    active: Boolean(selectedCostSurface) && costSurfaceQuery.isSuccess,
+    pid,
+    costSurfaceId: selectedCostSurface,
+    layerSettings: {
+      ...layerSettings[selectedCostSurface],
+      min: costSurfaceQuery.data?.min,
+      max: costSurfaceQuery.data?.max,
+    } as Parameters<typeof useCostSurfaceLayer>[0]['layerSettings'],
+  });
+
   const LAYERS = [
     // PUGridPreviewLayer,
     // AdminPreviewLayer,
     PUGridLayer,
+    costSurfaceLayer,
     WDPApreviewLayer,
     ...FeaturePreviewLayers,
     ...TargetedPreviewLayers,
   ].filter((l) => !!l);
-
-  // const LEGEND = useLegend({
-  //   layers,
-  //   options: {
-  //     wdpaIucnCategories: protectedAreas,
-  //     wdpaThreshold:
-  //       tab === TABS['scenario-protected-areas'] ? wdpaThreshold : scenarioData?.wdpaThreshold,
-  //     cost: costSurfaceRangeData,
-  //     items: selectedPreviewFeatures,
-  //     puAction,
-  //     puIncludedValue: [...puIncludedValue, ...puTmpIncludedValue],
-  //     puExcludedValue: [...puExcludedValue, ...puTmpExcludedValue],
-  //     puAvailableValue: [...puAvailableValue, ...puTmpAvailableValue],
-  //     runId: selectedSolution?.runId || bestSolution?.runId,
-  //     numberOfRuns: scenarioData?.numberOfRuns || 0,
-  //     layerSettings,
-  //   },
-  // });
 
   useEffect(() => {
     setBounds({
