@@ -16,59 +16,34 @@ import SQUARE_SVG from 'svgs/map/square.svg?sprite';
 import { UseLegend } from './types';
 
 export const COLORS = {
-  primary: '#00BFFF',
-  'features-preview': {
-    default: '#FFCC00',
-    hover: '#FF9900',
-    ramp: [
-      '#4b5eef',
-      '#f15100',
-      '#31a904',
-      '#2c18bd',
-      '#bf3220',
-      '#9d2e38',
-      '#e5e001',
-      '#f15100',
-      '#f4af00',
-      '#218134',
-      '#775b32',
-      '#cb9c00',
-      '#294635',
-      '#ba5da9',
-      '#5c3b85',
-      '#de4210',
-    ],
-  },
-  wdpa: '#12EC80',
-  'wdpa-preview': '#00f',
-  features: '#6F53F7',
+  primary: '#01768F',
+  wdpa: '#5156CB',
+  'wdpa-preview': '#01768F',
   highlightFeatures: '#BE6BFF',
-  abundance: {
-    default: '#FFF',
+  features: {
+    default: '#24242D',
     ramp: [
-      '#4b5eef',
-      '#f15100',
-      '#31a904',
-      '#2c18bd',
-      '#bf3220',
-      '#9d2e38',
-      '#e5e001',
-      '#f15100',
-      '#f4af00',
-      '#218134',
-      '#775b32',
-      '#cb9c00',
-      '#294635',
-      '#ba5da9',
-      '#5c3b85',
-      '#de4210',
+      '#66C379',
+      '#3C8BC4',
+      '#8B91EC',
+      '#E98842',
+      '#51A1B2',
+      '#CFD897',
+      '#BE6BFF',
+      '#B0A6CC',
+      '#71AADF',
+      '#E896BE',
+      '#C48259',
+      '#E9AB42',
+      '#B059B8',
     ],
   },
-  include: '#03E7D1',
-  exclude: '#FF472E',
-  available: '#FFCA42',
-  cost: ['#3C1002', '#FF440A'],
-  frequency: ['#0C2C32', '#006D83', '#008B8C', '#0BC6C2'],
+  include: '#66F39F',
+  exclude: '#FF6847',
+  available: '#F1B61E',
+  cost: ['#292F4D', '#732669', '#DE7239', '#FAFCA8'],
+  frequency: ['#292F4D', '#4D5784', '#99D693', '#FFFFC6'],
+  solution: '#9FD1F7',
   compare: {
     '#1F1F1F': ['00'],
     '#0F0559': ['01', '10', '11'],
@@ -287,9 +262,9 @@ export const LEGEND_LAYERS = {
       },
       items: items.map((item, i) => {
         const COLOR =
-          items.length > COLORS['features-preview'].ramp.length
-            ? chroma.scale(COLORS['features-preview'].ramp).colors(items.length)[i]
-            : COLORS['features-preview'].ramp[i];
+          items.length > COLORS.features.ramp.length
+            ? chroma.scale(COLORS.features.ramp).colors(items.length)[i]
+            : COLORS.features.ramp[i];
 
         return {
           value: item.name,
@@ -351,7 +326,7 @@ export const LEGEND_LAYERS = {
       },
       items: [
         {
-          color: COLORS.abundance.default,
+          color: COLORS.features.default,
           value: `${amountRange.min === amountRange.max ? 0 : amountRange.min}`,
         },
         {
@@ -385,6 +360,14 @@ export const LEGEND_LAYERS = {
         },
         {
           color: COLORS.cost[1],
+          value: null,
+        },
+        {
+          color: COLORS.cost[2],
+          value: null,
+        },
+        {
+          color: COLORS.cost[3],
           value: `${max}`,
         },
       ],
@@ -522,7 +505,7 @@ export const LEGEND_LAYERS = {
       <Icon
         icon={HEXAGON_SVG}
         className="mt-0.5 h-3.5 w-3.5 stroke-current stroke-2"
-        style={{ color: COLORS.primary }}
+        style={{ color: COLORS.solution }}
       />
     ),
     settingsManager: {

@@ -297,9 +297,9 @@ export function useSelectedFeatures(
         }
 
         const color =
-          features.length > COLORS['features-preview'].ramp.length
-            ? chroma.scale(COLORS['features-preview'].ramp).colors(features.length)[index]
-            : COLORS['features-preview'].ramp[index];
+          features.length > COLORS.features.ramp.length
+            ? chroma.scale(COLORS.features.ramp).colors(features.length)[index]
+            : COLORS.features.ramp[index];
 
         return {
           ...d,

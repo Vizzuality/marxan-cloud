@@ -186,13 +186,13 @@ export const ActionsSummary = ({
           <span className="flex flex-1 items-center space-x-2">
             <Icon
               icon={HEXAGON_SVG}
-              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-green-400"
+              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-[#66F39F]"
             />
             <span className="text-sm text-white">Included areas</span>
           </span>
           <span
             className={cn('flex flex-1 items-center justify-center text-sm text-white', {
-              'text-green-400': puAction === 'include',
+              'text-[#66F39F]': puAction === 'include',
             })}
           >
             {puTmpIncludedValue.length + puIncludedValue.length} PU
@@ -225,13 +225,13 @@ export const ActionsSummary = ({
           <span className="flex flex-1 items-center space-x-2">
             <Icon
               icon={HEXAGON_SVG}
-              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-red-700"
+              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-[#FF6847]"
             />
             <span className="text-sm text-white">Excluded areas</span>
           </span>
           <span
             className={cn('flex flex-1 items-center justify-center text-sm text-white', {
-              'text-red-700': puAction === 'exclude',
+              'text-[#FF6847]': puAction === 'exclude',
             })}
           >
             {puTmpExcludedValue.length + puExcludedValue.length} PU
@@ -264,13 +264,13 @@ export const ActionsSummary = ({
           <span className="flex flex-1 items-center space-x-2">
             <Icon
               icon={HEXAGON_SVG}
-              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-yellow-400"
+              className="h-5 w-5 fill-none stroke-current stroke-[1.5px] text-[#F1B61E]"
             />
             <span className="text-sm text-white">Available areas</span>
           </span>
           <span
             className={cn('flex flex-1 items-center justify-center text-sm text-white', {
-              'text-yellow-400': puAction === 'available',
+              'text-[#F1B61E]': puAction === 'available',
             })}
           >
             {puTmpAvailableValue.length + puAvailableValue.length} PU
