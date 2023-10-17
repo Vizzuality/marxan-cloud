@@ -309,6 +309,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                         size="xl"
                         type="submit"
                         onClick={() => setOpened(false)}
+                        disabled={loading}
                       >
                         Save
                       </Button>
