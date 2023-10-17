@@ -252,7 +252,7 @@ export const LEGEND_LAYERS = {
     }));
   },
 
-  'features-preview-new': (options: {
+  'binary-features': (options: {
     items: { id: string; name: string; color: string }[];
     onChangeVisibility: (featureId: Feature['id']) => void;
   }) => {
@@ -314,7 +314,7 @@ export const LEGEND_LAYERS = {
     },
   }),
   // ANALYSIS
-  ['features-abundance']: (options: {
+  ['continuous-features']: (options: {
     items: {
       id: Feature['id'];
       amountRange: { min: number; max: number };
@@ -326,7 +326,7 @@ export const LEGEND_LAYERS = {
     const { items, onChangeVisibility } = options;
 
     return items?.map(({ id, name, amountRange, color }) => ({
-      id: `feature-abundance-${id}`,
+      id,
       name,
       type: 'gradient' as LegendItemType,
       settingsManager: {

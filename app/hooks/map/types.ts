@@ -177,6 +177,7 @@ export interface UsePUGridLayer {
           min: number;
           max: number;
         };
+        color?: string;
       };
     };
   };

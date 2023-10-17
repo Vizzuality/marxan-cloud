@@ -770,7 +770,8 @@ export function usePUGridLayer({
                   const {
                     visibility = true,
                     opacity = 1,
-                    amountRange = { min: 50000, max: 1000000 },
+                    amountRange,
+                    color,
                   } = restLayerSettings[featureId] || {};
 
                   return {
@@ -804,10 +805,9 @@ export function usePUGridLayer({
                           ['linear'],
                           ['var', 'amount'],
                           amountRange.min,
-                          'white', // ! use COLORS.abundance.default instead when is available
+                          COLORS.abundance.default,
                           amountRange.max,
-                          'green',
-                          // color, // ! enable the color variable when we receive it
+                          color,
                         ],
                       ],
                       'fill-opacity': opacity,

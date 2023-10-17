@@ -161,7 +161,7 @@ export const ScenariosEditMap = (): JSX.Element => {
   const sublayers = useMemo(() => {
     return [
       ...(layerSettings['wdpa-percentage']?.visibility ? ['wdpa-percentage'] : []),
-      ...(layerSettings['features']?.visibility ? ['features'] : []),
+      ...(layerSettings['features']?.visibility || selectedFeatures?.length ? ['features'] : []),
       ...(preHighlightFeatures?.length || postHighlightFeatures?.length ? ['features'] : []),
       ...(selectedCostSurface ? ['cost'] : []),
       ...(layerSettings['lock-in']?.visibility ? ['lock-in'] : []),
@@ -170,7 +170,13 @@ export const ScenariosEditMap = (): JSX.Element => {
       ...(layerSettings['frequency']?.visibility ? ['frequency'] : []),
       ...(layerSettings['solution']?.visibility ? ['solution'] : []),
     ];
-  }, [layerSettings, selectedCostSurface, preHighlightFeatures, postHighlightFeatures]);
+  }, [
+    layerSettings,
+    selectedCostSurface,
+    preHighlightFeatures,
+    postHighlightFeatures,
+    selectedFeatures,
+  ]);
 
   const featuresIds = useMemo(() => {
     if (allGapAnalysisData) {

@@ -185,7 +185,7 @@ export const useFeaturesLegend = () => {
     ) || [];
 
   return [
-    ...LEGEND_LAYERS['features-preview-new']({
+    ...LEGEND_LAYERS['binary-features']({
       items: binaryFeaturesItems,
       onChangeVisibility: (featureId: Feature['id']) => {
         const newSelectedFeatures = [...selectedFeatures];
@@ -211,7 +211,7 @@ export const useFeaturesLegend = () => {
         );
       },
     }),
-    ...LEGEND_LAYERS['features-abundance']({
+    ...LEGEND_LAYERS['continuous-features']({
       items: continuousFeaturesItems,
       onChangeVisibility: (featureId: Feature['id']) => {
         const { color, amountRange } =
