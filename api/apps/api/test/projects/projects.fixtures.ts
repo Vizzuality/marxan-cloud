@@ -5,12 +5,12 @@ import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ComponentId, ComponentLocation } from '@marxan/cloning/domain';
 import { HttpStatus } from '@nestjs/common';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { TypeOrmModule, getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import * as request from 'supertest';
-import { Repository } from 'typeorm';
-import { validate, version } from 'uuid';
+import { EntityManager, Repository } from 'typeorm';
+import { v4, validate, version } from 'uuid';
 import { ApiEventsService } from '../../src/modules/api-events';
 import { ApiEventByTopicAndKind } from '../../src/modules/api-events/api-event.topic+kind.api.entity';
 import { CompleteExportPiece } from '../../src/modules/clone/export/application/complete-export-piece.command';
@@ -25,6 +25,17 @@ import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { MultiPolygon } from 'geojson';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { apiConnections } from '@marxan-api/ormconfig';
+
+type ApiErrorResponse = {
+  errors: {
+    status: number;
+    title: string;
+  }[];
+};
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
@@ -35,6 +46,13 @@ export const getFixtures = async () => {
   const publishedProjectsRepo: Repository<PublishedProject> = app.get(
     getRepositoryToken(PublishedProject),
   );
+  const apiEntityManager: EntityManager = app.get(
+    getEntityManagerToken(apiConnections.default),
+  );
+  const geoEntityManager: EntityManager = app.get(
+    getEntityManagerToken(apiConnections.geoprocessingDB),
+  );
+
   const cleanups: (() => Promise<void>)[] = [];
 
   const apiEvents = app.get(ApiEventsService);
@@ -43,6 +61,41 @@ export const getFixtures = async () => {
   const commandBus = app.get(CommandBus);
   const eventBusTestUtils = app.get(EventBusTestUtils);
 
+  const projectId = v4();
+  const organizationId = v4();
+  const planningAreaId = v4();
+
+  const expectedGeom: MultiPolygon = {
+    type: 'MultiPolygon',
+    coordinates: [
+      [
+        [
+          [102.0, 2.0],
+          [103.0, 2.0],
+          [103.0, 3.0],
+          [102.0, 3.0],
+          [102.0, 2.0],
+        ],
+      ],
+      [
+        [
+          [100.0, 0.0],
+          [101.0, 0.0],
+          [101.0, 1.0],
+          [100.0, 1.0],
+          [100.0, 0.0],
+        ],
+        [
+          [100.2, 0.2],
+          [100.8, 0.2],
+          [100.8, 0.8],
+          [100.2, 0.8],
+          [100.2, 0.2],
+        ],
+      ],
+    ],
+  };
+
   eventBusTestUtils.startInspectingEvents();
 
   return {
@@ -50,6 +103,46 @@ export const getFixtures = async () => {
       eventBusTestUtils.stopInspectingEvents();
       await Promise.all(cleanups.map((clean) => clean()));
       await app.close();
+    },
+    GivenPrivateProjectWithCustomPlanningAreaWasCreated: async () => {
+      await GivenProjectExistsV3(apiEntityManager, projectId, organizationId);
+    },
+    GivenCustomPlanningAreaWasCreated: async (): Promise<void> => {
+      await geoEntityManager.query(
+        `
+        insert into planning_areas (id, project_id, the_geom)
+        values
+        ($1, $2, ST_GeomFromGeoJSON($3));
+      `,
+        [planningAreaId, projectId, expectedGeom],
+      );
+    },
+    WhenCreatingAnotherProjectWithSameCustomPlanningArea:
+      async (): Promise<ApiErrorResponse> => {
+        // Here we create the project via an API request, so that the full project
+        // creation lifecycle is triggered, including an attempt to link the
+        // project to an existing planning area.
+        const result = (await ProjectsTestUtils.createProject(
+          app,
+          randomUserToken,
+          {
+            name: 'Test',
+            organizationId,
+            metadata: {},
+            planningAreaId,
+            planningUnitGridShape: PlanningUnitGridShape.FromShapefile,
+            planningUnitAreakm2: 10000,
+          },
+        )) as unknown as ApiErrorResponse;
+        return result;
+      },
+    ThenCreationOfProjectWithAlreadySpentCustomPlanningAreaShouldFail: (
+      projectCreationResult: ApiErrorResponse,
+    ) => {
+      expect(projectCreationResult.errors[0].status).toEqual(500);
+      expect(projectCreationResult.errors[0].title).toMatch(
+        /Planning area [a-f0-9-]{36} is already linked to a project: no new project can be created using it as its own planning area./,
+      );
     },
 
     WhenComparisonMapIsRequested: async (
@@ -547,3 +640,90 @@ export const getFixtures = async () => {
     },
   };
 };
+
+/**
+ * @debt Copy of same function from api/apps/geoprocessing/test/integration/cloning/fixtures.ts
+ *
+ * As `api/apps/api` code cannot rely on code from `api/apps/geoprocessing` (and vice versa),
+ * both instances of the function should be moved to a shared fixtures set in `api/libs` and
+ * imported from there.
+ */
+export function GivenOrganizationExists(
+  em: EntityManager,
+  organizationId: string,
+) {
+  return em
+    .createQueryBuilder()
+    .insert()
+    .into(`organizations`)
+    .values({
+      id: organizationId,
+      name: `test organization - ${organizationId}`,
+    })
+    .execute();
+}
+
+/**
+ * @debt Copy of same function from api/apps/geoprocessing/test/integration/cloning/fixtures.ts
+ *
+ * As `api/apps/api` code cannot rely on code from `api/apps/geoprocessing` (and vice versa),
+ * both instances of the function should be moved to a shared fixtures set in `api/libs` and
+ * imported from there.
+ */
+export async function GivenProjectExistsV3(
+  em: EntityManager,
+  projectId: string,
+  organizationId: string,
+  projectData: Record<string, any> = {},
+  costSurfaceId = v4(),
+) {
+  await GivenOrganizationExists(em, organizationId);
+
+  const insertResult = await em
+    .createQueryBuilder()
+    .insert()
+    .into(`projects`)
+    .values({
+      id: projectId,
+      name: `test project - ${projectId}`,
+      organizationId,
+      planningUnitGridShape: PlanningUnitGridShape.Square,
+      ...projectData,
+    })
+    .execute();
+
+  await GivenDefaultCostSurfaceForProject(em, projectId, costSurfaceId);
+
+  return insertResult;
+}
+
+/**
+ * @debt Copy of same function from api/apps/geoprocessing/test/integration/cloning/fixtures.ts
+ *
+ * As `api/apps/api` code cannot rely on code from `api/apps/geoprocessing` (and vice versa),
+ * both instances of the function should be moved to a shared fixtures set in `api/libs` and
+ * imported from there.
+ */
+async function GivenDefaultCostSurfaceForProject(
+  em: EntityManager,
+  projectId: string,
+  id: string,
+  name?: string,
+) {
+  const nameForCostSurface = name || projectId;
+  return em
+    .createQueryBuilder()
+    .insert()
+    .into(`cost_surfaces`)
+    .values({
+      id,
+      name: `${
+        nameForCostSurface ? nameForCostSurface + ' - ' : ''
+      }Default Cost Surface`,
+      projectId: projectId,
+      min: 0,
+      max: 0,
+      isDefault: true,
+    })
+    .execute();
+}

@@ -82,6 +82,13 @@ export function DeleteUser(em: EntityManager, userId: string) {
     .execute();
 }
 
+/**
+ * @debt A copy of this function is used in api/apps/api/test/projects/projects.fixtures.ts
+ *
+ * As `api/apps/api` code cannot rely on code from `api/apps/geoprocessing` (and vice versa),
+ * both instances of the function should be moved to a shared fixtures set in `api/libs` and
+ * imported from there.
+ */
 export function GivenOrganizationExists(
   em: EntityManager,
   organizationId: string,
@@ -97,6 +104,13 @@ export function GivenOrganizationExists(
     .execute();
 }
 
+/**
+ * @debt A copy of this function is used in api/apps/api/test/projects/projects.fixtures.ts
+ *
+ * As `api/apps/api` code cannot rely on code from `api/apps/geoprocessing` (and vice versa),
+ * both instances of the function should be moved to a shared fixtures set in `api/libs` and
+ * imported from there.
+ */
 export async function GivenProjectExists(
   em: EntityManager,
   projectId: string,
@@ -124,6 +138,13 @@ export async function GivenProjectExists(
   return insertResult;
 }
 
+/**
+ * @debt A copy of this function is used in api/apps/api/test/projects/projects.fixtures.ts
+ *
+ * As `api/apps/api` code cannot rely on code from `api/apps/geoprocessing` (and vice versa),
+ * both instances of the function should be moved to a shared fixtures set in `api/libs` and
+ * imported from there.
+ */
 async function GivenDefaultCostSurfaceForProject(
   em: EntityManager,
   projectId: string,
