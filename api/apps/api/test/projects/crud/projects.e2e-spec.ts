@@ -4,12 +4,17 @@ import { TestClientApi } from '../../utils/test-client/test-client-api';
 import { Repository } from 'typeorm';
 import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { getFixtures } from '../projects.fixtures';
+
+let fixtures: FixtureType<typeof getFixtures>;
 
 describe('ProjectsModule (e2e)', () => {
   let api: TestClientApi;
 
   beforeEach(async () => {
     api = await TestClientApi.initialize();
+    fixtures = await getFixtures();
   });
 
   describe('when creating a project', () => {
@@ -123,7 +128,17 @@ describe('ProjectsModule (e2e)', () => {
         'When a regular planning grid is requested (hexagon or square) either a custom planning area or a GADM area gid must be provided',
       );
     });
+
+    it('should fail when creating a second project using the same custom planning area as another project', async () => {
+      await fixtures.GivenCustomPlanningAreaWasCreated();
+      await fixtures.GivenPrivateProjectWithCustomPlanningAreaWasCreated();
+      const result = await fixtures.WhenCreatingAnotherProjectWithSameCustomPlanningArea();
+      fixtures.ThenCreationOfProjectWithAlreadySpentCustomPlanningAreaShouldFail(
+        result,
+      );
+    });
   });
+
   describe('when listing projects', () => {
     it('should be able to get a list of the projects the user have a role in', async () => {
       const userToken = await api.utils.createWorkingUser();
