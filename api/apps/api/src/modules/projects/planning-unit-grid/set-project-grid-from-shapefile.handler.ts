@@ -17,11 +17,11 @@ import { v4 } from 'uuid';
 import { SetProjectGridFromShapefile } from './set-project-grid-from-shapefile.command';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 import { CostRangeService } from '@marxan-api/modules/scenarios/cost-range-service';
+import { isNil } from 'lodash';
 
 @CommandHandler(SetProjectGridFromShapefile)
 export class SetProjectGridFromShapefileHandler
-  implements IInferredCommandHandler<SetProjectGridFromShapefile>
-{
+  implements IInferredCommandHandler<SetProjectGridFromShapefile> {
   constructor(
     @InjectRepository(Project) private readonly projects: Repository<Project>,
     private readonly events: ApiEventsService,
@@ -48,6 +48,16 @@ export class SetProjectGridFromShapefileHandler
     });
 
     await this.entityManager.transaction(async (manager) => {
+      if (
+        !(await this.isPlanningAreaNotLinkedToAnyProjectYet(
+          planningAreaId,
+          manager,
+        ))
+      ) {
+        throw new Error(
+          `Planning area ${planningAreaId} is already linked to a project: no new project can be created using it as its own planning area.`,
+        );
+      }
       await manager
         .getRepository(ProjectsPuEntity)
         .update({ planningAreaId }, { projectId });
@@ -89,5 +99,37 @@ export class SetProjectGridFromShapefileHandler
     });
 
     this.eventBus.publish(new PlanningUnitSet(projectId));
+  }
+
+  /**
+   * When a custom planning area has just been uploaded (either as a planning
+   * area shapefile or as a planning grid shapefile, from which we create the
+   * planning area itself), it is not linked to any projects to start with.
+   *
+   * Only once a project is created (in apidb), we then set up its grid and
+   * planning area from the previously-created planning area.
+   *
+   * However, planning areas where `project_id is null` are considered as
+   * dangling from the garbage collector, so we create custom planning areas
+   * initially with its `projectId` column set to the `id` of the planning area
+   * record itself: this can be used as a proxy of the planning area not being
+   * linked to any project.
+   *
+   * Once a project is created, we then update the planning area's `projectId`
+   * to match the actual `id` of the new project. To avoid "double spending" of
+   * a planning area (for example, if an API consumer issues more than one
+   * request to create a project, supplying the same `planningAreaId`, for
+   * whatever reason), we need to check that the planning area is not linked to
+   * any project yet (therefore, that `id = projectId`), before linking it to a
+   * project.
+   */
+  private async isPlanningAreaNotLinkedToAnyProjectYet(
+    planningAreaId: string,
+    transactionalEntityManager: EntityManager,
+  ): Promise<boolean> {
+    const planningArea = await transactionalEntityManager
+      .getRepository(PlanningArea)
+      .findOneBy({ id: planningAreaId, projectId: planningAreaId });
+    return !isNil(planningArea);
   }
 }
