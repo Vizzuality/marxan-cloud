@@ -83,8 +83,8 @@ export class ProjectCustomFeaturesPieceExporter
           'f.creation_status',
           'f.list_property_keys',
           'f.is_legacy',
-          'f.min_amount',
-          'f.max_amount',
+          'f.amount_min',
+          'f.amount_max',
           'pft.tag',
         ])
         .from('features', 'f')
