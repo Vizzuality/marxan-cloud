@@ -28,8 +28,8 @@ export interface GeoFeatureProperty {
 }
 
 export type FeatureAmountRange = {
-  min: number | undefined;
-  max: number | undefined;
+  min: number | null;
+  max: number | null;
 };
 
 @Entity('features')

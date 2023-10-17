@@ -189,12 +189,13 @@ export class ProjectsService {
 
     const resultWithMappedAmountRange = {
       data: result.data.map((feature) => {
-        if (feature?.amountMax || feature?.amountMin) {
-          return {
-            ...feature,
-            amountRange: { min: feature.amountMin, max: feature.amountMax },
-          };
-        }
+        return {
+          ...feature,
+          amountRange: {
+            min: feature?.amountMin ?? null,
+            max: feature?.amountMax ?? null,
+          },
+        };
       }),
       metadata: result.metadata,
     };
