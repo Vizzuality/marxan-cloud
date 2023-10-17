@@ -116,7 +116,8 @@ export const useConservationAreasLegend = () => {
   });
 };
 
-export const useFeatureAbundanceLegend = () => {
+export const useFeaturesLegend = () => {
+  const { selectedFeatures } = useAppSelector((state) => state['/projects/[id]']);
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
@@ -125,18 +126,39 @@ export const useFeatureAbundanceLegend = () => {
     pid,
     { sort: 'feature_class_name' },
     {
-      select: ({ data }) => data,
+      select: ({ data }) => ({
+        binaryFeatures:
+          data?.filter(
+            (feature) => !Object.hasOwn(feature, 'min') && !Object.hasOwn(feature, 'max')
+          ) || [],
+        continuousFeatures:
+          data?.filter(
+            (feature) => Object.hasOwn(feature, 'min') && Object.hasOwn(feature, 'max')
+          ) || [],
+      }),
     }
   );
 
-  const { layerSettings, selectedFeatures: visibleFeatures } = useAppSelector(
-    (state) => state['/projects/[id]']
-  );
+  const totalItems =
+    projectFeaturesQuery.data?.binaryFeatures.length +
+      projectFeaturesQuery.data?.continuousFeatures.length || 0;
 
-  const totalItems = projectFeaturesQuery.data?.length || 0;
+  const binaryFeaturesItems =
+    projectFeaturesQuery.data?.binaryFeatures?.map(({ id, featureClassName }, index) => {
+      const color =
+        totalItems > COLORS['features-preview'].ramp.length
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
+          : COLORS['features-preview'].ramp[index];
 
-  const items =
-    projectFeaturesQuery.data?.map(
+      return {
+        id,
+        name: featureClassName,
+        color,
+      };
+    }) || [];
+
+  const continuousFeaturesItems =
+    projectFeaturesQuery.data?.continuousFeatures.map(
       ({ id, featureClassName, amountRange = { min: 5000, max: 100000 } }, index) => {
         const color =
           totalItems > COLORS['features-preview'].ramp.length
@@ -152,91 +174,62 @@ export const useFeatureAbundanceLegend = () => {
       }
     ) || [];
 
-  return LEGEND_LAYERS['features-abundance']({
-    items,
-    onChangeVisibility: (featureId: Feature['id']) => {
-      const { color, amountRange } = items.find(({ id }) => id === featureId) || {};
+  return [
+    ...LEGEND_LAYERS['features-preview-new']({
+      items: binaryFeaturesItems,
+      onChangeVisibility: (featureId: Feature['id']) => {
+        const newSelectedFeatures = [...selectedFeatures];
+        const isIncluded = newSelectedFeatures.includes(featureId);
+        if (!isIncluded) {
+          newSelectedFeatures.push(featureId);
+        } else {
+          const i = newSelectedFeatures.indexOf(featureId);
+          newSelectedFeatures.splice(i, 1);
+        }
+        dispatch(setSelectedFeatures(newSelectedFeatures));
 
-      const newSelectedFeatures = [...visibleFeatures];
-      const isIncluded = newSelectedFeatures.includes(featureId);
-      if (!isIncluded) {
-        newSelectedFeatures.push(featureId);
-      } else {
-        const i = newSelectedFeatures.indexOf(featureId);
-        newSelectedFeatures.splice(i, 1);
-      }
-      dispatch(setSelectedFeatures(newSelectedFeatures));
+        const { color } = binaryFeaturesItems.find(({ id }) => id === featureId) || {};
 
-      dispatch(
-        setLayerSettings({
-          id: featureId,
-          settings: {
-            visibility: !layerSettings[featureId]?.visibility,
-            amountRange,
-            color,
-          },
-        })
-      );
-    },
-  });
-};
+        dispatch(
+          setLayerSettings({
+            id: featureId,
+            settings: {
+              visibility: !isIncluded,
+              color,
+            },
+          })
+        );
+      },
+    }),
+    ...LEGEND_LAYERS['features-abundance']({
+      items: continuousFeaturesItems,
+      onChangeVisibility: (featureId: Feature['id']) => {
+        const { color, amountRange } =
+          continuousFeaturesItems.find(({ id }) => id === featureId) || {};
 
-export const useFeaturesLegend = () => {
-  const { selectedFeatures } = useAppSelector((state) => state['/projects/[id]']);
-  const { query } = useRouter();
-  const { pid } = query as { pid: string };
+        const newSelectedFeatures = [...selectedFeatures];
+        const isIncluded = newSelectedFeatures.includes(featureId);
+        if (!isIncluded) {
+          newSelectedFeatures.push(featureId);
+        } else {
+          const i = newSelectedFeatures.indexOf(featureId);
+          newSelectedFeatures.splice(i, 1);
+        }
+        dispatch(setSelectedFeatures(newSelectedFeatures));
 
-  const dispatch = useAppDispatch();
-  const projectFeaturesQuery = useAllFeatures(
-    pid,
-    { sort: 'feature_class_name' },
-    {
-      select: ({ data }) => data,
-    }
-  );
-
-  const totalItems = projectFeaturesQuery.data?.length || 0;
-
-  const items =
-    projectFeaturesQuery.data?.map(({ id, featureClassName }, index) => {
-      const color =
-        totalItems > COLORS['features-preview'].ramp.length
-          ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
-          : COLORS['features-preview'].ramp[index];
-
-      return {
-        id,
-        name: featureClassName,
-        color,
-      };
-    }) || [];
-
-  return LEGEND_LAYERS['features-preview-new']({
-    items,
-    onChangeVisibility: (featureId: Feature['id']) => {
-      const newSelectedFeatures = [...selectedFeatures];
-      const isIncluded = newSelectedFeatures.includes(featureId);
-      if (!isIncluded) {
-        newSelectedFeatures.push(featureId);
-      } else {
-        const i = newSelectedFeatures.indexOf(featureId);
-        newSelectedFeatures.splice(i, 1);
-      }
-      dispatch(setSelectedFeatures(newSelectedFeatures));
-
-      const { color } = items.find(({ id }) => id === featureId) || {};
-
-      dispatch(
-        setLayerSettings({
-          id: featureId,
-          settings: {
-            visibility: !isIncluded,
-            color,
-          },
-        })
-      );
-    },
-  });
+        dispatch(
+          setLayerSettings({
+            id: featureId,
+            settings: {
+              visibility: !isIncluded,
+              amountRange,
+              color,
+            },
+          })
+        );
+      },
+    }),
+  ];
 };
 
 export const useComparisonScenariosLegend = ({
@@ -306,11 +299,7 @@ export const useInventoryLegend = ({
       layers: useConservationAreasLegend(),
     },
     {
-      name: 'Features (Continuous)',
-      layers: useFeatureAbundanceLegend(),
-    },
-    {
-      name: 'Features (Binary)',
+      name: 'Features',
       layers: useFeaturesLegend(),
     },
   ];

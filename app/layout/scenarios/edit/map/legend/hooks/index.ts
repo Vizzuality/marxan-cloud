@@ -7,7 +7,7 @@ import chroma from 'chroma-js';
 import { orderBy, sortBy } from 'lodash';
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
-import { useSelectedFeatures } from 'hooks/features';
+import { useAllFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import { COLORS, LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProject } from 'hooks/projects';
@@ -119,69 +119,42 @@ export const useConservationAreasLegend = () => {
   });
 };
 
-export const useFeatureAbundanceLegend = () => {
-  const { query } = useRouter();
-  const { sid } = query as { sid: string };
-
-  const dispatch = useAppDispatch();
-  const { data: features } = useSelectedFeatures(sid);
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setLayerSettings } = scenarioSlice.actions;
-
-  const { layerSettings } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const totalItems = features?.length || 0;
-
-  const items =
-    features?.map(({ id, name, amountRange = { min: 5000, max: 100000 } }, index) => {
-      const color =
-        totalItems > COLORS['features-preview'].ramp.length
-          ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
-          : COLORS['features-preview'].ramp[index];
-
-      return {
-        id,
-        name,
-        amountRange,
-        color,
-      };
-    }) || [];
-
-  return LEGEND_LAYERS['features-abundance']({
-    items,
-    onChangeVisibility: (featureId: Feature['id']) => {
-      const { color, amountRange } = items.find(({ id }) => id === featureId) || {};
-
-      dispatch(
-        setLayerSettings({
-          id: featureId,
-          settings: {
-            visibility: !layerSettings[featureId]?.visibility,
-            amountRange,
-            color,
-          },
-        })
-      );
-    },
-  });
-};
-
 export const useFeaturesLegend = () => {
   const { query } = useRouter();
-  const { sid } = query as { sid: string };
-
-  const dispatch = useAppDispatch();
-  const { data: features } = useSelectedFeatures(sid);
+  const { pid, sid } = query as { pid: string; sid: string };
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSelectedFeatures, setLayerSettings } = scenarioSlice.actions;
   const { selectedFeatures }: { selectedFeatures: Feature['id'][] } = useAppSelector(
     (state) => state[`/scenarios/${sid}/edit`]
   );
 
-  const totalItems = features?.length || 0;
+  const dispatch = useAppDispatch();
+  const projectFeaturesQuery = useAllFeatures(
+    pid,
+    { sort: 'feature_class_name' },
+    {
+      select: ({ data }) => ({
+        binaryFeatures:
+          data?.filter(
+            (feature) =>
+              !Object.hasOwn(feature.amountRange, 'min') &&
+              !Object.hasOwn(feature.amountRange, 'max')
+          ) || [],
+        continuousFeatures:
+          data?.filter(
+            (feature) =>
+              Object.hasOwn(feature.amountRange, 'min') && Object.hasOwn(feature.amountRange, 'max')
+          ) || [],
+      }),
+    }
+  );
 
-  const items =
-    features?.map(({ id, name }, index) => {
+  const totalItems =
+    projectFeaturesQuery.data?.binaryFeatures.length +
+      projectFeaturesQuery.data?.continuousFeatures.length || 0;
+
+  const binaryFeaturesItems =
+    projectFeaturesQuery.data?.binaryFeatures?.map(({ id, featureClassName }, index) => {
       const color =
         totalItems > COLORS['features-preview'].ramp.length
           ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
@@ -189,37 +162,84 @@ export const useFeaturesLegend = () => {
 
       return {
         id,
-        name,
+        name: featureClassName,
         color,
       };
     }) || [];
 
-  return LEGEND_LAYERS['features-preview-new']({
-    items,
-    onChangeVisibility: (featureId: Feature['id']) => {
-      const newSelectedFeatures = [...selectedFeatures];
-      const isIncluded = newSelectedFeatures.includes(featureId);
-      if (!isIncluded) {
-        newSelectedFeatures.push(featureId);
-      } else {
-        const i = newSelectedFeatures.indexOf(featureId);
-        newSelectedFeatures.splice(i, 1);
+  const continuousFeaturesItems =
+    projectFeaturesQuery.data?.continuousFeatures.map(
+      ({ id, featureClassName, amountRange = { min: 5000, max: 100000 } }, index) => {
+        const color =
+          totalItems > COLORS['features-preview'].ramp.length
+            ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
+            : COLORS['features-preview'].ramp[index];
+
+        return {
+          id,
+          name: featureClassName,
+          amountRange,
+          color,
+        };
       }
-      dispatch(setSelectedFeatures(newSelectedFeatures));
+    ) || [];
 
-      const { color } = items.find(({ id }) => id === featureId) || {};
+  return [
+    ...LEGEND_LAYERS['features-preview-new']({
+      items: binaryFeaturesItems,
+      onChangeVisibility: (featureId: Feature['id']) => {
+        const newSelectedFeatures = [...selectedFeatures];
+        const isIncluded = newSelectedFeatures.includes(featureId);
+        if (!isIncluded) {
+          newSelectedFeatures.push(featureId);
+        } else {
+          const i = newSelectedFeatures.indexOf(featureId);
+          newSelectedFeatures.splice(i, 1);
+        }
+        dispatch(setSelectedFeatures(newSelectedFeatures));
 
-      dispatch(
-        setLayerSettings({
-          id: featureId,
-          settings: {
-            visibility: !isIncluded,
-            color,
-          },
-        })
-      );
-    },
-  });
+        const { color } = binaryFeaturesItems.find(({ id }) => id === featureId) || {};
+
+        dispatch(
+          setLayerSettings({
+            id: featureId,
+            settings: {
+              visibility: !isIncluded,
+              color,
+            },
+          })
+        );
+      },
+    }),
+    ...LEGEND_LAYERS['features-abundance']({
+      items: continuousFeaturesItems,
+      onChangeVisibility: (featureId: Feature['id']) => {
+        const { color, amountRange } =
+          continuousFeaturesItems.find(({ id }) => id === featureId) || {};
+
+        const newSelectedFeatures = [...selectedFeatures];
+        const isIncluded = newSelectedFeatures.includes(featureId);
+        if (!isIncluded) {
+          newSelectedFeatures.push(featureId);
+        } else {
+          const i = newSelectedFeatures.indexOf(featureId);
+          newSelectedFeatures.splice(i, 1);
+        }
+        dispatch(setSelectedFeatures(newSelectedFeatures));
+
+        dispatch(
+          setLayerSettings({
+            id: featureId,
+            settings: {
+              visibility: !isIncluded,
+              amountRange,
+              color,
+            },
+          })
+        );
+      },
+    }),
+  ];
 };
 
 export const useLockInLegend = () => {
@@ -463,11 +483,7 @@ export const useScenarioLegend = () => {
       layers: useConservationAreasLegend(),
     },
     {
-      name: 'Features (Continuous)',
-      layers: useFeatureAbundanceLegend(),
-    },
-    {
-      name: 'Features (Binary)',
+      name: 'Features',
       layers: useFeaturesLegend(),
     },
   ];
