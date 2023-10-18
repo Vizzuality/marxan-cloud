@@ -27,13 +27,19 @@ import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dt
 import { GivenProjectExists } from '../../steps/given-project';
 import { GivenProjectsPu } from '../../../../geoprocessing/test/steps/given-projects-pu-exists';
 import * as request from 'supertest';
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, NotFoundException } from '@nestjs/common';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { CqrsModule } from '@nestjs/cqrs';
 import { EventBusTestUtils } from '../../utils/event-bus.test.utils';
 import { CostSurfaceDeleted } from '@marxan-api/modules/cost-surface/events/cost-surface-deleted.event';
 import { FakeQueue } from '../../utils/queues';
 import { unusedResourcesCleanupQueueName } from '@marxan/unused-resources-cleanup';
+import { scenarioCostSurfaceQueueName } from '@marxan/artifact-cache/cost-surface-queue-name';
+import { ApiEventsService } from '@marxan-api/modules/api-events';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { ApiEvent } from '@marxan-api/modules/api-events/api-event.api.entity';
 
 export const getProjectCostSurfaceFixtures = async () => {
   const app = await bootstrapApplication(
@@ -51,6 +57,11 @@ export const getProjectCostSurfaceFixtures = async () => {
   const unusedResourceCleanupQueue = FakeQueue.getByName(
     unusedResourcesCleanupQueueName,
   );
+  const scenarioCostSurfaceQueue = FakeQueue.getByName(
+    scenarioCostSurfaceQueueName,
+  );
+
+  const apiEventService = app.get(ApiEventsService);
 
   const token = await GivenUserIsLoggedIn(app, 'aa');
   const userId = await GivenUserExists(app, 'aa');
@@ -76,6 +87,12 @@ export const getProjectCostSurfaceFixtures = async () => {
   const usersProjectsApiRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
+  const usersScenarioRolesRepo: Repository<UsersScenariosApiEntity> = app.get(
+    getRepositoryToken(UsersScenariosApiEntity),
+  );
+  const apiEventsRepo: Repository<ApiEvent> = app.get(
+    getRepositoryToken(ApiEvent),
+  );
 
   return {
     cleanup: async () => {
@@ -83,6 +100,7 @@ export const getProjectCostSurfaceFixtures = async () => {
       await projectsPuRepo.delete({});
       await organizationRepo.delete({});
       await costSurfaceRepo.delete({});
+      await apiEventsRepo.delete({});
       eventBusTestUtils.stopInspectingEvents();
       await app.close();
     },
@@ -134,12 +152,25 @@ export const getProjectCostSurfaceFixtures = async () => {
       projectId: string,
       costSurfaceId: string,
       name?: string,
+      roles?: ScenarioRoles[],
     ) => {
-      return scenarioRepo.save({
+      const scenario = await scenarioRepo.save({
         projectId,
         costSurfaceId,
         name: name || `Scenario for project ${projectId}`,
       });
+
+      roles = roles ? roles : [ScenarioRoles.scenario_owner];
+
+      await usersScenarioRolesRepo.save(
+        roles.map((roleName) => ({
+          scenarioId: scenario.id,
+          userId,
+          roleName,
+        })),
+      );
+
+      return scenario;
     },
 
     GivenProjectPuData: async (projectId: string) => {
@@ -162,6 +193,14 @@ export const getProjectCostSurfaceFixtures = async () => {
     },
     GivenMockCostSurfaceShapefile: () => {
       return __dirname + `/../../upload-feature/import-files/wetlands.zip`;
+    },
+    GivenNoJobsOnScenarioCostSurfaceQueue: () => {
+      scenarioCostSurfaceQueue.disposeFakeJobs();
+    },
+    GivenFailureWhenAddingJob: () => {
+      scenarioCostSurfaceQueue.add.mockRejectedValueOnce(
+        new Error('Something happened!'),
+      );
     },
 
     WhenGettingCostSurfacesForProject: async (projectId: string) => {
@@ -205,6 +244,17 @@ export const getProjectCostSurfaceFixtures = async () => {
         .delete(`/api/v1/projects/${projectId}/cost-surfaces/${costSurfaceId}`)
         .set('Authorization', `Bearer ${token}`);
     },
+    WhenLinkingCostSurfaceToScenario: async (
+      scenarioId: string,
+      costSurfaceId: string,
+    ) => {
+      return request(app.getHttpServer())
+        .post(
+          `/api/v1/scenarios/${scenarioId}/link-cost-surface/${costSurfaceId}`,
+        )
+        .set('Authorization', `Bearer ${token}`)
+        .send();
+    },
 
     WhenGettingCostSurfaceRange: async (
       costSurfaceId: string,
@@ -224,6 +274,53 @@ export const getProjectCostSurfaceFixtures = async () => {
       });
       expect(savedCostSurface).toBeDefined();
       expect(savedCostSurface?.name).toEqual(name);
+    },
+    ThenCostSurfaceIsLinkedToScenario: async (
+      scenarioId: string,
+      linkedCostSurfaceId: string,
+    ) => {
+      const scenario = await scenarioRepo.findOneOrFail({
+        where: { id: scenarioId },
+      });
+
+      expect(scenario.costSurfaceId).toEqual(linkedCostSurfaceId);
+    },
+    ThenLinkCostSurfaceToScenarioJobWasSent: async (
+      scenarioId: string,
+      costSurfaceId: string,
+      originalCostSurfaceId: string,
+    ) => {
+      //expect(Object.values(scenarioCostSurfaceQueue.jobs).length).toBe(1);
+      const job = Object.values(scenarioCostSurfaceQueue.jobs).at(-1);
+      if (!job) throw new Error();
+      expect(job.data.type).toEqual('LinkCostSurfaceToScenarioJobInput');
+      expect(job.data.scenarioId).toEqual(scenarioId);
+      expect(job.data.costSurfaceId).toEqual(costSurfaceId);
+      expect(job.data.originalCostSurfaceId).toEqual(originalCostSurfaceId);
+      expect(job.data.mode).toEqual('update');
+    },
+    ThenLinkCostSurfaceToScenarioSubmittedApiEventWasSaved: async (
+      scenarioId: string,
+    ) => {
+      await apiEventService.getLatestEventForTopic({
+        topic: scenarioId,
+        kind: API_EVENT_KINDS.scenario__costSurface__link__submitted__v1_alpha1,
+      });
+    },
+    ThenNoJobWasSent: async () => {
+      expect(Object.values(scenarioCostSurfaceQueue.jobs).length).toBe(0);
+    },
+    ThenNoLinkCostSurfaceToScenarioSubmittedApiEventWasSaved: async (
+      scenarioId: string,
+    ) => {
+      await expect(
+        async () =>
+          await apiEventService.getLatestEventForTopic({
+            topic: scenarioId,
+            kind:
+              API_EVENT_KINDS.scenario__costSurface__link__submitted__v1_alpha1,
+          }),
+      ).rejects.toThrow(NotFoundException);
     },
 
     ThenResponseHasCostSurface: async (
@@ -309,6 +406,16 @@ export const getProjectCostSurfaceFixtures = async () => {
         `Project with id ${projectId} is not editable by user ${userId}`,
       );
     },
+    ThenScenarioNotEditableErrorWasReturned: (
+      response: request.Response,
+      scenarioId: string,
+    ) => {
+      const error: any = response.body.errors[0].title;
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+      expect(error).toContain(
+        `Scenario with id ${scenarioId} is not editable by the given user`,
+      );
+    },
     ThenCostSurfaceWasNotCreated: async (costSurfaceName: string) => {
       const costSurface = await costSurfaceRepo.findOne({
         where: { name: costSurfaceName },
@@ -329,8 +436,9 @@ export const getProjectCostSurfaceFixtures = async () => {
       expect(costSurface).not.toBeNull();
     },
     ThenCostSurfaceDeletedEventWasEmitted: async (costSurfaceId: string) => {
-      const event =
-        await eventBusTestUtils.waitUntilEventIsPublished(CostSurfaceDeleted);
+      const event = await eventBusTestUtils.waitUntilEventIsPublished(
+        CostSurfaceDeleted,
+      );
 
       expect(event).toMatchObject({ costSurfaceId });
     },
@@ -397,6 +505,30 @@ export const getProjectCostSurfaceFixtures = async () => {
     ThenCostSurfaceRangeWasReturned: async (response: any) => {
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.body).toEqual({ min: 0, max: 0 });
+    },
+
+    ThenScenarioNotFoundErrorWasReturned: (
+      response: request.Response,
+      scenarioId: string,
+    ) => {
+      const error: any = response.body.errors[0].meta.rawError.response.message;
+      expect(error).toContain(`Scenario ${scenarioId} could not be found.`);
+    },
+    ThenCostSurfaceNotFoundErrorWasReturned: (
+      response: request.Response,
+      costSurfaceId: string,
+    ) => {
+      const error: any = response.body.errors[0].meta.rawError.response.message;
+      expect(error).toContain(`Cost Surface ${costSurfaceId} not found`);
+    },
+    ThenCostSurfaceCouldNotBeLinkedErrorWasReturned: (
+      response: request.Response,
+      scenarioId: string,
+    ) => {
+      const error: any = response.body.errors[0].meta.rawError.response.message;
+      expect(error).toContain(
+        `Linking Cost Surface to Scenario ${scenarioId} failed`,
+      );
     },
   };
 };

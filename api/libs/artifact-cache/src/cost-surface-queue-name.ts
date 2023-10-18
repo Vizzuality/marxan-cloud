@@ -5,4 +5,6 @@
  */
 export const costSurfaceQueueName = 'cost-surface';
 
+export const scenarioCostSurfaceQueueName = 'scenario-cost-surface';
+
 export const projectCostSurfaceQueueName = 'project-cost-surface';

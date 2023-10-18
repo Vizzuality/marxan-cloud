@@ -14,6 +14,18 @@ export type InitialProjectCostInput = {
 export type ProjectCostSurfaceJobInput =
   | FromProjectShapefileJobInput
   | InitialProjectCostInput;
+
+export type LinkCostSurfaceToScenarioJobInput = {
+  type: 'LinkCostSurfaceToScenarioJobInput';
+  scenarioId: string;
+  costSurfaceId: string;
+  originalCostSurfaceId: string;
+
+  mode: 'creation' | 'update';
+};
+
+export type ScenarioCostSurfaceJobInput = LinkCostSurfaceToScenarioJobInput;
+
 /**
  * @note: we should deprecate all of the below
  */

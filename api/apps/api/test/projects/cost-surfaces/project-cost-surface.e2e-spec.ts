@@ -15,8 +15,9 @@ describe('Cost Surface', () => {
 
   describe('Default Cost Surface', () => {
     it(`should create a default Cost Surface`, async () => {
-      const { projectId } =
-        await fixtures.WhenCreatingAProject('my awesome project');
+      const { projectId } = await fixtures.WhenCreatingAProject(
+        'my awesome project',
+      );
       await fixtures.ThenADefaultCostSurfaceWasCreated(projectId);
     });
   });
@@ -25,8 +26,7 @@ describe('Cost Surface', () => {
       // ARRANGE
       const projectId1 = await fixtures.GivenProject('someProject 1');
       const projectId2 = await fixtures.GivenProject('the REAL project');
-      const default2 =
-        await fixtures.GivenDefaultCostSurfaceForProject(projectId1);
+      await fixtures.GivenDefaultCostSurfaceForProject(projectId1);
       const costSurface11 = await fixtures.GivenCostSurfaceMetadataForProject(
         projectId1,
         'costSurface 1 1',
@@ -73,10 +73,12 @@ describe('Cost Surface', () => {
       // ARRANGE
       const projectId1 = await fixtures.GivenProject('someProject 1');
       const projectId2 = await fixtures.GivenProject('the REAL project');
-      const default1 =
-        await fixtures.GivenDefaultCostSurfaceForProject(projectId1);
-      const default2 =
-        await fixtures.GivenDefaultCostSurfaceForProject(projectId2);
+      const default1 = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId1,
+      );
+      const default2 = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId2,
+      );
       const costSurface11 = await fixtures.GivenCostSurfaceMetadataForProject(
         projectId1,
         'costSurface 1 1',
@@ -138,10 +140,12 @@ describe('Cost Surface', () => {
       ];
 
       // ACT
-      const response1 =
-        await fixtures.WhenGettingCostSurfacesForProject(projectId1);
-      const response2 =
-        await fixtures.WhenGettingCostSurfacesForProject(projectId2);
+      const response1 = await fixtures.WhenGettingCostSurfacesForProject(
+        projectId1,
+      );
+      const response2 = await fixtures.WhenGettingCostSurfacesForProject(
+        projectId2,
+      );
 
       // ASSERT
       await fixtures.ThenReponseHasCostSurfaceList(
@@ -178,12 +182,11 @@ describe('Cost Surface', () => {
       const shapefilePath = fixtures.GivenMockCostSurfaceShapefile();
 
       // ACT
-      const response =
-        await fixtures.WhenUploadingCostSurfaceShapefileForProject(
-          projectId,
-          '',
-          shapefilePath,
-        );
+      const response = await fixtures.WhenUploadingCostSurfaceShapefileForProject(
+        projectId,
+        '',
+        shapefilePath,
+      );
 
       // ASSERT
       await fixtures.ThenEmptyErrorWasReturned(response);
@@ -274,6 +277,192 @@ describe('Cost Surface', () => {
     });
   });
 
+  describe('Link Cost Surface To Scenario', () => {
+    it(`should link properly`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const defaultCostSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId,
+      );
+      const scenario = await fixtures.GivenScenario(
+        projectId,
+        defaultCostSurface.id,
+        'someName',
+      );
+      const costSurface = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId,
+        'someCostSurface',
+      );
+      fixtures.GivenNoJobsOnScenarioCostSurfaceQueue();
+
+      // ACT
+      await fixtures.WhenLinkingCostSurfaceToScenario(
+        scenario.id,
+        costSurface.id,
+      );
+
+      // ASSERT
+      await fixtures.ThenCostSurfaceIsLinkedToScenario(
+        scenario.id,
+        costSurface.id,
+      );
+      await fixtures.ThenLinkCostSurfaceToScenarioJobWasSent(
+        scenario.id,
+        costSurface.id,
+        defaultCostSurface.id,
+      );
+      await fixtures.ThenLinkCostSurfaceToScenarioSubmittedApiEventWasSaved(
+        scenario.id,
+      );
+    });
+
+    it(`should return error when the Scenario was not found`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const defaultCostSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId,
+      );
+      const nonExistentScenarioId = v4();
+
+      // ACT
+      const response = await fixtures.WhenLinkingCostSurfaceToScenario(
+        nonExistentScenarioId,
+        defaultCostSurface.id,
+      );
+
+      // ASSERT
+      await fixtures.ThenScenarioNotFoundErrorWasReturned(
+        response,
+        nonExistentScenarioId,
+      );
+    });
+
+    it(`should return error when the Cost Surface was not found`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const defaultCostSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId,
+      );
+      const scenario = await fixtures.GivenScenario(
+        projectId,
+        defaultCostSurface.id,
+        'someName',
+      );
+      const nonExistentCostSurfaceId = v4();
+
+      // ACT
+      const response = await fixtures.WhenLinkingCostSurfaceToScenario(
+        scenario.id,
+        nonExistentCostSurfaceId,
+      );
+
+      // ASSERT
+      await fixtures.ThenCostSurfaceNotFoundErrorWasReturned(
+        response,
+        nonExistentCostSurfaceId,
+      );
+    });
+
+    it(`should return error when the Cost Surface being linked is from a different Project from the Scenario's`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const defaultCostSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId,
+      );
+      const scenario = await fixtures.GivenScenario(
+        projectId,
+        defaultCostSurface.id,
+        'someName',
+      );
+      const projectId2 = await fixtures.GivenProject('someProject2');
+      const otherProjectCostSurface = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId2,
+        'someCostSurface',
+      );
+
+      // ACT
+      const response = await fixtures.WhenLinkingCostSurfaceToScenario(
+        scenario.id,
+        otherProjectCostSurface.id,
+      );
+
+      // ASSERT
+      await fixtures.ThenCostSurfaceNotFoundErrorWasReturned(
+        response,
+        otherProjectCostSurface.id,
+      );
+    });
+
+    it(`should return true and do nothing when the Cost Surface is already linked to the Scenario`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const defaultCostSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId,
+      );
+      const scenario = await fixtures.GivenScenario(
+        projectId,
+        defaultCostSurface.id,
+        'someName',
+      );
+      fixtures.GivenNoJobsOnScenarioCostSurfaceQueue();
+
+      // ACT
+      await fixtures.WhenLinkingCostSurfaceToScenario(
+        scenario.id,
+        defaultCostSurface.id,
+      );
+
+      // ASSERT
+      await fixtures.ThenNoJobWasSent();
+      await fixtures.ThenCostSurfaceIsLinkedToScenario(
+        scenario.id,
+        defaultCostSurface.id,
+      );
+      await fixtures.ThenNoLinkCostSurfaceToScenarioSubmittedApiEventWasSaved(
+        scenario.id,
+      );
+    });
+
+    it(`should return error when the Cost Surface could not be linked (error at Command handler) `, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const defaultCostSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId,
+      );
+      const scenario = await fixtures.GivenScenario(
+        projectId,
+        defaultCostSurface.id,
+        'someName',
+      );
+      const costSurface = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId,
+        'someCostSurface',
+      );
+      fixtures.GivenFailureWhenAddingJob();
+      fixtures.GivenNoJobsOnScenarioCostSurfaceQueue();
+
+      // ACT
+      const response = await fixtures.WhenLinkingCostSurfaceToScenario(
+        scenario.id,
+        costSurface.id,
+      );
+
+      // ASSERT
+      await fixtures.ThenCostSurfaceCouldNotBeLinkedErrorWasReturned(
+        response,
+        scenario.id,
+      );
+      await fixtures.ThenCostSurfaceIsLinkedToScenario(
+        scenario.id,
+        defaultCostSurface.id,
+      );
+      await fixtures.ThenNoLinkCostSurfaceToScenarioSubmittedApiEventWasSaved(
+        scenario.id,
+      );
+      await fixtures.ThenNoJobWasSent();
+    });
+  });
+
   describe('Delete Cost Surface', () => {
     it(`should delete the CostSurface properly and emit event`, async () => {
       // ARRANGE
@@ -329,8 +518,9 @@ describe('Cost Surface', () => {
     it(`should return error if the CostSurface is the Project's default`, async () => {
       // ARRANGE
       const projectId = await fixtures.GivenProject('someProject');
-      const costSurface =
-        await fixtures.GivenDefaultCostSurfaceForProject(projectId);
+      const costSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId,
+      );
 
       // ACT
       const response = await fixtures.WhenDeletingCostSurface(

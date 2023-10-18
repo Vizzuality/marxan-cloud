@@ -24,6 +24,7 @@ import { LegacyProjectImportModule } from './legacy-project-import/legacy-projec
 import { UnusedResourcesCleanUpModule } from './modules/unused-resources-cleanup/unused-resources-cleanup.module';
 import { CleanupTasksModule } from './modules/cleanup-tasks/cleanup-tasks.module';
 import { ProjectCostSurfaceModule } from '@marxan-geoprocessing/modules/cost-surface/project/project-cost-surface.module';
+import { ScenarioCostSurfaceModule } from '@marxan-geoprocessing/modules/cost-surface/scenario/scenario-cost-surface.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ProjectCostSurfaceModule } from '@marxan-geoprocessing/modules/cost-sur
     ApiEventsModule,
     CostSurfaceModule,
     ProjectCostSurfaceModule,
+    ScenarioCostSurfaceModule,
     ScenarioPlanningUnitsInclusionModule,
     ScenarioProtectedAreaCalculationModule,
     PlanningAreaModule,

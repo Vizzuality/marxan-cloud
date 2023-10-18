@@ -11,15 +11,22 @@ import { DeleteCostSurfaceModule } from '@marxan-api/modules/cost-surface/delete
 import { ProjectCostSurfaceAdaptersModule } from '@marxan-api/modules/cost-surface/adapters/cost-surface-adapters.module';
 import { CostRangeService } from '@marxan-api/modules/scenarios/cost-range-service';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ScenarioAclModule } from '@marxan-api/modules/access-control/scenarios-acl/scenario-acl.module';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { ScenarioCostSurfaceApplicationModule } from '@marxan-api/modules/cost-surface/application/scenario/scenario-cost-surface-application.module';
+import { ScenarioCostSurfaceAdaptersModule } from '@marxan-api/modules/cost-surface/adapters/scenario-cost-surface-adapters.module';
 
 @Module({
   imports: [
     ProjectCostSurfaceApplicationModule,
     ProjectCostSurfaceAdaptersModule,
+    ScenarioCostSurfaceApplicationModule,
+    ScenarioCostSurfaceAdaptersModule,
     CostSurfaceApplicationModule,
     DeleteProjectModule,
-    TypeOrmModule.forFeature([CostSurface]),
+    TypeOrmModule.forFeature([CostSurface, Scenario]),
     ProjectAclModule,
+    ScenarioAclModule,
     DeleteCostSurfaceModule,
     CqrsModule,
   ],

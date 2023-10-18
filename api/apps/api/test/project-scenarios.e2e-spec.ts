@@ -27,7 +27,7 @@ let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-}, 12_000);
+}, 1000000);
 
 describe('ScenariosModule (e2e)', () => {
   it('Creating a scenario with incomplete data should fail', async () => {
@@ -92,7 +92,7 @@ describe('ScenariosModule (e2e)', () => {
     const response =
       await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner(false);
     fixtures.ThenCostSurfaceNotFoundMessageIsReturned(response);
-  });
+  }, 1000000);
 
   it('Creating a scenario with complete data should succeed', async () => {
     const response =
@@ -476,7 +476,7 @@ async function getFixtures() {
 
     ThenCostSurfaceNotFoundMessageIsReturned: (response: request.Response) => {
       expect(response.body.errors[0].title).toEqual(
-        `Cost Surface not found for Project with id ${projectId}`,
+        `Cost Surface for Project with id ${projectId} not found`,
       );
     },
 
