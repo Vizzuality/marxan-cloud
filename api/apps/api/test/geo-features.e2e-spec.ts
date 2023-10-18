@@ -9,7 +9,7 @@ import {
 import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 
-import { createWorld } from './project/projects-world';
+import { createWorld } from './projects/projects-world';
 import { Repository } from 'typeorm';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { v4 } from 'uuid';
@@ -65,6 +65,10 @@ describe('GeoFeaturesModule (e2e)', () => {
     const geoFeaturesForProject: GeoFeature[] = response.body.data;
     expect(geoFeaturesForProject.length).toBeGreaterThan(0);
     expect(response.body.data[0].type).toBe(geoFeatureResource.name.plural);
+    expect(response.body.data[0].attributes.amountRange).toEqual({
+      min: null,
+      max: null,
+    });
   });
 
   test('should include correct scenarioUsageCounts for the given project', async () => {
