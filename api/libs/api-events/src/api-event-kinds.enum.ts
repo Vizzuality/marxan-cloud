@@ -11,6 +11,10 @@ export enum API_EVENT_KINDS {
   project__costSurface_shapefile_submitted__v1alpha1 = 'project.costSurface.shapefile.submitted/v1alpha1',
   project__costSurface_shapefile_finished__v1alpha1 = 'project.costSurface.shapefile.finished/v1alpha1',
   project__costSurface_shapeConverted__v1alpha1 = 'project.costSurface.shapeConverted/v1alpha1',
+  scenario__costSurface__link__submitted__v1_alpha1 = 'scenario.costSurface.link.submitted/v1/alpha1',
+  scenario__costSurface__link__finished__v1_alpha1 = 'scenario.costSurface.link.finished/v1/alpha1',
+  scenario__costSurface__link__failed__v1_alpha1 = 'scenario.costSurface.link.failed/v1/alpha1',
+
   project__costSurface_shapeConversionFailed__v1alpha1 = 'project.costSurface.shapeConversionFailed/v1alpha1',
   project__costSurface_shapefile_failed__v1alpha1 = 'project.costSurface.shapefile.failed/v1alpha1',
   scenario__costSurface__submitted__v1_alpha1 = 'scenario.costSurface.submitted/v1alpha1',
@@ -120,5 +124,4 @@ export type ScenarioGeofeatureEvents = Pick<
   typeof API_EVENT_KINDS,
   ScenarioGeoFeatureEventKeys
 >;
-export type ScenarioGeofeatureEventValues =
-  ValuesType<ScenarioGeofeatureEvents>;
+export type ScenarioGeofeatureEventValues = ValuesType<ScenarioGeofeatureEvents>;

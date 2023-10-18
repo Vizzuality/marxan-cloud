@@ -111,6 +111,7 @@ import { ClearLockStatusParams } from '@marxan-api/modules/scenarios/dto/clear-l
 import { CostRangeDto } from '@marxan-api/modules/scenarios/dto/cost-range.dto';
 import { plainToClass } from 'class-transformer';
 import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
+import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -139,6 +140,7 @@ export class ScenariosController {
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
     private readonly projectsService: ProjectsService,
+    private readonly costSurfaceService: CostSurfaceService,
   ) {}
 
   @ApiOperation({
@@ -415,6 +417,77 @@ export class ScenariosController {
       scenarioId,
       req.user.id,
       file,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
+  }
+
+  @ApiOperation({
+    description:
+      'Links a Cost Surface to a Scenario, and applies costs on the Geoprocessing DB',
+  })
+  @ApiParam({
+    name: 'scenarioId',
+    description: 'Id of the Scenario that the Cost Surface will be applied',
+    required: true,
+  })
+  @ApiParam({
+    name: 'costSurfaceId',
+    description:
+      'Id of the Cost Surface that will be applied to the given Scenario',
+    required: true,
+  })
+  @ApiTags(asyncJobTag)
+  @Post(`:scenarioId/link-cost-surface/:costSurfaceId`)
+  async linkCostSurfaceToScenario(
+    @Param('scenarioId') scenarioId: string,
+    @Param('costSurfaceId') costSurfaceId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<true> {
+    const result = await this.costSurfaceService.linkCostSurfaceToScenario(
+      req.user.id,
+      scenarioId,
+      costSurfaceId,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        scenarioId,
+        costSurfaceId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    return true;
+  }
+
+  @ApiOperation({
+    description:
+      'To be removed soon to POST /projects/:projectId/cost-surface/shapefile',
+  })
+  @ApiParam({
+    name: 'scenarioId',
+    description: 'Id of the Scenario that the Cost Surface will be applied',
+    required: true,
+  })
+  @ApiTags(asyncJobTag)
+  @Post(`:scenarioId/unlink-cost-surface/`)
+  async unlinkCostSurfaceToScenario(
+    @Param('scenarioId') scenarioId: string,
+    @Param('costSurfaceId') costSurfaceId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const result = await this.costSurfaceService.linkCostSurfaceToScenario(
+      req.user.id,
+      scenarioId,
+      costSurfaceId,
     );
 
     if (isLeft(result)) {

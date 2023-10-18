@@ -90,7 +90,6 @@ import {
 
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
 import {
-  SetInitialCostSurface,
   SetInitialCostSurfaceError,
 } from '@marxan-api/modules/cost-surface/application/set-initial-cost-surface.command';
 import { UpdateCostSurface } from '@marxan-api/modules/cost-surface/application/update-cost-surface.command';
@@ -122,7 +121,13 @@ import { lastValueFrom } from 'rxjs';
 import { AdjustPlanningUnitsInput } from '@marxan-api/modules/analysis/entry-points/adjust-planning-units-input';
 import { submissionFailed } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
 import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
-import { costSurfaceNotFound } from '@marxan-api/modules/cost-surface/cost-surface.service';
+import {
+  costSurfaceNotFound,
+} from '@marxan-api/modules/cost-surface/cost-surface.service';
+import {
+  LinkCostSurfaceToScenarioCommand,
+  linkCostSurfaceToScenarioFailed,
+} from '@marxan-api/modules/cost-surface/application/scenario/link-cost-surface-to-scenario.command';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -133,10 +138,9 @@ const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
 export const projectNotReady = Symbol('project not ready');
 export type ProjectNotReady = typeof projectNotReady;
 export const scenarioNotCreated = Symbol('scenario not created');
-
 export const bestSolutionNotFound = Symbol('best solution not found');
-
 export const projectDoesntExist = Symbol(`project doesn't exist`);
+export const scenarioNotEditable = Symbol(`scenario not editable`);
 export const lockedSolutions = Symbol(
   `solutions from this scenario are locked`,
 );
@@ -270,7 +274,8 @@ export class ScenariosService {
       | ProjectDoesntExist
       | SetInitialCostSurfaceError
       | typeof scenarioNotCreated
-      | typeof costSurfaceNotFound,
+      | typeof costSurfaceNotFound
+      | typeof linkCostSurfaceToScenarioFailed,
       Scenario
     >
   > {
@@ -335,13 +340,16 @@ export class ScenariosService {
 
     await this.planningUnitsLinkerService.link(scenario);
 
-    const costSurfaceInitializationResult = await this.commandBus.execute(
-      new SetInitialCostSurface(scenario.id),
+    const linkResult = await this.commandBus.execute(
+      new LinkCostSurfaceToScenarioCommand(
+        scenario.id,
+        costSurfaceDefault.id,
+        'creation',
+      ),
     );
-
-    if (isLeft(costSurfaceInitializationResult)) {
+    if (isLeft(linkResult)) {
       await this.commandBus.execute(new DeleteScenario(scenario.id));
-      return costSurfaceInitializationResult;
+      return linkResult;
     }
 
     await this.crudService.assignCreatorRole(

@@ -91,6 +91,12 @@ const eventToJobStatusMapping: Record<
     ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__costSurface__submitted__v1_alpha1]:
     ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__costSurface__link__submitted__v1_alpha1]:
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__costSurface__link__finished__v1_alpha1]:
+    ApiEventJobStatus.done,
+  [API_EVENT_KINDS.scenario__costSurface__link__failed__v1_alpha1]:
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__run__progress__v1__alpha1]:
     ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1]:
@@ -187,4 +193,6 @@ const eventToJobStatusMapping: Record<
     ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha]:
     ApiEventJobStatus.failure,
+
+  // RENAME Y AÑADIR MAPPING
 };

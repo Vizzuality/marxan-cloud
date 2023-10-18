@@ -1,6 +1,7 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { getProjectCostSurfaceFixtures } from './project-cost-surface.fixtures';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 let fixtures: FixtureType<typeof getProjectCostSurfaceFixtures>;
 
@@ -45,8 +46,9 @@ describe('Get Project Cost Surface', () => {
     await fixtures.GivenScenario(projectId, costSurface2.id);
     await fixtures.GivenScenario(projectId, costSurface2.id);
     // ACT
-    const response =
-      await fixtures.WhenGettingCostSurfacesForProject(projectId);
+    const response = await fixtures.WhenGettingCostSurfacesForProject(
+      projectId,
+    );
 
     // ASSERT
     await fixtures.ThenProjectNotViewableErrorWasReturned(response);
@@ -79,6 +81,46 @@ describe('Upload Cost Surface Shapefile', () => {
   });
 });
 
+describe('Link Cost Surface To Scenario', () => {
+  beforeEach(async () => {
+    fixtures = await getProjectCostSurfaceFixtures();
+  });
+
+  it(`should not update CostSurface API entity if the user doesn't have permissions to edit the project`, async () => {
+    // ARRANGE
+    const projectId = await fixtures.GivenProject('someProject');
+    const defaultCostSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+      projectId,
+    );
+    const costSurface = await fixtures.GivenCostSurfaceMetadataForProject(
+      projectId,
+      'someName',
+    );
+
+    const scenario = await fixtures.GivenScenario(
+      projectId,
+      defaultCostSurface.id,
+      'someScenario',
+      [ScenarioRoles.scenario_viewer],
+    );
+
+    // ACT
+    const response = await fixtures.WhenLinkingCostSurfaceToScenario(
+      scenario.id,
+      costSurface.id,
+    );
+
+    // ASSERT
+    await fixtures.ThenScenarioNotEditableErrorWasReturned(
+      response,
+      scenario.id,
+    );
+    await fixtures.ThenCostSurfaceIsLinkedToScenario(
+      scenario.id,
+      defaultCostSurface.id,
+    );
+  });
+});
 describe('Upload Cost Surface Shapefile', () => {
   beforeEach(async () => {
     fixtures = await getProjectCostSurfaceFixtures();

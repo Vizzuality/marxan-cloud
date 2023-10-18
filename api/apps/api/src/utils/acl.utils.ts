@@ -52,6 +52,7 @@ import {
   projectDoesntExist,
   projectNotReady,
   scenarioNotCreated,
+  scenarioNotEditable,
 } from '@marxan-api/modules/scenarios/scenarios.service';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
@@ -102,12 +103,12 @@ import {
 } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { outputProjectSummaryNotFound } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
 import {
-  customProtectedAreaNotEditableByUser,
-  globalProtectedAreaNotEditable,
-  customProtectedAreaNotDeletableByUser,
-  protectedAreaNotFound,
   customProtectedAreaIsUsedInOneOrMoreScenarios,
+  customProtectedAreaNotDeletableByUser,
+  customProtectedAreaNotEditableByUser,
   globalProtectedAreaNotDeletable,
+  globalProtectedAreaNotEditable,
+  protectedAreaNotFound,
 } from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
 import {
   cannotDeleteDefaultCostSurface,
@@ -117,6 +118,7 @@ import {
   costSurfaceStillInUse,
 } from '@marxan-api/modules/cost-surface/cost-surface.service';
 import { deleteCostSurfaceFailed } from '@marxan-api/modules/cost-surface/delete-cost-surface/delete-cost-surface.command';
+import { linkCostSurfaceToScenarioFailed } from '@marxan-api/modules/cost-surface/application/scenario/link-cost-surface-to-scenario.command';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -205,7 +207,9 @@ export const mapAclDomainToHttpError = (
     | typeof costSurfaceNotFound
     | typeof costSurfaceStillInUse
     | typeof cannotDeleteDefaultCostSurface
-    | typeof deleteCostSurfaceFailed,
+    | typeof deleteCostSurfaceFailed
+    | typeof scenarioNotEditable
+    | typeof linkCostSurfaceToScenarioFailed,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -395,7 +399,7 @@ export const mapAclDomainToHttpError = (
       );
     case costSurfaceNotFound:
       throw new NotFoundException(
-        `Cost Surface not found for Project with id ${options?.projectId}`,
+        `Cost Surface ${options?.costSurfaceId} not found`,
       );
     case costSurfaceNameAlreadyExistsForProject:
       throw new ForbiddenException(
@@ -462,6 +466,14 @@ export const mapAclDomainToHttpError = (
     case customProtectedAreaIsUsedInOneOrMoreScenarios:
       throw new ForbiddenException(
         `Custom protected area is used in one or more scenarios cannot be deleted.`,
+      );
+    case scenarioNotEditable:
+      throw new ForbiddenException(
+        `Scenario with id ${options?.scenarioId} is not editable by the given user`,
+      );
+    case linkCostSurfaceToScenarioFailed:
+      throw new BadRequestException(
+        `Linking Cost Surface to Scenario ${options?.scenarioId} failed`,
       );
 
     default:

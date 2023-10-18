@@ -14,9 +14,11 @@ import { getFixtures } from '../planning-unit-fixtures';
 import { CostSurfaceShapefileRecord } from '@marxan-geoprocessing/modules/cost-surface/ports/cost-surface-shapefile-record';
 import {
   FromProjectShapefileJobInput,
+  LinkCostSurfaceToScenarioJobInput,
   ProjectCostSurfaceJobInput,
 } from '@marxan/artifact-cache/surface-cost-job-input';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
+import { v4 } from 'uuid';
 
 export const createWorld = async (app: INestApplication) => {
   const newCost = [199.99, 300, 1];
@@ -33,27 +35,47 @@ export const createWorld = async (app: INestApplication) => {
     },
     WhenTheJobIsProcessed: async (job: Job<ProjectCostSurfaceJobInput>) =>
       fixtures.projectCostSurfaceProcessor.process(job),
+    WhenTheCostSurfaceLinkingJobIsProcessed: async (
+      job: Job<LinkCostSurfaceToScenarioJobInput>,
+    ) => await fixtures.scenarioCostSurfaceProcessor.process(job),
     GivenPuCostDataExists: fixtures.GivenPuCostDataExists,
+    GivenScenarioPuDataExists: fixtures.GivenScenarioPuDataExists,
+    GivenCostSurfacePuDataExists: fixtures.GivenCostSurfacePuDataExists,
     getShapefileForScenarioWithCost: () =>
-      ({
+      (({
         data: {
           scenarioId: fixtures.scenarioId,
           shapefile,
         },
         id: 'test-job',
-      }) as unknown as Job<FromShapefileJobInput>,
+      } as unknown) as Job<FromShapefileJobInput>),
     getShapefileForProjectWithCost: (
       projectId: string,
       costSurfaceId: string,
     ) =>
-      ({
+      (({
         data: {
           projectId,
           costSurfaceId,
           shapefile,
         },
         id: 'test-job',
-      }) as unknown as Job<FromProjectShapefileJobInput>,
+      } as unknown) as Job<FromProjectShapefileJobInput>),
+    getLinkCostSurfaceToScenarioJob: (
+      scenarioId: string,
+      costSurfaceId: string,
+    ) =>
+      (({
+        data: {
+          type: 'LinkCostSurfaceToScenarioJobInput',
+          projectId: v4(),
+          scenarioId,
+          costSurfaceId,
+          originalCostSurfaceId: v4(),
+          mode: 'creation',
+        },
+        id: 'test-job',
+      } as unknown) as Job<LinkCostSurfaceToScenarioJobInput>),
     ThenCostIsUpdated: async () => {
       const newCost = await fixtures.GetPuCostsData(fixtures.scenarioId);
       expect(newCost).toEqual(
@@ -76,6 +98,21 @@ export const createWorld = async (app: INestApplication) => {
         .then((cost: CostSurfacePuDataEntity[]) =>
           expect(cost[0].cost).toEqual(199.99),
         ),
+    ThenTheScenarioPuCostDataIsUpdated: async (
+      scenarioId: string,
+      cost: number,
+    ) => {
+      const puCosts = await fixtures.planningUnitCostDataRepo
+        .createQueryBuilder('spcd')
+        .select('cost')
+        .leftJoin(
+          'scenarios_pu_data',
+          'spd',
+          'spcd.scenarios_pu_data_id = spd.id',
+        )
+        .getRawMany();
+      expect(puCosts.every((puCost) => puCost.cost === cost)).toBeTruthy();
+    },
   };
 };
 

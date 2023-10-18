@@ -18,6 +18,13 @@ import {
 } from '@marxan-api/modules/cost-surface/delete-cost-surface/delete-cost-surface.command';
 import { CostSurfaceCalculationPort } from '@marxan-api/modules/cost-surface/ports/project/cost-surface-calculation.port';
 import { CommandBus } from '@nestjs/cqrs';
+import { scenarioNotFound } from '@marxan-api/modules/blm/values/blm-repos';
+import {
+  LinkCostSurfaceToScenarioCommand,
+  LinkCostSurfaceToScenarioError,
+} from '@marxan-api/modules/cost-surface/application/scenario/link-cost-surface-to-scenario.command';
+import { scenarioNotEditable } from '@marxan-api/modules/scenarios/scenarios.service';
+import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios-acl/scenario-acl.service';
 
 export const costSurfaceNotEditableWithinProject = Symbol(
   `cost surface not editable within project`,
@@ -45,7 +52,10 @@ export class CostSurfaceService {
   constructor(
     @InjectRepository(CostSurface)
     private readonly costSurfaceRepository: Repository<CostSurface>,
+    @InjectRepository(Scenario)
+    private readonly scenarioRepository: Repository<Scenario>,
     private readonly projectAclService: ProjectAclService,
+    private readonly scenarioAclService: ScenarioAclService,
     private readonly calculateCost: CostSurfaceCalculationPort,
     private readonly commandBus: CommandBus,
   ) {}
@@ -155,6 +165,49 @@ export class CostSurfaceService {
     );
   }
 
+  async linkCostSurfaceToScenario(
+    userId: string,
+    scenarioId: string,
+    costSurfaceId: string,
+  ): Promise<
+    Either<
+      | typeof scenarioNotEditable
+      | typeof costSurfaceNotFound
+      | typeof scenarioNotFound
+      | LinkCostSurfaceToScenarioError,
+      true
+    >
+  > {
+    const scenario = await this.scenarioRepository.findOne({
+      where: { id: scenarioId },
+    });
+    if (!scenario) {
+      return left(scenarioNotFound);
+    }
+
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(scenarioNotEditable);
+    }
+
+    const costSurface = await this.costSurfaceRepository.findOne({
+      where: { id: costSurfaceId },
+    });
+    if (!costSurface) {
+      return left(costSurfaceNotFound);
+    }
+
+    if (scenario.projectId !== costSurface.projectId) {
+      return left(costSurfaceNotFound);
+    }
+    if (scenario.costSurfaceId === costSurface.id) {
+      return right(true);
+    }
+
+    return this.commandBus.execute(
+      new LinkCostSurfaceToScenarioCommand(scenarioId, costSurfaceId, 'update'),
+    );
+  }
+
   async update(
     userId: string,
     projectId: string,
@@ -244,6 +297,7 @@ export class CostSurfaceService {
 
     return right(costSurface);
   }
+
   async getCostSurface(
     userId: string,
     projectId: string,
