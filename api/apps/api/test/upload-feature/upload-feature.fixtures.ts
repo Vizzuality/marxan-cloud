@@ -271,6 +271,8 @@ export const getFixtures = async () => {
           featureClassName: name,
           description,
           alias: null,
+          amountMax: null,
+          amountMin: null,
           propertyName: null,
           intersection: null,
           creationStatus: `done`,
