@@ -843,13 +843,13 @@ export class GeoFeaturesService extends AppBaseService<
         .addSelect('MAX(amount)', 'max')
         .from('puvspr_calculations', 'puvspr')
         .where('puvspr.feature_id = :featureId', { featureId })
-        .getOneOrFail();
+        .getOne();
 
       await this.geoFeaturesRepository.update(
         { id: featureId },
         {
-          amountMin: minAndMaxAmount.min,
-          amountMax: minAndMaxAmount.max,
+          amountMin: minAndMaxAmount?.min ?? null,
+          amountMax: minAndMaxAmount?.max ?? null,
         },
       );
     }
