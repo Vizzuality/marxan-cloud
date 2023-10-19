@@ -843,12 +843,15 @@ export class GeoFeaturesService extends AppBaseService<
     const minAndMaxAmountsForFeatures = await this.geoEntityManager
       .createQueryBuilder()
       .select('feature_id', 'id')
-      .select('MIN(amount)', 'amountMin')
+      .addSelect('MIN(amount)', 'amountMin')
       .addSelect('MAX(amount)', 'amountMax')
       .from('puvspr_calculations', 'puvspr')
       .where('puvspr.feature_id IN (:...featureIds)', { featureIds })
-      .getMany();
+      .groupBy('puvspr.feature_id')
+      .getRawMany();
 
-    await this.geoFeaturesRepository.save(minAndMaxAmountsForFeatures);
+    await this.geoFeaturesRepository.upsert(minAndMaxAmountsForFeatures, [
+      'id',
+    ]);
   }
 }
