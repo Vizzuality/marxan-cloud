@@ -835,23 +835,20 @@ export class GeoFeaturesService extends AppBaseService<
     } as GeoFeature;
   }
 
-  async saveAmountRangeForFeatures(featureIds: string[]) {
-    for (const featureId of featureIds) {
-      const minAndMaxAmount = await this.geoEntityManager
-        .createQueryBuilder()
-        .select('MIN(amount)', 'min')
-        .addSelect('MAX(amount)', 'max')
-        .from('puvspr_calculations', 'puvspr')
-        .where('puvspr.feature_id = :featureId', { featureId })
-        .getOne();
+  // @TODO: update tests once saving amounts in puvspr_calculations is consolidates
 
-      await this.geoFeaturesRepository.update(
-        { id: featureId },
-        {
-          amountMin: minAndMaxAmount?.min ?? null,
-          amountMax: minAndMaxAmount?.max ?? null,
-        },
-      );
-    }
+  async saveAmountRangeForFeatures(featureIds: string[]) {
+    this.logger.log(`Saving min and max amounts for new features...`);
+
+    const minAndMaxAmountsForFeatures = await this.geoEntityManager
+      .createQueryBuilder()
+      .select('feature_id', 'id')
+      .select('MIN(amount)', 'amountMin')
+      .addSelect('MAX(amount)', 'amountMax')
+      .from('puvspr_calculations', 'puvspr')
+      .where('puvspr.feature_id IN (:...featureIds)', { featureIds })
+      .getMany();
+
+    await this.geoFeaturesRepository.save(minAndMaxAmountsForFeatures);
   }
 }
