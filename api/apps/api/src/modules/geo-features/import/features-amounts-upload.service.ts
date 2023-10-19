@@ -117,17 +117,17 @@ export class FeatureAmountUploadService {
         apiQueryRunner.manager,
       );
 
-      this.logger.log(`Saving min and max amounts for new features...`);
-
-      await this.geoFeaturesService.saveAmountRangeForFeatures(
-        newFeaturesFromCsvUpload.map((feature) => feature.id),
-      );
-
       this.logger.log(`Csv file upload process finished successfully`);
       // Committing transaction
 
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
+
+      this.logger.log(`Saving min and max amounts for new features...`);
+
+      await this.geoFeaturesService.saveAmountRangeForFeatures(
+        newFeaturesFromCsvUpload.map((feature) => feature.id),
+      );
     } catch (err) {
       await this.events.failEvent(err);
       await apiQueryRunner.rollbackTransaction();
