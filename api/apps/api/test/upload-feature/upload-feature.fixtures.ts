@@ -307,6 +307,8 @@ export const getFixtures = async () => {
       expect(newFeaturesAdded[0].projectId).toBe(projectId);
       expect(newFeaturesAdded[0].isLegacy).toBe(true);
       expect(newFeaturesAdded[1].isLegacy).toBe(true);
+      expect(newFeaturesAdded[0].amountMin).toEqual(3.245387225);
+      expect(newFeaturesAdded[0].amountMax).toEqual(4.245387225);
     },
 
     ThenNewFeaturesAmountsAreCreated: async () => {
@@ -322,6 +324,9 @@ export const getFixtures = async () => {
       });
       const newFeature1Amounts = await featuresAmounsGeoDbRepository.find({
         where: { featureId: newFeatures1?.id },
+        order: {
+          amount: 'DESC',
+        },
       });
       const newFeature2Amounts = await featuresAmounsGeoDbRepository.find({
         where: { featureId: newFeatures2?.id },
@@ -331,7 +336,7 @@ export const getFixtures = async () => {
       expect(newFeature2Amounts).toHaveLength(3);
       expect(newFeature1Amounts[0].amount).toBe(4.245387225);
       expect(newFeature1Amounts[1].amount).toBe(4.245387225);
-      expect(newFeature1Amounts[2].amount).toBe(4.245387225);
+      expect(newFeature1Amounts[2].amount).toBe(3.245387225);
 
       expect(newFeature2Amounts[0].amount).toBe(0);
       expect(newFeature2Amounts[1].amount).toBe(0);

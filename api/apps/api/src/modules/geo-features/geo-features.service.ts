@@ -850,8 +850,22 @@ export class GeoFeaturesService extends AppBaseService<
       .groupBy('puvspr.feature_id')
       .getRawMany();
 
-    await this.geoFeaturesRepository.upsert(minAndMaxAmountsForFeatures, [
-      'id',
-    ]);
+    const minMaxSqlValueStringForFeatures = minAndMaxAmountsForFeatures
+      .map(
+        (feature) =>
+          `(uuid('${feature.id}'), ${feature.amountMin}, ${feature.amountMax})`,
+      )
+      .join(', ');
+
+    const query = `
+        update features set
+           amount_min = minmax.min,
+           amount_max = minmax.max
+        from (
+        values
+            ${minMaxSqlValueStringForFeatures}
+        ) as minmax(feature_id, min, max)
+        where features.id = minmax.feature_id;`;
+    await this.geoFeaturesRepository.query(query);
   }
 }

@@ -119,15 +119,15 @@ export class FeatureAmountUploadService {
 
       this.logger.log(`Saving min and max amounts for new features...`);
 
-      await this.geoFeaturesService.saveAmountRangeForFeatures(
-        newFeaturesFromCsvUpload.map((feature) => feature.id),
-      );
-
       this.logger.log(`Csv file upload process finished successfully`);
       // Committing transaction
 
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
+
+      await this.geoFeaturesService.saveAmountRangeForFeatures(
+        newFeaturesFromCsvUpload.map((feature) => feature.id),
+      );
     } catch (err) {
       await this.events.failEvent(err);
       await apiQueryRunner.rollbackTransaction();
@@ -333,6 +333,10 @@ export class FeatureAmountUploadService {
             RETURNING *
           `,
           parameters,
+        );
+        await geoQueryRunner.manager.query(
+          ` INSERT INTO puvspr_calculations (project_id, feature_id, amount, project_pu_id) select $1, $2, amount, project_pu_id from features_data where feature_id = $2`,
+          [projectId, newFeature.id],
         );
         this.logger.log(
           `Chunk with index ${amountIndex} saved to (geoDB).features_data`,
