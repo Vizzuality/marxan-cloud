@@ -27,7 +27,7 @@ let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-}, 1000000);
+}, 12_000);
 
 describe('ScenariosModule (e2e)', () => {
   it('Creating a scenario with incomplete data should fail', async () => {
@@ -92,7 +92,7 @@ describe('ScenariosModule (e2e)', () => {
     const response =
       await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner(false);
     fixtures.ThenCostSurfaceNotFoundMessageIsReturned(response);
-  }, 1000000);
+  });
 
   it('Creating a scenario with complete data should succeed', async () => {
     const response =

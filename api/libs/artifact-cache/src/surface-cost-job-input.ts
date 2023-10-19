@@ -20,9 +20,10 @@ export type LinkCostSurfaceToScenarioJobInput = {
   scenarioId: string;
   costSurfaceId: string;
   originalCostSurfaceId: string;
-
-  mode: 'creation' | 'update';
+  mode: LinkCostSurfaceToScenarioMode;
 };
+
+export type LinkCostSurfaceToScenarioMode = 'creation' | 'update';
 
 export type ScenarioCostSurfaceJobInput = LinkCostSurfaceToScenarioJobInput;
 

@@ -1,11 +1,13 @@
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
+import { LinkCostSurfaceToScenarioMode } from '@marxan/artifact-cache/surface-cost-job-input';
 
 export const linkCostSurfaceToScenarioFailed = Symbol(
   'link surface cost to scenario failed',
 );
 
-export type LinkCostSurfaceToScenarioError = typeof linkCostSurfaceToScenarioFailed;
+export type LinkCostSurfaceToScenarioError =
+  typeof linkCostSurfaceToScenarioFailed;
 
 export type LinkCostSurfaceToScenarioResponse = Either<
   LinkCostSurfaceToScenarioError,
@@ -20,7 +22,7 @@ export class LinkCostSurfaceToScenarioCommand extends Command<LinkCostSurfaceToS
   constructor(
     public readonly scenarioId: string,
     public readonly costSurfaceId: string,
-    public readonly mode: 'creation' | 'update',
+    public readonly mode: LinkCostSurfaceToScenarioMode,
   ) {
     super();
   }
