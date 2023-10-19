@@ -35,13 +35,18 @@ import { GeoFeaturesRequestInfo } from './geo-features-request-info';
 import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
-import { projectNotFound } from '@marxan-api/modules/projects/projects.service';
+import {
+  projectNotFound,
+  projectNotVisible,
+} from '@marxan-api/modules/projects/projects.service';
 import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
-import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
+import {
+  featureNotFoundWithinProject,
+  GeoFeatureTagsService,
+} from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
-import { isLeft } from 'fp-ts/Either';
 import { isNil } from 'lodash';
 
 const geoFeatureFilterKeyNames = [
@@ -833,5 +838,30 @@ export class GeoFeaturesService extends AppBaseService<
       ...feature,
       scenarioUsageCount: usage ? Number(usage.count) : 0,
     } as GeoFeature;
+  }
+
+  async checkProjectFeatureVisibility(
+    userId: string,
+    projectId: string,
+    featureId: string,
+  ): Promise<
+    Either<
+      typeof featureNotFoundWithinProject | typeof projectNotVisible,
+      GeoFeature
+    >
+  > {
+    const projectFeature = await this.geoFeaturesRepository.findOne({
+      where: { id: featureId, projectId },
+    });
+
+    console.log('projectFeature', projectFeature);
+    if (!projectFeature) {
+      return left(featureNotFoundWithinProject);
+    }
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(projectNotVisible);
+    }
+
+    return right(projectFeature);
   }
 }
