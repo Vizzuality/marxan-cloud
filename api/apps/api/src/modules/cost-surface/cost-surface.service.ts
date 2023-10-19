@@ -208,6 +208,35 @@ export class CostSurfaceService {
     );
   }
 
+  async unlinkCostSurfaceFromScenario(
+    userId: string,
+    scenarioId: string,
+  ): Promise<
+    Either<
+      | typeof scenarioNotEditable
+      | typeof costSurfaceNotFound
+      | typeof scenarioNotFound
+      | LinkCostSurfaceToScenarioError,
+      true
+    >
+  > {
+    const scenario = await this.scenarioRepository.findOne({
+      where: { id: scenarioId },
+    });
+    if (!scenario) {
+      return left(scenarioNotFound);
+    }
+
+    const costSurface = await this.costSurfaceRepository.findOne({
+      where: { projectId: scenario.projectId, isDefault: true },
+    });
+    if (!costSurface) {
+      return left(costSurfaceNotFound);
+    }
+
+    return this.linkCostSurfaceToScenario(userId, scenarioId, costSurface.id);
+  }
+
   async update(
     userId: string,
     projectId: string,

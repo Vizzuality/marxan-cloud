@@ -250,7 +250,17 @@ export const getProjectCostSurfaceFixtures = async () => {
     ) => {
       return request(app.getHttpServer())
         .post(
-          `/api/v1/scenarios/${scenarioId}/link-cost-surface/${costSurfaceId}`,
+          `/api/v1/scenarios/${scenarioId}/cost-surface/${costSurfaceId}`,
+        )
+        .set('Authorization', `Bearer ${token}`)
+        .send();
+    },
+    WhenUnlinkingCostSurfaceToScenario: async (
+      scenarioId: string,
+    ) => {
+      return request(app.getHttpServer())
+        .delete(
+          `/api/v1/scenarios/${scenarioId}/cost-surface/`,
         )
         .set('Authorization', `Bearer ${token}`)
         .send();

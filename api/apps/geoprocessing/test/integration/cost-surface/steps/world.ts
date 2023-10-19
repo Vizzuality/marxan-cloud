@@ -14,7 +14,7 @@ import { getFixtures } from '../planning-unit-fixtures';
 import { CostSurfaceShapefileRecord } from '@marxan-geoprocessing/modules/cost-surface/ports/cost-surface-shapefile-record';
 import {
   FromProjectShapefileJobInput,
-  LinkCostSurfaceToScenarioJobInput,
+  LinkCostSurfaceToScenarioJobInput, LinkCostSurfaceToScenarioMode,
   ProjectCostSurfaceJobInput,
 } from '@marxan/artifact-cache/surface-cost-job-input';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
@@ -64,6 +64,7 @@ export const createWorld = async (app: INestApplication) => {
     getLinkCostSurfaceToScenarioJob: (
       scenarioId: string,
       costSurfaceId: string,
+      mode: LinkCostSurfaceToScenarioMode
     ) =>
       (({
         data: {
@@ -72,7 +73,7 @@ export const createWorld = async (app: INestApplication) => {
           scenarioId,
           costSurfaceId,
           originalCostSurfaceId: v4(),
-          mode: 'creation',
+          mode: mode,
         },
         id: 'test-job',
       } as unknown) as Job<LinkCostSurfaceToScenarioJobInput>),

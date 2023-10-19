@@ -445,7 +445,7 @@ export class ScenariosController {
     required: true,
   })
   @ApiTags(asyncJobTag)
-  @Post(`:scenarioId/link-cost-surface/:costSurfaceId`)
+  @Post(`:scenarioId/cost-surface/:costSurfaceId`)
   async linkCostSurfaceToScenario(
     @Param('scenarioId') scenarioId: string,
     @Param('costSurfaceId') costSurfaceId: string,
@@ -469,25 +469,22 @@ export class ScenariosController {
   }
 
   @ApiOperation({
-    description:
-      'To be removed soon to POST /projects/:projectId/cost-surface/shapefile',
+    description: `Unlinks the currently applied CostSurface from the given Scenario, and links back the default Cost Surface of the Scenario's Project`,
   })
   @ApiParam({
     name: 'scenarioId',
-    description: 'Id of the Scenario that the Cost Surface will be applied',
+    description: 'Id of the Scenario that will have its Cost Surface unlinked',
     required: true,
   })
   @ApiTags(asyncJobTag)
-  @Post(`:scenarioId/unlink-cost-surface/`)
+  @Delete(`:scenarioId/cost-surface/`)
   async unlinkCostSurfaceToScenario(
     @Param('scenarioId') scenarioId: string,
-    @Param('costSurfaceId') costSurfaceId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<JsonApiAsyncJobMeta> {
-    const result = await this.costSurfaceService.linkCostSurfaceToScenario(
+    const result = await this.costSurfaceService.unlinkCostSurfaceFromScenario(
       req.user.id,
       scenarioId,
-      costSurfaceId,
     );
 
     if (isLeft(result)) {

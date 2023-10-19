@@ -9,7 +9,8 @@ import { ScenarioCostSurfacePersistencePort } from '@marxan-geoprocessing/module
 
 @Injectable()
 export class ScenarioCostSurfaceProcessor
-  implements WorkerProcessor<ScenarioCostSurfaceJobInput, true> {
+  implements WorkerProcessor<ScenarioCostSurfaceJobInput, true>
+{
   constructor(private readonly repo: ScenarioCostSurfacePersistencePort) {}
 
   private async linkCostSurfaceToScenario({
@@ -18,6 +19,7 @@ export class ScenarioCostSurfaceProcessor
     await this.repo.linkScenarioToCostSurface(
       data.scenarioId,
       data.costSurfaceId,
+      data.mode,
     );
 
     return true;

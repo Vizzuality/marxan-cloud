@@ -315,6 +315,40 @@ describe('Cost Surface', () => {
         scenario.id,
       );
     });
+    it(`should link back to the scenario's project default cost surface when unlinkind`, async () => {
+      // ARRANGE
+      const projectId = await fixtures.GivenProject('someProject');
+      const defaultCostSurface = await fixtures.GivenDefaultCostSurfaceForProject(
+        projectId,
+      );
+      const costSurface = await fixtures.GivenCostSurfaceMetadataForProject(
+        projectId,
+        'someCostSurface',
+      );
+      const scenario = await fixtures.GivenScenario(
+        projectId,
+        costSurface.id,
+        'someName',
+      );
+      fixtures.GivenNoJobsOnScenarioCostSurfaceQueue();
+
+      // ACT
+      await fixtures.WhenUnlinkingCostSurfaceToScenario(scenario.id);
+
+      // ASSERT
+      await fixtures.ThenCostSurfaceIsLinkedToScenario(
+        scenario.id,
+        defaultCostSurface.id,
+      );
+      await fixtures.ThenLinkCostSurfaceToScenarioJobWasSent(
+        scenario.id,
+        defaultCostSurface.id,
+        costSurface.id,
+      );
+      await fixtures.ThenLinkCostSurfaceToScenarioSubmittedApiEventWasSaved(
+        scenario.id,
+      );
+    });
 
     it(`should return error when the Scenario was not found`, async () => {
       // ARRANGE
