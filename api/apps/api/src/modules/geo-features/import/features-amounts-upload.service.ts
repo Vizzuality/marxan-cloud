@@ -334,6 +334,14 @@ export class FeatureAmountUploadService {
           `,
           parameters,
         );
+        await geoQueryRunner.manager.query(
+          `
+          INSERT INTO puvspr_calculations (project_id, feature_id, amount, project_pu_id)
+          select $1, $2, amount, project_pu_id from features_data
+          where feature_id = $2
+          `,
+          [projectId, newFeature.id],
+        );
         this.logger.log(
           `Chunk with index ${amountIndex} saved to (geoDB).features_data`,
         );
