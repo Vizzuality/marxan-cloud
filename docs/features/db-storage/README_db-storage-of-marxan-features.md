@@ -39,7 +39,7 @@ When we process/calculate features that were created from shapefiles (that is,
 to calculate the area of the intersection between a feature and each planning
 unit in a project), we do generate a union of all of a feature's geometries "on
 the fly" via `st_union()` (see
-`PuvsprCalculationsService.computeMarxanAmountPerPlanningUnit()`), and then
+`FeatureAmountsPerPlanningUnitService.computeMarxanAmountPerPlanningUnit()`), and then
 intersect this "whole feature" with each planning unit, and calculate the
 intersection area as "amount" of the feature).
 

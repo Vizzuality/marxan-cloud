@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import {
   FeatureAmountPerProjectPlanningUnit,
-  PuvsprCalculationsRepository,
-} from './puvspr-calculations.repository';
+  FeatureAmountsPerPlanningUnitRepository,
+} from './feature-amounts-per-planning-unit.repository';
 
 @Injectable()
-export class MemoryPuvsprCalculationsRepository
-  implements PuvsprCalculationsRepository
+export class MemoryFeatureAmountsPerPlanningUnitRepository
+  implements FeatureAmountsPerPlanningUnitRepository
 {
   public memory: Record<string, FeatureAmountPerProjectPlanningUnit[]> = {};
   async areAmountPerPlanningUnitAndFeatureSaved(

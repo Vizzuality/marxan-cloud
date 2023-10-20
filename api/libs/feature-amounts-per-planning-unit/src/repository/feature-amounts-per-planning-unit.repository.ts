@@ -4,7 +4,7 @@ export type FeatureAmountPerProjectPlanningUnit = {
   projectPuId: string;
 };
 
-export abstract class PuvsprCalculationsRepository {
+export abstract class FeatureAmountsPerPlanningUnitRepository {
   abstract areAmountPerPlanningUnitAndFeatureSaved(
     projectId: string,
     featureId: string,

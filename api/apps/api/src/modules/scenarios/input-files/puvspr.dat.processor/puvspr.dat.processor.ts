@@ -13,7 +13,7 @@ import {
 import { SpecificationRepository } from '@marxan-api/modules/specification/application/specification.repository';
 import { Specification } from '@marxan-api/modules/specification/domain';
 import { SingleSplitConfigFeatureValue } from '@marxan/features-hash';
-import { PuvsprCalculationsService } from '@marxan/puvspr-calculations';
+import { FeatureAmountsPerPlanningUnitService } from '@marxan/feature-amounts-per-planning-unit';
 import { SpecificationOperation } from '@marxan/specification';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -38,7 +38,7 @@ export class PuvsprDatProcessor {
     private readonly scenarioSpecificationsRepo: ScenarioSpecificationRepo,
     private readonly specificationsRepo: SpecificationRepository,
     private readonly geoFeatureMapper: GeoFeatureDtoMapper,
-    private readonly puvsprCalculationsService: PuvsprCalculationsService,
+    private readonly featureAmountsPerPlanningUnitService: FeatureAmountsPerPlanningUnitService,
     private readonly splitConfigHasher: SingleConfigFeatureValueHasher,
     private readonly splitFeatureConfigMapper: SplitFeatureConfigMapper,
     private readonly puvsprDatFactory: PuvrsprDatFactory,
@@ -58,7 +58,7 @@ export class PuvsprDatProcessor {
     const featuresIds = await this.getFeaturesIds(specification);
 
     const featuresIdsWithSpeciesId =
-      await this.puvsprCalculationsService.computeSpeciesId(
+      await this.featureAmountsPerPlanningUnitService.computeSpeciesId(
         featuresIds,
         scenarioId,
       );

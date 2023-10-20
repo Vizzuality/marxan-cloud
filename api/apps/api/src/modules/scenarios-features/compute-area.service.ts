@@ -1,8 +1,8 @@
 import { ProjectSourcesEnum } from '@marxan/projects';
 import {
-  PuvsprCalculationsRepository,
-  PuvsprCalculationsService,
-} from '@marxan/puvspr-calculations';
+  FeatureAmountsPerPlanningUnitRepository,
+  FeatureAmountsPerPlanningUnitService,
+} from '@marxan/feature-amounts-per-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,8 +11,8 @@ import { Project } from '../projects/project.api.entity';
 @Injectable()
 export class ComputeArea {
   constructor(
-    private readonly puvsprCalculationsRepo: PuvsprCalculationsRepository,
-    private readonly puvsprCalculations: PuvsprCalculationsService,
+    private readonly featureAmountsPerPlanningUnitRepo: FeatureAmountsPerPlanningUnitRepository,
+    private readonly featureAmountsPerPlanningUnit: FeatureAmountsPerPlanningUnitService,
     @InjectRepository(Project)
     private readonly projectsRepo: Repository<Project>,
   ) {}
@@ -26,7 +26,7 @@ export class ComputeArea {
     if (isLegacyProject) return;
 
     const alreadyComputed =
-      await this.puvsprCalculationsRepo.areAmountPerPlanningUnitAndFeatureSaved(
+      await this.featureAmountsPerPlanningUnitRepo.areAmountPerPlanningUnitAndFeatureSaved(
         projectId,
         featureId,
       );
@@ -34,12 +34,12 @@ export class ComputeArea {
     if (alreadyComputed) return;
 
     const amountPerPlanningUnitOfFeature =
-      await this.puvsprCalculations.computeMarxanAmountPerPlanningUnit(
+      await this.featureAmountsPerPlanningUnit.computeMarxanAmountPerPlanningUnit(
         featureId,
         scenarioId,
       );
 
-    return this.puvsprCalculationsRepo.saveAmountPerPlanningUnitAndFeature(
+    return this.featureAmountsPerPlanningUnitRepo.saveAmountPerPlanningUnitAndFeature(
       projectId,
       amountPerPlanningUnitOfFeature.map(
         ({ featureId, projectPuId, amount }) => ({

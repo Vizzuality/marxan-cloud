@@ -4,12 +4,12 @@ import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { ProjectPuvsprCalculationsContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-puvspr-calculations';
+import { ProjectFeatureAmountsPerPlanningUnitContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-feature-amounts-per-planning-unit';
 import { SingleConfigFeatureValueStripped } from '@marxan/features-hash';
 import {
   FeatureAmountPerProjectPlanningUnit,
-  PuvsprCalculationsRepository,
-} from '@marxan/puvspr-calculations';
+  FeatureAmountsPerPlanningUnitRepository,
+} from '@marxan/feature-amounts-per-planning-unit';
 import { SpecificationOperation } from '@marxan/specification';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
@@ -36,16 +36,16 @@ type FeatureByIdMap = Record<string, Omit<FeaturesSelectResult, 'id'>>;
 
 @Injectable()
 @PieceExportProvider()
-export class ProjectPuvsprCalculationsPieceExporter
+export class ProjectFeatureAmountsPerPlanningUnitPieceExporter
   implements ExportPieceProcessor
 {
   private readonly logger: Logger = new Logger(
-    ProjectPuvsprCalculationsPieceExporter.name,
+    ProjectFeatureAmountsPerPlanningUnitPieceExporter.name,
   );
 
   constructor(
     private readonly fileRepository: CloningFilesRepository,
-    private readonly puvsprCalculationsRepo: PuvsprCalculationsRepository,
+    private readonly featureAmountsPerPlanningUnitRepo: FeatureAmountsPerPlanningUnitRepository,
     @InjectRepository(ProjectsPuEntity)
     private readonly projectPusRepo: Repository<ProjectsPuEntity>,
     @InjectEntityManager(geoprocessingConnections.apiDB)
@@ -54,7 +54,7 @@ export class ProjectPuvsprCalculationsPieceExporter
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
-      piece === ClonePiece.ProjectPuvsprCalculations &&
+      piece === ClonePiece.ProjectFeatureAmountsPerPlanningUnit &&
       kind === ResourceKind.Project
     );
   }
@@ -63,7 +63,7 @@ export class ProjectPuvsprCalculationsPieceExporter
     const projectId = input.resourceId;
 
     const featureAmountPerPlanningUnit =
-      await this.puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeatureInProject(
+      await this.featureAmountsPerPlanningUnitRepo.getAmountPerPlanningUnitAndFeatureInProject(
         projectId,
       );
 
@@ -76,13 +76,13 @@ export class ProjectPuvsprCalculationsPieceExporter
     const projectFeaturesGeoOperations =
       await this.getProjectFeaturesGeoOperations(projectId);
 
-    const fileContent: ProjectPuvsprCalculationsContent = {
-      puvsprCalculations: featuresAmountPerPlanningUnitParsed,
+    const fileContent: ProjectFeatureAmountsPerPlanningUnitContent = {
+      featureAmountsPerPlanningUnit: featuresAmountPerPlanningUnitParsed,
       projectFeaturesGeoOperations,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
-      ClonePiece.ProjectPuvsprCalculations,
+      ClonePiece.ProjectFeatureAmountsPerPlanningUnit,
     );
 
     const outputFile = await this.fileRepository.saveCloningFile(
@@ -92,7 +92,7 @@ export class ProjectPuvsprCalculationsPieceExporter
     );
 
     if (isLeft(outputFile)) {
-      const errorMessage = `${ProjectPuvsprCalculationsPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`;
+      const errorMessage = `${ProjectFeatureAmountsPerPlanningUnitPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }

@@ -58,7 +58,10 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       ExportComponent.newOne(id, ClonePiece.ProjectCustomProtectedAreas),
       ExportComponent.newOne(id, ClonePiece.ProjectCostSurfaces),
       ExportComponent.newOne(id, ClonePiece.ProjectCustomFeatures),
-      ExportComponent.newOne(id, ClonePiece.ProjectPuvsprCalculations),
+      ExportComponent.newOne(
+        id,
+        ClonePiece.ProjectFeatureAmountsPerPlanningUnit,
+      ),
       ...scenarioPieces,
     ];
 

@@ -1,5 +1,5 @@
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
-import { PuvsprCalculationsService } from '@marxan/puvspr-calculations';
+import { FeatureAmountsPerPlanningUnitService } from '@marxan/feature-amounts-per-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { FeatureAmountPerPlanningUnitId, PuvsprDat } from './puvsrpr.dat';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,7 +8,7 @@ import { Repository, In } from 'typeorm';
 @Injectable()
 export class PuvsprDatLegacyProject implements PuvsprDat {
   constructor(
-    private readonly puvsprCalculations: PuvsprCalculationsService,
+    private readonly featureAmountsPerPlanningUnit: FeatureAmountsPerPlanningUnitService,
     @InjectRepository(GeoFeature)
     private readonly featuresRepo: Repository<GeoFeature>,
   ) {}
@@ -57,7 +57,7 @@ export class PuvsprDatLegacyProject implements PuvsprDat {
   ): Promise<FeatureAmountPerPlanningUnitId[]> {
     const legacyFeaturesComputations = await Promise.all(
       featureIds.map((featureId) =>
-        this.puvsprCalculations.computeLegacyAmountPerPlanningUnit(
+        this.featureAmountsPerPlanningUnit.computeLegacyAmountPerPlanningUnit(
           featureId,
           scenarioId,
         ),
@@ -76,7 +76,7 @@ export class PuvsprDatLegacyProject implements PuvsprDat {
   ): Promise<FeatureAmountPerPlanningUnitId[]> {
     const marxanFeaturesComputations = await Promise.all(
       featureIds.map((featureId) =>
-        this.puvsprCalculations.computeMarxanAmountPerPlanningUnit(
+        this.featureAmountsPerPlanningUnit.computeMarxanAmountPerPlanningUnit(
           featureId,
           scenarioId,
         ),

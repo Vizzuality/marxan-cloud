@@ -28,7 +28,7 @@ import {
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { ComputeArea } from './compute-area.service';
 import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/infra/legacy-project-import.repository.module';
-import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
+import { FeatureAmountsPerPlanningUnitModule } from '@marxan/feature-amounts-per-planning-unit';
 import { SplitFeatureConfigMapper } from '../scenarios/specification/split-feature-config.mapper';
 import { FeatureHashModule } from '../features-hash/features-hash.module';
 import { SplitCreateFeatures } from './split/split-create-features.service';
@@ -47,7 +47,7 @@ import { Project } from '../projects/project.api.entity';
       DbConnections.geoprocessingDB,
     ),
     FeatureHashModule,
-    PuvsprCalculationsModule.for(DbConnections.geoprocessingDB),
+    FeatureAmountsPerPlanningUnitModule.for(DbConnections.geoprocessingDB),
     ProjectsModule,
     ApiEventsModule,
     IntersectWithPuModule,

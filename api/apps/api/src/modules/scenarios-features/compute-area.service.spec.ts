@@ -1,9 +1,9 @@
 import { ProjectSourcesEnum } from '@marxan/projects';
 import {
-  MemoryPuvsprCalculationsRepository,
-  PuvsprCalculationsRepository,
-  PuvsprCalculationsService,
-} from '@marxan/puvspr-calculations';
+  MemoryFeatureAmountsPerPlanningUnitRepository,
+  FeatureAmountsPerPlanningUnitRepository,
+  FeatureAmountsPerPlanningUnitService,
+} from '@marxan/feature-amounts-per-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -43,11 +43,11 @@ const getFixtures = async () => {
         useValue: { find: findProjectMock },
       },
       {
-        provide: PuvsprCalculationsRepository,
-        useClass: MemoryPuvsprCalculationsRepository,
+        provide: FeatureAmountsPerPlanningUnitRepository,
+        useClass: MemoryFeatureAmountsPerPlanningUnitRepository,
       },
       {
-        provide: PuvsprCalculationsService,
+        provide: FeatureAmountsPerPlanningUnitService,
         useValue: {
           computeMarxanAmountPerPlanningUnit:
             computeMarxanAmountPerPlanningUnitMock,
@@ -60,8 +60,8 @@ const getFixtures = async () => {
   await sandbox.init();
 
   const sut = sandbox.get(ComputeArea);
-  const puvsprCalculationsRepo: MemoryPuvsprCalculationsRepository =
-    sandbox.get(PuvsprCalculationsRepository);
+  const featureAmountsPerPlanningUnitRepo: MemoryFeatureAmountsPerPlanningUnitRepository =
+    sandbox.get(FeatureAmountsPerPlanningUnitRepository);
 
   const expectedPuid = v4();
   const expectedAmount = 20;
@@ -106,7 +106,7 @@ const getFixtures = async () => {
       featureId: string,
     ) => {
       const savedCalculations =
-        await puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeature(
+        await featureAmountsPerPlanningUnitRepo.getAmountPerPlanningUnitAndFeature(
           projectId,
           [featureId],
         );
@@ -124,7 +124,7 @@ const getFixtures = async () => {
     ) => {
       expect(computeMarxanAmountPerPlanningUnitMock).not.toHaveBeenCalled();
       const hasBeenSaved =
-        await puvsprCalculationsRepo.areAmountPerPlanningUnitAndFeatureSaved(
+        await featureAmountsPerPlanningUnitRepo.areAmountPerPlanningUnitAndFeatureSaved(
           projectId,
           featureId,
         );
