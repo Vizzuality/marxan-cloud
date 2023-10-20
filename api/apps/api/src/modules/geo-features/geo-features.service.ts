@@ -887,7 +887,6 @@ export class GeoFeaturesService extends AppBaseService<
       where: { id: featureId, projectId },
     });
 
-    console.log('projectFeature', projectFeature);
     if (!projectFeature) {
       return left(featureNotFoundWithinProject);
     }
