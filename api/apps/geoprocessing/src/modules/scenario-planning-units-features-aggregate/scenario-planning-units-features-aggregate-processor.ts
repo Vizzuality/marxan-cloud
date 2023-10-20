@@ -11,9 +11,9 @@ WITH pu AS (
 	SELECT pug.the_geom,
            spd.id,
            spd.scenario_id,
-           pc.amount
-	from puvspr_calculations pc
-INNER JOIN projects_pu pp on pc.project_pu_id = pp.id
+           fappu.amount
+	from feature_amounts_per_planning_unit fappu
+INNER JOIN projects_pu pp on fappu.project_pu_id = pp.id
 INNER JOIN planning_units_geom pug on pp.geom_id = pug.id
 INNER JOIN scenarios_pu_data spd ON pp.id = spd.project_pu_id
 AND scenario_id = $1

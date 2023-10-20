@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('puvspr_calculations')
+@Entity('feature_amounts_per_planning_unit')
 export class PuvsprCalculationsEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
