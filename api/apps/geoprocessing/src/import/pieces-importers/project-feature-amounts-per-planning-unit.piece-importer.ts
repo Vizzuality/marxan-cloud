@@ -7,9 +7,9 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import {
   FeatureAmountPerPlanningUnit,
   ProjectFeatureGeoOperation,
-  ProjectPuvsprCalculationsContent,
-} from '@marxan/cloning/infrastructure/clone-piece-data/project-puvspr-calculations';
-import { PuvsprCalculationsEntity } from '@marxan/puvspr-calculations';
+  ProjectFeatureAmountsPerPlanningUnitContent,
+} from '@marxan/cloning/infrastructure/clone-piece-data/project-feature-amounts-per-planning-unit';
+import { FeatureAmountsPerPlanningUnitEntity } from '@marxan/feature-amounts-per-planning-unit';
 import { SpecificationOperation } from '@marxan/specification';
 import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
@@ -28,11 +28,11 @@ type FeatureSelectResult = {
 
 @Injectable()
 @PieceImportProvider()
-export class ProjectPuvsprCalculationsPieceImporter
+export class ProjectFeatureAmountsPerPlanningUnitPieceImporter
   implements ImportPieceProcessor
 {
   private readonly logger: Logger = new Logger(
-    ProjectPuvsprCalculationsPieceImporter.name,
+    ProjectFeatureAmountsPerPlanningUnitPieceImporter.name,
   );
 
   constructor(
@@ -47,7 +47,7 @@ export class ProjectPuvsprCalculationsPieceImporter
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
-      piece === ClonePiece.ProjectPuvsprCalculations &&
+      piece === ClonePiece.ProjectFeatureAmountsPerPlanningUnit &&
       kind === ResourceKind.Project
     );
   }
@@ -61,31 +61,32 @@ export class ProjectPuvsprCalculationsPieceImporter
         this.logger.error(errorMessage);
         throw new Error(errorMessage);
       }
-      const [puvsprCalculationsLocation] = uris;
+      const [featureAmountsPerPlanningUnitLocation] = uris;
 
       const readableOrError = await this.fileRepository.get(
-        puvsprCalculationsLocation.uri,
+        featureAmountsPerPlanningUnitLocation.uri,
       );
       if (isLeft(readableOrError)) {
-        const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${puvsprCalculationsLocation.uri}`;
+        const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${featureAmountsPerPlanningUnitLocation.uri}`;
         this.logger.error(errorMessage);
         throw new Error(errorMessage);
       }
 
       const buffer = await readableToBuffer(readableOrError.right);
-      const stringPuvsprCalculationsOrError = buffer.toString();
+      const stringFeatureAmountsPerPlanningUnitOrError = buffer.toString();
 
       const {
-        puvsprCalculations,
+        featureAmountsPerPlanningUnit,
         projectFeaturesGeoOperations,
-      }: ProjectPuvsprCalculationsContent = JSON.parse(
-        stringPuvsprCalculationsOrError,
+      }: ProjectFeatureAmountsPerPlanningUnitContent = JSON.parse(
+        stringFeatureAmountsPerPlanningUnitOrError,
       );
 
-      const parsedPuvsprCalculations = await this.parsePuvsprCalculations(
-        puvsprCalculations,
-        projectId,
-      );
+      const parsedFeatureAmountsPerPlanningUnit =
+        await this.parseFeatureAmountsPerPlanningUnit(
+          featureAmountsPerPlanningUnit,
+          projectId,
+        );
 
       const parsedProjectFeaturesGeoOperations =
         await this.parseProjectFeaturesGeoOperations(
@@ -94,14 +95,21 @@ export class ProjectPuvsprCalculationsPieceImporter
         );
 
       await this.geoEntityManager.transaction(async (em) => {
-        const puvsprRepo = em.getRepository(PuvsprCalculationsEntity);
+        const featureAmountsPerPlanningUnitRepo = em.getRepository(
+          FeatureAmountsPerPlanningUnitEntity,
+        );
         try {
-          await puvsprRepo.save(parsedPuvsprCalculations, {
-            chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-          });
+          await featureAmountsPerPlanningUnitRepo.save(
+            parsedFeatureAmountsPerPlanningUnit,
+            {
+              chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+            },
+          );
         } catch (e) {
           this.logger.error(e);
-          throw new Error('error while saving parsed puvspr calculations');
+          throw new Error(
+            'error while saving parsed feature amounts per planning units',
+          );
         }
 
         await this.apiEntityManager.transaction(async (em) => {
@@ -132,11 +140,11 @@ export class ProjectPuvsprCalculationsPieceImporter
     };
   }
 
-  private async parsePuvsprCalculations(
-    puvsprCalculations: FeatureAmountPerPlanningUnit[],
+  private async parseFeatureAmountsPerPlanningUnit(
+    featureAmountsPerPlanningUnit: FeatureAmountPerPlanningUnit[],
     projectId: string,
   ) {
-    const customFeaturesNames = puvsprCalculations
+    const customFeaturesNames = featureAmountsPerPlanningUnit
       .filter(({ isCustom }) => isCustom)
       .map(({ featureName }) => featureName);
 
@@ -145,7 +153,7 @@ export class ProjectPuvsprCalculationsPieceImporter
       projectId,
     );
 
-    const platformFeaturesNames = puvsprCalculations
+    const platformFeaturesNames = featureAmountsPerPlanningUnit
       .filter(({ isCustom }) => !isCustom)
       .map(({ featureName }) => featureName);
 
@@ -155,18 +163,20 @@ export class ProjectPuvsprCalculationsPieceImporter
 
     const projectPusByPuid = await this.getProjectPusByPuid(projectId);
 
-    return puvsprCalculations.map(({ isCustom, featureName, amount, puid }) => {
-      const featureId = isCustom
-        ? customFeaturesMap[featureName]
-        : platformFeaturesMap[featureName];
+    return featureAmountsPerPlanningUnit.map(
+      ({ isCustom, featureName, amount, puid }) => {
+        const featureId = isCustom
+          ? customFeaturesMap[featureName]
+          : platformFeaturesMap[featureName];
 
-      return {
-        amount,
-        projectPuId: projectPusByPuid[puid],
-        featureId,
-        projectId: projectId,
-      };
-    });
+        return {
+          amount,
+          projectPuId: projectPusByPuid[puid],
+          featureId,
+          projectId: projectId,
+        };
+      },
+    );
   }
 
   private async getCustomFeaturesByFeatureName(

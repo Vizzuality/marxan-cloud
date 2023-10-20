@@ -1,6 +1,6 @@
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
-import { PuvsprCalculationsRepository } from '@marxan/puvspr-calculations';
+import { FeatureAmountsPerPlanningUnitRepository } from '@marxan/feature-amounts-per-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -9,7 +9,7 @@ import { FeatureAmountPerPlanningUnitId, PuvsprDat } from './puvsrpr.dat';
 @Injectable()
 export class PuvsprDatMarxanProject implements PuvsprDat {
   constructor(
-    private readonly puvsprCalculationsRepo: PuvsprCalculationsRepository,
+    private readonly featureAmountsPerPlanningUnitRepo: FeatureAmountsPerPlanningUnitRepository,
     @InjectRepository(ProjectsPuEntity, DbConnections.geoprocessingDB)
     private readonly projectsPusRepo: Repository<ProjectsPuEntity>,
   ) {}
@@ -19,7 +19,7 @@ export class PuvsprDatMarxanProject implements PuvsprDat {
     featureIds: string[],
   ): Promise<FeatureAmountPerPlanningUnitId[]> {
     const amountPerPlanningUnitOfFeature =
-      await this.puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeature(
+      await this.featureAmountsPerPlanningUnitRepo.getAmountPerPlanningUnitAndFeature(
         projectId,
         featureIds,
       );

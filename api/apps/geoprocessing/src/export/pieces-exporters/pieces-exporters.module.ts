@@ -6,7 +6,7 @@ import {
   MarxanExecutionMetadataGeoEntity,
   OutputScenariosFeaturesDataGeoEntity,
 } from '@marxan/marxan-output';
-import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
+import { FeatureAmountsPerPlanningUnitModule } from '@marxan/feature-amounts-per-planning-unit';
 import { Logger, Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -21,7 +21,7 @@ import { PlanningUnitsGridPieceExporter } from './planning-units-grid.piece-expo
 import { ProjectCustomFeaturesPieceExporter } from './project-custom-features.piece-exporter';
 import { ProjectCustomProtectedAreasPieceExporter } from './project-custom-protected-areas.piece-exporter';
 import { ProjectMetadataPieceExporter } from './project-metadata.piece-exporter';
-import { ProjectPuvsprCalculationsPieceExporter } from './project-puvspr-calculations.piece-exporter';
+import { ProjectFeatureAmountsPerPlanningUnitPieceExporter } from './project-feature-amounts-per-planning-unit.piece-exporter';
 import { ScenarioFeaturesDataPieceExporter } from './scenario-features-data.piece-exporter';
 import { ScenarioFeaturesSpecificationPieceExporter } from './scenario-features-specification.piece-exporter';
 import { ScenarioInputFolderPieceExporter } from './scenario-input-folder.piece-exporter';
@@ -45,7 +45,9 @@ import { ProjectCostSurfacesPieceExporter } from '@marxan-geoprocessing/export/p
       ],
       geoprocessingConnections.default,
     ),
-    PuvsprCalculationsModule.for(geoprocessingConnections.default.name!),
+    FeatureAmountsPerPlanningUnitModule.for(
+      geoprocessingConnections.default.name!,
+    ),
     HttpModule,
   ],
   providers: [
@@ -69,7 +71,7 @@ import { ProjectCostSurfacesPieceExporter } from '@marxan-geoprocessing/export/p
     ScenarioOutputFolderPieceExporter,
     ScenarioFeaturesSpecificationPieceExporter,
     MarxanExecutionMetadataPieceExporter,
-    ProjectPuvsprCalculationsPieceExporter,
+    ProjectFeatureAmountsPerPlanningUnitPieceExporter,
     Logger,
   ],
 })

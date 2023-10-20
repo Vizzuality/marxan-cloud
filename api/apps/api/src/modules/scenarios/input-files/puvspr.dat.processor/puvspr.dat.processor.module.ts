@@ -4,7 +4,7 @@ import { SpecificationAdaptersModule } from '@marxan-api/modules/specification/a
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
-import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
+import { FeatureAmountsPerPlanningUnitModule } from '@marxan/feature-amounts-per-planning-unit';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Scenario } from '../../scenario.api.entity';
@@ -19,7 +19,7 @@ import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 
 @Module({
   imports: [
-    PuvsprCalculationsModule.for(DbConnections.geoprocessingDB),
+    FeatureAmountsPerPlanningUnitModule.for(DbConnections.geoprocessingDB),
     FeatureHashModule,
     TypeOrmModule.forFeature([Scenario, GeoFeature]),
     TypeOrmModule.forFeature(

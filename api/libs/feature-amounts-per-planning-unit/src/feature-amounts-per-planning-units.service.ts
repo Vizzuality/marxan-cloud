@@ -1,7 +1,7 @@
 import { ScenarioFeaturesData } from '@marxan/features';
 import { Inject, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
-import { FeatureAmountPerProjectPlanningUnit } from './repository/puvspr-calculations.repository';
+import { FeatureAmountPerProjectPlanningUnit } from './repository/feature-amounts-per-planning-unit.repository';
 
 export const geoEntityManagerToken = Symbol('geo entity manager token');
 
@@ -11,7 +11,7 @@ export type ComputeFeatureAmountPerPlanningUnit =
   };
 
 @Injectable()
-export class PuvsprCalculationsService {
+export class FeatureAmountsPerPlanningUnitService {
   constructor(
     @Inject(geoEntityManagerToken)
     private readonly geoEntityManager: EntityManager,

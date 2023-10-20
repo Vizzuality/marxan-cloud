@@ -99,7 +99,7 @@ const getFixtures = async () => {
       ClonePiece.ProjectCustomProtectedAreas,
       ClonePiece.ProjectCostSurfaces,
       ClonePiece.ProjectCustomFeatures,
-      ClonePiece.ProjectPuvsprCalculations,
+      ClonePiece.ProjectFeatureAmountsPerPlanningUnit,
     ];
   };
 

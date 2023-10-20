@@ -17,10 +17,10 @@ export type ProjectFeatureGeoOperation = {
   geoOperation: GeoOperation;
 };
 
-export type ProjectPuvsprCalculationsContent = {
-  puvsprCalculations: FeatureAmountPerPlanningUnit[];
+export type ProjectFeatureAmountsPerPlanningUnitContent = {
+  featureAmountsPerPlanningUnit: FeatureAmountPerPlanningUnit[];
   projectFeaturesGeoOperations: ProjectFeatureGeoOperation[];
 };
 
-export const projectPuvsprCalculationsRelativePath =
-  'project-puvspr-calculations.json';
+export const projectFeatureAmountsPerPlanningUnitRelativePath =
+  'project-feature-amounts-per-planning-unit.json';

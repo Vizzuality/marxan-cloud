@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
-import { PuvsprCalculationsEntity } from '../puvspr-calculations.geo.entity';
-import { geoEntityManagerToken } from '../puvspr-calculations.service';
+import { FeatureAmountsPerPlanningUnitEntity } from '../feature-amounts-per-planning-unit.geo.entity';
+import { geoEntityManagerToken } from '../feature-amounts-per-planning-units.service';
 import {
   FeatureAmountPerProjectPlanningUnit,
-  PuvsprCalculationsRepository,
-} from './puvspr-calculations.repository';
+  FeatureAmountsPerPlanningUnitRepository,
+} from './feature-amounts-per-planning-unit.repository';
 
 @Injectable()
-export class TypeOrmPuvsprCalculationsRepository
-  implements PuvsprCalculationsRepository
+export class TypeormFeatureAmountsPerPlanningUnitRepository
+  implements FeatureAmountsPerPlanningUnitRepository
 {
   constructor(
     @Inject(geoEntityManagerToken)
@@ -23,7 +23,7 @@ export class TypeOrmPuvsprCalculationsRepository
       .select('amount')
       .addSelect('project_pu_id', 'projectPuId')
       .addSelect('feature_id', 'featureId')
-      .from(PuvsprCalculationsEntity, 'puvspr')
+      .from(FeatureAmountsPerPlanningUnitEntity, 'fappu')
       .where('project_id = :projectId', { projectId })
       .execute();
   }
@@ -37,7 +37,7 @@ export class TypeOrmPuvsprCalculationsRepository
       .select('amount')
       .addSelect('project_pu_id', 'projectPuId')
       .addSelect('feature_id', 'featureId')
-      .from(PuvsprCalculationsEntity, 'puvspr')
+      .from(FeatureAmountsPerPlanningUnitEntity, 'fappu')
       .where('project_id = :projectId', { projectId })
       .andWhere('feature_id IN (:...featureIds)', { featureIds })
       .execute();
@@ -47,7 +47,9 @@ export class TypeOrmPuvsprCalculationsRepository
     projectId: string,
     results: FeatureAmountPerProjectPlanningUnit[],
   ) {
-    const repo = this.geoEntityManager.getRepository(PuvsprCalculationsEntity);
+    const repo = this.geoEntityManager.getRepository(
+      FeatureAmountsPerPlanningUnitEntity,
+    );
     await repo.save(
       results.map(({ amount, projectPuId, featureId }) => ({
         projectId,

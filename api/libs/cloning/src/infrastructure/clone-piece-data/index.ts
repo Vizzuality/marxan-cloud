@@ -12,7 +12,7 @@ import { planningUnitsGridGeoJSONRelativePath } from './planning-units-grid-geoj
 import { projectCustomFeaturesRelativePath } from './project-custom-features';
 import { projectCustomProtectedAreasRelativePath } from './project-custom-protected-areas';
 import { projectMetadataRelativePath } from './project-metadata';
-import { projectPuvsprCalculationsRelativePath } from './project-puvspr-calculations';
+import { projectFeatureAmountsPerPlanningUnitRelativePath } from './project-feature-amounts-per-planning-unit';
 import { scenarioFeaturesDataRelativePath } from './scenario-features-data';
 import { featuresSpecificationRelativePath } from './scenario-features-specification';
 import { scenarioInputFolderRelativePath } from './scenario-input-folder';
@@ -69,7 +69,7 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   [ClonePiece.ScenarioProtectedAreas]: 4,
   [ClonePiece.ScenarioPlanningUnitsData]: 4,
   //
-  [ClonePiece.ProjectPuvsprCalculations]: 5,
+  [ClonePiece.ProjectFeatureAmountsPerPlanningUnit]: 5,
   [ClonePiece.ScenarioFeaturesData]: 5,
   //
   [ClonePiece.ScenarioRunResults]: 6,
@@ -99,8 +99,8 @@ export class ClonePieceRelativePathResolver {
       projectCustomProtectedAreasRelativePath,
     [ClonePiece.ProjectCostSurfaces]: () => projectCostSurfacesRelativePath,
     [ClonePiece.ProjectCustomFeatures]: () => projectCustomFeaturesRelativePath,
-    [ClonePiece.ProjectPuvsprCalculations]: () =>
-      projectPuvsprCalculationsRelativePath,
+    [ClonePiece.ProjectFeatureAmountsPerPlanningUnit]: () =>
+      projectFeatureAmountsPerPlanningUnitRelativePath,
     [ClonePiece.FeaturesSpecification]:
       ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
         featuresSpecificationRelativePath,

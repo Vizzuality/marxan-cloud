@@ -27,15 +27,15 @@ import {
   GivenProjectPus,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
-import { ProjectPuvsprCalculationsPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-puvspr-calculations.piece-importer';
-import { ProjectPuvsprCalculationsContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-puvspr-calculations';
+import { ProjectFeatureAmountsPerPlanningUnitPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-feature-amounts-per-planning-unit.piece-importer';
+import { ProjectFeatureAmountsPerPlanningUnitContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-feature-amounts-per-planning-unit';
 import { SpecificationOperation } from '@marxan/specification';
 import { SingleConfigFeatureValueStripped } from '@marxan/features-hash';
 import {
-  PuvsprCalculationsEntity,
-  PuvsprCalculationsModule,
-  PuvsprCalculationsRepository,
-} from '@marxan/puvspr-calculations';
+  FeatureAmountsPerPlanningUnitEntity,
+  FeatureAmountsPerPlanningUnitModule,
+  FeatureAmountsPerPlanningUnitRepository,
+} from '@marxan/feature-amounts-per-planning-unit';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
@@ -59,7 +59,7 @@ describe(ProjectCustomFeaturesPieceImporter, () => {
 
   it('fails when the file cannot be retrieved from file repo', async () => {
     const archiveLocation =
-      fixtures.GivenNoProjectPuvsprCalculationsFileIsAvailable();
+      fixtures.GivenNoProjectFeatureAmountsPerPlanningUnitFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -69,11 +69,11 @@ describe(ProjectCustomFeaturesPieceImporter, () => {
   it('imports project puvspr calculations', async () => {
     await fixtures.GivenProject();
     const archiveLocation =
-      await fixtures.GivenValidProjectPuvsprCalculationsFile();
+      await fixtures.GivenValidProjectFeatureAmountsPerPlanningUnitFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenPuvsprCalculationsAreImportedAndDerivedFeaturesAreUpdated();
+      .ThenFeatureAmountsPerPlanningUnitAreImportedAndDerivedFeaturesAreUpdated();
   });
 });
 
@@ -91,13 +91,15 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature(
-        [PuvsprCalculationsEntity, ProjectsPuEntity],
+        [FeatureAmountsPerPlanningUnitEntity, ProjectsPuEntity],
         geoprocessingConnections.default,
       ),
       GeoCloningFilesRepositoryModule,
-      PuvsprCalculationsModule.for(geoprocessingConnections.default.name!),
+      FeatureAmountsPerPlanningUnitModule.for(
+        geoprocessingConnections.default.name!,
+      ),
     ],
-    providers: [ProjectPuvsprCalculationsPieceImporter],
+    providers: [ProjectFeatureAmountsPerPlanningUnitPieceImporter],
   }).compile();
 
   await sandbox.init();
@@ -112,14 +114,16 @@ const getFixtures = async () => {
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
   );
 
-  const sut = sandbox.get(ProjectPuvsprCalculationsPieceImporter);
+  const sut = sandbox.get(ProjectFeatureAmountsPerPlanningUnitPieceImporter);
   const fileRepository = sandbox.get(CloningFilesRepository);
-  const puvsprCalculationsRepo = sandbox.get(PuvsprCalculationsRepository);
+  const featureAmountsPerPlanningUnitRepo = sandbox.get(
+    FeatureAmountsPerPlanningUnitRepository,
+  );
   const projectPusRepo: Repository<ProjectsPuEntity> = sandbox.get(
     getRepositoryToken(ProjectsPuEntity),
   );
 
-  const amountOfPuvsprCalculations = 5;
+  const amountOfFeatureAmountsPerPlanningUnit = 5;
   let featureIds: string[] = [];
   const getFeaturesImported = async () => {
     const projectFeatures: {
@@ -198,10 +202,10 @@ const getFixtures = async () => {
         ownerId: userId,
       };
     },
-    GivenNoProjectPuvsprCalculationsFileIsAvailable: () => {
+    GivenNoProjectFeatureAmountsPerPlanningUnitFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidProjectPuvsprCalculationsFile: async () => {
+    GivenValidProjectFeatureAmountsPerPlanningUnitFile: async () => {
       const { platformFeatures, customFeatures } = await GivenFeatures(
         apiEntityManager,
         1,
@@ -211,12 +215,12 @@ const getFixtures = async () => {
       const projectPus = await GivenProjectPus(
         geoEntityManager,
         projectId,
-        amountOfPuvsprCalculations,
+        amountOfFeatureAmountsPerPlanningUnit,
       );
       const basePlatformFeature = platformFeatures[0];
       featureIds = [basePlatformFeature.id];
       const importedSplitDerivedFeature = customFeatures[0];
-      const validProjectPuvsprCalculationsFile: ProjectPuvsprCalculationsContent =
+      const validProjectFeatureAmountsPerPlanningUnitFile: ProjectFeatureAmountsPerPlanningUnitContent =
         {
           projectFeaturesGeoOperations: [
             {
@@ -229,7 +233,9 @@ const getFixtures = async () => {
               },
             },
           ],
-          puvsprCalculations: Array(amountOfPuvsprCalculations)
+          featureAmountsPerPlanningUnit: Array(
+            amountOfFeatureAmountsPerPlanningUnit,
+          )
             .fill(0)
             .map((_, index) => ({
               amount: 200,
@@ -241,12 +247,14 @@ const getFixtures = async () => {
 
       const exportId = v4();
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
-        ClonePiece.ProjectPuvsprCalculations,
+        ClonePiece.ProjectFeatureAmountsPerPlanningUnit,
       );
 
       const uriOrError = await fileRepository.saveCloningFile(
         exportId,
-        Readable.from(JSON.stringify(validProjectPuvsprCalculationsFile)),
+        Readable.from(
+          JSON.stringify(validProjectFeatureAmountsPerPlanningUnitFile),
+        ),
         relativePath,
       );
 
@@ -263,7 +271,7 @@ const getFixtures = async () => {
             /File with piece data for/gi,
           );
         },
-        ThenPuvsprCalculationsAreImportedAndDerivedFeaturesAreUpdated:
+        ThenFeatureAmountsPerPlanningUnitAreImportedAndDerivedFeaturesAreUpdated:
           async () => {
             const projectFeaturesImported = 1;
             const featuresAlreadyImported = await getFeaturesImported();
@@ -275,15 +283,17 @@ const getFixtures = async () => {
             expect(featuresAlreadyImported).toHaveLength(
               projectFeaturesImported,
             );
-            const projectPuvsprCalculations =
-              await puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeatureInProject(
+            const projectFeatureAmountsPerPlanningUnit =
+              await featureAmountsPerPlanningUnitRepo.getAmountPerPlanningUnitAndFeatureInProject(
                 projectId,
               );
-            expect(projectPuvsprCalculations).toEqual([]);
+            expect(projectFeatureAmountsPerPlanningUnit).toEqual([]);
             const projectPus = await projectPusRepo.find({
               where: { projectId },
             });
-            expect(projectPus).toHaveLength(amountOfPuvsprCalculations);
+            expect(projectPus).toHaveLength(
+              amountOfFeatureAmountsPerPlanningUnit,
+            );
 
             await sut.run(input);
 
@@ -297,15 +307,15 @@ const getFixtures = async () => {
             expect(baseFeature).toBeDefined();
             expect(baseFeature!.geoOperation).toEqual(null);
 
-            const puvsprCalculationsAfterImport =
-              await puvsprCalculationsRepo.getAmountPerPlanningUnitAndFeatureInProject(
+            const featureAmountsPerPlanningUnitAfterImport =
+              await featureAmountsPerPlanningUnitRepo.getAmountPerPlanningUnitAndFeatureInProject(
                 projectId,
               );
-            expect(puvsprCalculationsAfterImport).toHaveLength(
-              amountOfPuvsprCalculations,
+            expect(featureAmountsPerPlanningUnitAfterImport).toHaveLength(
+              amountOfFeatureAmountsPerPlanningUnit,
             );
             expect(
-              puvsprCalculationsAfterImport.every(
+              featureAmountsPerPlanningUnitAfterImport.every(
                 ({ featureId }) => baseFeatureId === featureId,
               ),
             );

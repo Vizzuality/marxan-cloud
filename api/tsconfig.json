@@ -140,11 +140,11 @@
       "@marxan/protected-areas/*": [
         "libs/protected-areas/src/*"
       ],
-      "@marxan/puvspr-calculations": [
-        "libs/puvspr-calculations/src"
+      "@marxan/feature-amounts-per-planning-unit": [
+        "libs/feature-amounts-per-planning-unit/src"
       ],
-      "@marxan/puvspr-calculations/*": [
-        "libs/puvspr-calculations/src/*"
+      "@marxan/feature-amounts-per-planning-unit/*": [
+        "libs/feature-amounts-per-planning-unit/src/*"
       ],
       "@marxan/specification": [
         "libs/specification/src"
