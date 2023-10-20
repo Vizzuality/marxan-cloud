@@ -69,12 +69,26 @@ export class FeatureService {
    */
   public findTile(
     tileSpecification: TileSpecification,
+    forProject: boolean,
     bbox?: BBox,
   ): Promise<Buffer> {
     const { z, x, y, id } = tileSpecification;
     const simplificationLevel = 360 / (Math.pow(2, z + 1) * 100);
-    const attributes = 'feature_id, properties';
-    const table = `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) as the_geom, (coalesce(properties,'{}'::jsonb) || jsonb_build_object('amount', amount)) as properties, feature_id from "${this.featuresRepository.metadata.tableName}")`;
+    const attributes = forProject
+      ? 'feature_id, amount'
+      : 'feature_id, properties';
+    const table = forProject
+      ? `(SELECT ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) AS the_geom,
+                 amount,
+                 feature_id
+                 FROM puvspr_calculations
+                 INNER JOIN projects_pu ppu on ppu.id=puvspr_calculations.project_pu_id
+                 INNER JOIN planning_units_geom pug on pug.id=ppu.geom_id)`
+      : `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) as the_geom,
+                 (coalesce(properties,'{}'::jsonb) || jsonb_build_object('amount', amount)) as properties,
+                 feature_id
+                 from "${this.featuresRepository.metadata.tableName}")`;
+
     const customQuery = this.buildFeaturesWhereQuery(id, bbox);
     return this.tileService.getTile({
       z,

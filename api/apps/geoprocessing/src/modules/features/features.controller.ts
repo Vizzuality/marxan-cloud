@@ -73,6 +73,23 @@ export class FeaturesController {
   ): Promise<Response> {
     const tile: Buffer = await this.service.findTile(
       TileSpecification,
+      false,
+      query.bbox as BBox,
+    );
+    setTileResponseHeadersForSuccessfulRequests(response);
+    return response.send(tile);
+  }
+
+  @Get('project-feature/:id/preview/tiles/:z/:x/:y.mvt')
+  @ApiBadRequestResponse()
+  async getTileForProjectFeature(
+    @Param() TileSpecification: TileSpecification,
+    @Query() query: FeaturesFilters,
+    @Res() response: Response,
+  ): Promise<Response> {
+    const tile: Buffer = await this.service.findTile(
+      TileSpecification,
+      true,
       query.bbox as BBox,
     );
     setTileResponseHeadersForSuccessfulRequests(response);

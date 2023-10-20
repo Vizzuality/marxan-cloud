@@ -13,6 +13,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -26,6 +27,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -76,6 +78,8 @@ import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
 import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
 import { isNil } from 'lodash';
+import { Response } from 'express';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -88,6 +92,7 @@ export class ProjectFeaturesController {
     private readonly geoFeatureService: GeoFeaturesService,
     private readonly geoFeatureTagsService: GeoFeatureTagsService,
     private readonly shapefileService: ShapefileService,
+    private readonly proxyService: ProxyService,
   ) {}
 
   @IsMissingAclImplementation()
@@ -426,5 +431,72 @@ export class ProjectFeaturesController {
         projectId,
       });
     }
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Get tile for a project feature by project id and feature id.',
+  })
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Id of the project',
+    type: String,
+    required: true,
+  })
+  @ApiParam({
+    name: 'featureId',
+    description: 'Id of the feature',
+    type: String,
+    required: true,
+  })
+  @ApiQuery({
+    name: 'bbox',
+    description: 'Bounding box of the project [xMin, xMax, yMin, yMax]',
+    type: [Number],
+    required: false,
+    example: [-1, 40, 1, 42],
+  })
+  @Get(':projectId/features/:featureId/preview/tiles/:z/:x/:y.mvt')
+  async proxyFeatureTile(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('featureId', ParseUUIDPipe) featureId: string,
+  ): Promise<void> {
+    const checkCostSurfaceForProject =
+      await this.geoFeatureService.checkProjectFeatureVisibility(
+        req.user.id,
+        projectId,
+        featureId,
+      );
+    console.log('checkCostSurfaceForProject', checkCostSurfaceForProject);
+    if (isLeft(checkCostSurfaceForProject)) {
+      throw mapAclDomainToHttpError(checkCostSurfaceForProject.left);
+    }
+
+    req.url = req.url.replace(
+      `projects/${projectId}/features`,
+      `geo-features/project-feature`,
+    );
+
+    return await this.proxyService.proxyTileRequest(req, response);
   }
 }

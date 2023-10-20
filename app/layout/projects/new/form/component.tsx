@@ -92,6 +92,17 @@ const ProjectForm = ({ onFormUpdate }: ProjectFormProps): JSX.Element => {
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
     } satisfies NewProjectFields & { organizationId: string };
 
+    addToast(
+      'info-project-creation',
+      <>
+        <h2 className="font-medium">Your project is being created.</h2>
+        <p className="text-sm">This might take a few seconds.</p>
+      </>,
+      {
+        level: 'info',
+      }
+    );
+
     saveProjectMutation.mutate(
       { data },
       {
@@ -99,8 +110,8 @@ const ProjectForm = ({ onFormUpdate }: ProjectFormProps): JSX.Element => {
           addToast(
             'success-project-creation',
             <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Project saved successfully</p>
+              <h2 className="font-medium">Your project has been created.</h2>
+              <p className="text-sm">You will be redirected to the dashboard.</p>
             </>,
             {
               level: 'success',
