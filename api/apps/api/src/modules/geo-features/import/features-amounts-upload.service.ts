@@ -26,7 +26,6 @@ import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-s
 import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/features-amounts-data.api.entity';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { ProjectSourcesEnum } from '@marxan/projects';
-import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -335,7 +334,9 @@ export class FeatureAmountUploadService {
           parameters,
         );
         await geoQueryRunner.manager.query(
-          ` INSERT INTO puvspr_calculations (project_id, feature_id, amount, project_pu_id) select $1, $2, amount, project_pu_id from features_data where feature_id = $2`,
+          ` INSERT INTO feature_amounts_per_planning_unit (project_id, feature_id, amount, project_pu_id)
+                  SELECT $1, $2, amount, project_pu_id
+                  FROM features_data where feature_id = $2`,
           [projectId, newFeature.id],
         );
         this.logger.log(

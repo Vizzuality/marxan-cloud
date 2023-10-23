@@ -1,4 +1,4 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -81,8 +81,8 @@ export class FeatureService {
       ? `(SELECT ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) AS the_geom,
                  amount,
                  feature_id
-                 FROM puvspr_calculations
-                 INNER JOIN projects_pu ppu on ppu.id=puvspr_calculations.project_pu_id
+                 FROM feature_amounts_per_planning_unit
+                 INNER JOIN projects_pu ppu on ppu.id=feature_amounts_per_planning_unit.project_pu_id
                  INNER JOIN planning_units_geom pug on pug.id=ppu.geom_id)`
       : `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) as the_geom,
                  (coalesce(properties,'{}'::jsonb) || jsonb_build_object('amount', amount)) as properties,
