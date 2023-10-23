@@ -849,9 +849,9 @@ export class GeoFeaturesService extends AppBaseService<
       .select('feature_id', 'id')
       .addSelect('MIN(amount)', 'amountMin')
       .addSelect('MAX(amount)', 'amountMax')
-      .from('puvspr_calculations', 'puvspr')
-      .where('puvspr.feature_id IN (:...featureIds)', { featureIds })
-      .groupBy('puvspr.feature_id')
+      .from('feature_amounts_per_planning_unit', 'fappu')
+      .where('fappu.feature_id IN (:...featureIds)', { featureIds })
+      .groupBy('fappu.feature_id')
       .getRawMany();
 
     const minMaxSqlValueStringForFeatures = minAndMaxAmountsForFeatures
