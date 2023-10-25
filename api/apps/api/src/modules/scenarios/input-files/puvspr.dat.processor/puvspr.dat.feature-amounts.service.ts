@@ -4,10 +4,15 @@ import { FeatureAmountsPerPlanningUnitRepository } from '@marxan/feature-amounts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FeatureAmountPerPlanningUnitId, PuvsprDat } from './puvsrpr.dat';
+
+export type FeatureAmountPerPlanningUnitId = {
+  featureId: string;
+  amount: number;
+  puId: number;
+};
 
 @Injectable()
-export class PuvsprDatMarxanProject implements PuvsprDat {
+export class PuvsprDatFeatureAmountsService {
   constructor(
     private readonly featureAmountsPerPlanningUnitRepo: FeatureAmountsPerPlanningUnitRepository,
     @InjectRepository(ProjectsPuEntity, DbConnections.geoprocessingDB)
@@ -15,7 +20,6 @@ export class PuvsprDatMarxanProject implements PuvsprDat {
   ) {}
   public async getAmountPerPlanningUnitAndFeature(
     projectId: string,
-    scenarioId: string,
     featureIds: string[],
   ): Promise<FeatureAmountPerPlanningUnitId[]> {
     const amountPerPlanningUnitOfFeature =
