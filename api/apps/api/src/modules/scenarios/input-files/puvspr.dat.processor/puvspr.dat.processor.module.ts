@@ -10,12 +10,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Scenario } from '../../scenario.api.entity';
 import { GeoFeatureDtoMapper } from '../../specification/geo-feature-dto.mapper';
 import { SplitFeatureConfigMapper } from '../../specification/split-feature-config.mapper';
-import { PuvrsprDatFactory } from './puvspr.dat.factory';
-import { PuvsprDatLegacyProject } from './puvspr.dat.legacy-project';
-import { PuvsprDatMarxanProject } from './puvspr.dat.marxan-project';
 import { PuvsprDatProcessor } from './puvspr.dat.processor';
 import { FeatureHashModule } from '@marxan-api/modules/features-hash/features-hash.module';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { PuvsprDatFeatureAmountsService } from '@marxan-api/modules/scenarios/input-files/puvspr.dat.processor/puvspr.dat.feature-amounts.service';
 
 @Module({
   imports: [
@@ -32,9 +30,7 @@ import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
   providers: [
     GeoFeatureDtoMapper,
     PuvsprDatProcessor,
-    PuvrsprDatFactory,
-    PuvsprDatMarxanProject,
-    PuvsprDatLegacyProject,
+    PuvsprDatFeatureAmountsService,
     SplitFeatureConfigMapper,
   ],
   exports: [PuvsprDatProcessor],

@@ -22,7 +22,7 @@ import { isLeft, left, right } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
 import { GeoFeatureDtoMapper } from '../../specification/geo-feature-dto.mapper';
 import { SplitFeatureConfigMapper } from '../../specification/split-feature-config.mapper';
-import { PuvrsprDatFactory } from './puvspr.dat.factory';
+import { PuvsprDatFeatureAmountsService } from '@marxan-api/modules/scenarios/input-files/puvspr.dat.processor/puvspr.dat.feature-amounts.service';
 
 export type PuvrsprDatRow = {
   speciesId: number;
@@ -41,11 +41,10 @@ export class PuvsprDatProcessor {
     private readonly featureAmountsPerPlanningUnitService: FeatureAmountsPerPlanningUnitService,
     private readonly splitConfigHasher: SingleConfigFeatureValueHasher,
     private readonly splitFeatureConfigMapper: SplitFeatureConfigMapper,
-    private readonly puvsprDatFactory: PuvrsprDatFactory,
+    private readonly puvsprFeatureAmounts: PuvsprDatFeatureAmountsService,
   ) {}
 
   async getPuvsprDatRows(
-    isLegacy: boolean,
     scenarioId: string,
     projectId: string,
   ): Promise<PuvrsprDatRow[]> {
@@ -64,10 +63,8 @@ export class PuvsprDatProcessor {
       );
 
     const featuresAmountPerPlanningUnit =
-      await this.getAmountPerPlanningUnitAndFeature(
-        isLegacy,
+      await this.puvsprFeatureAmounts.getAmountPerPlanningUnitAndFeature(
         projectId,
-        scenarioId,
         featuresIds,
       );
 
@@ -131,21 +128,6 @@ export class PuvsprDatProcessor {
     const splitFeatureIds = await this.getSplitFeatureIds(featureConfigs);
 
     return copyFeatureIds.concat(splitFeatureIds);
-  }
-
-  private async getAmountPerPlanningUnitAndFeature(
-    isLegacy: boolean,
-    projectId: string,
-    scenarioId: string,
-    fetaureIds: string[],
-  ) {
-    const puvspr = this.puvsprDatFactory.getPuvsrDat(isLegacy);
-
-    return puvspr.getAmountPerPlanningUnitAndFeature(
-      projectId,
-      scenarioId,
-      fetaureIds,
-    );
   }
 
   private getCopyFeatureIds(
