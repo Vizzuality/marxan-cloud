@@ -18,6 +18,7 @@ test(`custom feature csv upload`, async () => {
   expect(result.body).toHaveLength(2);
   await fixtures.ThenNewFeaturesAreCreated();
   await fixtures.ThenNewFeaturesAmountsAreCreated();
+  await fixtures.ThenFeatureAmountPerPlanningUnitAreCreated();
   await fixtures.ThenFeatureUploadRegistryIsCleared();
   await fixtures.ThenProjectSourcesIsSetToLegacyProject();
 });

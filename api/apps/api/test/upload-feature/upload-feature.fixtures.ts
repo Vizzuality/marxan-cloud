@@ -14,6 +14,7 @@ import { HttpStatus } from '@nestjs/common';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
 import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { FeatureAmountsPerPlanningUnitEntity } from '@marxan/feature-amounts-per-planning-unit';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -54,9 +55,18 @@ export const getFixtures = async () => {
     getRepositoryToken(Project, DbConnections.default),
   );
 
-  const featuresAmounsGeoDbRepository: Repository<GeoFeatureGeometry> = app.get(
-    getRepositoryToken(GeoFeatureGeometry, DbConnections.geoprocessingDB),
-  );
+  const featuresAmountsGeoDbRepository: Repository<GeoFeatureGeometry> =
+    app.get(
+      getRepositoryToken(GeoFeatureGeometry, DbConnections.geoprocessingDB),
+    );
+
+  const featureAmountsPerPlanningUnitRepo: Repository<FeatureAmountsPerPlanningUnitEntity> =
+    app.get(
+      getRepositoryToken(
+        FeatureAmountsPerPlanningUnitEntity,
+        DbConnections.geoprocessingDB,
+      ),
+    );
 
   const geoEntityManager: EntityManager = app.get(
     getEntityManagerToken(DbConnections.geoprocessingDB),
@@ -322,13 +332,13 @@ export const getFixtures = async () => {
           featureClassName: 'feat_28135ef',
         },
       });
-      const newFeature1Amounts = await featuresAmounsGeoDbRepository.find({
+      const newFeature1Amounts = await featuresAmountsGeoDbRepository.find({
         where: { featureId: newFeatures1?.id },
         order: {
           amount: 'DESC',
         },
       });
-      const newFeature2Amounts = await featuresAmounsGeoDbRepository.find({
+      const newFeature2Amounts = await featuresAmountsGeoDbRepository.find({
         where: { featureId: newFeatures2?.id },
       });
 
@@ -341,6 +351,37 @@ export const getFixtures = async () => {
       expect(newFeature2Amounts[0].amount).toBe(0);
       expect(newFeature2Amounts[1].amount).toBe(0);
       expect(newFeature2Amounts[2].amount).toBe(0);
+    },
+    ThenFeatureAmountPerPlanningUnitAreCreated: async () => {
+      const feature1 = await featuresRepository.findOne({
+        where: {
+          featureClassName: 'feat_1d666bd',
+        },
+      });
+      const feature2 = await featuresRepository.findOne({
+        where: {
+          featureClassName: 'feat_28135ef',
+        },
+      });
+      const feature1Amounts = await featureAmountsPerPlanningUnitRepo.find({
+        where: { featureId: feature1?.id },
+        order: {
+          amount: 'DESC',
+        },
+      });
+      const feature2Amounts = await featureAmountsPerPlanningUnitRepo.find({
+        where: { featureId: feature2?.id },
+      });
+
+      expect(feature1Amounts).toHaveLength(3);
+      expect(feature2Amounts).toHaveLength(3);
+      expect(feature1Amounts[0].amount).toBe(4.245387225);
+      expect(feature1Amounts[1].amount).toBe(4.245387225);
+      expect(feature1Amounts[2].amount).toBe(3.245387225);
+
+      expect(feature2Amounts[0].amount).toBe(0);
+      expect(feature2Amounts[1].amount).toBe(0);
+      expect(feature2Amounts[2].amount).toBe(0);
     },
     ThenFeatureUploadRegistryIsCleared: async () => {
       const featureImportRegistryRecord = await featureImportRegistry.findOne({

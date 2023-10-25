@@ -43,6 +43,7 @@ import {
   GivenUserExists,
 } from '../cloning/fixtures';
 import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
+import { FeatureAmountsPerPlanningUnitEntity } from '@marxan/feature-amounts-per-planning-unit';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -233,7 +234,11 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature(
-        [ProjectsPuEntity, GeoFeatureGeometry],
+        [
+          ProjectsPuEntity,
+          GeoFeatureGeometry,
+          FeatureAmountsPerPlanningUnitEntity,
+        ],
         geoprocessingConnections.default,
       ),
       TypeOrmModule.forRoot({
@@ -289,6 +294,8 @@ const getFixtures = async () => {
   const featuresDataRepo = sandbox.get<Repository<GeoFeatureGeometry>>(
     getRepositoryToken(GeoFeatureGeometry),
   );
+  const featureAmountsPerPlanningUnitRepo: Repository<FeatureAmountsPerPlanningUnitEntity> =
+    sandbox.get(getRepositoryToken(FeatureAmountsPerPlanningUnitEntity));
 
   const specDatFileType = LegacyProjectImportFileType.SpecDat;
   const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
@@ -515,6 +522,21 @@ const getFixtures = async () => {
             },
           });
 
+          const featureAmounts = await featureAmountsPerPlanningUnitRepo.find({
+            where: { featureId: In(insertedFeaturesIds) },
+          });
+
+          const featuresMinMax = await apiEntityManager
+            .createQueryBuilder()
+            .select('id')
+            .addSelect('amount_min', 'amountMin')
+            .addSelect('amount_max', 'amountMax')
+            .from('features', 'f')
+            .where('f.id IN (:...featureIds)', {
+              featureIds: insertedFeaturesIds,
+            })
+            .execute();
+
           expect(insertedFeaturesData).toHaveLength(
             amountOfFeaturesData - amountOfNonExistingPuids,
           );
@@ -526,6 +548,25 @@ const getFixtures = async () => {
                 pus.map(({ id }) => id).includes(projectPuId),
             ),
           ).toEqual(true);
+
+          expect(featureAmounts).toHaveLength(
+            amountOfFeaturesData - amountOfNonExistingPuids,
+          );
+          expect(
+            featureAmounts.every(
+              ({ amount, projectPuId }) =>
+                amount === expectedAmount &&
+                projectPuId &&
+                pus.map(({ id }) => id).includes(projectPuId),
+            ),
+          ).toEqual(true);
+          expect(
+            featuresMinMax.every(
+              (featureMinMax: any) =>
+                featureMinMax.amountMin === expectedAmount &&
+                featureMinMax.amountMax === expectedAmount,
+            ),
+          ).toBeTruthy();
         },
       };
     },
