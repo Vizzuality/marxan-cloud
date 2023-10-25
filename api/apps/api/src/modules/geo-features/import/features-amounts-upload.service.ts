@@ -24,8 +24,6 @@ import { chunk } from 'lodash';
 import { Left } from 'fp-ts/lib/Either';
 import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
 import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/features-amounts-data.api.entity';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { ProjectSourcesEnum } from '@marxan/projects';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -108,22 +106,13 @@ export class FeatureAmountUploadService {
       this.logger.log(
         `Upload temporary data removed from apiDB uploads tables`,
       );
-      // Setting project source to legacy-import to create puvspr.dat files from pre-calculated amounts, to allow to use new features after upload
-      this.logger.log(`Updating project sources value to legacy-import...`);
-      await this.updateProjectSources(
-        data.projectId,
-        ProjectSourcesEnum.legacyImport,
-        apiQueryRunner.manager,
-      );
-
-      this.logger.log(`Saving min and max amounts for new features...`);
 
       this.logger.log(`Csv file upload process finished successfully`);
       // Committing transaction
-
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
 
+      this.logger.log(`Saving min and max amounts for new features...`);
       await this.geoFeaturesService.saveAmountRangeForFeatures(
         newFeaturesFromCsvUpload.map((feature) => feature.id),
       );
@@ -401,18 +390,5 @@ export class FeatureAmountUploadService {
     );
 
     return { featureNames: Array.from(featureNames), puids: Array.from(puids) };
-  }
-
-  private async updateProjectSources(
-    projectId: string,
-    sources: ProjectSourcesEnum,
-    entityManager: EntityManager,
-  ) {
-    await entityManager
-      .createQueryBuilder()
-      .update(Project)
-      .set({ sources })
-      .where('id = :projectId', { projectId })
-      .execute();
   }
 }
