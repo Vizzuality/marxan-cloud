@@ -20,7 +20,6 @@ test(`custom feature csv upload`, async () => {
   await fixtures.ThenNewFeaturesAmountsAreCreated();
   await fixtures.ThenFeatureAmountPerPlanningUnitAreCreated();
   await fixtures.ThenFeatureUploadRegistryIsCleared();
-  await fixtures.ThenProjectSourcesIsSetToLegacyProject();
 });
 
 test('custom feature csv upload when project not found', async () => {
