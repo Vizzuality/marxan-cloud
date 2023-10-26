@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { Brackets, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
+import { IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
 import { ProtectedArea } from '@marxan/protected-areas';
@@ -30,7 +30,7 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IUCNCategory } from '@marxan/iucn';
 import { isDefined } from '@marxan/utils';
 import { Scenario } from '../scenarios/scenario.api.entity';
-import { groupBy, intersection, isArray } from 'lodash';
+import { groupBy } from 'lodash';
 import { ProjectSnapshot } from '@marxan/projects';
 import { SelectionGetService } from '@marxan-api/modules/scenarios/protected-area/getter/selection-get.service';
 import { Either, left, right } from 'fp-ts/Either';
@@ -320,8 +320,6 @@ export class ProtectedAreasCrudService extends AppBaseService<
      * apply search, filtering and sorting if requested, and add a count of the
      * number of scenarios where each protected area is used.
      */
-
-    info!.params.project = project;
 
     let projectProtectedAreas =
       await this.selectionGetService.getForProject(project);
