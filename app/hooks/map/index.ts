@@ -658,6 +658,7 @@ export function usePUGridLayer({
       puIncludedValue,
       puExcludedValue,
       puAvailableValue,
+      selectedFeatures = [],
       preHighlightFeatures = [],
       postHighlightFeatures = [],
       runId,
@@ -764,6 +765,55 @@ export function usePUGridLayer({
                     ],
                   },
                 })),
+                // features abundance
+                ...selectedFeatures.map((featureId) => {
+                  const {
+                    visibility = true,
+                    opacity = 1,
+                    amountRange = { min: 50000, max: 1000000 },
+                  } = restLayerSettings[featureId] || {};
+
+                  return {
+                    type: 'fill',
+                    'source-layer': 'layer0',
+                    layout: {
+                      visibility: getLayerVisibility(visibility),
+                    },
+                    filter: ['all', ['in', featureId, ['get', 'featureList']]],
+                    paint: {
+                      'fill-outline-color': 'yellow',
+                      'fill-color': [
+                        'let',
+                        'amount',
+                        [
+                          'to-number',
+                          [
+                            'let',
+                            'idx',
+                            ['index-of', featureId, ['get', 'featureList']],
+                            [
+                              'slice',
+                              ['get', 'featureList'],
+                              ['+', ['index-of', ':', ['get', 'featureList'], ['var', 'idx']], 1],
+                              ['index-of', ';', ['get', 'featureList'], ['var', 'idx']],
+                            ],
+                          ],
+                        ],
+                        [
+                          'interpolate',
+                          ['linear'],
+                          ['var', 'amount'],
+                          amountRange.min,
+                          'white', // ! use COLORS.abundance.default instead when is available
+                          amountRange.max,
+                          'green',
+                          // color, // ! enable the color variable when we receive it
+                        ],
+                      ],
+                      'fill-opacity': opacity,
+                    },
+                  };
+                }),
               ]
             : []),
 
