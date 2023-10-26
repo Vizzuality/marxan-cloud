@@ -34,8 +34,6 @@ import {
   UseScenariosOptionsProps,
   UseDeleteScenarioProps,
   DeleteScenarioProps,
-  UseUploadScenarioCostSurfaceProps,
-  UploadScenarioCostSurfaceProps,
   UseUploadScenarioPUProps,
   UploadScenarioPUProps,
   UseSaveScenarioPUProps,
@@ -648,36 +646,6 @@ export function useCostSurfaceRange(id: Scenario['id']) {
       data,
     };
   }, [query, data]);
-}
-
-export function useUploadCostSurface({
-  requestConfig = {
-    method: 'GET',
-  },
-}: UseUploadScenarioCostSurfaceProps) {
-  const { data: session } = useSession();
-
-  const uploadScenarioCostSurface = ({ id, data }: UploadScenarioCostSurfaceProps) => {
-    return UPLOADS.request({
-      url: `/scenarios/${id}/cost-surface/shapefile`,
-      data,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'multipart/form-data',
-      },
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(uploadScenarioCostSurface, {
-    onSuccess: (data, variables, context) => {
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
-    },
-  });
 }
 
 // PLANNING UNITS

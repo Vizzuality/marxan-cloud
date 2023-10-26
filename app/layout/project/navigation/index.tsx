@@ -63,7 +63,7 @@ export const Navigation = (): JSX.Element => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
-  const isProjectRoute = route.startsWith('/projects/[pid]');
+  const isProjectRoute = route.startsWith('/projects/[pid]') && !route.includes('/scenarios');
   const isScenarioRoute = route.startsWith('/projects/[pid]/scenarios/') && !route.endsWith('/new');
 
   const { addToast } = useToasts();

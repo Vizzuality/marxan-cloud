@@ -40,10 +40,8 @@ const RowItem = ({
       >
         <span className="inline-flex">{name}</span>
         <div className="mt-1.5 text-xs text-gray-400">
-          Currently in use in
-          <span className="rounded bg-blue-600 bg-opacity-10 px-1 text-blue-600">
-            {scenarios}
-          </span>{' '}
+          Currently in use in{' '}
+          <span className="rounded bg-blue-600 bg-opacity-10 px-1 text-blue-600">{scenarios}</span>{' '}
           scenarios.
         </div>
       </td>

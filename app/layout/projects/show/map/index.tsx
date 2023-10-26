@@ -13,6 +13,7 @@ import { FiLayers } from 'react-icons/fi';
 import { HiOutlinePrinter } from 'react-icons/hi';
 
 import { useAccessToken } from 'hooks/auth';
+import { useProjectCostSurface } from 'hooks/cost-surface';
 import { useAllFeatures } from 'hooks/features';
 import {
   usePUCompareLayer,
@@ -21,6 +22,7 @@ import {
   useBBOX,
   useFeaturePreviewLayers,
   useWDPAPreviewLayer,
+  useCostSurfaceLayer,
 } from 'hooks/map';
 import { useDownloadScenarioComparisonReport, useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -105,6 +107,8 @@ export const ProjectMap = (): JSX.Element => {
     }
   );
 
+  const costSurfaceQuery = useProjectCostSurface(pid, selectedCostSurface);
+
   const selectedFeaturesData = useMemo(() => {
     return allFeaturesQuery.data?.data.filter((f) => selectedFeaturesIds?.includes(f.id));
   }, [selectedFeaturesIds, allFeaturesQuery.data?.data]);
@@ -134,7 +138,7 @@ export const ProjectMap = (): JSX.Element => {
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
     sid: sid ? `${sid}` : null,
-    include: 'results,cost',
+    include: 'results',
     sublayers: [
       ...(sid1 && !sid2 ? ['frequency'] : []),
       ...(!!selectedCostSurface ? ['cost'] : []),
@@ -145,10 +149,20 @@ export const ProjectMap = (): JSX.Element => {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
         features: layerSettings.features,
-        'cost-surface': layerSettings[selectedCostSurface],
         frequency: layerSettings.frequency,
       },
     },
+  });
+
+  const costSurfaceLayer = useCostSurfaceLayer({
+    active: Boolean(selectedCostSurface) && costSurfaceQuery.isSuccess,
+    pid,
+    costSurfaceId: selectedCostSurface,
+    layerSettings: {
+      ...layerSettings[selectedCostSurface],
+      min: costSurfaceQuery.data?.min,
+      max: costSurfaceQuery.data?.max,
+    } as Parameters<typeof useCostSurfaceLayer>[0]['layerSettings'],
   });
 
   const PUCompareLayer = usePUCompareLayer({
@@ -192,6 +206,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const LAYERS = [
     PUGridLayer,
+    costSurfaceLayer,
     PUCompareLayer,
     PlanningAreaLayer,
     WDPAsPreviewLayers,

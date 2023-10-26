@@ -5,6 +5,7 @@ import {
   setSelectedFeatures,
   setLayerSettings,
   setSelectedWDPAs as setVisibleWDPAs,
+  setSelectedCostSurfaces as setVisibleCostSurface,
 } from 'store/slices/projects/[id]';
 
 import chroma from 'chroma-js';
@@ -15,6 +16,7 @@ import { COLORS, LEGEND_LAYERS } from 'hooks/map/constants';
 import { useScenario } from 'hooks/scenarios';
 import { useProjectWDPAs } from 'hooks/wdpa';
 
+import { CostSurface } from 'types/api/cost-surface';
 import { Feature } from 'types/api/feature';
 import { Scenario } from 'types/api/scenario';
 import { WDPA } from 'types/api/wdpa';
@@ -44,27 +46,31 @@ export const useCostSurfaceLegend = () => {
   const dispatch = useAppDispatch();
   const { layerSettings, selectedCostSurface } = useAppSelector((state) => state['/projects/[id]']);
 
-  const costSurfaceQuery = useProjectCostSurfaces(
-    pid,
-    {},
-    {
-      select: (data) => data.map(({ id, name }) => ({ id, name })),
-    }
-  );
+  const costSurfaceQuery = useProjectCostSurfaces(pid, {});
+
+  const costSurfaceIds = costSurfaceQuery.data?.map((cs) => cs.id);
 
   if (!costSurfaceQuery.data?.length) return [];
 
   return LEGEND_LAYERS['cost-surface']({
     items: costSurfaceQuery.data,
-    onChangeVisibility: () => {
-      dispatch(
-        setLayerSettings({
-          id: selectedCostSurface,
-          settings: {
-            visibility: !layerSettings[selectedCostSurface]?.visibility,
-          },
-        })
-      );
+    onChangeVisibility: (costSurfaceId: CostSurface['id']) => {
+      costSurfaceIds.forEach((id) => {
+        dispatch(
+          setLayerSettings({
+            id,
+            settings: {
+              visibility: id !== costSurfaceId ? false : !layerSettings[costSurfaceId]?.visibility,
+            },
+          })
+        );
+      });
+
+      if (costSurfaceId === selectedCostSurface) {
+        dispatch(setVisibleCostSurface(null));
+      } else {
+        dispatch(setVisibleCostSurface(costSurfaceId));
+      }
     },
   });
 };

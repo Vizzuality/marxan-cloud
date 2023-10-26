@@ -1,6 +1,7 @@
 import { PUAction } from 'store/slices/scenarios/types';
 
 import { TargetSPFItemProps } from 'components/features/target-spf-item/types';
+import { CostSurface } from 'types/api/cost-surface';
 import { Feature } from 'types/api/feature';
 import { Scenario } from 'types/api/scenario';
 import { WDPA } from 'types/api/wdpa';
@@ -145,6 +146,8 @@ export interface UsePUGridLayer {
       'cost-surface'?: {
         opacity?: number;
         visibility?: boolean;
+        min: CostSurface['min'];
+        max: CostSurface['max'];
       };
       'lock-in'?: {
         opacity?: number;

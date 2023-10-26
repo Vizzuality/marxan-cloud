@@ -14,6 +14,7 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
+import { CostSurface } from 'types/api/cost-surface';
 import { Feature } from 'types/api/feature';
 import { WDPA } from 'types/api/wdpa';
 
@@ -55,8 +56,7 @@ export const useCostSurfaceLegend = () => {
     pid,
     {},
     {
-      select: (data) =>
-        data.filter(({ id }) => selectedCostSurface === id).map(({ id, name }) => ({ id, name })),
+      select: (data) => data.filter(({ id }) => selectedCostSurface === id),
     }
   );
 
@@ -64,12 +64,12 @@ export const useCostSurfaceLegend = () => {
 
   return LEGEND_LAYERS['cost-surface']({
     items: costSurfaceQuery.data,
-    onChangeVisibility: () => {
+    onChangeVisibility: (costSurfaceId: CostSurface['id']) => {
       dispatch(
         setLayerSettings({
-          id: selectedCostSurface,
+          id: costSurfaceId,
           settings: {
-            visibility: !layerSettings[selectedCostSurface]?.visibility,
+            visibility: !layerSettings[costSurfaceId]?.visibility,
           },
         })
       );

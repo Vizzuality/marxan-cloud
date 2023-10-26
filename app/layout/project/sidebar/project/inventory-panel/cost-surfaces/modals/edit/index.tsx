@@ -30,7 +30,13 @@ const EditModal = ({
 
   const formRef = useRef<FormProps<FormValues>['form']>(null);
 
-  const allProjectCostSurfacesQuery = useProjectCostSurfaces(pid, {});
+  const allProjectCostSurfacesQuery = useProjectCostSurfaces(
+    pid,
+    {},
+    {
+      select: (data) => data.find(({ id }) => id === costSurfaceId),
+    }
+  );
 
   const editProjectCostSurfaceMutation = useEditProjectCostSurface();
 
@@ -53,7 +59,7 @@ const EditModal = ({
             addToast(
               'success-edit-cost-surfaces',
               <>
-                <h2 className="font-medium">Success!</h2>
+                <h2 className="font-medium">Success</h2>
                 <p className="text-sm">Cost surface edited</p>
               </>,
               {
@@ -82,7 +88,7 @@ const EditModal = ({
   return (
     <FormRFF<FormValues>
       initialValues={{
-        name: allProjectCostSurfacesQuery.data?.[0]?.name,
+        name: allProjectCostSurfacesQuery.data?.name,
       }}
       ref={formRef}
       onSubmit={onEditSubmit}

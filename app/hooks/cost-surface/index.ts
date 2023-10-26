@@ -5,52 +5,50 @@ import { useSession } from 'next-auth/react';
 import { CostSurface } from 'types/api/cost-surface';
 import { Project } from 'types/api/project';
 
-import { API } from 'services/api';
+import { API, JSONAPI } from 'services/api';
 import UPLOADS from 'services/uploads';
 
 export function useProjectCostSurfaces<T = CostSurface[]>(
   pid: Project['id'],
-  params: { search?: string; sort?: string } = {},
+  params: { sort?: string } = {},
   queryOptions: QueryObserverOptions<CostSurface[], Error, T> = {}
 ) {
   const { data: session } = useSession();
 
-  const mockData: CostSurface[] = [
-    {
-      id: 'b7454579-c48e-4e2f-8438-833280cb65d8',
-      name: 'Brazil 15 k Cost Surface',
-      isCustom: true,
-      scenarioUsageCount: 3,
-    },
-    {
-      id: 'rfjghhrtersdtbkjshfw',
-      name: 'Cost Surface Rwanda B',
-      isCustom: true,
-      scenarioUsageCount: 0,
-    },
-    {
-      id: '23275455HGVVCMSJHDFk',
-      name: 'Cost Surface Rwanda C',
-      isCustom: true,
-      scenarioUsageCount: 0,
-    },
-  ];
-
   return useQuery({
     queryKey: ['cost-surfaces', pid],
     queryFn: async () =>
-      API.request<CostSurface[]>({
+      JSONAPI.request<{ data: CostSurface[] }>({
         method: 'GET',
-        // !TODO: change this to the correct endpoint
-        url: `/projects/${pid}/protected-areas`,
+        url: `/projects/${pid}/cost-surfaces`,
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
         params,
-      }).then(({ data }) => mockData),
-    // TODO: enable this when the endpoint is ready
-    enabled: true,
-    // enabled: Boolean(pid),
+      }).then(({ data }) => data?.data),
+    enabled: Boolean(pid),
+    ...queryOptions,
+  });
+}
+
+export function useProjectCostSurface<T = CostSurface>(
+  pid: Project['id'],
+  csid: CostSurface['id'],
+  queryOptions: QueryObserverOptions<CostSurface, Error, T> = {}
+) {
+  const { data: session } = useSession();
+
+  return useQuery({
+    queryKey: ['cost-surface', csid],
+    queryFn: async () =>
+      JSONAPI.request<{ data: CostSurface }>({
+        method: 'GET',
+        url: `/projects/${pid}/cost-surfaces/${csid}`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then(({ data }) => data?.data),
+    enabled: Boolean(csid),
     ...queryOptions,
   });
 }
@@ -67,7 +65,6 @@ export function useEditProjectCostSurface() {
     projectId: Project['id'];
     body: Record<string, unknown>;
   }) => {
-    // TODO: change this to the correct endpoint
     return API.patch<CostSurface>(
       `projects/${projectId}/cost-surfaces/${costSurfaceId}`,
       {
@@ -90,8 +87,7 @@ export function useUploadProjectCostSurface() {
   const uploadProjectCostSurface = ({ id, data }: { id: CostSurface['id']; data: FormData }) => {
     return UPLOADS.request({
       method: 'POST',
-      // TODO: change this to the correct endpoint
-      url: `/projects/${id}/cost-surface/shapefile`,
+      url: `/projects/${id}/cost-surfaces/shapefile`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
