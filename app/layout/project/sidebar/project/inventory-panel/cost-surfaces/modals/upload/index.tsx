@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
@@ -42,6 +43,7 @@ export const CostSurfaceUploadModal = ({
   onDismiss: () => void;
 }): JSX.Element => {
   const formRef = useRef<FormProps<FormValues>['form']>(null);
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState<{ name: FormValues['name'] }>(null);
@@ -114,9 +116,11 @@ export const CostSurfaceUploadModal = ({
       data.append('name', name);
 
       uploadProjectCostSurfaceMutation.mutate(
-        { data, id: `${pid}` },
+        { data, id: pid },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
+            await queryClient.invalidateQueries(['cost-surfaces', pid]);
+
             setSuccessFile({ ...successFile });
             onClose();
             addToast(
@@ -163,7 +167,7 @@ export const CostSurfaceUploadModal = ({
         }
       );
     },
-    [pid, addToast, onClose, uploadProjectCostSurfaceMutation, successFile]
+    [pid, addToast, onClose, uploadProjectCostSurfaceMutation, successFile, queryClient]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
@@ -214,7 +218,7 @@ export const CostSurfaceUploadModal = ({
                   </InfoButton>
                 </div>
 
-                <p className="mt-4 text-sm text-gray-900">
+                <p className="text-sm text-gray-900">
                   Please download and fill in the{' '}
                   <button
                     className="text-primary-500 underline hover:no-underline"

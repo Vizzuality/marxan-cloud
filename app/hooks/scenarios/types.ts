@@ -39,15 +39,6 @@ export interface UploadScenarioPUProps {
   data: FormData;
 }
 
-export interface UseUploadScenarioCostSurfaceProps {
-  requestConfig?: AxiosRequestConfig;
-}
-
-export interface UploadScenarioCostSurfaceProps {
-  id?: string;
-  data: any;
-}
-
 export interface UseSaveScenarioPUProps {
   requestConfig?: AxiosRequestConfig;
 }
