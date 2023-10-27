@@ -41,7 +41,8 @@ export class FeatureAmountsPerPlanningUnitService {
 
   public async computeMarxanAmountPerPlanningUnit(
     featureId: string,
-    scenarioId: string,
+    projectId: string,
+    geoEntityManager?: EntityManager,
   ): Promise<ComputeFeatureAmountPerPlanningUnit[]> {
     /**
      * @TODO further performance savings: limiting scans to planning_units_geom
@@ -49,40 +50,42 @@ export class FeatureAmountsPerPlanningUnitService {
      * && operator instead of st_intersects() for bbox-based calculation of
      * intersections.
      */
+    geoEntityManager = geoEntityManager
+      ? geoEntityManager
+      : this.geoEntityManager;
+
     const rows: {
       featureid: string;
       puid: number;
       projectpuid: string;
       amount: number;
-    }[] = await this.geoEntityManager.query(
+    }[] = await geoEntityManager.query(
       `
           WITH all_amount_per_planning_unit as
           ( select
-            $2 as featureId,
-            pu.puid as puid,
-            pu.id as projectpuid,
-            ST_Area(ST_Transform(ST_Intersection(species.the_geom, pu.the_geom),3410)) as amount
-          from
-          (
-              select
-                st_union(the_geom) as the_geom
-              from scenario_features_preparation sfp
-              inner join features_data fd on sfp.feature_class_id = fd.id where sfp.scenario_id = $1
-              AND sfp.api_feature_id = $2
-              group by sfp.api_feature_id
-          ) species,
-          (
-              select the_geom, ppu.puid as puid, ppu.id as id, spd.scenario_id
-              from planning_units_geom pug
-              inner join projects_pu ppu on pug.id = ppu.geom_id
-              inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id
-              where spd.scenario_id = $1 order by ppu.puid asc
-          ) pu
-          where species.the_geom && pu.the_geom
+              $2 as featureId,
+              pu.puid as puid,
+              pu.id as projectpuid,
+              ST_Area(ST_Transform(ST_Intersection(species.the_geom, pu.the_geom),3410)) as amount
+            from
+              (
+                select st_union(the_geom) as the_geom
+                from features_data fd
+                where fd.feature_id = $2
+                group by fd.feature_id
+              ) species,
+              (
+                select the_geom, ppu.puid as puid, ppu.id as id
+                from planning_units_geom pug
+                inner join projects_pu ppu on pug.id = ppu.geom_id
+                where ppu.project_id = $1
+                order by ppu.puid asc
+              ) pu
+            where species.the_geom && pu.the_geom
           )
           select * from all_amount_per_planning_unit where amount > 0 order by puid;
         `,
-      [scenarioId, featureId],
+      [projectId, featureId],
     );
 
     return rows.map(({ featureid, projectpuid, puid, amount }) => ({

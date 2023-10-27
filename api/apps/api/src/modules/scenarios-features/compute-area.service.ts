@@ -36,7 +36,7 @@ export class ComputeArea {
     const amountPerPlanningUnitOfFeature =
       await this.featureAmountsPerPlanningUnit.computeMarxanAmountPerPlanningUnit(
         featureId,
-        scenarioId,
+        projectId,
       );
 
     return this.featureAmountsPerPlanningUnitRepo.saveAmountPerPlanningUnitAndFeature(
