@@ -24,6 +24,7 @@ import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/f
 import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import { FeatureImportEventsService } from '@marxan-api/modules/geo-features/import/feature-import.events';
+import { FeatureAmountsPerPlanningUnitModule } from '@marxan/feature-amounts-per-planning-unit';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { FeatureImportEventsService } from '@marxan-api/modules/geo-features/imp
     forwardRef(() => ScenarioFeaturesModule),
     ApiEventsModule,
     GeoFeatureTagsModule,
+    FeatureAmountsPerPlanningUnitModule.for(DbConnections.geoprocessingDB),
   ],
   providers: [
     GeoFeaturesService,

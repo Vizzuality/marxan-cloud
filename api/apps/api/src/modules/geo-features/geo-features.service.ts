@@ -48,6 +48,11 @@ import {
 } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
 import { isNil } from 'lodash';
+import {
+  FeatureAmountsPerPlanningUnitEntity,
+  FeatureAmountsPerPlanningUnitService,
+} from '@marxan/feature-amounts-per-planning-unit';
+import { ComputeFeatureAmountPerPlanningUnit } from '@marxan/feature-amounts-per-planning-unit/feature-amounts-per-planning-units.service';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -119,6 +124,7 @@ export class GeoFeaturesService extends AppBaseService<
     private readonly scenarioFeaturesService: ScenarioFeaturesService,
     private readonly projectAclService: ProjectAclService,
     private readonly featureAmountUploads: FeatureAmountUploadService,
+    private readonly featureAmountsPerPlanningUnitService: FeatureAmountsPerPlanningUnitService,
   ) {
     super(
       geoFeaturesRepository,
@@ -411,8 +417,23 @@ export class GeoFeaturesService extends AppBaseService<
         );
       }
 
+      const computedFeatureAmounts =
+        await this.featureAmountsPerPlanningUnitService.computeMarxanAmountPerPlanningUnit(
+          geoFeature.id,
+          projectId,
+          geoQueryRunner.manager,
+        );
+
+      await this.saveFeatureAmountPerPlanningUnit(
+        geoQueryRunner.manager,
+        projectId,
+        computedFeatureAmounts,
+      );
+
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
+
+      await this.saveAmountRangeForFeatures([geoFeature.id]);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
       await geoQueryRunner.rollbackTransaction();
@@ -429,6 +450,24 @@ export class GeoFeaturesService extends AppBaseService<
     }
 
     return right(geoFeature);
+  }
+
+  private async saveFeatureAmountPerPlanningUnit(
+    geoEntityManager: EntityManager,
+    projectId: string,
+    featureAmounts: ComputeFeatureAmountPerPlanningUnit[],
+  ): Promise<void> {
+    const repo = geoEntityManager.getRepository(
+      FeatureAmountsPerPlanningUnitEntity,
+    );
+    await repo.save(
+      featureAmounts.map(({ amount, projectPuId, featureId }) => ({
+        projectId,
+        featureId,
+        amount,
+        projectPuId,
+      })),
+    );
   }
 
   public async updateFeatureForProject(
@@ -853,6 +892,10 @@ export class GeoFeaturesService extends AppBaseService<
       .where('fappu.feature_id IN (:...featureIds)', { featureIds })
       .groupBy('fappu.feature_id')
       .getRawMany();
+
+    if (minAndMaxAmountsForFeatures.length === 0) {
+      return;
+    }
 
     const minMaxSqlValueStringForFeatures = minAndMaxAmountsForFeatures
       .map(
