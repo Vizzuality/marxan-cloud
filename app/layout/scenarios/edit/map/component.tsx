@@ -10,6 +10,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { FiLayers } from 'react-icons/fi';
 
 import { useAccessToken } from 'hooks/auth';
+import { useProjectCostSurface } from 'hooks/cost-surface';
 import { useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
@@ -18,6 +19,7 @@ import {
   useFeaturePreviewLayers,
   useBBOX,
   useTargetedPreviewLayers,
+  useCostSurfaceLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenario, useScenarioPU } from 'hooks/scenarios';
@@ -45,6 +47,9 @@ import { cn } from 'utils/cn';
 import { centerMap } from 'utils/map';
 
 import { useScenarioLegend } from './legend/hooks';
+
+const minZoom = 2;
+const maxZoom = 20;
 
 export const ScenariosEditMap = (): JSX.Element => {
   const [open, setOpen] = useState(true);
@@ -148,8 +153,8 @@ export const ScenariosEditMap = (): JSX.Element => {
   });
   const bestSolution = bestSolutionData;
 
-  const minZoom = 2;
-  const maxZoom = 20;
+  const costSurfaceQuery = useProjectCostSurface(pid, selectedCostSurface);
+
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState<MapProps['bounds']>(null);
 
@@ -255,8 +260,20 @@ export const ScenariosEditMap = (): JSX.Element => {
     },
   });
 
+  const costSurfaceLayer = useCostSurfaceLayer({
+    active: Boolean(selectedCostSurface) && costSurfaceQuery.isSuccess,
+    pid,
+    costSurfaceId: selectedCostSurface,
+    layerSettings: {
+      ...layerSettings[selectedCostSurface],
+      min: costSurfaceQuery.data?.min,
+      max: costSurfaceQuery.data?.max,
+    } as Parameters<typeof useCostSurfaceLayer>[0]['layerSettings'],
+  });
+
   const LAYERS = [
     PUGridLayer,
+    costSurfaceLayer,
     WDPApreviewLayer,
     ...FeaturePreviewLayers,
     ...TargetedPreviewLayers,

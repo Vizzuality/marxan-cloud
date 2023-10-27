@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import {
   setLayerSettings,
-  setSelectedCostSurfaces as setVisibleCostSurface,
+  setSelectedCostSurface as setVisibleCostSurface,
 } from 'store/slices/projects/[id]';
 
 import { orderBy } from 'lodash';

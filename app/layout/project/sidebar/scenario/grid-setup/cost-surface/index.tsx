@@ -1,34 +1,74 @@
-import { useCallback, useState } from 'react';
+import { ComponentProps, useCallback, useEffect, useRef, useState } from 'react';
+
+import { Form as FormRFF, FormProps, Field } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
+import { useAppDispatch } from 'store/hooks';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import { motion } from 'framer-motion';
+import { sortBy } from 'lodash';
 import { HiOutlineArrowUpOnSquareStack } from 'react-icons/hi2';
 
+import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useCanEditScenario } from 'hooks/permissions';
 import { useDownloadShapefileTemplate } from 'hooks/projects';
+import {
+  useLinkScenarioToCostSurface,
+  useUnlinkScenarioToCostSurface,
+  useScenario,
+} from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
+import Select from 'components/forms/select';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import CostSurfaceUploadModal from 'layout/project/sidebar/project/inventory-panel/cost-surfaces/modals/upload';
 import Section from 'layout/section';
+import { Scenario } from 'types/api/scenario';
 
 import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
 import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
+export type FormFields = {
+  costSurfaceId: Scenario['costSurface']['id'];
+};
+
 export const GridSetupCostSurface = (): JSX.Element => {
   const [opened, setOpened] = useState(false);
   const [successFile, setSuccessFile] = useState<{ name: string }>(null);
-
-  const { addToast } = useToasts();
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
+  const formRef = useRef<FormProps<FormFields>['form']>(null);
+  const dispatch = useAppDispatch();
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setSelectedCostSurface, setLayerSettings } = scenarioSlice.actions;
+
+  const { addToast } = useToasts();
+
   const editable = useCanEditScenario(pid, sid);
+  const costSurfaceQuery = useProjectCostSurfaces(
+    pid,
+    {},
+    {
+      select: (data) =>
+        sortBy(
+          data.filter(({ isDefault }) => !isDefault),
+          'name'
+        )?.map(({ id, name }) => ({ value: id, label: name })),
+    }
+  );
+  const scenarioQuery = useScenario(sid, {
+    include: 'costSurface',
+  });
+  const linkScenarioMutation = useLinkScenarioToCostSurface();
+  const unlinkScenarioMutation = useUnlinkScenarioToCostSurface();
+
   const downloadShapefileTemplateMutation = useDownloadShapefileTemplate();
 
   const onDownload = useCallback(() => {
@@ -54,6 +94,104 @@ export const GridSetupCostSurface = (): JSX.Element => {
   const cancelCostSurfaceUpload = useCallback(() => {
     setSuccessFile(null);
   }, []);
+
+  const onChangeCostSurface = useCallback(
+    (value: string) => {
+      formRef.current.change('costSurfaceId', value);
+
+      dispatch(setSelectedCostSurface(value));
+      dispatch(
+        setLayerSettings({
+          id: value,
+          settings: {
+            visibility: true,
+          },
+        })
+      );
+    },
+    [dispatch, setSelectedCostSurface, setLayerSettings]
+  );
+
+  const handleCostSurfaceChange = useCallback(
+    (data: Parameters<ComponentProps<typeof FormRFF<FormFields>>['onSubmit']>[0]) => {
+      if (!data.costSurfaceId) {
+        return unlinkScenarioMutation.mutate(
+          { sid },
+          {
+            onSuccess: () => {
+              addToast(
+                'scenario-cost-surface-unlink-success',
+                <>
+                  <h2 className="font-medium">Cost surface unlinked successfully</h2>
+                </>,
+                {
+                  level: 'success',
+                }
+              );
+            },
+            onError: () => {
+              addToast(
+                'scenario-cost-surface-error',
+                <>
+                  <h2 className="font-medium">Something went wrong</h2>
+                  <ul className="text-sm">Cost surface could not be unlinke.</ul>
+                </>,
+                {
+                  level: 'error',
+                }
+              );
+            },
+          }
+        );
+      }
+
+      linkScenarioMutation.mutate(
+        { sid, csid: data.costSurfaceId },
+        {
+          onSuccess: () => {
+            addToast(
+              'scenario-cost-surface-success',
+              <>
+                <h2 className="font-medium">Cost surface applied successfully</h2>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          },
+          onError: () => {
+            addToast(
+              'scenario-cost-surface-error',
+              <>
+                <h2 className="font-medium">Something went wrong</h2>
+                <ul className="text-sm">Cost surface could not be updated</ul>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [linkScenarioMutation, unlinkScenarioMutation, sid, addToast]
+  );
+
+  useEffect(() => {
+    if (scenarioQuery.isSuccess) {
+      const costSurfaceId = scenarioQuery.data.costSurface?.id;
+      dispatch(setSelectedCostSurface(costSurfaceId));
+
+      dispatch(
+        setLayerSettings({
+          id: costSurfaceId,
+          settings: {
+            visibility: true,
+          },
+        })
+      );
+    }
+  }, [scenarioQuery, dispatch, setSelectedCostSurface, setLayerSettings]);
 
   return (
     <motion.div
@@ -94,8 +232,52 @@ export const GridSetupCostSurface = (): JSX.Element => {
           </div>
         </div>
 
+        <FormRFF<FormFields>
+          onSubmit={handleCostSurfaceChange}
+          initialValues={{
+            costSurfaceId: scenarioQuery.data.costSurface?.id || null,
+          }}
+          keepDirtyOnReinitialize
+        >
+          {(fprops) => {
+            formRef.current = fprops.form;
+
+            return (
+              <form
+                id="form-cost-surface-scenario"
+                onSubmit={fprops.handleSubmit}
+                autoComplete="off"
+                className="space-y-3"
+              >
+                <Field name="costSurfaceId">
+                  {() => (
+                    <Select
+                      maxHeight={300}
+                      size="base"
+                      theme="dark"
+                      selected={fprops.values.costSurfaceId}
+                      options={costSurfaceQuery.data}
+                      clearSelectionActive
+                      onChange={onChangeCostSurface}
+                    />
+                  )}
+                </Field>
+                <Button
+                  type="submit"
+                  theme="primary-alt"
+                  size="base"
+                  className="w-full"
+                  disabled={!fprops.dirty}
+                >
+                  Apply cost surface
+                </Button>
+              </form>
+            );
+          }}
+        </FormRFF>
+
         <div className="relative mt-1 flex min-h-0 w-full flex-grow flex-col overflow-hidden text-sm">
-          <p className="pt-2">
+          <p className="mt-2 text-xs">
             By default all projects have an equal area cost surface which means that planning units
             with the same area have the same cost
           </p>

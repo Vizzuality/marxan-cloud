@@ -1,5 +1,7 @@
 import { Job } from 'types/api/job';
 
+import { CostSurface } from './cost-surface';
+
 export interface Scenario {
   id: string;
   projectId: number;
@@ -9,6 +11,12 @@ export interface Scenario {
   lastUpdate: string;
   lock?: Record<string, any>;
   lastUpdateDistance: string;
+  costSurface: {
+    type: 'costSurfaces';
+    id: CostSurface['id'];
+    name: CostSurface['name'];
+    isDefault: CostSurface['isDefault'];
+  };
   name: string;
   numberOfRuns: number;
   metadata: {
