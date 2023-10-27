@@ -142,6 +142,7 @@ export const ProjectMap = (): JSX.Element => {
     sublayers: [
       ...(sid1 && !sid2 ? ['frequency'] : []),
       ...(!!selectedCostSurface ? ['cost'] : []),
+      ...(!!selectedFeaturesIds.length ? ['features'] : []),
     ],
     options: {
       cost: { min: 1, max: 100 },
