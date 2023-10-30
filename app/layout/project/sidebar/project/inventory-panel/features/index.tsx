@@ -1,17 +1,17 @@
 import { useCallback, useState, ChangeEvent, useEffect } from 'react';
 
+import { useQueryClient } from 'react-query';
+
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import {
   setSelectedFeatures as setVisibleFeatures,
+  setSelectedContinuousFeatures,
   setLayerSettings,
 } from 'store/slices/projects/[id]';
 
-import chroma from 'chroma-js';
-
 import { useAllFeatures } from 'hooks/features';
-import { COLORS } from 'hooks/map/constants';
 
 import ActionsMenu from 'layout/project/sidebar/project/inventory-panel/features/actions-menu';
 import FeaturesBulkActionMenu from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu';
@@ -36,6 +36,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
 
   const {
     selectedFeatures: visibleFeatures,
+    selectedContinuousFeatures,
     search,
     layerSettings,
   } = useAppSelector((state) => state['/projects/[id]']);
@@ -46,6 +47,11 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
   const [selectedFeaturesIds, setSelectedFeaturesIds] = useState<Feature['id'][]>([]);
   const { query } = useRouter();
   const { pid } = query as { pid: string };
+
+  const queryClient = useQueryClient();
+
+  const featureColorQueryState =
+    queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
 
   const allFeaturesQuery = useAllFeatures(
     pid,
@@ -61,11 +67,8 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     },
     {
       select: ({ data }) => {
-        return data?.map((feature, index) => {
-          const color =
-            data.length > COLORS['features-preview'].ramp.length
-              ? chroma.scale(COLORS['features-preview'].ramp).colors(data.length)[index]
-              : COLORS['features-preview'].ramp[index];
+        return data?.map((feature) => {
+          const { color } = featureColorQueryState.data.find(({ id }) => feature.id === id) || {};
 
           return {
             id: feature.id,
@@ -74,11 +77,13 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
             tag: feature.tag,
             isCustom: feature.isCustom,
             color,
+            amountRange: feature.amountRange,
           };
         });
       },
       placeholderData: { data: [] },
       keepPreviousData: true,
+      enabled: featureColorQueryState?.status === 'success',
     }
   );
 
@@ -118,30 +123,58 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
 
   const toggleSeeOnMap = useCallback(
     (featureId: Feature['id']) => {
-      const newSelectedFeatures = [...visibleFeatures];
-      const isIncluded = newSelectedFeatures.includes(featureId);
-      if (!isIncluded) {
-        newSelectedFeatures.push(featureId);
+      const binaryFeatures = [...visibleFeatures];
+      const continuousFeatures = [...selectedContinuousFeatures];
+      const isIncludedInBinary = binaryFeatures.includes(featureId);
+      const isIncludedInContinuous = continuousFeatures.includes(featureId);
+
+      const feature = allFeaturesQuery.data?.find(({ id }) => featureId === id);
+      const isContinuous = feature.amountRange.min !== null && feature.amountRange.max !== null;
+
+      // const isIncluded = newSelectedFeatures.includes(featureId);
+      // if (!isIncluded) {
+      //   newSelectedFeatures.push(featureId);
+      // } else {
+      //   const i = newSelectedFeatures.indexOf(featureId);
+      //   newSelectedFeatures.splice(i, 1);
+      // }
+
+      if (isContinuous) {
+        if (!isIncludedInContinuous) {
+          continuousFeatures.push(featureId);
+        } else {
+          const i = continuousFeatures.indexOf(featureId);
+          continuousFeatures.splice(i, 1);
+        }
+
+        dispatch(setSelectedContinuousFeatures(continuousFeatures));
       } else {
-        const i = newSelectedFeatures.indexOf(featureId);
-        newSelectedFeatures.splice(i, 1);
+        if (!isIncludedInBinary) {
+          binaryFeatures.push(featureId);
+        } else {
+          const i = binaryFeatures.indexOf(featureId);
+          binaryFeatures.splice(i, 1);
+        }
+
+        dispatch(setVisibleFeatures(binaryFeatures));
       }
-      dispatch(setVisibleFeatures(newSelectedFeatures));
 
       const selectedFeature = allFeaturesQuery.data.find(({ id }) => featureId === id);
-      const { color } = selectedFeature || {};
 
       dispatch(
         setLayerSettings({
           id: featureId,
           settings: {
-            visibility: !isIncluded,
-            color,
+            visibility: !(isIncludedInBinary || isIncludedInContinuous),
+            color: selectedFeature.color,
+            ...(isContinuous && {
+              amountRange: feature.amountRange,
+            }),
           },
         })
       );
     },
-    [dispatch, visibleFeatures, allFeaturesQuery.data]
+    [dispatch, visibleFeatures, allFeaturesQuery.data, selectedContinuousFeatures]
   );
 
   const displayBulkActions = selectedFeaturesIds.length > 0;

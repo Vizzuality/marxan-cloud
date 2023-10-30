@@ -35,13 +35,14 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
   const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setFeatures, setLayerSettings, setSelectedFeatures } = scenarioSlice.actions;
-  const { selectedFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { setFeatures, setLayerSettings, setSelectedFeatures, setSelectedContinuousFeatures } =
+    scenarioSlice.actions;
+  const { selectedFeatures, selectedContinuousFeatures, layerSettings } = useSelector(
+    (state) => state[`/scenarios/${sid}/edit`]
+  );
 
   const dispatch = useDispatch();
-
   const queryClient = useQueryClient();
-
   const editable = useCanEditScenario(pid, sid);
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
   const saveScenarioMutation = useSaveScenario({
@@ -241,15 +242,33 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
 
   const toggleSeeOnMap = useCallback(
     (id: Feature['id']) => {
-      const newSelectedFeatures = [...selectedFeatures];
-      const isIncluded = newSelectedFeatures.includes(id);
-      if (!isIncluded) {
-        newSelectedFeatures.push(id);
+      const binaryFeatures = [...selectedFeatures];
+      const continuousFeatures = [...selectedContinuousFeatures];
+
+      const isIncludedInBinary = binaryFeatures.includes(id);
+      const isIncludedInContinuous = continuousFeatures.includes(id);
+
+      const feature = selectedFeaturesData?.find(({ id: featureId }) => featureId === id);
+      const isContinuous = feature.amountRange.min !== null && feature.amountRange.max !== null;
+
+      if (isContinuous) {
+        if (!isIncludedInContinuous) {
+          continuousFeatures.push(id);
+        } else {
+          const i = continuousFeatures.indexOf(id);
+          continuousFeatures.splice(i, 1);
+        }
+
+        dispatch(setSelectedContinuousFeatures(continuousFeatures));
       } else {
-        const i = newSelectedFeatures.indexOf(id);
-        newSelectedFeatures.splice(i, 1);
+        if (!isIncludedInBinary) {
+          binaryFeatures.push(id);
+        } else {
+          const i = binaryFeatures.indexOf(id);
+          binaryFeatures.splice(i, 1);
+        }
+        dispatch(setSelectedFeatures(binaryFeatures));
       }
-      dispatch(setSelectedFeatures(newSelectedFeatures));
 
       const selectedFeature = selectedFeaturesData.find(({ featureId }) => featureId === id);
       const { color } = selectedFeature || {};
@@ -258,23 +277,24 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
         setLayerSettings({
           id,
           settings: {
-            visibility: !isIncluded,
+            visibility: !(isIncludedInBinary || isIncludedInContinuous),
             color,
+            ...(isContinuous && {
+              amountRange: feature.amountRange,
+            }),
           },
         })
       );
     },
-    [dispatch, setSelectedFeatures, setLayerSettings, selectedFeatures, selectedFeaturesData]
-  );
-
-  const isShown = useCallback(
-    (id) => {
-      if (!selectedFeatures.includes(id)) {
-        return false;
-      }
-      return true;
-    },
-    [selectedFeatures]
+    [
+      dispatch,
+      setSelectedFeatures,
+      setLayerSettings,
+      selectedFeatures,
+      selectedContinuousFeatures,
+      setSelectedContinuousFeatures,
+      selectedFeaturesData,
+    ]
   );
 
   useEffect(() => {
@@ -343,7 +363,7 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
                                 onRemove={() => {
                                   setDeleteFeature(item);
                                 }}
-                                isShown={isShown(item.id)}
+                                isShown={layerSettings[item.id]?.visibility}
                                 onSeeOnMap={() => toggleSeeOnMap(item.id)}
                               />
                               <ConfirmationPrompt

@@ -1,5 +1,7 @@
 import React, { ComponentProps, useCallback, useEffect, useState, useMemo, useRef } from 'react';
 
+import { useQueryClient } from 'react-query';
+
 import { useRouter } from 'next/router';
 
 import { useAppSelector, useAppDispatch } from 'store/hooks';
@@ -7,11 +9,12 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import chroma from 'chroma-js';
 import { FiLayers } from 'react-icons/fi';
 
 import { useAccessToken } from 'hooks/auth';
 import { useProjectCostSurface } from 'hooks/cost-surface';
-import { useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
+import { useAllFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
   useWDPAPreviewLayer,
@@ -20,7 +23,9 @@ import {
   useBBOX,
   useTargetedPreviewLayers,
   useCostSurfaceLayer,
+  useContinuousFeaturesLayers,
 } from 'hooks/map';
+import { COLORS } from 'hooks/map/constants';
 import { useProject } from 'hooks/projects';
 import { useScenario, useScenarioPU } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
@@ -61,6 +66,7 @@ export const ScenariosEditMap = (): JSX.Element => {
   const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
+  const queryClient = useQueryClient();
 
   const { query } = useRouter();
 
@@ -98,6 +104,7 @@ export const ScenariosEditMap = (): JSX.Element => {
     features: featuresRecipe,
     featureHoverId,
     selectedFeatures,
+    selectedContinuousFeatures,
     preHighlightFeatures,
     postHighlightFeatures,
 
@@ -215,6 +222,32 @@ export const ScenariosEditMap = (): JSX.Element => {
     },
   });
 
+  const featuresColorQuery = useAllFeatures(
+    pid,
+    {
+      filters: {
+        sort: 'featureClassName',
+      },
+      disablePagination: true,
+    },
+    {
+      select: ({ data }) => {
+        return data.map((feature, index) => {
+          const color =
+            data.length > COLORS['features-preview'].ramp.length
+              ? chroma.scale(COLORS['features-preview'].ramp).colors(data.length)[index]
+              : COLORS['features-preview'].ramp[index];
+
+          return {
+            id: feature.id,
+            color,
+          };
+        });
+      },
+      placeholderData: { data: [] },
+    }
+  );
+
   const TargetedPreviewLayers = useTargetedPreviewLayers({
     features: targetedFeaturesData,
     cache,
@@ -247,7 +280,6 @@ export const ScenariosEditMap = (): JSX.Element => {
       features: [TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab)
         ? []
         : featuresIds,
-      selectedFeatures,
       preHighlightFeatures,
       postHighlightFeatures: postHighlightedFeaturesIds,
       runId: selectedSolution?.runId || bestSolution?.runId,
@@ -277,12 +309,20 @@ export const ScenariosEditMap = (): JSX.Element => {
     } as Parameters<typeof useCostSurfaceLayer>[0]['layerSettings'],
   });
 
+  const continuousFeaturesLayers = useContinuousFeaturesLayers({
+    active: selectedContinuousFeatures.length > 0,
+    pid,
+    features: selectedContinuousFeatures,
+    layerSettings,
+  });
+
   const LAYERS = [
     PUGridLayer,
     costSurfaceLayer,
     WDPApreviewLayer,
     ...FeaturePreviewLayers,
     ...TargetedPreviewLayers,
+    ...continuousFeaturesLayers,
   ].filter((l) => !!l);
 
   useEffect(() => {
@@ -303,6 +343,12 @@ export const ScenariosEditMap = (): JSX.Element => {
     // ? As this flow is gone and the user is free to go wherever they want, we need to update the cache manually when the tab changes.
     if (tab) dispatch(setCache(Date.now()));
   }, [tab, dispatch, setCache]);
+
+  useEffect(() => {
+    if (featuresColorQuery.isSuccess) {
+      queryClient.setQueryData('feature-colors', featuresColorQuery.data);
+    }
+  }, [featuresColorQuery, queryClient]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);

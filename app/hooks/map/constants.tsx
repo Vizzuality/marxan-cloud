@@ -43,7 +43,7 @@ export const COLORS = {
   'wdpa-preview': '#00f',
   features: '#6F53F7',
   highlightFeatures: '#BE6BFF',
-  abundance: {
+  continuous: {
     default: '#FFF',
     ramp: [
       '#4b5eef',
@@ -335,7 +335,7 @@ export const LEGEND_LAYERS = {
       },
       items: [
         {
-          color: COLORS.abundance.default,
+          color: COLORS.continuous.default,
           value: `${amountRange.min === amountRange.max ? 0 : amountRange.min}`,
         },
         {

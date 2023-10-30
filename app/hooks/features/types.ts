@@ -25,4 +25,5 @@ export interface UseFeaturesOptionsProps {
   search?: string;
   sort?: string;
   filters?: Record<string, unknown>;
+  disablePagination?: boolean;
 }
