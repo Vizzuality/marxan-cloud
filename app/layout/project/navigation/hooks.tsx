@@ -1,7 +1,5 @@
 import { useRouter } from 'next/router';
 
-import { useFeatureFlags } from 'hooks/feature-flags';
-
 import BLM_CALIBRATION_SVG from 'svgs/navigation/blm-calibration.svg?sprite';
 import COST_SURFACE_SVG from 'svgs/navigation/cost-surface.svg?sprite';
 import FEATURES_SVG from 'svgs/navigation/features.svg?sprite';
@@ -16,7 +14,6 @@ import type { SubMenuItem } from './submenu';
 const SCENARIO_ROUTE = '/projects/[pid]/scenarios/';
 
 export const useInventoryItems = (): SubMenuItem[] => {
-  const { showCS } = useFeatureFlags();
   const { query, route } = useRouter();
   const { pid, tab } = query as { pid: string; tab: string };
   const isProjectRoute = route.startsWith('/projects/[pid]') && !route.includes('/scenarios');
@@ -28,16 +25,12 @@ export const useInventoryItems = (): SubMenuItem[] => {
       icon: PROTECTED_AREA_SVG,
       selected: isProjectRoute && tab === TABS['project-protected-areas'],
     },
-    ...(showCS
-      ? [
-          {
-            name: 'Cost surface',
-            route: `/projects/${pid}?tab=${TABS['project-cost-surface']}`,
-            icon: COST_SURFACE_SVG,
-            selected: isProjectRoute && tab === TABS['project-cost-surface'],
-          },
-        ]
-      : []),
+    {
+      name: 'Cost surface',
+      route: `/projects/${pid}?tab=${TABS['project-cost-surface']}`,
+      icon: COST_SURFACE_SVG,
+      selected: isProjectRoute && tab === TABS['project-cost-surface'],
+    },
     {
       name: 'Features',
       route: `/projects/${pid}?tab=${TABS['project-features']}`,
