@@ -62,20 +62,21 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
   );
 
   const filteredData = useMemo(() => {
+    if (!allProjectCostSurfacesQuery.data.length) return allProjectCostSurfacesQuery.data;
     let sortedData = allProjectCostSurfacesQuery.data;
 
-    if (filters.sort === '-name') {
-      sortedData = orderBy(allProjectCostSurfacesQuery.data, 'name', 'desc');
+    switch (filters.sort) {
+      case 'name':
+        sortedData = orderBy(allProjectCostSurfacesQuery.data, 'name', 'asc');
+        break;
+      case '-name':
+        sortedData = orderBy(allProjectCostSurfacesQuery.data, 'name', 'desc');
+        break;
     }
 
-    if (search) {
-      sortedData = sortedData.filter((cs) =>
-        cs.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-      );
-    }
-
-    // the API assumes the default sort is ascending
-    return sortedData;
+    return sortedData.filter((cs) =>
+      cs.name.toLocaleLowerCase().includes(search?.toLocaleLowerCase())
+    );
   }, [filters, allProjectCostSurfacesQuery.data, search]);
 
   const costSurfaceIds = filteredData?.map((cs) => cs.id);
