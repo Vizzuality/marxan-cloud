@@ -252,23 +252,23 @@ export function useWDPAPreviewLayer({
       },
       render: {
         layers: [
-          {
+          ...visibleCategories.map((id) => ({
             type: 'fill',
             'source-layer': 'layer0',
             layout: {
               visibility: 'visible',
             },
             // wdpaIucnCategories are filtered in two steps as they are custom and WDPA.
-            // We have not way to separate them into two arrays but it would be ideal
             filter: [
               'any',
-              ['all', ['in', ['get', 'iucn_cat'], ['literal', visibleCategories]]],
-              ['all', ['in', ['get', 'id'], ['literal', visibleCategories]]],
+              ['all', ['in', ['get', 'iucn_cat'], ['literal', id]]],
+              ['all', ['in', ['get', 'id'], ['literal', id]]],
             ],
             paint: {
               'fill-color': COLORS['wdpa-preview'],
+              'fill-opacity': layerSettings[id]?.opacity || 1,
             },
-          },
+          })),
           {
             type: 'line',
             'source-layer': 'layer0',
