@@ -16,10 +16,12 @@ afterEach(async () => {
 test(`custom feature upload`, async () => {
   const name = 'someFeature';
   const description = 'someDescrip';
+  await fixtures.GivenProjectPusWithGeometryForProject();
 
   const result = await fixtures.WhenUploadingCustomFeature(name, description);
 
   await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
+  await fixtures.ThenFeatureAmountsFromShapefileAreCreated(name);
 });
 
 test(`if tagging info is included in DTO but invalid, then error is returned and everything is rolled back`, async () => {
@@ -28,6 +30,7 @@ test(`if tagging info is included in DTO but invalid, then error is returned and
   const description = 'invalidDesc';
   const invalidTag1 = 'some\ntag';
   const invalidTag2 = `t${'a'.repeat(tagMaxlength + 1)}g`;
+  await fixtures.GivenProjectPusWithGeometryForProject();
 
   // ACT / ASSERT
   const result1 = await fixtures.WhenUploadingCustomFeature(
@@ -54,6 +57,7 @@ test(`if tagging info is included in DTO and valid, created feature should be ta
   const name = 'someFeature';
   const description = 'someDescrip';
   const tag = 'someTag';
+  await fixtures.GivenProjectPusWithGeometryForProject();
 
   // ACT
   const result = await fixtures.WhenUploadingCustomFeature(
@@ -72,6 +76,7 @@ test(`if there is already an existing feature with a tag that has equivalent cap
   const equivalentTag = 'some-Tag';
   const name = 'someFeature';
   const description = 'someDescrip';
+  await fixtures.GivenProjectPusWithGeometryForProject();
 
   const featureWithEquivalentTagId = await fixtures.GivenFeatureOnProject(
     'equivalentTagFeature',

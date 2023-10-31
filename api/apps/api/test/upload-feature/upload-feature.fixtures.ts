@@ -14,6 +14,12 @@ import { HttpStatus } from '@nestjs/common';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
 import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { FeatureAmountsPerPlanningUnitEntity } from '@marxan/feature-amounts-per-planning-unit';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { GivenPuSquareGridGeometryExists } from '../../../geoprocessing/test/steps/given-pu-geometries-exists';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -29,6 +35,11 @@ export const getFixtures = async () => {
       name: `Organization ${Date.now()}`,
     },
   );
+
+  const geoEntityManager: EntityManager = app.get(
+    getEntityManagerToken(DbConnections.geoprocessingDB),
+  );
+
   const customFeatureName = `User custom feature ${Date.now()}`;
   const customFeatureDesc = `User custom feature desc`;
 
@@ -37,6 +48,12 @@ export const getFixtures = async () => {
   );
   const geoFeatureDataRepo: Repository<GeoFeatureGeometry> = app.get(
     getRepositoryToken(GeoFeatureGeometry, DbConnections.geoprocessingDB),
+  );
+  const planningUnitsRepo: Repository<PlanningUnitsGeom> = app.get(
+    getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
+  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> = app.get(
+    getRepositoryToken(ProjectsPuEntity, DbConnections.geoprocessingDB),
   );
   const geoFeatureTagRepo: Repository<GeoFeatureTag> = app.get(
     getRepositoryToken(GeoFeatureTag),
@@ -50,11 +67,6 @@ export const getFixtures = async () => {
     getRepositoryToken(GeoFeature, DbConnections.default),
   );
 
-  const featuresAmountsGeoDbRepository: Repository<GeoFeatureGeometry> =
-    app.get(
-      getRepositoryToken(GeoFeatureGeometry, DbConnections.geoprocessingDB),
-    );
-
   const featureAmountsPerPlanningUnitRepo: Repository<FeatureAmountsPerPlanningUnitEntity> =
     app.get(
       getRepositoryToken(
@@ -62,10 +74,6 @@ export const getFixtures = async () => {
         DbConnections.geoprocessingDB,
       ),
     );
-
-  const geoEntityManager: EntityManager = app.get(
-    getEntityManagerToken(DbConnections.geoprocessingDB),
-  );
 
   return {
     cleanup: async () => {
@@ -82,6 +90,8 @@ export const getFixtures = async () => {
       await geoFeaturesApiRepo.delete({
         projectId,
       });
+      await planningUnitsRepo.delete({});
+      await projectsPuRepo.delete({});
       await cleanup();
       await app.close();
     },
@@ -105,6 +115,30 @@ export const getFixtures = async () => {
             (project_id, feature_id, tag)
           VALUES
             ('${projectId}', '${featureId}', '${tag}' ) `),
+
+    GivenProjectPusWithGeometryForProject: async () => {
+      const geomType = PlanningUnitGridShape.FromShapefile;
+      //These parameters are meant to be generate geometries that intersect with the ones on the feature shapefile wetlands.zip
+      const geometries = await GivenPuSquareGridGeometryExists(
+        geoEntityManager,
+        3,
+        18,
+        -18,
+        23,
+        -14,
+        geomType,
+      );
+
+      let piudCounter = 1;
+      const pus: Partial<ProjectsPuEntity>[] = geometries.map((geometry) => ({
+        projectId,
+        puid: piudCounter++,
+        geomId: geometry.id,
+        geomType,
+      }));
+
+      await geoEntityManager.save(ProjectsPuEntity, pus);
+    },
 
     // ACT
     WhenUploadingCustomFeature: async (
@@ -276,8 +310,8 @@ export const getFixtures = async () => {
           featureClassName: name,
           description,
           alias: null,
-          amountMax: null,
-          amountMin: null,
+          amountMax: 5296399725.20094,
+          amountMin: 820348505.9774874,
           propertyName: null,
           intersection: null,
           creationStatus: `done`,
@@ -301,6 +335,21 @@ export const getFixtures = async () => {
           source: `user_imported`,
         },
       ]);
+    },
+    ThenFeatureAmountsFromShapefileAreCreated: async (
+      featureClassName: string,
+    ) => {
+      const feature = await featuresRepository.findOne({
+        where: { featureClassName },
+      });
+      const featureAmounts = await featureAmountsPerPlanningUnitRepo.find({
+        where: { featureId: feature?.id },
+        order: { amount: 'DESC' },
+      });
+      expect(featureAmounts).toHaveLength(3);
+      expect(featureAmounts[0].amount).toBeCloseTo(5296399725.20094);
+      expect(featureAmounts[1].amount).toBeCloseTo(2643783217.418024);
+      expect(featureAmounts[2].amount).toBeCloseTo(820348505.9774874);
     },
     ThenNewFeaturesAreCreated: async () => {
       const newFeaturesAdded = await featuresRepository.find({
@@ -327,13 +376,13 @@ export const getFixtures = async () => {
           featureClassName: 'feat_28135ef',
         },
       });
-      const newFeature1Amounts = await featuresAmountsGeoDbRepository.find({
+      const newFeature1Amounts = await geoFeatureDataRepo.find({
         where: { featureId: newFeatures1?.id },
         order: {
           amount: 'DESC',
         },
       });
-      const newFeature2Amounts = await featuresAmountsGeoDbRepository.find({
+      const newFeature2Amounts = await geoFeatureDataRepo.find({
         where: { featureId: newFeatures2?.id },
       });
 
