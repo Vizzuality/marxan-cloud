@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { BestSolutionDataService } from '@marxan-api/modules/projects/output-project-summaries/solution-data/best-solution-data.service';
 import { SummedSolutionDataService } from '@marxan-api/modules/projects/output-project-summaries/solution-data/summed-solution-data.service';
@@ -54,7 +54,7 @@ export class OutputProjectSummariesService {
     ).map((pu) => pu.puid);
     const scenarios = await this.scenarioRepo.find({
       select: { id: true, projectScenarioId: true, name: true },
-      where: { projectId, numberOfRuns: Not(IsNull()) },
+      where: { projectId, ranAtLeastOnce: true },
     });
 
     const bestSolutionData =
