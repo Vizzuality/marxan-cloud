@@ -74,9 +74,13 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
         break;
     }
 
-    return sortedData.filter((cs) =>
-      cs.name.toLocaleLowerCase().includes(search?.toLocaleLowerCase())
-    );
+    if (search) {
+      return sortedData.filter((cs) =>
+        cs.name.toLocaleLowerCase().includes(search?.toLocaleLowerCase())
+      );
+    }
+
+    return sortedData;
   }, [filters, allProjectCostSurfacesQuery.data, search]);
 
   const costSurfaceIds = filteredData?.map((cs) => cs.id);
