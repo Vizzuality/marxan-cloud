@@ -16,7 +16,9 @@
             "outFiles": [
                 "!**/node_modules/**"
             ],
-            "sourceMaps": true
+            "sourceMaps": true,
+            "autoAttachChildProcesses": false // avoids issues with node child
+              // processes such as those exec'ed by Mapshaper's runCommandsXL()
         },
         {
             "name": "Marxan Geoprocessing service",
@@ -30,7 +32,9 @@
             "outFiles": [
                 "!**/node_modules/**"
             ],
-            "sourceMaps": true
+            "sourceMaps": true,
+            "autoAttachChildProcesses": false // avoids issues with node child
+              // processes such as those exec'ed by Mapshaper's runCommandsXL()
         }
     ]
 }
