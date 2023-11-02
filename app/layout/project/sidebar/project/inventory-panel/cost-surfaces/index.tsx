@@ -65,12 +65,16 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
     if (!allProjectCostSurfacesQuery.data.length) return allProjectCostSurfacesQuery.data;
     let sortedData = allProjectCostSurfacesQuery.data;
 
+    const insensitiveFilter = (value: (typeof allProjectCostSurfacesQuery.data)[0]) => {
+      return value.name?.toLocaleLowerCase();
+    };
+
     switch (filters.sort) {
       case 'name':
-        sortedData = orderBy(allProjectCostSurfacesQuery.data, 'name', 'asc');
+        sortedData = orderBy(allProjectCostSurfacesQuery.data, insensitiveFilter, 'asc');
         break;
       case '-name':
-        sortedData = orderBy(allProjectCostSurfacesQuery.data, 'name', 'desc');
+        sortedData = orderBy(allProjectCostSurfacesQuery.data, insensitiveFilter, 'desc');
         break;
     }
 
@@ -81,7 +85,7 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
     }
 
     return sortedData;
-  }, [filters, allProjectCostSurfacesQuery.data, search]);
+  }, [filters, allProjectCostSurfacesQuery, search]);
 
   const costSurfaceIds = filteredData?.map((cs) => cs.id);
 
