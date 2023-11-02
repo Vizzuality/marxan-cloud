@@ -53,6 +53,7 @@ import {
   FeatureAmountsPerPlanningUnitService,
 } from '@marxan/feature-amounts-per-planning-unit';
 import { ComputeFeatureAmountPerPlanningUnit } from '@marxan/feature-amounts-per-planning-unit/feature-amounts-per-planning-units.service';
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -467,6 +468,7 @@ export class GeoFeaturesService extends AppBaseService<
         amount,
         projectPuId,
       })),
+      { chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS },
     );
   }
 
