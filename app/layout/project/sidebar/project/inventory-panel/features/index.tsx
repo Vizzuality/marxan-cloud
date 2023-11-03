@@ -50,7 +50,13 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
   const allFeaturesQuery = useAllFeatures(
     pid,
     {
-      ...filters,
+      ...{
+        ...filters,
+        // ? if tag sorting is chosen, sort by tag and then by name
+        ...(['tag', '-tag'].includes(filters.sort) && {
+          sort: `${filters.sort},featureClassName`,
+        }),
+      },
       search,
     },
     {
