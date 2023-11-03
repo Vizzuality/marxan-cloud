@@ -65,7 +65,6 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
         Authorization: `Bearer ${session.accessToken}`,
       },
       params: {
-        'page[number]': pageParam,
         ...parsedFilters,
         ...(search && {
           q: search,
@@ -73,6 +72,7 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
         ...(sort && {
           sort,
         }),
+        disablePagination: true,
       },
     });
 

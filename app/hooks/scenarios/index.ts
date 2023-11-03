@@ -351,7 +351,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     };
   }, {});
 
-  const fetchScenarios = ({ pageParam = 1 }) =>
+  const fetchScenarios = () =>
     SCENARIOS.request({
       method: 'GET',
       url: '/',
@@ -359,7 +359,6 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
         Authorization: `Bearer ${session.accessToken}`,
       },
       params: {
-        'page[number]': pageParam,
         ...parsedFilters,
         ...(search && {
           q: search,
@@ -367,6 +366,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
         ...(sort && {
           sort,
         }),
+        disablePagination: true,
       },
     });
 

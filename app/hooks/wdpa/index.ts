@@ -35,6 +35,7 @@ export function useWDPACategories({
           ...(customAreaId && {
             'filter[customAreaId]': customAreaId,
           }),
+          disablePagination: true,
         },
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
@@ -104,6 +105,7 @@ export function useProjectWDPAs<T = WDPA[]>(
         ...(sort && {
           sort,
         }),
+        disablePagination: true,
       },
     }).then(({ data }) => data.data);
 

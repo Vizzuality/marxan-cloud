@@ -24,7 +24,10 @@ export function useProjectCostSurfaces<T = CostSurface[]>(
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
-        params,
+        params: {
+          disablePagination: true,
+          ...params,
+        },
       }).then(({ data }) => data?.data),
     enabled: Boolean(pid),
     ...queryOptions,

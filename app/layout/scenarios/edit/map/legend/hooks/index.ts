@@ -131,7 +131,7 @@ export const useFeaturesLegend = () => {
   const dispatch = useAppDispatch();
   const projectFeaturesQuery = useAllFeatures(
     pid,
-    { sort: 'feature_class_name' },
+    { sort: 'featureClassName' },
     {
       select: ({ data }) => ({
         binaryFeatures:
