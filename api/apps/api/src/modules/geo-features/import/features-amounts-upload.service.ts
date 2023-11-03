@@ -28,6 +28,7 @@ import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/f
 @Injectable()
 export class FeatureAmountUploadService {
   private readonly logger = new Logger(this.constructor.name);
+
   constructor(
     @InjectDataSource(DbConnections.default)
     private readonly apiDataSource: DataSource,
@@ -107,15 +108,17 @@ export class FeatureAmountUploadService {
         `Upload temporary data removed from apiDB uploads tables`,
       );
 
+      this.logger.log(`Saving min and max amounts for new features...`);
+      await this.geoFeaturesService.saveAmountRangeForFeatures(
+        apiQueryRunner.manager,
+        geoQueryRunner.manager,
+        newFeaturesFromCsvUpload.map((feature) => feature.id),
+      );
+
       this.logger.log(`Csv file upload process finished successfully`);
       // Committing transaction
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
-
-      this.logger.log(`Saving min and max amounts for new features...`);
-      await this.geoFeaturesService.saveAmountRangeForFeatures(
-        newFeaturesFromCsvUpload.map((feature) => feature.id),
-      );
     } catch (err) {
       await this.events.failEvent(err);
       await apiQueryRunner.rollbackTransaction();
@@ -134,6 +137,7 @@ export class FeatureAmountUploadService {
     }
     return right(newFeaturesFromCsvUpload);
   }
+
   async saveCsvToRegistry(
     data: {
       fileBuffer: Buffer;

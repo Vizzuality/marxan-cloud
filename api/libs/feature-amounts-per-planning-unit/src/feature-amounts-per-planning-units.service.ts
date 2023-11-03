@@ -42,7 +42,7 @@ export class FeatureAmountsPerPlanningUnitService {
   public async computeMarxanAmountPerPlanningUnit(
     featureId: string,
     projectId: string,
-    geoEntityManager?: EntityManager,
+    geoEntityManager: EntityManager = this.geoEntityManager,
   ): Promise<ComputeFeatureAmountPerPlanningUnit[]> {
     /**
      * @TODO further performance savings: limiting scans to planning_units_geom
@@ -50,10 +50,6 @@ export class FeatureAmountsPerPlanningUnitService {
      * && operator instead of st_intersects() for bbox-based calculation of
      * intersections.
      */
-    geoEntityManager = geoEntityManager
-      ? geoEntityManager
-      : this.geoEntityManager;
-
     const rows: {
       featureid: string;
       puid: number;
