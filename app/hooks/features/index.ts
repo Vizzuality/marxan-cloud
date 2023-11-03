@@ -197,6 +197,7 @@ export function useAllFeatures<T = { data: Feature[] }>(
         ...(sort && {
           sort,
         }),
+        disablePagination: true,
       },
     }).then(({ data }) => data);
 
@@ -221,6 +222,9 @@ export function useSelectedFeatures(
       url: `/${sid}/features/specification`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        disablePagination: true,
       },
     }).then(({ data }) => data);
 
@@ -354,6 +358,9 @@ export function useTargetedFeatures(
       url: `/${sid}/features/specification`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        disablePagination: true,
       },
     }).then(({ data }) => data);
 
