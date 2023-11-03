@@ -53,7 +53,7 @@ import {
   FeatureAmountsPerPlanningUnitService,
 } from '@marxan/feature-amounts-per-planning-unit';
 import { ComputeFeatureAmountPerPlanningUnit } from '@marxan/feature-amounts-per-planning-unit/feature-amounts-per-planning-units.service';
-import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
+import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -431,10 +431,14 @@ export class GeoFeaturesService extends AppBaseService<
         computedFeatureAmounts,
       );
 
+      await this.saveAmountRangeForFeatures(
+        apiQueryRunner.manager,
+        geoQueryRunner.manager,
+        [geoFeature.id],
+      );
+
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
-
-      await this.saveAmountRangeForFeatures([geoFeature.id]);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
       await geoQueryRunner.rollbackTransaction();
@@ -468,7 +472,7 @@ export class GeoFeaturesService extends AppBaseService<
         amount,
         projectPuId,
       })),
-      { chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS },
+      { chunk: CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS },
     );
   }
 
@@ -882,10 +886,14 @@ export class GeoFeaturesService extends AppBaseService<
     } as GeoFeature;
   }
 
-  async saveAmountRangeForFeatures(featureIds: string[]) {
+  async saveAmountRangeForFeatures(
+    apiEntityManager: EntityManager,
+    geoEntityManager: EntityManager,
+    featureIds: string[],
+  ) {
     this.logger.log(`Saving min and max amounts for new features...`);
 
-    const minAndMaxAmountsForFeatures = await this.geoEntityManager
+    const minAndMaxAmountsForFeatures = await geoEntityManager
       .createQueryBuilder()
       .select('feature_id', 'id')
       .addSelect('MIN(amount)', 'amountMin')
@@ -896,7 +904,7 @@ export class GeoFeaturesService extends AppBaseService<
       .getRawMany();
 
     if (minAndMaxAmountsForFeatures.length === 0) {
-      return;
+      throw new Error('Error saving Min/Max amounts for given features ');
     }
 
     const minMaxSqlValueStringForFeatures = minAndMaxAmountsForFeatures
@@ -915,7 +923,7 @@ export class GeoFeaturesService extends AppBaseService<
             ${minMaxSqlValueStringForFeatures}
         ) as minmax(feature_id, min, max)
         where features.id = minmax.feature_id;`;
-    await this.geoFeaturesRepository.query(query);
+    await apiEntityManager.query(query);
   }
 
   async checkProjectFeatureVisibility(
