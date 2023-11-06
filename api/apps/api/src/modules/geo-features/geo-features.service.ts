@@ -111,6 +111,8 @@ export class GeoFeaturesService extends AppBaseService<
     private readonly geoDataSource: DataSource,
     @InjectRepository(GeoFeatureGeometry, DbConnections.geoprocessingDB)
     private readonly geoFeaturesGeometriesRepository: Repository<GeoFeatureGeometry>,
+    @InjectEntityManager()
+    private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(DbConnections.geoprocessingDB)
     private readonly geoEntityManager: EntityManager,
     @InjectRepository(GeoFeature)
@@ -432,9 +434,9 @@ export class GeoFeaturesService extends AppBaseService<
       );
 
       await this.saveAmountRangeForFeatures(
+        [geoFeature.id],
         apiQueryRunner.manager,
         geoQueryRunner.manager,
-        [geoFeature.id],
       );
 
       await apiQueryRunner.commitTransaction();
@@ -887,10 +889,17 @@ export class GeoFeaturesService extends AppBaseService<
   }
 
   async saveAmountRangeForFeatures(
-    apiEntityManager: EntityManager,
-    geoEntityManager: EntityManager,
     featureIds: string[],
+    apiEntityManager?: EntityManager,
+    geoEntityManager?: EntityManager,
   ) {
+    apiEntityManager = apiEntityManager
+      ? apiEntityManager
+      : this.apiEntityManager;
+    geoEntityManager = geoEntityManager
+      ? geoEntityManager
+      : this.geoEntityManager;
+
     this.logger.log(`Saving min and max amounts for new features...`);
 
     const minAndMaxAmountsForFeatures = await geoEntityManager

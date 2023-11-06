@@ -7,6 +7,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from '../projects/project.api.entity';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 
 @Injectable()
 export class ComputeArea {
@@ -15,7 +17,11 @@ export class ComputeArea {
     private readonly featureAmountsPerPlanningUnit: FeatureAmountsPerPlanningUnitService,
     @InjectRepository(Project)
     private readonly projectsRepo: Repository<Project>,
+    @InjectRepository(GeoFeature)
+    private readonly geoFeatureRepo: Repository<GeoFeature>,
+    private readonly geoFeatureService: GeoFeaturesService,
   ) {}
+
   public async computeAreaPerPlanningUnitOfFeature(
     projectId: string,
     scenarioId: string,
@@ -31,24 +37,37 @@ export class ComputeArea {
         featureId,
       );
 
-    if (alreadyComputed) return;
-
-    const amountPerPlanningUnitOfFeature =
-      await this.featureAmountsPerPlanningUnit.computeMarxanAmountPerPlanningUnit(
-        featureId,
-        projectId,
-      );
-
-    return this.featureAmountsPerPlanningUnitRepo.saveAmountPerPlanningUnitAndFeature(
-      projectId,
-      amountPerPlanningUnitOfFeature.map(
-        ({ featureId, projectPuId, amount }) => ({
+    if (!alreadyComputed) {
+      const amountPerPlanningUnitOfFeature =
+        await this.featureAmountsPerPlanningUnit.computeMarxanAmountPerPlanningUnit(
           featureId,
-          projectPuId,
-          amount,
-        }),
-      ),
-    );
+          projectId,
+        );
+
+      await this.featureAmountsPerPlanningUnitRepo.saveAmountPerPlanningUnitAndFeature(
+        projectId,
+        amountPerPlanningUnitOfFeature.map(
+          ({ featureId, projectPuId, amount }) => ({
+            featureId,
+            projectPuId,
+            amount,
+          }),
+        ),
+      );
+    }
+
+    const minMaxAlreadyComputed = await this.areFeatureMinMaxSaved(featureId);
+
+    if (!minMaxAlreadyComputed) {
+      await this.geoFeatureService.saveAmountRangeForFeatures([featureId]);
+    }
+  }
+
+  private async areFeatureMinMaxSaved(featureId: string): Promise<boolean> {
+    const feature = await this.geoFeatureRepo.findOneOrFail({
+      where: { id: featureId },
+    });
+    return !!(feature.amountMin && feature.amountMax);
   }
 
   private async isLegacyProject(projectId: string) {

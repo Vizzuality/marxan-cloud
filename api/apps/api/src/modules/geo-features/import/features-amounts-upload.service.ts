@@ -110,9 +110,9 @@ export class FeatureAmountUploadService {
 
       this.logger.log(`Saving min and max amounts for new features...`);
       await this.geoFeaturesService.saveAmountRangeForFeatures(
+        newFeaturesFromCsvUpload.map((feature) => feature.id),
         apiQueryRunner.manager,
         geoQueryRunner.manager,
-        newFeaturesFromCsvUpload.map((feature) => feature.id),
       );
 
       this.logger.log(`Csv file upload process finished successfully`);
