@@ -3,7 +3,6 @@ import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAllPaginatedFeatures } from 'hooks/features';
-import useBottomScrollListener from 'hooks/scroll';
 
 import Item from 'components/features/intersect-item';
 import Loading from 'components/loading';
@@ -30,17 +29,10 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
 
   const {
     data: allFeaturesData,
-    fetchNextPage: allFeaturesfetchNextPage,
-    hasNextPage,
     isFetching: allFeaturesIsFetching,
-    isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
   } = useAllPaginatedFeatures(pid, {
     search,
-  });
-
-  const scrollRef = useBottomScrollListener(() => {
-    if (hasNextPage) allFeaturesfetchNextPage();
   });
 
   // Callbacks
@@ -70,7 +62,6 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
       <div className="pointer-events-none absolute -top-1 left-0 z-10 h-6 w-full bg-gradient-to-b from-white via-white" />
 
       <div
-        ref={scrollRef}
         className={cn({
           'divide-y divide-dashed divide-black divide-opacity-20 overflow-y-auto overflow-x-hidden bg-white px-8':
             true,
@@ -105,7 +96,6 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
                   <Item
                     {...item}
                     {...selectedItem}
-                    scrollRoot={scrollRef}
                     selected={selectedIndex !== -1}
                     onSelected={() => {
                       handleSelected(item);
@@ -124,17 +114,6 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
       </div>
 
       <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-white via-white" />
-
-      <div
-        className={cn({
-          'opacity-100': allFeaturesIsFetchingNextPage,
-          'pointer-events-none absolute bottom-0 left-0 z-20 w-full text-center font-heading text-xs uppercase opacity-0 transition':
-            true,
-        })}
-      >
-        <div className="bg-gray-300 py-1">Loading more...</div>
-        <div className="h-6 w-full bg-white" />
-      </div>
     </div>
   );
 };

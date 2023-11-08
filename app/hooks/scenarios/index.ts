@@ -1,19 +1,11 @@
 import { useMemo } from 'react';
 
-import {
-  useQuery,
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-  useQueries,
-  UseQueryOptions,
-} from 'react-query';
+import { useQuery, useMutation, useQueryClient, useQueries, UseQueryOptions } from 'react-query';
 
 import { useRouter } from 'next/router';
 
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { formatDistanceToNow } from 'date-fns';
-import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
 
 import { useMe } from 'hooks/me';
@@ -368,22 +360,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
         }),
         disablePagination: true,
       },
-    });
-
-  const query = useInfiniteQuery(['scenarios', pId, JSON.stringify(options)], fetchScenarios, {
-    retry: false,
-    keepPreviousData: true,
-    refetchOnWindowFocus: true,
-    getNextPageParam: (lastPage) => {
-      const {
-        data: { meta },
-      } = lastPage;
-      const { page, totalPages } = meta;
-
-      const nextPage = page + 1 > totalPages ? null : page + 1;
-      return nextPage;
-    },
-  });
+    }).then((response) => response.data);
 
   const { data: user } = useMe();
 
@@ -393,86 +370,61 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const { data: scenariosLocksData = [] } = useProjectScenariosLocks(pId);
   const { data: projectUsersData = [] } = useProjectUsers(pId);
 
-  const { data } = query;
-  const { pages } = data || {};
+  return useQuery(['scenarios', pId, JSON.stringify(options)], fetchScenarios, {
+    retry: false,
+    keepPreviousData: true,
+    refetchOnWindowFocus: true,
+    placeholderData: { data: [] },
+    select: (data) => {
+      const parsedData = data?.data.map((d): ItemProps => {
+        const { id, projectId, name, lastModifiedAt, status, ranAtLeastOnce, numberOfRuns } = d;
 
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages)
-      ? flatten(
-          pages.map((p) => {
-            const {
-              data: { data: pageData },
-            } = p;
+        const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
+        const runStatus = status || jobs.find((job) => job.kind === 'run')?.status || 'created';
 
-            return pageData.map((d): ItemProps => {
-              const { id, projectId, name, lastModifiedAt, status, ranAtLeastOnce, numberOfRuns } =
-                d;
+        let lock = scenariosLocksData.find((sl) => sl.scenarioId === id && sl.userId !== user?.id);
+        if (lock) {
+          const userLock = projectUsersData.find((pu) => pu?.user?.id === lock.userId);
 
-              const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
-              const runStatus =
-                status || jobs.find((job) => job.kind === 'run')?.status || 'created';
+          lock = {
+            ...lock,
+            ...userLock?.user,
+            roleName: userLock?.roleName,
+          };
+        }
 
-              let lock = scenariosLocksData.find(
-                (sl) => sl.scenarioId === id && sl.userId !== user?.id
-              );
-              if (lock) {
-                const userLock = projectUsersData.find((pu) => pu?.user?.id === lock.userId);
+        const lastUpdateDistance = () => {
+          return formatDistanceToNow(new Date(lastModifiedAt), { addSuffix: true });
+        };
 
-                lock = {
-                  ...lock,
-                  ...userLock?.user,
-                  roleName: userLock?.roleName,
-                };
-              }
+        return {
+          id,
+          name,
+          lastUpdate: lastModifiedAt,
+          lastUpdateDistance: lastUpdateDistance(),
+          warnings: false,
+          runStatus,
+          jobs,
+          lock,
+          ranAtLeastOnce,
+          numberOfRuns,
+          onEdit: () => {
+            push(`/projects/${projectId}/scenarios/${id}/edit?tab=protected-areas`);
+          },
+        };
+      });
 
-              const lastUpdateDistance = () => {
-                return formatDistanceToNow(new Date(lastModifiedAt), { addSuffix: true });
-              };
-
-              return {
-                id,
-                name,
-                lastUpdate: lastModifiedAt,
-                lastUpdateDistance: lastUpdateDistance(),
-                warnings: false,
-                runStatus,
-                jobs,
-                lock,
-                ranAtLeastOnce,
-                numberOfRuns,
-                onEdit: () => {
-                  push(`/projects/${projectId}/scenarios/${id}/edit?tab=protected-areas`);
-                },
-              };
-            });
-          })
-        )
-      : [];
-
-    // Backend can't deal with the `status` filter just yet, so we'll just manually
-    // filter it out manually in the frontend. It'll allow us to make the feature work
-    // in the frontend for now, albeit in a non-ideal way.
-    const filteredData = parsedData.filter((parsedDataItem) => {
-      const statusFiltersArr = (filters?.status as Array<string>) || [];
-      // No filters to apply, return everything
-      if (!statusFiltersArr.length) return true;
-      return statusFiltersArr.includes(parsedDataItem.runStatus);
-    });
-
-    return {
-      ...query,
-      data: filteredData,
-    };
-  }, [
-    query,
-    pages,
-    filters,
-    push,
-    user?.id,
-    statusScenarios,
-    scenariosLocksData,
-    projectUsersData,
-  ]);
+      // Backend can't deal with the `status` filter just yet, so we'll just manually
+      // filter it out manually in the frontend. It'll allow us to make the feature work
+      // in the frontend for now, albeit in a non-ideal way.
+      return parsedData.filter((parsedDataItem) => {
+        const statusFiltersArr = (filters?.status as Array<string>) || [];
+        // No filters to apply, return everything
+        if (!statusFiltersArr.length) return true;
+        return statusFiltersArr.includes(parsedDataItem.runStatus);
+      });
+    },
+  });
 }
 
 export function useScenario(id: Scenario['id'], params = {}) {

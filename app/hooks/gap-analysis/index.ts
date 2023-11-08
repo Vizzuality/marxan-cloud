@@ -1,10 +1,7 @@
-import { useMemo, useRef } from 'react';
-
-import { useInfiniteQuery, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 
 import { format } from 'd3';
 import { sortBy } from 'lodash';
-import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
 
 import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
@@ -41,11 +38,7 @@ export function useAllGapAnalysis(sId: Scenario['id'], queryOptions) {
   );
 }
 
-export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
-  const placeholderDataRef = useRef({
-    pages: [],
-    pageParams: [],
-  });
+export function usePreGapAnalysis(sId: Scenario['id'], options: UseFeaturesOptionsProps = {}) {
   const { data: session } = useSession();
 
   const { filters = {}, search, sort } = options;
@@ -57,7 +50,7 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
     };
   }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) =>
+  const fetchFeatures = () =>
     SCENARIOS.request({
       method: 'GET',
       url: `/${sId}/features/gap-data`,
@@ -74,87 +67,45 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
         }),
         disablePagination: true,
       },
-    });
+    }).then((response) => response.data);
 
-  const query = useInfiniteQuery(
-    ['pre-gap-analysis', sId, JSON.stringify(options)],
-    fetchFeatures,
-    {
-      placeholderData: placeholderDataRef.current,
-      getNextPageParam: (lastPage) => {
-        const {
-          data: { meta },
-        } = lastPage;
-        const { page, totalPages } = meta;
+  return useQuery(['pre-gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
+    select: ({ data }) =>
+      sortBy(
+        data.map((d): AllItemProps => {
+          const {
+            id,
+            name,
+            featureClassName,
+            met,
+            metArea,
+            coverageTarget,
+            coverageTargetArea,
+            onTarget,
+          } = d;
 
-        const nextPage = page + 1 > totalPages ? null : page + 1;
-        return nextPage;
-      },
-    }
-  );
-
-  const { data } = query;
-  const { pages } = data || {};
-
-  if (data) {
-    placeholderDataRef.current = data;
-  }
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages)
-      ? flatten(
-          pages.map((p) => {
-            const {
-              data: { data: pageData },
-            } = p;
-
-            return sortBy(
-              pageData.map((d): AllItemProps => {
-                const {
-                  id,
-                  name,
-                  featureClassName,
-                  met,
-                  metArea,
-                  coverageTarget,
-                  coverageTargetArea,
-                  onTarget,
-                } = d;
-
-                return {
-                  id,
-                  name: name || featureClassName || 'Metadata name',
-                  onTarget,
-                  current: {
-                    percent: met / 100,
-                    value: format('.3s')(metArea / 1000000),
-                    unit: 'km2',
-                  },
-                  target: {
-                    percent: coverageTarget / 100,
-                    value: format('.3s')(coverageTargetArea / 1000000),
-                    unit: 'km2',
-                  },
-                };
-              }),
-              ['name']
-            );
-          })
-        )
-      : [];
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, pages]);
+          return {
+            id,
+            name: name || featureClassName || 'Metadata name',
+            onTarget,
+            current: {
+              percent: met / 100,
+              value: format('.3s')(metArea / 1000000),
+              unit: 'km2',
+            },
+            target: {
+              percent: coverageTarget / 100,
+              value: format('.3s')(coverageTargetArea / 1000000),
+              unit: 'km2',
+            },
+          };
+        }),
+        ['name']
+      ),
+  });
 }
 
 export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
-  const placeholderDataRef = useRef({
-    pages: [],
-    pageParams: [],
-  });
   const { data: session } = useSession();
 
   const { filters = {}, search, sort } = options;
@@ -166,7 +117,7 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
     };
   }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) =>
+  const fetchFeatures = () =>
     SCENARIOS.request({
       method: 'GET',
       url: `/${sId}/marxan/solutions/gap-data`,
@@ -174,7 +125,6 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
         Authorization: `Bearer ${session.accessToken}`,
       },
       params: {
-        'page[number]': pageParam,
         ...parsedFilters,
         ...(search && {
           q: search,
@@ -182,77 +132,41 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
         ...(sort && {
           sort,
         }),
+        disablePagination: true,
       },
-    });
+    }).then((response) => response.data);
 
-  const query = useInfiniteQuery(
-    ['post-gap-analysis', sId, JSON.stringify(options)],
-    fetchFeatures,
-    {
-      enabled: !!filters.runId,
-      placeholderData: placeholderDataRef.current,
-      getNextPageParam: (lastPage) => {
+  return useQuery(['post-gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
+    enabled: !!filters.runId,
+    placeholderData: { data: [] },
+    select: ({ data }) =>
+      data.map((d): AllItemProps => {
         const {
-          data: { meta },
-        } = lastPage;
-        const { page, totalPages } = meta;
+          id,
+          name,
+          met,
+          featureClassName,
+          metArea,
+          coverageTarget,
+          coverageTargetArea,
+          onTarget,
+        } = d;
 
-        const nextPage = page + 1 > totalPages ? null : page + 1;
-        return nextPage;
-      },
-    }
-  );
-
-  const { data } = query;
-  const { pages } = data || {};
-
-  if (data) {
-    placeholderDataRef.current = data;
-  }
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages)
-      ? flatten(
-          pages.map((p) => {
-            const {
-              data: { data: pageData },
-            } = p;
-
-            return pageData.map((d): AllItemProps => {
-              const {
-                id,
-                name,
-                met,
-                featureClassName,
-                metArea,
-                coverageTarget,
-                coverageTargetArea,
-                onTarget,
-              } = d;
-
-              return {
-                id,
-                name: name || featureClassName || 'Metadata name',
-                onTarget,
-                current: {
-                  percent: met / 100,
-                  value: format('.3s')(metArea / 1000000),
-                  unit: 'km2',
-                },
-                target: {
-                  percent: coverageTarget / 100,
-                  value: format('.3s')(coverageTargetArea / 1000000),
-                  unit: 'km2',
-                },
-              };
-            });
-          })
-        )
-      : [];
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, pages]);
+        return {
+          id,
+          name: name || featureClassName || 'Metadata name',
+          onTarget,
+          current: {
+            percent: met / 100,
+            value: format('.3s')(metArea / 1000000),
+            unit: 'km2',
+          },
+          target: {
+            percent: coverageTarget / 100,
+            value: format('.3s')(coverageTargetArea / 1000000),
+            unit: 'km2',
+          },
+        };
+      }),
+  });
 }

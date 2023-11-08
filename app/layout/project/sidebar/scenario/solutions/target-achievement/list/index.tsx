@@ -7,7 +7,6 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { usePostGapAnalysis } from 'hooks/gap-analysis';
 import { useScenario } from 'hooks/scenarios';
-import useBottomScrollListener from 'hooks/scroll';
 import { useBestSolution } from 'hooks/solutions';
 
 import Item from 'components/gap-analysis/item';
@@ -35,20 +34,13 @@ export const TargetAchievementList = ({ search }: { search?: string }): JSX.Elem
 
   const {
     data: allFeaturesData,
-    fetchNextPage: allFeaturesfetchNextPage,
-    hasNextPage,
     isFetching: allFeaturesIsFetching,
-    isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
   } = usePostGapAnalysis(sid, {
     search,
     filters: {
       runId: selectedSolution?.runId || bestSolutionData?.runId,
     },
-  });
-
-  const scrollRef = useBottomScrollListener(() => {
-    if (hasNextPage) allFeaturesfetchNextPage();
   });
 
   const toggleHighlight = useCallback(
@@ -96,7 +88,6 @@ export const TargetAchievementList = ({ search }: { search?: string }): JSX.Elem
       <div className="absolute -top-1 left-0 z-10 h-6 w-full bg-gradient-to-b from-gray-800 via-gray-800" />
 
       <div
-        ref={scrollRef}
         className={cn({
           'divide-y divide-dashed divide-black divide-opacity-20 overflow-y-auto overflow-x-hidden bg-gray-800':
             true,
@@ -126,7 +117,6 @@ export const TargetAchievementList = ({ search }: { search?: string }): JSX.Elem
                 >
                   <Item
                     {...item}
-                    scrollRoot={scrollRef}
                     highlighted={isHighlighted(item.id)}
                     onHighlight={() => toggleHighlight(item.id)}
                   />
@@ -138,17 +128,6 @@ export const TargetAchievementList = ({ search }: { search?: string }): JSX.Elem
       </div>
 
       <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-800 via-gray-800" />
-
-      <div
-        className={cn({
-          'opacity-100': allFeaturesIsFetchingNextPage,
-          'pointer-events-none absolute bottom-0 left-0 z-20 w-full text-center font-heading text-xs uppercase opacity-0 transition':
-            true,
-        })}
-      >
-        <div className="bg-gray-800 py-1">Loading more...</div>
-        <div className="h-6 w-full bg-gray-800" />
-      </div>
     </div>
   );
 };
