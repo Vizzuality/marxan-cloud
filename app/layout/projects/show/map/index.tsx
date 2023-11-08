@@ -1,5 +1,7 @@
 import { ComponentProps, useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
+import { useQueryClient } from 'react-query';
+
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -7,6 +9,7 @@ import { setLayerSettings } from 'store/slices/projects/[id]';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
+import chroma from 'chroma-js';
 import { AnimatePresence, motion } from 'framer-motion';
 import pick from 'lodash/pick';
 import { FiLayers } from 'react-icons/fi';
@@ -23,7 +26,9 @@ import {
   useFeaturePreviewLayers,
   useWDPAPreviewLayer,
   useCostSurfaceLayer,
+  useContinuousFeaturesLayers,
 } from 'hooks/map';
+import { COLORS } from 'hooks/map/constants';
 import { useDownloadScenarioComparisonReport, useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -64,9 +69,11 @@ export const ProjectMap = (): JSX.Element => {
     layerSettings,
     selectedFeatures: selectedFeaturesIds,
     selectedCostSurface,
+    selectedContinuousFeatures,
   } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
+  const queryClient = useQueryClient();
 
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState<MapProps['bounds']>(null);
@@ -129,6 +136,32 @@ export const ProjectMap = (): JSX.Element => {
       ? `${rawScenariosData[0].id}`
       : null;
   }, [sid1, rawScenariosData, rawScenariosIsFetched]);
+
+  const featuresColorQuery = useAllFeatures(
+    pid,
+    {
+      filters: {
+        sort: 'featureClassName',
+      },
+      disablePagination: true,
+    },
+    {
+      select: ({ data }) => {
+        return data.map((feature, index) => {
+          const color =
+            data.length > COLORS['features-preview'].ramp.length
+              ? chroma.scale(COLORS['features-preview'].ramp).colors(data.length)[index]
+              : COLORS['features-preview'].ramp[index];
+
+          return {
+            id: feature.id,
+            color,
+          };
+        });
+      },
+      placeholderData: { data: [] },
+    }
+  );
 
   const PlanningAreaLayer = useProjectPlanningAreaLayer({
     active: rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length,
@@ -195,6 +228,13 @@ export const ProjectMap = (): JSX.Element => {
     },
   });
 
+  const continuousFeaturesLayers = useContinuousFeaturesLayers({
+    active: selectedContinuousFeatures.length > 0,
+    pid,
+    features: selectedContinuousFeatures,
+    layerSettings,
+  });
+
   const selectedPreviewFeatures = useMemo(() => {
     return selectedFeaturesData
       ?.map(({ featureClassName, id }) => ({ name: featureClassName, id }))
@@ -212,6 +252,7 @@ export const ProjectMap = (): JSX.Element => {
     PlanningAreaLayer,
     WDPAsPreviewLayers,
     ...FeaturePreviewLayers,
+    ...continuousFeaturesLayers,
   ].filter((l) => !!l);
 
   const SCENARIOS_RUNNED = useMemo(() => {
@@ -243,6 +284,12 @@ export const ProjectMap = (): JSX.Element => {
   useEffect(() => {
     centerMap({ ref: mapRef.current, isSidebarOpen });
   }, [isSidebarOpen]);
+
+  useEffect(() => {
+    if (featuresColorQuery.isSuccess) {
+      queryClient.setQueryData('feature-colors', featuresColorQuery.data);
+    }
+  }, [featuresColorQuery, queryClient]);
 
   const handleViewportChange = useCallback(
     (vw) => {

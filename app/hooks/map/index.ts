@@ -4,6 +4,7 @@ import chroma from 'chroma-js';
 import { Layer } from 'mapbox-gl';
 
 import { CostSurface } from 'types/api/cost-surface';
+import { Feature } from 'types/api/feature';
 import { Project } from 'types/api/project';
 
 import { COLORS, LEGEND_LAYERS } from './constants';
@@ -223,6 +224,57 @@ export function useCostSurfaceLayer({
       },
     };
   }, [active, pid, costSurfaceId, layerSettings]);
+}
+
+export function useContinuousFeaturesLayers({
+  active,
+  pid,
+  features,
+  layerSettings,
+}: {
+  active: boolean;
+  pid: Project['id'];
+  features: Feature['id'][];
+  layerSettings: UsePUGridLayer['options']['settings'][0];
+}) {
+  return useMemo(() => {
+    if (!active) return [];
+
+    return features.map((fid) => {
+      const { amountRange, color, opacity = 1 } = layerSettings[fid] || {};
+
+      return {
+        id: `continuous-features-layer-${pid}-${fid}`,
+        type: 'vector',
+        source: {
+          type: 'vector',
+          tiles: [
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/features/${fid}/preview/tiles/{z}/{x}/{y}.mvt`,
+          ],
+        },
+        render: {
+          layers: [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              paint: {
+                'fill-color': [
+                  'interpolate',
+                  ['linear'],
+                  ['get', 'amount'],
+                  amountRange.min,
+                  COLORS.continuous.default,
+                  amountRange.max,
+                  color,
+                ],
+                'fill-opacity': opacity,
+              },
+            },
+          ],
+        },
+      };
+    });
+  }, [active, pid, features, layerSettings]);
 }
 
 // WDPA preview layer
@@ -765,7 +817,7 @@ export function usePUGridLayer({
                     ],
                   },
                 })),
-                // features abundance
+                // continuous features
                 ...selectedFeatures.map((featureId) => {
                   const {
                     visibility = true,
@@ -782,7 +834,6 @@ export function usePUGridLayer({
                     },
                     filter: ['all', ['in', featureId, ['get', 'featureList']]],
                     paint: {
-                      'fill-outline-color': 'yellow',
                       'fill-color': [
                         'let',
                         'amount',
@@ -805,7 +856,7 @@ export function usePUGridLayer({
                           ['linear'],
                           ['var', 'amount'],
                           amountRange.min,
-                          COLORS.abundance.default,
+                          COLORS.continuous.default,
                           amountRange.max,
                           color,
                         ],

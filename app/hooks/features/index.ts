@@ -9,14 +9,11 @@ import {
 } from 'react-query';
 
 import { AxiosRequestConfig } from 'axios';
-import chroma from 'chroma-js';
 import Fuse from 'fuse.js';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
 import partition from 'lodash/partition';
 import { useSession } from 'next-auth/react';
-
-import { COLORS } from 'hooks/map/constants';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
@@ -173,12 +170,12 @@ export function useAllFeatures<T = { data: Feature[] }>(
 ) {
   const { data: session } = useSession();
 
-  const { filters = {}, search, sort } = options;
+  const { filters = {}, search, sort, disablePagination } = options;
 
   const parsedFilters = Object.keys(filters).reduce((acc, k) => {
     return {
       ...acc,
-      [`filter[${k}]`]: filters[k].toString(),
+      [k]: filters[k].toString(),
     };
   }, {});
 
@@ -216,6 +213,11 @@ export function useSelectedFeatures(
   const { data: session } = useSession();
   const { search } = filters;
 
+  const queryClient = useQueryClient();
+
+  const featureColorQueryState =
+    queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
+
   const fetchFeatures = () =>
     SCENARIOS.request({
       method: 'GET',
@@ -230,7 +232,7 @@ export function useSelectedFeatures(
 
   return useQuery(['selected-features', sid], fetchFeatures, {
     ...queryOptions,
-    enabled: !!sid,
+    enabled: !!sid && featureColorQueryState?.status === 'success',
     select: ({ data }) => {
       const { features = [] } = data;
 
@@ -242,6 +244,8 @@ export function useSelectedFeatures(
           featureClassName,
           tag,
           description,
+          amountMin,
+          amountMax,
           properties = {},
         } = metadata || ({} as GeoFeatureSet['features'][0]['metadata']);
 
@@ -300,18 +304,17 @@ export function useSelectedFeatures(
           );
         }
 
-        const color =
-          features.length > COLORS['features-preview'].ramp.length
-            ? chroma.scale(COLORS['features-preview'].ramp).colors(features.length)[index]
-            : COLORS['features-preview'].ramp[index];
-
         return {
           ...d,
           id: featureId,
           name: alias || featureClassName,
           type: tag,
           description,
-          color,
+          amountRange: {
+            min: amountMin,
+            max: amountMax,
+          },
+          color: featureColorQueryState.data.find(({ id }) => featureId === id)?.color,
 
           // SPLIT
           splitOptions,
@@ -335,10 +338,7 @@ export function useSelectedFeatures(
         });
       }
 
-      // Sort
-      parsedData = orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
-
-      return parsedData;
+      return orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
     },
     placeholderData: { data: {} as GeoFeatureSet },
   });
@@ -465,7 +465,7 @@ export function useTargetedFeatures(
       }
 
       // Sort
-      parsedData = orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
+      parsedData = orderBy(parsedData, ['name'], ['desc']);
 
       parsedData = flatten(
         parsedData.map((s) => {

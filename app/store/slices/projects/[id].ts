@@ -11,6 +11,7 @@ interface ProjectShowStateProps {
   layerSettings: Record<string, any>;
   selectedCostSurface: CostSurface['id'];
   selectedFeatures: Feature['id'][];
+  selectedContinuousFeatures: Feature['id'][];
   selectedWDPAs: WDPA['id'][];
   isSidebarOpen: boolean;
 }
@@ -26,6 +27,7 @@ const initialState: ProjectShowStateProps = {
     },
   },
   selectedFeatures: [],
+  selectedContinuousFeatures: [],
   selectedCostSurface: null,
   selectedWDPAs: [],
   isSidebarOpen: true,
@@ -75,6 +77,12 @@ const projectsDetailSlice = createSlice({
     ) => {
       state.selectedFeatures = action.payload;
     },
+    setSelectedContinuousFeatures: (
+      state,
+      action: PayloadAction<ProjectShowStateProps['selectedContinuousFeatures']>
+    ) => {
+      state.selectedContinuousFeatures = action.payload;
+    },
     // COST SURFACE
     setSelectedCostSurface: (
       state,
@@ -95,6 +103,7 @@ export const {
   setSort,
   setLayerSettings,
   setSelectedFeatures,
+  setSelectedContinuousFeatures,
   setSelectedCostSurface,
   setSelectedWDPAs,
   setSidebarVisibility,

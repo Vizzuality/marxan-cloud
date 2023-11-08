@@ -1,18 +1,19 @@
+import { useQueryClient } from 'react-query';
+
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import {
   setSelectedFeatures,
+  setSelectedContinuousFeatures,
   setLayerSettings,
   setSelectedWDPAs as setVisibleWDPAs,
   setSelectedCostSurface as setVisibleCostSurface,
 } from 'store/slices/projects/[id]';
 
-import chroma from 'chroma-js';
-
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useAllFeatures } from 'hooks/features';
-import { COLORS, LEGEND_LAYERS } from 'hooks/map/constants';
+import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useScenario } from 'hooks/scenarios';
 import { useProjectWDPAs } from 'hooks/wdpa';
 
@@ -117,9 +118,16 @@ export const useConservationAreasLegend = () => {
 };
 
 export const useFeaturesLegend = () => {
-  const { selectedFeatures } = useAppSelector((state) => state['/projects/[id]']);
+  const { selectedFeatures, selectedContinuousFeatures } = useAppSelector(
+    (state) => state['/projects/[id]']
+  );
   const { query } = useRouter();
   const { pid } = query as { pid: string };
+
+  const queryClient = useQueryClient();
+
+  const featureColorQueryState =
+    queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
 
   const dispatch = useAppDispatch();
   const projectFeaturesQuery = useAllFeatures(
@@ -127,47 +135,37 @@ export const useFeaturesLegend = () => {
     { sort: 'featureClassName' },
     {
       select: ({ data }) => ({
-        binaryFeatures:
-          data?.filter(
-            (feature) =>
-              !Object.hasOwn(feature.amountRange, 'min') &&
-              !Object.hasOwn(feature.amountRange, 'max')
-          ) || [],
-        continuousFeatures:
-          data?.filter(
-            (feature) =>
-              Object.hasOwn(feature.amountRange, 'min') && Object.hasOwn(feature.amountRange, 'max')
-          ) || [],
+        binaryFeatures: (
+          data?.filter(({ amountRange }) => amountRange.min === null && amountRange.max === null) ||
+          []
+        ).map((feature) => ({
+          ...feature,
+          color: featureColorQueryState.data?.find(({ id }) => id === feature.id)?.color,
+        })),
+        continuousFeatures: (
+          data?.filter(({ amountRange }) => amountRange.min !== null && amountRange.max !== null) ||
+          []
+        ).map((feature) => ({
+          ...feature,
+          color: featureColorQueryState.data?.find(({ id }) => id === feature.id)?.color,
+        })),
       }),
+      enabled: featureColorQueryState?.status === 'success',
     }
   );
 
-  const totalItems =
-    projectFeaturesQuery.data?.binaryFeatures.length +
-      projectFeaturesQuery.data?.continuousFeatures.length || 0;
-
   const binaryFeaturesItems =
-    projectFeaturesQuery.data?.binaryFeatures?.map(({ id, featureClassName }, index) => {
-      const color =
-        totalItems > COLORS['features-preview'].ramp.length
-          ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
-          : COLORS['features-preview'].ramp[index];
-
+    projectFeaturesQuery.data?.binaryFeatures?.map(({ id, alias, featureClassName, color }) => {
       return {
         id,
-        name: featureClassName,
+        name: alias || featureClassName,
         color,
       };
     }) || [];
 
   const continuousFeaturesItems =
     projectFeaturesQuery.data?.continuousFeatures.map(
-      ({ id, featureClassName, amountRange = { min: 5000, max: 100000 } }, index) => {
-        const color =
-          totalItems > COLORS['features-preview'].ramp.length
-            ? chroma.scale(COLORS['features-preview'].ramp).colors(totalItems)[index]
-            : COLORS['features-preview'].ramp[index];
-
+      ({ id, featureClassName, amountRange, color }) => {
         return {
           id,
           name: featureClassName,
@@ -210,7 +208,7 @@ export const useFeaturesLegend = () => {
         const { color, amountRange } =
           continuousFeaturesItems.find(({ id }) => id === featureId) || {};
 
-        const newSelectedFeatures = [...selectedFeatures];
+        const newSelectedFeatures = [...selectedContinuousFeatures];
         const isIncluded = newSelectedFeatures.includes(featureId);
         if (!isIncluded) {
           newSelectedFeatures.push(featureId);
@@ -218,7 +216,7 @@ export const useFeaturesLegend = () => {
           const i = newSelectedFeatures.indexOf(featureId);
           newSelectedFeatures.splice(i, 1);
         }
-        dispatch(setSelectedFeatures(newSelectedFeatures));
+        dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
 
         dispatch(
           setLayerSettings({

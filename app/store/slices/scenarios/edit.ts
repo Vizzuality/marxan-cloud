@@ -4,6 +4,7 @@ import type { ScenarioPlanningUnit } from 'hooks/scenarios/types';
 
 import { injectReducer } from 'store';
 import { CostSurface } from 'types/api/cost-surface';
+import { Feature } from 'types/api/feature';
 import { Solution } from 'types/api/solution';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 
@@ -20,7 +21,8 @@ interface ScenarioEditStateProps {
   // FEATURES
   features: Record<string, any>;
   featureHoverId: string;
-  selectedFeatures: string[];
+  selectedFeatures: Feature['id'][];
+  selectedContinuousFeatures: Feature['id'][];
   preHighlightFeatures: string[];
   postHighlightFeatures: string[];
 
@@ -72,6 +74,7 @@ const initialState = {
   features: [],
   featureHoverId: null,
   selectedFeatures: [],
+  selectedContinuousFeatures: [],
   preHighlightFeatures: [],
   postHighlightFeatures: [],
 
@@ -139,8 +142,17 @@ export function getScenarioEditSlice(id) {
       setFeatureHoverId: (state, action: PayloadAction<string>) => {
         state.featureHoverId = action.payload;
       },
-      setSelectedFeatures: (state, action: PayloadAction<string[]>) => {
+      setSelectedFeatures: (
+        state,
+        action: PayloadAction<ScenarioEditStateProps['selectedFeatures']>
+      ) => {
         state.selectedFeatures = action.payload;
+      },
+      setSelectedContinuousFeatures: (
+        state,
+        action: PayloadAction<ScenarioEditStateProps['selectedContinuousFeatures']>
+      ) => {
+        state.selectedContinuousFeatures = action.payload;
       },
       setPreHighlightFeatures: (state, action: PayloadAction<string[]>) => {
         state.preHighlightFeatures = action.payload;
