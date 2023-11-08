@@ -1,13 +1,12 @@
 import { useMemo } from 'react';
 
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
 import { AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import { formatDistance } from 'date-fns';
-import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
 import { useSession } from 'next-auth/react';
 
@@ -69,7 +68,7 @@ export function useProjects(options: UseProjectsOptionsProps) {
     };
   }, {});
 
-  const fetchProjects = ({ pageParam = 1 }) =>
+  const fetchProjects = () =>
     PROJECTS.request({
       method: 'GET',
       url: '/',
@@ -77,7 +76,6 @@ export function useProjects(options: UseProjectsOptionsProps) {
         Authorization: `Bearer ${session.accessToken}`,
       },
       params: {
-        'page[number]': pageParam,
         include: 'scenarios,users',
         ...parsedFilters,
         ...(search && {
@@ -86,96 +84,68 @@ export function useProjects(options: UseProjectsOptionsProps) {
         ...(sort && {
           sort,
         }),
+        disablePagination: true,
       },
-    });
+    }).then((response) => response.data);
 
-  const query = useInfiniteQuery(['projects', JSON.stringify(options)], fetchProjects, {
+  return useQuery(['projects', JSON.stringify(options)], fetchProjects, {
     retry: false,
     keepPreviousData: true,
-    getNextPageParam: (lastPage) => {
-      const {
-        data: { meta },
-      } = lastPage;
-      const { page, totalPages } = meta;
+    placeholderData: { data: [] },
+    select: ({ data }) => {
+      const parsedData = data.map((d): ItemProps => {
+        const {
+          id,
+          name,
+          description,
+          lastModifiedAt,
+          scenarios,
+          planningAreaName,
+          isPublic,
+          publicMetadata,
+        } = d;
 
-      const nextPage = page + 1 > totalPages ? null : page + 1;
-      return nextPage;
+        const lastUpdate = scenarios.reduce((acc, s) => {
+          const { lastModifiedAt: slastModifiedAt } = s;
+
+          return slastModifiedAt > acc ? slastModifiedAt : acc;
+        }, lastModifiedAt);
+
+        const lastUpdateDistance = () => {
+          return formatDistance(new Date(lastUpdate || null), new Date(), {
+            addSuffix: true,
+          });
+        };
+
+        return {
+          id,
+          area: planningAreaName || 'Custom area name',
+          name,
+          description,
+          lastUpdate,
+          lastUpdateDistance: lastUpdateDistance(),
+          contributors: [],
+          isPublic,
+          scenarios,
+          underModeration: publicMetadata?.underModeration,
+          onClick: () => {
+            push(`/projects/${id}`);
+          },
+          onDownload: (e) => {
+            console.info('onDownload', e);
+          },
+          onDuplicate: (e) => {
+            console.info('onDuplicate', e);
+          },
+          onDelete: (e) => {
+            console.info('onDelete', e);
+          },
+        };
+      });
+
+      return orderBy(parsedData, ['lastUpdate'], ['desc']);
     },
   });
-
-  const { data } = query;
-  const { pages } = data || {};
-
-  return useMemo(() => {
-    let parsedData = Array.isArray(pages)
-      ? flatten(
-          pages.map((p) => {
-            const {
-              data: { data: pageData },
-            } = p;
-
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return pageData.map((d): ItemProps => {
-              const {
-                id,
-                name,
-                description,
-                lastModifiedAt,
-                scenarios,
-                planningAreaName,
-                isPublic,
-                publicMetadata,
-              } = d;
-
-              const lastUpdate = scenarios.reduce((acc, s) => {
-                const { lastModifiedAt: slastModifiedAt } = s;
-
-                return slastModifiedAt > acc ? slastModifiedAt : acc;
-              }, lastModifiedAt);
-
-              const lastUpdateDistance = () => {
-                return formatDistance(new Date(lastUpdate || null), new Date(), {
-                  addSuffix: true,
-                });
-              };
-
-              return {
-                id,
-                area: planningAreaName || 'Custom area name',
-                name,
-                description,
-                lastUpdate,
-                lastUpdateDistance: lastUpdateDistance(),
-                contributors: [],
-                isPublic,
-                scenarios,
-                underModeration: publicMetadata?.underModeration,
-                onClick: () => {
-                  push(`/projects/${id}`);
-                },
-                onDownload: (e) => {
-                  console.info('onDownload', e);
-                },
-                onDuplicate: (e) => {
-                  console.info('onDuplicate', e);
-                },
-                onDelete: (e) => {
-                  console.info('onDelete', e);
-                },
-              };
-            });
-          })
-        )
-      : [];
-
-    // Sort
-    parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, pages, push]);
 }
 
 export function useProject(id: Project['id']) {

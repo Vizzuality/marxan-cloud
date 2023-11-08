@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { useInfiniteQuery, useMutation, useQuery } from 'react-query';
 
-import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
 
 import { Scenario } from 'types/api/scenario';
@@ -25,7 +24,7 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
     };
   }, {});
 
-  const fetchSolutions = ({ pageParam = 1 }) =>
+  const fetchSolutions = () =>
     SCENARIOS.request({
       method: 'GET',
       url: `/${sid}/marxan/solutions`,
@@ -33,59 +32,31 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
         Authorization: `Bearer ${session.accessToken}`,
       },
       params: {
-        'page[number]': pageParam,
         ...parsedFilters,
         ...(sort && {
           sort,
         }),
+        disablePagination: true,
       },
-    });
+    }).then((response) => response.data);
 
-  const query = useInfiniteQuery(['solutions', sid, JSON.stringify(options)], fetchSolutions, {
+  return useQuery(['solutions', sid, JSON.stringify(options)], fetchSolutions, {
     keepPreviousData: true,
-    getNextPageParam: (lastPage) => {
-      const {
-        data: { meta },
-      } = lastPage;
-      const { page, totalPages } = meta;
+    placeholderData: { data: [] },
+    select: ({ data }) =>
+      data.map((d) => {
+        const { id, runId, scoreValue, costValue, planningUnits, missingValues } = d;
 
-      const nextPage = page + 1 > totalPages ? null : page + 1;
-      return nextPage;
-    },
+        return {
+          id,
+          runId,
+          score: scoreValue,
+          cost: costValue,
+          planningUnits,
+          missingValues,
+        };
+      }),
   });
-
-  const { data } = query;
-  const { pages } = data || {};
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages)
-      ? flatten(
-          pages.map((p) => {
-            const {
-              data: { data: pageData },
-            } = p;
-
-            return pageData.map((d) => {
-              const { id, runId, scoreValue, costValue, planningUnits, missingValues } = d;
-
-              return {
-                id,
-                runId,
-                score: scoreValue,
-                cost: costValue,
-                planningUnits,
-                missingValues,
-              };
-            });
-          })
-        )
-      : [];
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, pages]);
 }
 
 export function useAllSolutions(sid: Scenario['id'], options: UseSolutionsOptionsProps = {}) {

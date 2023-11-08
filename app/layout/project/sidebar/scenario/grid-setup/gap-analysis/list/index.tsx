@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { usePreGapAnalysis } from 'hooks/gap-analysis';
-import useBottomScrollListener from 'hooks/scroll';
 
 import Item from 'components/gap-analysis/item';
 import Loading from 'components/loading';
@@ -20,7 +19,7 @@ export interface ScenariosPreGapAnalysisListProps {
 
 export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setPreHighlightFeatures, setLayerSettings } = scenarioSlice.actions;
@@ -31,17 +30,10 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
 
   const {
     data: allFeaturesData,
-    fetchNextPage: allFeaturesfetchNextPage,
-    hasNextPage,
     isFetching: allFeaturesIsFetching,
-    isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
   } = usePreGapAnalysis(sid, {
     search,
-  });
-
-  const scrollRef = useBottomScrollListener(() => {
-    if (hasNextPage) allFeaturesfetchNextPage();
   });
 
   const toggleHighlight = useCallback(
@@ -89,7 +81,6 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
       <div className="absolute -top-1 left-0 z-10 h-6 w-full bg-gradient-to-b from-gray-800 via-gray-800" />
 
       <div
-        ref={scrollRef}
         className={cn({
           'divide-y divide-dashed divide-black divide-opacity-20 bg-gray-800': true,
         })}
@@ -119,7 +110,6 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
                 >
                   <Item
                     {...item}
-                    scrollRoot={scrollRef}
                     highlighted={isHighlighted(item.id)}
                     onHighlight={() => toggleHighlight(item.id)}
                   />
@@ -127,19 +117,6 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
               );
             })}
         </ul>
-      </div>
-
-      <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-800 via-gray-800" />
-
-      <div
-        className={cn({
-          'opacity-100': allFeaturesIsFetchingNextPage,
-          'pointer-events-none absolute bottom-0 left-0 z-20 w-full text-center font-heading text-xs uppercase opacity-0 transition':
-            true,
-        })}
-      >
-        <div className="bg-gray-800 py-1">Loading more...</div>
-        <div className="h-6 w-full bg-gray-800" />
       </div>
     </div>
   );

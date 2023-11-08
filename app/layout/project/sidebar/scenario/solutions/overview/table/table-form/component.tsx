@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useScenario } from 'hooks/scenarios';
-import useBottomScrollListener from 'hooks/scroll';
 import {
   useSolutions,
   useBestSolution,
@@ -22,7 +21,6 @@ import Label from 'components/forms/label';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
-import LoadingMore from 'components/loading-more/component';
 import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 
 import FIVE_DIFF_SOLUTIONS_IMG from 'images/info-buttons/img_5_different_solutions.png';
@@ -60,10 +58,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   const {
     data: solutionsData,
-    fetchNextPage,
-    hasNextPage,
     isFetching: solutionsAreFetching,
-    isFetchingNextPage,
     isFetched: solutionsAreFetched,
   } = useSolutions(sid);
 
@@ -80,10 +75,6 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
     (mostDifSolutionsAreFetched && !mostDifSolutionsData.length);
 
   const solutionsAreLoading = solutionsAreFetching || mostDifSolutionsAreFetching;
-
-  const scrollRef = useBottomScrollListener(() => {
-    if (hasNextPage) fetchNextPage();
-  });
 
   const downloadSolutionsMutation = useDownloadSolutions({});
 
@@ -115,10 +106,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   return (
     <div className="relative mt-8 flex flex-grow flex-col overflow-hidden text-gray-900">
-      <div
-        ref={scrollRef}
-        className="relative flex flex-grow flex-col overflow-hidden overflow-y-auto overflow-x-hidden"
-      >
+      <div className="relative flex flex-grow flex-col overflow-hidden overflow-y-auto overflow-x-hidden">
         <div className="flex-column items-center space-y-6 px-8 pb-8">
           <div className="flex items-center space-x-3">
             <h2 className="font-heading text-2xl">Solutions Table:</h2>
@@ -232,7 +220,6 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
               onSelectSolution={(solution) => setSelectSolution(solution)}
             />
           )}
-          <LoadingMore visible={isFetchingNextPage} />
         </div>
       </div>
 

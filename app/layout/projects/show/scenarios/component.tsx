@@ -58,10 +58,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
   const {
     data: scenariosData,
-    fetchNextPage: scenariosFetchNextPage,
-    hasNextPage,
     isFetching: scenariosIsFetching,
-    isFetchingNextPage: scenariosIsFetchingNextPage,
     isFetched: scenariosIsFetched,
   } = useScenarios(pid, {
     search,
@@ -70,10 +67,6 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
       ...filters,
     },
     sort,
-  });
-
-  const scrollRef = useBottomScrollListener(() => {
-    if (hasNextPage) scenariosFetchNextPage();
   });
 
   const projectLoading = projectIsFetching && !projectIsFetched;
@@ -229,10 +222,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             )}
 
             {hasScenarios && (
-              <div
-                ref={scrollRef}
-                className="relative z-0 flex h-full flex-grow flex-col overflow-y-auto overflow-x-hidden py-6"
-              >
+              <div className="relative z-0 flex h-full flex-grow flex-col overflow-y-auto overflow-x-hidden py-6">
                 {scenariosData.map((s, i) => {
                   const TAG = i === 0 ? HelpBeacon : Fragment;
 
@@ -275,17 +265,6 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             )}
 
             <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-black via-black" />
-
-            <div
-              className={cn({
-                'opacity-100': scenariosIsFetchingNextPage,
-                'pointer-events-none absolute bottom-0 left-0 z-20 w-full text-center font-heading text-xs uppercase opacity-0 transition':
-                  true,
-              })}
-            >
-              <div className="bg-gray-300 py-1">Loading more...</div>
-              <div className="h-6 w-full bg-white" />
-            </div>
           </div>
 
           {!hasScenarios && !search && !hasFilters && scenariosIsFetched && (

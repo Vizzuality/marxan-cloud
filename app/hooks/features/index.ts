@@ -1,12 +1,6 @@
 import { useMemo } from 'react';
 
-import {
-  useQuery,
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-  QueryObserverOptions,
-} from 'react-query';
+import { useQuery, useMutation, useQueryClient, QueryObserverOptions } from 'react-query';
 
 import { AxiosRequestConfig } from 'axios';
 import Fuse from 'fuse.js';
@@ -48,7 +42,7 @@ export function useAllPaginatedFeatures(projectId, options: UseFeaturesOptionsPr
     };
   }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) =>
+  const fetchFeatures = () =>
     PROJECTS.request({
       method: 'GET',
       url: `/${projectId}/features`,
@@ -56,8 +50,6 @@ export function useAllPaginatedFeatures(projectId, options: UseFeaturesOptionsPr
         Authorization: `Bearer ${session.accessToken}`,
       },
       params: {
-        'page[number]': pageParam,
-        // omitFields: 'properties',
         ...parsedFilters,
         ...(search && {
           q: search,
@@ -65,102 +57,71 @@ export function useAllPaginatedFeatures(projectId, options: UseFeaturesOptionsPr
         ...(sort && {
           sort,
         }),
+        disablePagination: true,
       },
-    });
+    }).then((response) => response.data);
 
-  const query = useInfiniteQuery(
-    ['all-paginated-features', projectId, JSON.stringify(options)],
-    fetchFeatures,
-    {
-      keepPreviousData: true,
-      getNextPageParam: (lastPage) => {
+  return useQuery(['all-paginated-features', projectId, JSON.stringify(options)], fetchFeatures, {
+    keepPreviousData: true,
+    select: ({ data }) => {
+      const parsedData = data.map((d): AllItemProps => {
         const {
-          data: { meta },
-        } = lastPage;
-        const { page, totalPages } = meta;
+          id,
+          alias,
+          featureClassName,
+          description,
+          properties = {},
+          splitSelected,
+          splitFeaturesSelected,
+        } = d;
 
-        const nextPage = page + 1 > totalPages ? null : page + 1;
-        return nextPage;
-      },
-    }
-  );
+        let splitOptions = [];
+        let splitFeaturesOptions = [];
 
-  const { data } = query;
-  const { pages } = data || {};
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages)
-      ? flatten(
-          pages.map((p) => {
-            const {
-              data: { data: pageData },
-            } = p;
-
-            return pageData.map((d): AllItemProps => {
-              const {
-                id,
-                alias,
-                featureClassName,
-                description,
-                properties = {},
-                splitSelected,
-                splitFeaturesSelected,
-              } = d;
-
-              let splitOptions = [];
-              let splitFeaturesOptions = [];
-
-              /**
-               * @todo Checking whether `properties` is defined here is just a
-               * workaround to avoid an error when processing `bioregional`
-               * features, which would prevent progressing through the stop of
-               * configuring features for a scenario until this code is reviewed.
-               * Without much knowledge of the flow for feature data, I see that
-               * short-circuiting the `map()` below and therefore setting
-               * `splitOptions = []` still results in properties being shown in the
-               * dropdowns used for splitting features, but since `properties` is
-               * always undefined (from what I can see), we may need to adapt the
-               * API payload or how we process it here.
-               */
-              splitOptions = properties
-                ? Object.keys(properties).map((k) => {
-                    return {
-                      key: k,
-                      label: k,
-                      values: properties[k].map((v) => ({ id: v, name: v })),
-                    };
-                  })
-                : [];
-
-              splitFeaturesOptions = splitSelected
-                ? splitOptions
-                    .find((s) => s.key === splitSelected)
-                    .values.map((v) => ({ label: v.name, value: v.id }))
-                : [];
-
+        /**
+         * @todo Checking whether `properties` is defined here is just a
+         * workaround to avoid an error when processing `bioregional`
+         * features, which would prevent progressing through the stop of
+         * configuring features for a scenario until this code is reviewed.
+         * Without much knowledge of the flow for feature data, I see that
+         * short-circuiting the `map()` below and therefore setting
+         * `splitOptions = []` still results in properties being shown in the
+         * dropdowns used for splitting features, but since `properties` is
+         * always undefined (from what I can see), we may need to adapt the
+         * API payload or how we process it here.
+         */
+        splitOptions = properties
+          ? Object.keys(properties).map((k) => {
               return {
-                id,
-                name: alias || featureClassName,
-                description,
-
-                splitSelected,
-                splitOptions,
-                splitFeaturesSelected,
-                splitFeaturesOptions,
+                key: k,
+                label: k,
+                values: properties[k].map((v) => ({ id: v, name: v })),
               };
-            });
-          })
-        )
-      : [];
+            })
+          : [];
 
-    // We want to return custom features first, but preserve the overall sorting
-    const sortedByCustomFeature = flatten(partition(parsedData, (feature) => feature.isCustom));
+        splitFeaturesOptions = splitSelected
+          ? splitOptions
+              .find((s) => s.key === splitSelected)
+              .values.map((v) => ({ label: v.name, value: v.id }))
+          : [];
 
-    return {
-      ...query,
-      data: sortedByCustomFeature,
-    };
-  }, [query, pages]);
+        return {
+          id,
+          name: alias || featureClassName,
+          description,
+
+          splitSelected,
+          splitOptions,
+          splitFeaturesSelected,
+          splitFeaturesOptions,
+        };
+      });
+
+      // We want to return custom features first, but preserve the overall sorting
+      return flatten(partition(parsedData, (feature) => feature.isCustom));
+    },
+  });
 }
 
 export function useAllFeatures<T = { data: Feature[] }>(

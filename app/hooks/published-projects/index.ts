@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
-import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
 
 import { PublishedItemProps } from 'layout/community/published-projects/list/table/item/component';
@@ -26,82 +25,41 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
     };
   }, {});
 
-  const fetchPublishedProjects = ({ pageParam = 1 }) =>
+  const fetchPublishedProjects = () =>
     PUBLISHED_PROJECTS.request({
       method: 'GET',
       url: '/',
       params: {
-        'page[number]': pageParam,
         ...parsedFilters,
         ...(search && {
           q: search,
         }),
       },
-    });
+    }).then((response) => response.data);
 
-  const query = useInfiniteQuery(
-    ['published-projects', JSON.stringify(options)],
-    fetchPublishedProjects,
-    {
-      retry: false,
-      keepPreviousData: true,
-      getNextPageParam: (lastPage) => {
-        const {
-          data: { meta },
-        } = lastPage;
-        const { page, totalPages } = meta;
+  return useQuery(['published-projects', JSON.stringify(options)], fetchPublishedProjects, {
+    retry: false,
+    keepPreviousData: true,
+    placeholderData: { data: [] },
 
-        const nextPage = page + 1 > totalPages ? null : page + 1;
-        return nextPage;
-      },
-    }
-  );
+    select: ({ data }) =>
+      data.map((d): PublishedItemProps => {
+        const { id, name, description, location, creators, resources, company, pngData, exportId } =
+          d;
 
-  const { data } = query;
-  const { pages } = data || {};
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages)
-      ? flatten(
-          pages.map((p) => {
-            const {
-              data: { data: pageData },
-            } = p;
-
-            return pageData.map((d): PublishedItemProps => {
-              const {
-                id,
-                name,
-                description,
-                location,
-                creators,
-                resources,
-                company,
-                pngData,
-                exportId,
-              } = d;
-
-              return {
-                id,
-                name,
-                description,
-                location,
-                creators,
-                resources,
-                company,
-                pngData,
-                exportId,
-              };
-            });
-          })
-        )
-      : [];
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, pages]);
+        return {
+          id,
+          name,
+          description,
+          location,
+          creators,
+          resources,
+          company,
+          pngData,
+          exportId,
+        };
+      }),
+  });
 }
 
 export function usePublishedProject(id) {
