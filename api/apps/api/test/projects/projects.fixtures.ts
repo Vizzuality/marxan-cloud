@@ -195,9 +195,7 @@ export const getFixtures = async () => {
             adminAreaLevel1Id: null,
             adminAreaLevel2Id: null,
             bbox: [
-              25.25670051574707,
-              11.735139846801758,
-              -16.959890365600586,
+              25.25670051574707, 11.735139846801758, -16.959890365600586,
               -28.969440460205078,
             ],
             countryId: 'NAM',

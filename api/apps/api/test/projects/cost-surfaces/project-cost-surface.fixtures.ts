@@ -249,19 +249,13 @@ export const getProjectCostSurfaceFixtures = async () => {
       costSurfaceId: string,
     ) => {
       return request(app.getHttpServer())
-        .post(
-          `/api/v1/scenarios/${scenarioId}/cost-surface/${costSurfaceId}`,
-        )
+        .post(`/api/v1/scenarios/${scenarioId}/cost-surface/${costSurfaceId}`)
         .set('Authorization', `Bearer ${token}`)
         .send();
     },
-    WhenUnlinkingCostSurfaceToScenario: async (
-      scenarioId: string,
-    ) => {
+    WhenUnlinkingCostSurfaceToScenario: async (scenarioId: string) => {
       return request(app.getHttpServer())
-        .delete(
-          `/api/v1/scenarios/${scenarioId}/cost-surface/`,
-        )
+        .delete(`/api/v1/scenarios/${scenarioId}/cost-surface/`)
         .set('Authorization', `Bearer ${token}`)
         .send();
     },
@@ -327,8 +321,7 @@ export const getProjectCostSurfaceFixtures = async () => {
         async () =>
           await apiEventService.getLatestEventForTopic({
             topic: scenarioId,
-            kind:
-              API_EVENT_KINDS.scenario__costSurface__link__submitted__v1_alpha1,
+            kind: API_EVENT_KINDS.scenario__costSurface__link__submitted__v1_alpha1,
           }),
       ).rejects.toThrow(NotFoundException);
     },
@@ -446,9 +439,8 @@ export const getProjectCostSurfaceFixtures = async () => {
       expect(costSurface).not.toBeNull();
     },
     ThenCostSurfaceDeletedEventWasEmitted: async (costSurfaceId: string) => {
-      const event = await eventBusTestUtils.waitUntilEventIsPublished(
-        CostSurfaceDeleted,
-      );
+      const event =
+        await eventBusTestUtils.waitUntilEventIsPublished(CostSurfaceDeleted);
 
       expect(event).toMatchObject({ costSurfaceId });
     },

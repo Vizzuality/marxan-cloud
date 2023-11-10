@@ -19,7 +19,8 @@ type EventKind = { event: API_EVENT_KINDS };
 
 @Injectable()
 export class ScenarioCostSurfaceEventsHandler
-  implements EventFactory<ScenarioCostSurfaceJobInput, true> {
+  implements EventFactory<ScenarioCostSurfaceJobInput, true>
+{
   private queueEvents: QueueEventsAdapter<ScenarioCostSurfaceJobInput, true>;
 
   private failEventsMapper: EventKind = {

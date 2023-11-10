@@ -158,11 +158,12 @@ export class ProjectFeaturesController {
       throw new BadRequestException(`Only FeatureCollection is supported.`);
     }
 
-    const newFeatureOrError = await this.geoFeatureService.createFeaturesForShapefile(
-      projectId,
-      body,
-      data.features,
-    );
+    const newFeatureOrError =
+      await this.geoFeatureService.createFeaturesForShapefile(
+        projectId,
+        body,
+        data.features,
+      );
 
     if (isLeft(newFeatureOrError)) {
       // @debt Use mapDomainToHttpException() instead
@@ -480,11 +481,12 @@ export class ProjectFeaturesController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('featureId', ParseUUIDPipe) featureId: string,
   ): Promise<void> {
-    const checkCostSurfaceForProject = await this.geoFeatureService.checkProjectFeatureVisibility(
-      req.user.id,
-      projectId,
-      featureId,
-    );
+    const checkCostSurfaceForProject =
+      await this.geoFeatureService.checkProjectFeatureVisibility(
+        req.user.id,
+        projectId,
+        featureId,
+      );
     if (isLeft(checkCostSurfaceForProject)) {
       throw mapAclDomainToHttpError(checkCostSurfaceForProject.left);
     }

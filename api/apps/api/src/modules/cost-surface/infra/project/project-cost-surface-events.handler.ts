@@ -23,8 +23,6 @@ export class ProjectCostSurfaceEventsHandler
 {
   private queueEvents: QueueEventsAdapter<ProjectCostSurfaceJobInput, true>;
 
-  // TODO!!! Create proper events
-
   private failEventsMapper: EventKind = {
     event: API_EVENT_KINDS.project__costSurface_shapefile_failed__v1alpha1,
   };

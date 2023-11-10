@@ -74,9 +74,8 @@ export class GeoFeaturesController {
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<GeoFeatureResult> {
-    const results = await this.geoFeatureService.findAllPaginated(
-      fetchSpecification,
-    );
+    const results =
+      await this.geoFeatureService.findAllPaginated(fetchSpecification);
     return this.geoFeatureService.serialize(results.data, results.metadata);
   }
 

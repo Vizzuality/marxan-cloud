@@ -41,7 +41,7 @@ const projectFilterKeyNames = [
 ] as const;
 type ProjectFilterKeys = keyof Pick<
   Project,
-  typeof projectFilterKeyNames[number]
+  (typeof projectFilterKeyNames)[number]
 >;
 type ProjectFilters = Record<ProjectFilterKeys, string[]>;
 
@@ -241,9 +241,8 @@ export class ProjectsCrudService extends AppBaseService<
     _info?: ProjectsRequest,
   ): Promise<Project> {
     const ids: MultiplePlanningAreaIds = entity;
-    const idAndName = await this.planningAreasService.getPlanningAreaIdAndName(
-      ids,
-    );
+    const idAndName =
+      await this.planningAreasService.getPlanningAreaIdAndName(ids);
     if (isDefined(idAndName)) {
       entity.planningAreaId = idAndName.planningAreaId;
       entity.planningAreaName = idAndName.planningAreaName;
@@ -361,7 +360,8 @@ export class ProjectsCrudService extends AppBaseService<
     return [await Promise.all(extendedEntities), entitiesAndCount[1]];
   }
 
-  locatePlanningAreaEntity = this.planningAreasService.locatePlanningAreaEntity.bind(
-    this.planningAreasService,
-  );
+  locatePlanningAreaEntity =
+    this.planningAreasService.locatePlanningAreaEntity.bind(
+      this.planningAreasService,
+    );
 }
