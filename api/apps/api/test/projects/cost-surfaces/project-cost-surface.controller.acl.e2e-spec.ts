@@ -46,9 +46,8 @@ describe('Get Project Cost Surface', () => {
     await fixtures.GivenScenario(projectId, costSurface2.id);
     await fixtures.GivenScenario(projectId, costSurface2.id);
     // ACT
-    const response = await fixtures.WhenGettingCostSurfacesForProject(
-      projectId,
-    );
+    const response =
+      await fixtures.WhenGettingCostSurfacesForProject(projectId);
 
     // ASSERT
     await fixtures.ThenProjectNotViewableErrorWasReturned(response);
@@ -89,9 +88,8 @@ describe('Link Cost Surface To Scenario', () => {
   it(`should not update CostSurface API entity if the user doesn't have permissions to edit the project`, async () => {
     // ARRANGE
     const projectId = await fixtures.GivenProject('someProject');
-    const defaultCostSurface = await fixtures.GivenDefaultCostSurfaceForProject(
-      projectId,
-    );
+    const defaultCostSurface =
+      await fixtures.GivenDefaultCostSurfaceForProject(projectId);
     const costSurface = await fixtures.GivenCostSurfaceMetadataForProject(
       projectId,
       'someName',

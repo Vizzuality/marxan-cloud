@@ -9,7 +9,8 @@ import {
 @Injectable()
 export class ScenarioCostSurfaceApiEvents
   extends ApiEventsService
-  implements ScenarioCostSurfaceEventsPort {
+  implements ScenarioCostSurfaceEventsPort
+{
   private readonly eventsMap: Record<
     ScenarioCostSurfaceState,
     API_EVENT_KINDS

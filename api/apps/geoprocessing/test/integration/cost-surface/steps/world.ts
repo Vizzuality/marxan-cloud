@@ -14,7 +14,8 @@ import { getFixtures } from '../planning-unit-fixtures';
 import { CostSurfaceShapefileRecord } from '@marxan-geoprocessing/modules/cost-surface/ports/cost-surface-shapefile-record';
 import {
   FromProjectShapefileJobInput,
-  LinkCostSurfaceToScenarioJobInput, LinkCostSurfaceToScenarioMode,
+  LinkCostSurfaceToScenarioJobInput,
+  LinkCostSurfaceToScenarioMode,
   ProjectCostSurfaceJobInput,
 } from '@marxan/artifact-cache/surface-cost-job-input';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
@@ -42,31 +43,31 @@ export const createWorld = async (app: INestApplication) => {
     GivenScenarioPuDataExists: fixtures.GivenScenarioPuDataExists,
     GivenCostSurfacePuDataExists: fixtures.GivenCostSurfacePuDataExists,
     getShapefileForScenarioWithCost: () =>
-      (({
+      ({
         data: {
           scenarioId: fixtures.scenarioId,
           shapefile,
         },
         id: 'test-job',
-      } as unknown) as Job<FromShapefileJobInput>),
+      }) as unknown as Job<FromShapefileJobInput>,
     getShapefileForProjectWithCost: (
       projectId: string,
       costSurfaceId: string,
     ) =>
-      (({
+      ({
         data: {
           projectId,
           costSurfaceId,
           shapefile,
         },
         id: 'test-job',
-      } as unknown) as Job<FromProjectShapefileJobInput>),
+      }) as unknown as Job<FromProjectShapefileJobInput>,
     getLinkCostSurfaceToScenarioJob: (
       scenarioId: string,
       costSurfaceId: string,
-      mode: LinkCostSurfaceToScenarioMode
+      mode: LinkCostSurfaceToScenarioMode,
     ) =>
-      (({
+      ({
         data: {
           type: 'LinkCostSurfaceToScenarioJobInput',
           projectId: v4(),
@@ -76,7 +77,7 @@ export const createWorld = async (app: INestApplication) => {
           mode: mode,
         },
         id: 'test-job',
-      } as unknown) as Job<LinkCostSurfaceToScenarioJobInput>),
+      }) as unknown as Job<LinkCostSurfaceToScenarioJobInput>,
     ThenCostIsUpdated: async () => {
       const newCost = await fixtures.GetPuCostsData(fixtures.scenarioId);
       expect(newCost).toEqual(

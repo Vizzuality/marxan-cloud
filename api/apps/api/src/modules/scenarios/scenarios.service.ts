@@ -89,9 +89,7 @@ import {
 } from '@marxan-api/modules/blm/values/blm-repos';
 
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
-import {
-  SetInitialCostSurfaceError,
-} from '@marxan-api/modules/cost-surface/application/set-initial-cost-surface.command';
+import { SetInitialCostSurfaceError } from '@marxan-api/modules/cost-surface/application/set-initial-cost-surface.command';
 import { UpdateCostSurface } from '@marxan-api/modules/cost-surface/application/update-cost-surface.command';
 import { DeleteScenario } from '@marxan-api/modules/cost-surface/infra/delete-scenario.command';
 import {
@@ -121,9 +119,7 @@ import { lastValueFrom } from 'rxjs';
 import { AdjustPlanningUnitsInput } from '@marxan-api/modules/analysis/entry-points/adjust-planning-units-input';
 import { submissionFailed } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
 import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
-import {
-  costSurfaceNotFound,
-} from '@marxan-api/modules/cost-surface/cost-surface.service';
+import { costSurfaceNotFound } from '@marxan-api/modules/cost-surface/cost-surface.service';
 import {
   LinkCostSurfaceToScenarioCommand,
   linkCostSurfaceToScenarioFailed,

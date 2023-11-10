@@ -19,7 +19,8 @@ import { scenarioCostSurfaceQueueToken } from '@marxan-api/modules/cost-surface/
 
 @CommandHandler(LinkCostSurfaceToScenarioCommand)
 export class LinkCostSurfaceToScenarioHandler
-  implements IInferredCommandHandler<LinkCostSurfaceToScenarioCommand> {
+  implements IInferredCommandHandler<LinkCostSurfaceToScenarioCommand>
+{
   private readonly logger: Logger = new Logger(
     LinkCostSurfaceToScenarioHandler.name,
   );
