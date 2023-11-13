@@ -4,10 +4,11 @@ import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useSelectedFeatures } from 'hooks/features';
 import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
-import { useCostSurfaceRange, useScenario, useScenarioPU } from 'hooks/scenarios';
+import { useScenario, useScenarioPU } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
 globalThis.MARXAN = {
@@ -44,8 +45,14 @@ export const WebShotStatus = () => {
 
   const { data: featuresData, isFetched: featuresDataIsFetched } = useSelectedFeatures(sid, {});
 
-  const { data: costSurfaceRangeData, isFetched: costSurfaceRangeDataIsFetched } =
-    useCostSurfaceRange(sid);
+  const costSurfaceQuery = useProjectCostSurfaces(
+    pid,
+    {},
+    {
+      select: (data) =>
+        data.filter((cs) => cs.scenarios.filter((s) => s.id === sid).length > 0)?.[0],
+    }
+  );
 
   const reportDataIsFetched =
     projectData &&
@@ -60,8 +67,8 @@ export const WebShotStatus = () => {
     PUDataIsFetched &&
     featuresData &&
     featuresDataIsFetched &&
-    costSurfaceRangeData &&
-    costSurfaceRangeDataIsFetched &&
+    costSurfaceQuery.data &&
+    costSurfaceQuery.isFetched &&
     mapsLoaded;
 
   useEffect(() => {

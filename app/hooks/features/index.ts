@@ -193,11 +193,12 @@ export function useSelectedFeatures(
 
   return useQuery(['selected-features', sid], fetchFeatures, {
     ...queryOptions,
-    enabled: !!sid && featureColorQueryState?.status === 'success',
+    enabled:
+      !!sid && ((featureColorQueryState && featureColorQueryState.status === 'success') || true),
     select: ({ data }) => {
       const { features = [] } = data;
 
-      let parsedData = features.map((d, index) => {
+      let parsedData = features.map((d) => {
         const { featureId, geoprocessingOperations, metadata } = d;
 
         const {
@@ -275,7 +276,9 @@ export function useSelectedFeatures(
             min: amountMin,
             max: amountMax,
           },
-          color: featureColorQueryState.data.find(({ id }) => featureId === id)?.color,
+          color: featureColorQueryState
+            ? featureColorQueryState.data.find(({ id }) => featureId === id)?.color
+            : null,
 
           // SPLIT
           splitOptions,
