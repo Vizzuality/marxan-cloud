@@ -160,20 +160,27 @@ export class GeoFeatureTagsService {
     await apiQueryRunner.startTransaction();
 
     try {
-      const previousTag = await this.geoFeatureTagsRepo.findOne({
+      const previousTag = await apiQueryRunner.manager.findOne(GeoFeatureTag, {
         where: { projectId, featureId },
       });
       if (previousTag) {
-        await this.geoFeatureTagsRepo.delete(previousTag.id);
+        await apiQueryRunner.manager.delete(GeoFeatureTag, previousTag.id);
       }
 
-      await this.geoFeatureTagsRepo.save(
-        this.geoFeatureTagsRepo.create({ projectId, featureId, tag }),
+      await apiQueryRunner.manager.save(GeoFeatureTag, {
+        projectId,
+        featureId,
+        tag,
+      });
+
+      const updatedGeoFeature = await apiQueryRunner.manager.findOneOrFail(
+        GeoFeature,
+        {
+          where: { id: featureId, projectId },
+        },
       );
 
-      const updatedGeoFeature = await this.geoFeaturesRepo.findOneOrFail({
-        where: { id: featureId, projectId },
-      });
+      await apiQueryRunner.commitTransaction();
 
       return right(updatedGeoFeature);
     } catch (err) {
