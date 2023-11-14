@@ -398,38 +398,6 @@ export class ScenariosController {
   }
 
   @ApiOperation({
-    deprecated: true,
-    description:
-      'To be removed soon to POST /projects/:projectId/cost-surface/shapefile',
-  })
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
-  @ApiTags(asyncJobTag)
-  @Post(`:scenarioId/cost-surface/shapefile`)
-  async processCostSurfaceShapefile(
-    @Param('scenarioId') scenarioId: string,
-    @Req() req: RequestWithAuthenticatedUser,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<JsonApiAsyncJobMeta> {
-    await ensureShapefileHasRequiredFiles(file);
-
-    const result = await this.service.processCostSurfaceShapefile(
-      scenarioId,
-      req.user.id,
-      file,
-    );
-
-    if (isLeft(result)) {
-      throw mapAclDomainToHttpError(result.left, {
-        scenarioId,
-        userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
-      });
-    }
-    return AsyncJobDto.forScenario().asJsonApiMetadata();
-  }
-
-  @ApiOperation({
     description:
       'Links a Cost Surface to a Scenario, and applies costs on the Geoprocessing DB',
   })
@@ -495,28 +463,6 @@ export class ScenariosController {
       });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
-  }
-
-  @ApiOperation({
-    deprecated: true,
-    description:
-      'To be removed soon to GET /projects/:projectId/cost-surface/:costSurfaceId/cost-range',
-  })
-  @Get(`:id/cost-surface`)
-  @ApiOkResponse({ type: CostRangeDto })
-  async getCostRange(
-    @Param('id') scenarioId: string,
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<CostRangeDto> {
-    const result = await this.service.getCostRange(scenarioId, req.user.id);
-    if (isLeft(result)) {
-      throw mapAclDomainToHttpError(result.left, {
-        scenarioId,
-        userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
-      });
-    }
-    return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
   }
 
   @ApiConsumesShapefile()
@@ -1493,51 +1439,5 @@ export class ScenariosController {
     }
 
     return result.right;
-  }
-
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @ApiOperation({
-    deprecated: true,
-    description:
-      'To be removed soon to POST /projects/:projectId/protected-areas/shapefile',
-  })
-  @GeometryFileInterceptor(GeometryKind.Complex)
-  @ApiTags(asyncJobTag)
-  @Post(':id/protected-areas/shapefile')
-  async shapefileForProtectedArea(
-    @Param('id') scenarioId: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: RequestWithAuthenticatedUser,
-    @Body() dto: UploadShapefileDto,
-  ): Promise<JsonApiAsyncJobMeta> {
-    const scenario = await this.service.getById(scenarioId, {
-      authenticatedUser: req.user,
-    });
-
-    if (isLeft(scenario)) {
-      throw mapAclDomainToHttpError(scenario.left, {
-        userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
-      });
-    }
-
-    const outcome = await this.projectsService.addProtectedAreaFor(
-      scenario.right.projectId,
-      file,
-      { authenticatedUser: req.user },
-      dto,
-    );
-
-    if (isLeft(outcome)) {
-      if (isLeft(outcome)) {
-        throw mapAclDomainToHttpError(outcome.left, {
-          scenarioId,
-          userId: req.user.id,
-          resourceType: scenarioResource.name.plural,
-        });
-      }
-    }
-
-    return AsyncJobDto.forProject().asJsonApiMetadata();
   }
 }
