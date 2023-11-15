@@ -302,4 +302,44 @@ describe('GeoFeatureTag PATCH (e2e)', () => {
     expect(response.status).toBe(HttpStatus.OK);
     await fixtures.ThenFeatureHasTag(projectId, featureId, equivalentTag);
   });
+
+  /**
+   * @see MRXN23-316
+   */
+  test('updating feature tags in a large batch of concurrent-ish operations should complete without errors', async () => {
+    // ARRANGE
+    const projectId = await fixtures.GivenProject('someProject');
+    // create an array of 100 features
+    const features = await Promise.all(
+      Array.from({ length: 100 }, (_item, index) => index).map((featureId) =>
+        fixtures.GivenFeatureOnProject(projectId, `feature${featureId}`),
+      ),
+    );
+    await Promise.all(
+      features.map((feature) =>
+        fixtures.GivenTagOnFeature(projectId, feature, 'oldTag'),
+      ),
+    );
+    const newTag = 'newTag';
+
+    // ACT
+    const responses = await Promise.all(
+      features.map((feature) =>
+        fixtures.WhenPatchingAGeoFeatureTag(projectId, feature, newTag),
+      ),
+    );
+
+    // ASSERT
+    responses.forEach((response) =>
+      expect(response.status).toBe(HttpStatus.OK),
+    );
+    responses.forEach((response) =>
+      expect(response.body.data.type).toBe('geo_features'),
+    );
+    await Promise.all(
+      features.map((feature) =>
+        fixtures.ThenFeatureHasTag(projectId, feature, newTag),
+      ),
+    );
+  });
 });
