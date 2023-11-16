@@ -52,6 +52,7 @@ const DeleteModal = ({
     bulkDeleteFeatureFromProject(pid, deletableFeatureIds, session)
       .then(async () => {
         await queryClient.invalidateQueries(['all-features', pid]);
+        await queryClient.invalidateQueries(['project-tags', pid]);
 
         onDismiss();
 
