@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
+import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { COLORS } from 'hooks/map/constants';
-import { useCostSurfaceRange } from 'hooks/scenarios';
 
 import LegendItem from 'components/map/legend/item';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
@@ -11,8 +11,16 @@ import CostSurfaceReportMap from 'layout/scenarios/reports/solutions/cost-surfac
 
 export const CostSurfaceReport = (): JSX.Element => {
   const { query } = useRouter();
-  const { sid } = query as { sid: string };
-  const costSurfaceQuery = useCostSurfaceRange(sid);
+  const { pid, sid } = query as { pid: string; sid: string };
+
+  const costSurfaceQuery = useProjectCostSurfaces(
+    pid,
+    {},
+    {
+      select: (data) =>
+        data.filter((cs) => cs.scenarios.filter((s) => s.id === sid).length > 0)?.[0],
+    }
+  );
 
   const LEGEND = useMemo(() => {
     return {

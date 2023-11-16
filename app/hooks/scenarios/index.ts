@@ -564,44 +564,6 @@ export function useUploadPA({
   return useMutation(uploadPAShapefile);
 }
 
-export function useCostSurfaceRange(id: Scenario['id']) {
-  const { data: session } = useSession();
-
-  const query = useQuery(
-    ['scenarios-cost-surface', id],
-    async () =>
-      // ! this endpoint is deprecated: https://marxan23.northeurope.cloudapp.azure.com/swagger#/Scenario/ScenariosController_getCostRange
-      SCENARIOS.request<{ min: number; max: number }>({
-        method: 'GET',
-        url: `/${id}/cost-surface`,
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-        },
-        transformResponse: (data) => {
-          try {
-            return JSON.parse(data);
-          } catch (error) {
-            return data;
-          }
-        },
-      }).then((response) => {
-        return response.data;
-      }),
-    {
-      enabled: !!id,
-    }
-  );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data,
-    };
-  }, [query, data]);
-}
-
 // PLANNING UNITS
 export function useScenarioPU(
   sid: string,

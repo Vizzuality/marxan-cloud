@@ -9,14 +9,17 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 import { useAccessToken } from 'hooks/auth';
-import { useBBOX, usePUGridLayer } from 'hooks/map';
+import { useProjectCostSurfaces } from 'hooks/cost-surface';
+import { useBBOX, useCostSurfaceLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
 import Map from 'components/map';
 
-export const ReportMap = ({ id }: { id: string }): JSX.Element => {
+const minZoom = 2;
+const maxZoom = 20;
+
+export const CostSurfaceReportMap = ({ id }: { id: string }): JSX.Element => {
   const accessToken = useAccessToken();
-  const [cache] = useState<number>(Date.now());
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const { query } = useRouter();
@@ -27,27 +30,31 @@ export const ReportMap = ({ id }: { id: string }): JSX.Element => {
 
   const { data } = useProject(pid);
 
+  const costSurfaceQuery = useProjectCostSurfaces(
+    pid,
+    {},
+    {
+      select: (data) =>
+        data.filter((cs) => cs.scenarios.filter((s) => s.id === sid).length > 0)?.[0],
+    }
+  );
+
   const BBOX = useBBOX({
     bbox: data?.bbox,
   });
 
-  const minZoom = 2;
-  const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
 
-  const PUGridLayer = usePUGridLayer({
-    cache,
-    active: true,
-    sid: sid ? `${sid}` : null,
-    include: 'cost',
-    sublayers: ['cost'],
-    options: {
-      cost: {
-        min: 0,
-        max: 1,
-      },
-      settings: {},
+  const PUGridLayer = useCostSurfaceLayer({
+    active: Boolean(costSurfaceQuery?.data),
+    pid,
+    costSurfaceId: costSurfaceQuery?.data?.id,
+    layerSettings: {
+      opacity: 1,
+      visibility: true,
+      min: costSurfaceQuery?.data?.min,
+      max: costSurfaceQuery?.data?.max,
     },
   });
 
@@ -123,4 +130,4 @@ export const ReportMap = ({ id }: { id: string }): JSX.Element => {
   );
 };
 
-export default ReportMap;
+export default CostSurfaceReportMap;
