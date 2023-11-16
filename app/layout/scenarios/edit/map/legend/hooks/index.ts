@@ -148,14 +148,14 @@ export const useFeaturesLegend = () => {
           []
         ).map((feature) => ({
           ...feature,
-          color: featureColorQueryState.data?.find(({ id }) => id === feature.id)?.color,
+          color: featureColorQueryState?.data?.find(({ id }) => id === feature.id)?.color,
         })),
         continuousFeatures: (
           data?.filter(({ amountRange }) => amountRange.min !== null && amountRange.max !== null) ||
           []
         ).map((feature) => ({
           ...feature,
-          color: featureColorQueryState.data?.find(({ id }) => id === feature.id)?.color,
+          color: featureColorQueryState?.data?.find(({ id }) => id === feature.id)?.color,
         })),
       }),
       enabled: featureColorQueryState?.status === 'success',

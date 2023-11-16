@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
-import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
@@ -50,7 +49,6 @@ export const WDPAUploadModal = ({
   const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
-  const queryClient = useQueryClient();
 
   const uploadWDPAsShapefileMutation = useUploadWDPAsShapefile({});
 
@@ -114,57 +112,58 @@ export const WDPAUploadModal = ({
       data.append('file', file);
       data.append('name', name);
 
-      const mutationResponse = {
-        onSuccess: () => {
-          setSuccessFile({ ...successFile });
-          onClose();
-          addToast(
-            'success-upload-wdpa-file',
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">File uploaded</p>
-            </>,
-            {
-              level: 'success',
+      uploadWDPAsShapefileMutation.mutate(
+        { data, id: pid },
+        {
+          onSuccess: () => {
+            setSuccessFile({ ...successFile });
+
+            addToast(
+              'success-upload-wdpa-file',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">File uploaded</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+            onClose();
+          },
+          onError: (error: AxiosError | Error) => {
+            let errors: { status: number; title: string }[] = [];
+
+            if (isAxiosError(error)) {
+              errors = [...error.response.data.errors];
+            } else {
+              // ? in case of unknown error (not request error), display generic error message
+              errors = [{ status: 500, title: 'Something went wrong' }];
             }
-          );
-          queryClient.invalidateQueries(['wdpas', pid]);
-        },
-        onError: (error: AxiosError | Error) => {
-          let errors: { status: number; title: string }[] = [];
 
-          if (isAxiosError(error)) {
-            errors = [...error.response.data.errors];
-          } else {
-            // ? in case of unknown error (not request error), display generic error message
-            errors = [{ status: 500, title: 'Something went wrong' }];
-          }
+            setSuccessFile(null);
 
-          setSuccessFile(null);
-
-          addToast(
-            'error-upload-wdpa-csv',
-            <>
-              <h2 className="font-medium">Error</h2>
-              <ul className="text-sm">
-                {errors.map((e) => (
-                  <li key={`${e.status}`}>{e.title}</li>
-                ))}
-              </ul>
-            </>,
-            {
-              level: 'error',
-            }
-          );
-        },
-        onSettled: () => {
-          setLoading(false);
-        },
-      };
-
-      uploadWDPAsShapefileMutation.mutate({ data, id: `${pid}` }, mutationResponse);
+            addToast(
+              'error-upload-wdpa-csv',
+              <>
+                <h2 className="font-medium">Error</h2>
+                <ul className="text-sm">
+                  {errors.map((e) => (
+                    <li key={`${e.status}`}>{e.title}</li>
+                  ))}
+                </ul>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+          onSettled: () => {
+            setLoading(false);
+          },
+        }
+      );
     },
-    [pid, addToast, onClose, uploadWDPAsShapefileMutation, successFile, queryClient]
+    [pid, addToast, onClose, uploadWDPAsShapefileMutation, successFile]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({

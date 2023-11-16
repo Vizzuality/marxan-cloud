@@ -2,6 +2,7 @@ import { useMutation, useQuery, QueryObserverOptions, useQueryClient } from 'rea
 
 import { AxiosRequestConfig } from 'axios';
 import { useSession } from 'next-auth/react';
+import { useDebouncedCallback } from 'use-debounce';
 
 import { Project } from 'types/api/project';
 import { Scenario } from 'types/api/scenario';
@@ -148,6 +149,10 @@ export function useUploadWDPAsShapefile({
   const queryClient = useQueryClient();
   const { data: session } = useSession();
 
+  const delayedInvalidateQueryCache = useDebouncedCallback(async (id: Project['id']) => {
+    await queryClient.invalidateQueries(['wdpas', id]);
+  }, 550);
+
   const uploadWDPAShapefile = ({ id, data }: { id: Project['id']; data: FormData }) => {
     return UPLOADS.request<{ success: true }>({
       url: `/projects/${id}/protected-areas/shapefile`,
@@ -163,7 +168,9 @@ export function useUploadWDPAsShapefile({
   return useMutation(uploadWDPAShapefile, {
     onSuccess: async (data, variables) => {
       const { id: projectId } = variables;
-      await queryClient.invalidateQueries(['wdpas', projectId]);
+      // ? It takes the API a little bit to get the final list of WDPAs updated
+      // ? after uploading a shapefile, so we need to delay the cache invalidation a few milliseconds
+      await delayedInvalidateQueryCache(projectId);
     },
   });
 }

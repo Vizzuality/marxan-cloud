@@ -49,7 +49,6 @@ const InventoryPanelProtectedAreas = ({
       search,
     },
     {
-      keepPreviousData: true,
       placeholderData: [],
     }
   );
