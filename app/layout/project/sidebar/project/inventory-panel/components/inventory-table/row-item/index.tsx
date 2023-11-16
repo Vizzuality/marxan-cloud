@@ -39,11 +39,15 @@ const RowItem = ({
         })}
       >
         <span className="inline-flex">{name}</span>
-        <div className="mt-1.5 text-xs text-gray-400">
-          Currently in use in{' '}
-          <span className="rounded bg-blue-600 bg-opacity-10 px-1 text-blue-600">{scenarios}</span>{' '}
-          scenarios.
-        </div>
+        {isCustom && (
+          <div className="mt-1.5 text-xs text-gray-400">
+            Currently in use in{' '}
+            <span className="rounded bg-blue-600 bg-opacity-10 px-1 text-blue-600">
+              {scenarios}
+            </span>{' '}
+            scenarios.
+          </div>
+        )}
       </td>
       {tag && (
         <td className="w-28 px-6 pb-2 pt-5 text-xs">
