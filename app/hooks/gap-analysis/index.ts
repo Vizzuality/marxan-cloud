@@ -1,6 +1,5 @@
 import { useQuery } from 'react-query';
 
-import { format } from 'd3';
 import { sortBy } from 'lodash';
 import { useSession } from 'next-auth/react';
 
@@ -90,13 +89,9 @@ export function usePreGapAnalysis(sId: Scenario['id'], options: UseFeaturesOptio
             onTarget,
             current: {
               percent: met / 100,
-              value: format('.3s')(metArea / 1000000),
-              unit: 'km2',
             },
             target: {
               percent: coverageTarget / 100,
-              value: format('.3s')(coverageTargetArea / 1000000),
-              unit: 'km2',
             },
           };
         }),
@@ -158,13 +153,9 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
           onTarget,
           current: {
             percent: met / 100,
-            value: format('.3s')(metArea / 1000000),
-            unit: 'km2',
           },
           target: {
             percent: coverageTarget / 100,
-            value: format('.3s')(coverageTargetArea / 1000000),
-            unit: 'km2',
           },
         };
       }),
