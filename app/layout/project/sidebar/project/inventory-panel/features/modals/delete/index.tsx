@@ -36,7 +36,7 @@ const DeleteModal = ({
         .getQueryData<{ data: Feature[]; meta: Pagination }>(['all-features', pid], {
           exact: false,
         })
-        ?.data?.filter(({ id, isCustom }) => selectedFeaturesIds.includes(id) && isCustom) ?? [],
+        ?.data?.filter(({ id }) => selectedFeaturesIds.includes(id)) ?? [],
     [queryClient, selectedFeaturesIds, pid]
   );
 
