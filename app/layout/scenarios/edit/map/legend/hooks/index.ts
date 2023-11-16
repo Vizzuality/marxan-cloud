@@ -5,13 +5,12 @@ import { useRouter } from 'next/router';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import chroma from 'chroma-js';
 import { orderBy, sortBy } from 'lodash';
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
-import { useAllFeatures } from 'hooks/features';
+import { useAllFeatures, useSelectedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
-import { COLORS, LEGEND_LAYERS } from 'hooks/map/constants';
+import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
@@ -133,32 +132,44 @@ export const useFeaturesLegend = () => {
   }: { selectedFeatures: Feature['id'][]; selectedContinuousFeatures: Feature['id'][] } =
     useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
 
   const featureColorQueryState =
     queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
 
-  const dispatch = useAppDispatch();
+  const selectedFeaturesQuery = useSelectedFeatures(sid);
+  const selectedFeaturesIds = selectedFeaturesQuery.data?.map(({ metadata: { id } }) => id) || [];
+
   const projectFeaturesQuery = useAllFeatures(
     pid,
     { sort: 'featureClassName' },
     {
       select: ({ data }) => ({
         binaryFeatures: (
-          data?.filter(({ amountRange }) => amountRange.min === null && amountRange.max === null) ||
-          []
+          data?.filter(
+            ({ amountRange, id }) =>
+              amountRange.min === null &&
+              amountRange.max === null &&
+              selectedFeaturesIds.includes(id)
+          ) || []
         ).map((feature) => ({
           ...feature,
           color: featureColorQueryState.data?.find(({ id }) => id === feature.id)?.color,
         })),
         continuousFeatures: (
-          data?.filter(({ amountRange }) => amountRange.min !== null && amountRange.max !== null) ||
-          []
+          data?.filter(
+            ({ amountRange, id }) =>
+              amountRange.min !== null &&
+              amountRange.max !== null &&
+              selectedFeaturesIds.includes(id)
+          ) || []
         ).map((feature) => ({
           ...feature,
           color: featureColorQueryState.data?.find(({ id }) => id === feature.id)?.color,
         })),
       }),
-      enabled: featureColorQueryState?.status === 'success',
+      enabled:
+        featureColorQueryState?.status === 'success' && selectedFeaturesQuery.status === 'success',
     }
   );
 
