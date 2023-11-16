@@ -224,9 +224,10 @@ export const FeatureUploadModal = ({
 
   const handleKeyPress = useCallback(
     (event: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
+      formRef.current.change('tag', event.currentTarget.value);
+
       if (event.key === 'Enter') {
         setTagIsDone(true);
-        formRef.current.change('tag', event.currentTarget.value);
         setTagsMenuOpen(false);
       }
     },
@@ -259,6 +260,12 @@ export const FeatureUploadModal = ({
       }
     );
   }, [pid, downloadShapefileTemplateMutation, addToast]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTagIsDone(false);
+    }
+  }, [setTagIsDone, isOpen]);
 
   return (
     <Modal id="features-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
@@ -329,8 +336,9 @@ export const FeatureUploadModal = ({
                                 className="h-10 w-full rounded-md border border-gray-600 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-600"
                                 placeholder="Type to pick or create tag..."
                                 value={fprops.input.value}
-                                onFocus={() => setTagsMenuOpen(true)}
-                                onBlur={() => setTagIsDone(true)}
+                                onFocus={() => {
+                                  setTagsMenuOpen(true);
+                                }}
                                 onKeyDown={handleKeyPress}
                               />
 
@@ -370,7 +378,7 @@ export const FeatureUploadModal = ({
                               >
                                 <Icon
                                   icon={CLOSE_SVG}
-                                  className="h-2 w-2 text-gray-100  group-hover:text-white"
+                                  className="h-2 w-2 text-gray-900  group-hover:text-white"
                                 />
                               </button>
                             </div>
