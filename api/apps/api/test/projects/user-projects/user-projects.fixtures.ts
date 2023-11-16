@@ -3,6 +3,7 @@ import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { OrganizationsTestUtils } from '../../utils/organizations.test.utils';
 import { ProjectsTestUtils } from '../../utils/projects.test.utils';
 import * as request from 'supertest';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -16,6 +17,9 @@ export const getFixtures = async () => {
       await ProjectsTestUtils.createProject(app, authToken, {
         name: `User Project ${Date.now()}`,
         organizationId: org.data.id,
+        countryId: 'RWA',
+        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
+        planningUnitAreakm2: 10000,
       })
     ).data.id;
   };

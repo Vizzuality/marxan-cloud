@@ -7,6 +7,7 @@ import * as request from 'supertest';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { ProjectCheckerFake } from '../../utils/project-checker.service-fake';
 import { HttpStatus } from '@nestjs/common';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -30,6 +31,9 @@ export const getFixtures = async () => {
           name: originalName,
           organizationId,
           metadata: {},
+          countryId: 'RWA',
+          planningUnitGridShape: PlanningUnitGridShape.Hexagon,
+          planningUnitAreakm2: 10000,
         })
       ).data.id;
     },
