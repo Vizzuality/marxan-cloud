@@ -77,9 +77,8 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
   }, []);
 
   return (
-    <div className="relative flex flex-grow flex-col">
+    <div className="relative">
       <div className="absolute -top-1 left-0 z-10 h-6 w-full bg-gradient-to-b from-gray-800 via-gray-800" />
-
       <div
         className={cn({
           'divide-y divide-dashed divide-black divide-opacity-20 bg-gray-800': true,
@@ -112,6 +111,7 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
                     {...item}
                     highlighted={isHighlighted(item.id)}
                     onHighlight={() => toggleHighlight(item.id)}
+                    className="w-full"
                   />
                 </li>
               );

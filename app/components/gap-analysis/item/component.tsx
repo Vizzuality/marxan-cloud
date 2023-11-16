@@ -87,7 +87,7 @@ export const Item: React.FC<ItemProps> = ({
           delay={[400, null]}
           offset={[-10, -34]}
         >
-          <div className=" overflow-hidden overflow-ellipsis whitespace-nowrap pt-1 font-heading text-sm">
+          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap pt-1 font-heading text-sm">
             {name}
           </div>
         </Tooltip>
