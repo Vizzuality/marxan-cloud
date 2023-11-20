@@ -61,7 +61,7 @@ export const GridSetupGAPAnalysis = (): JSX.Element => {
         <Toolbar search={search} onSearch={onSearch} />
 
         <div className="relative flex h-full flex-col overflow-hidden before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-gray-800 before:via-gray-800 after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-gray-800 after:via-gray-800">
-          <ScrollArea className="h-full pr-3">
+          <ScrollArea className="h-full">
             <List search={search} />
           </ScrollArea>
         </div>

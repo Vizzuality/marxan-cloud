@@ -14,13 +14,9 @@ export interface ItemProps {
   name: string;
   current: {
     percent: number;
-    value: string;
-    unit: string;
   };
   target: {
     percent: number;
-    value: string;
-    unit: string;
   };
   onTarget: boolean;
   className?: string;
@@ -84,39 +80,35 @@ export const Item: React.FC<ItemProps> = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="flex justify-between">
+      <div className="grid auto-cols-auto grid-cols-2 justify-between gap-2">
         <Tooltip
           content={<div className="rounded bg-white p-2 text-gray-600">{name}</div>}
           placement="top-start"
           delay={[400, null]}
           offset={[-10, -34]}
         >
-          <div className="flex-shrink-1 mr-4 overflow-hidden overflow-ellipsis whitespace-nowrap pt-1 font-heading text-sm">
+          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap pt-1 font-heading text-sm">
             {name}
           </div>
         </Tooltip>
 
         <button
           type="button"
-          className="flex flex-shrink-0 items-center justify-between rounded-[40px] border border-transparent px-2 py-1 text-xs focus:border-white"
+          className="flex items-center justify-end rounded-[40px] border border-transparent px-2 py-1 text-xs focus:border-white"
           onClick={onHighlight}
         >
-          {highlighted ? 'Lowlight on map' : 'Highlight on map'}
+          <span>{highlighted ? 'Lowlight on map' : 'Highlight on map'}</span>
           <Icon icon={highlighted ? HIDE_SVG : SHOW_SVG} className="ml-3 h-5 w-5" />
         </button>
       </div>
       <div className="flex justify-start">
         <div className="mr-5">
           <div className="mr-3 inline-block h-3 w-3 rounded-sm bg-purple-800 align-middle" />
-          <span className="text-sm">
-            Current: {percentFormatter.format(current.percent)} ({current.value} {current.unit})
-          </span>
+          <span className="text-sm">Current: {percentFormatter.format(current.percent)}</span>
         </div>
         <div>
           <div className="w- with-stripes mr-3 inline-block h-3 w-3 rounded-sm bg-gradient-repeat-to-br from-gray-200 to-gray-900 align-middle" />
-          <span className="text-sm">
-            Target: {percentFormatter.format(target.percent)} ({target.value} {target.unit})
-          </span>
+          <span className="text-sm">Target: {percentFormatter.format(target.percent)}</span>
         </div>
       </div>
       <div ref={chartRef} className="relative mt-4 h-2.5 rounded-sm bg-gray-700">
