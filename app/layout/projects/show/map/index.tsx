@@ -34,6 +34,7 @@ import { useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useProjectWDPAs } from 'hooks/wdpa';
 
+import Button from 'components/button';
 import Select from 'components/forms/select';
 import Loading from 'components/loading';
 import Map from 'components/map';
@@ -574,21 +575,15 @@ export const ProjectMap = (): JSX.Element => {
                   <HiOutlinePrinter className="h-6 w-6 text-white" />
                 </button>
               )}
-              <button
+              <Button
+                theme="primary"
+                size="base"
                 type="button"
                 onClick={() => setOpen(!open)}
-                className={cn({
-                  'rounded-full bg-gray-800 p-5 shadow-xl': true,
-                  'bg-blue-400': open,
-                })}
+                className="rounded-full p-5 shadow-xl"
               >
-                <FiLayers
-                  className={cn({
-                    'h-6 w-6 text-white': true,
-                    'text-gray-700': open,
-                  })}
-                />
-              </button>
+                <FiLayers className="h-6 w-6 text-gray-900" />
+              </Button>
             </div>
             <Legend
               open={open}

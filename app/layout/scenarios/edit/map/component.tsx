@@ -31,6 +31,7 @@ import { useScenario, useScenarioPU } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 import { useWDPACategories } from 'hooks/wdpa';
 
+import Button from 'components/button';
 import Loading from 'components/loading';
 import Map from 'components/map';
 import Controls from 'components/map/controls';
@@ -611,21 +612,15 @@ export const ScenariosEditMap = (): JSX.Element => {
       </Controls>
 
       <div className="absolute bottom-16 right-5 flex w-full max-w-xs flex-col items-end space-y-2">
-        <button
+        <Button
+          theme="primary"
+          size="base"
           type="button"
           onClick={() => setOpen(!open)}
-          className={cn({
-            'rounded-full bg-gray-800 p-5 shadow-xl': true,
-            'bg-blue-400': open,
-          })}
+          className="rounded-full p-5 shadow-xl"
         >
-          <FiLayers
-            className={cn({
-              'h-6 w-6 text-white': true,
-              'text-gray-700': open,
-            })}
-          />
-        </button>
+          <FiLayers className="h-6 w-6 text-gray-900" />
+        </Button>
         <Legend open={open} className="max-h-[50svh] w-full" onChangeOpen={() => setOpen(!open)}>
           {legendConfig.map((c) => {
             return (
