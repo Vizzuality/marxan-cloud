@@ -9,6 +9,7 @@ import React, {
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
@@ -56,6 +57,7 @@ export const FeatureUploadModal = ({
 }): JSX.Element => {
   const formRef = useRef<FormProps<FormValues>['form']>(null);
   const tagsSectionRef = useRef<ElementRef<'div'>>(null);
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState<{ name: FormValues['name'] }>(null);
@@ -157,9 +159,11 @@ export const FeatureUploadModal = ({
       data.append('tagName', tag);
 
       const mutationResponse = {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await queryClient.invalidateQueries(['project-tags', pid]);
           setSuccessFile({ ...successFile });
           onClose();
+
           addToast(
             'success-upload-feature-file',
             <>
@@ -224,9 +228,10 @@ export const FeatureUploadModal = ({
 
   const handleKeyPress = useCallback(
     (event: Parameters<InputHTMLAttributes<HTMLInputElement>['onKeyDown']>[0]) => {
+      formRef.current.change('tag', event.currentTarget.value);
+
       if (event.key === 'Enter') {
         setTagIsDone(true);
-        formRef.current.change('tag', event.currentTarget.value);
         setTagsMenuOpen(false);
       }
     },
@@ -259,6 +264,12 @@ export const FeatureUploadModal = ({
       }
     );
   }, [pid, downloadShapefileTemplateMutation, addToast]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTagIsDone(false);
+    }
+  }, [setTagIsDone, isOpen]);
 
   return (
     <Modal id="features-upload" open={isOpen} size="narrow" onDismiss={onDismiss}>
@@ -329,16 +340,17 @@ export const FeatureUploadModal = ({
                                 className="h-10 w-full rounded-md border border-gray-600 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-600"
                                 placeholder="Type to pick or create tag..."
                                 value={fprops.input.value}
-                                onFocus={() => setTagsMenuOpen(true)}
-                                onBlur={() => setTagIsDone(true)}
+                                onFocus={() => {
+                                  setTagsMenuOpen(true);
+                                }}
                                 onKeyDown={handleKeyPress}
                               />
 
-                              {tagsMenuOpen && (
+                              {tagsMenuOpen && tagsQuery.data?.length > 0 && (
                                 <div className="w-full space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-900 shadow-md">
                                   <div className="text-sm text-gray-900">Recent:</div>
                                   <div className="flex flex-wrap gap-2.5">
-                                    {tagsQuery.data?.map((tag) => (
+                                    {tagsQuery.data.map((tag) => (
                                       <button
                                         key={tag}
                                         className="inline-block rounded-2xl border border-yellow-700 bg-yellow-500/50 px-3 py-0.5"
@@ -370,7 +382,7 @@ export const FeatureUploadModal = ({
                               >
                                 <Icon
                                   icon={CLOSE_SVG}
-                                  className="h-2 w-2 text-gray-100  group-hover:text-white"
+                                  className="h-2 w-2 text-gray-900  group-hover:text-white"
                                 />
                               </button>
                             </div>

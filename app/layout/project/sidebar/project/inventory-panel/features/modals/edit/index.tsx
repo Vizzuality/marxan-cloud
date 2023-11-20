@@ -210,11 +210,11 @@ const EditModal = ({
                             onKeyDown={handleKeyPress}
                           />
 
-                          {tagsMenuOpen && (
+                          {tagsMenuOpen && tagsQuery.data?.length > 0 && (
                             <div className="w-full space-y-2.5 rounded-md bg-white p-4 font-sans text-gray-900 shadow-md">
                               <div className="text-sm text-gray-900">Recent:</div>
                               <div className="flex flex-wrap gap-2.5">
-                                {tagsQuery.data?.map((tag) => (
+                                {tagsQuery.data.map((tag) => (
                                   <button
                                     key={tag}
                                     className="inline-block rounded-2xl border border-yellow-700 bg-yellow-500/50 px-3 py-0.5"
