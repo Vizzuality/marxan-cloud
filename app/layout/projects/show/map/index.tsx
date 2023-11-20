@@ -108,7 +108,7 @@ export const ProjectMap = (): JSX.Element => {
 
   const protectedAreaQuery = useProjectWDPAs(
     pid,
-    {},
+    { sort: 'name' },
     {
       select: (data) => data.map(({ id }) => id),
     }
