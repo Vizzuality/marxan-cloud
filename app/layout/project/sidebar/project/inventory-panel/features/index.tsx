@@ -87,7 +87,9 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     }
   );
 
-  const featureIds = allFeaturesQuery.data?.map((feature) => feature.id);
+  const featureIds = allFeaturesQuery.data
+    ?.filter(({ isCustom }) => isCustom)
+    .map((feature) => feature.id);
 
   const handleSelectAll = useCallback(
     (evt: ChangeEvent<HTMLInputElement>) => {
@@ -130,14 +132,6 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
 
       const feature = allFeaturesQuery.data?.find(({ id }) => featureId === id);
       const isContinuous = feature.amountRange.min !== null && feature.amountRange.max !== null;
-
-      // const isIncluded = newSelectedFeatures.includes(featureId);
-      // if (!isIncluded) {
-      //   newSelectedFeatures.push(featureId);
-      // } else {
-      //   const i = newSelectedFeatures.indexOf(featureId);
-      //   newSelectedFeatures.splice(i, 1);
-      // }
 
       if (isContinuous) {
         if (!isIncludedInContinuous) {
@@ -183,6 +177,12 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     ...feature,
     isVisibleOnMap: layerSettings[feature.id]?.visibility ?? false,
   }));
+
+  useEffect(() => {
+    if (allFeaturesQuery.isRefetching) {
+      setSelectedFeaturesIds([]);
+    }
+  }, [allFeaturesQuery.isRefetching]);
 
   return (
     <div className="flex flex-col space-y-6 overflow-hidden">
