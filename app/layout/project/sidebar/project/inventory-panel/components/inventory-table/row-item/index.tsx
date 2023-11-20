@@ -70,7 +70,7 @@ const RowItem = ({
             />
           </button>
 
-          <Popover>
+          <Popover modal>
             <PopoverTrigger asChild>
               <button
                 type="button"
