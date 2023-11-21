@@ -72,10 +72,6 @@ const InventoryPanelProtectedAreas = ({
     }
   }, []);
 
-  useEffect(() => {
-    setSelectedWDPAIds([]);
-  }, [search]);
-
   const toggleSeeOnMap = useCallback(
     (WDPAId: WDPA['id']) => {
       const newSelectedWDPAs = [...visibleWDPAs];
@@ -121,6 +117,12 @@ const InventoryPanelProtectedAreas = ({
     isCustom: wdpa.isCustom,
     isVisibleOnMap: layerSettings[wdpa.id]?.visibility ?? false,
   }));
+
+  useEffect(() => {
+    if (allProjectWDPAsQuery.isRefetching) {
+      setSelectedWDPAIds([]);
+    }
+  }, [allProjectWDPAsQuery.isRefetching]);
 
   return (
     <div className="flex flex-col space-y-6 overflow-hidden">

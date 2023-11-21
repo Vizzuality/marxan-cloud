@@ -157,6 +157,12 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
     isVisibleOnMap: visibleCostSurface === cs.id,
   }));
 
+  useEffect(() => {
+    if (allProjectCostSurfacesQuery.isRefetching) {
+      setSelectedCostSurfaceIds([]);
+    }
+  }, [allProjectCostSurfacesQuery.isRefetching]);
+
   return (
     <div className="flex flex-col space-y-6 overflow-hidden">
       <div className="h-full overflow-hidden">
