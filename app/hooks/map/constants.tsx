@@ -354,28 +354,53 @@ export const LEGEND_LAYERS = {
   }) => {
     const { items, onChangeVisibility } = options;
 
-    return items?.map(({ id, name, min = 1, max = 100 }) => ({
-      id,
-      name,
-      type: 'gradient' as LegendItemType,
-      settingsManager: {
-        opacity: true,
-        visibility: true,
-      },
-      items: [
-        {
-          color: COLORS.cost[0],
-          value: `${min === max ? 0 : min}`,
+    return items?.map(({ id, name, min = 1, max = 100 }) => {
+      // ? if the cost surface has a flat range, a gradient makes no sense
+      if (min === max) {
+        return {
+          id,
+          name,
+          type: 'basic' as LegendItemType,
+          icon: (
+            <FaSquare
+              className="h-3 w-3"
+              style={{ color: COLORS.cost[1], minWidth: 12, minHeight: 12 }}
+            />
+          ),
+          items: [],
+          settingsManager: {
+            opacity: true,
+            visibility: true,
+          },
+          onChangeVisibility: () => {
+            onChangeVisibility?.(id);
+          },
+        };
+      }
+
+      return {
+        id,
+        name,
+        type: 'gradient' as LegendItemType,
+        settingsManager: {
+          opacity: true,
+          visibility: true,
         },
-        {
-          color: COLORS.cost[1],
-          value: `${max}`,
+        items: [
+          {
+            color: COLORS.cost[0],
+            value: min,
+          },
+          {
+            color: COLORS.cost[1],
+            value: `${max}`,
+          },
+        ],
+        onChangeVisibility: () => {
+          onChangeVisibility?.(id);
         },
-      ],
-      onChangeVisibility: () => {
-        onChangeVisibility?.(id);
-      },
-    }));
+      };
+    });
   },
   'lock-available': (options) => {
     const { puAvailableValue, onChangeVisibility } = options;
