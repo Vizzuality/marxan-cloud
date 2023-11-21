@@ -448,7 +448,7 @@ export const LEGEND_LAYERS = {
     const { items, onChangeVisibility } = options;
 
     return items?.map(({ name, id }) => ({
-      id,
+      id: `gap-analysis-${id}`,
       name,
       type: 'basic' as LegendItemType,
       icon: (

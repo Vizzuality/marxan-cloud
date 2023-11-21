@@ -403,9 +403,9 @@ export const useGapAnalysisLegend = () => {
 
       dispatch(
         setLayerSettings({
-          id: featureId,
+          id: `gap-analysis-${featureId}`,
           settings: {
-            visibility: !layerSettings[featureId]?.visibility,
+            visibility: !layerSettings[`gap-analysis-${featureId}`]?.visibility,
           },
         })
       );

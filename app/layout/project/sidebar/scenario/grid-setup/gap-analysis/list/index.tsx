@@ -11,6 +11,7 @@ import { usePreGapAnalysis } from 'hooks/gap-analysis';
 import Item from 'components/gap-analysis/item';
 import Loading from 'components/loading';
 import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
+import { Feature } from 'types/api/feature';
 import { cn } from 'utils/cn';
 
 export interface ScenariosPreGapAnalysisListProps {
@@ -37,7 +38,7 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
   });
 
   const toggleHighlight = useCallback(
-    (id) => {
+    (id: Feature['id']) => {
       const newHighlightFeatures = [...preHighlightFeatures];
       if (!newHighlightFeatures.includes(id)) {
         newHighlightFeatures.push(id);
@@ -49,9 +50,9 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
 
       dispatch(
         setLayerSettings({
-          id,
+          id: `gap-analysis-${id}`,
           settings: {
-            visibility: layerSettings[id]?.visibility || 1,
+            visibility: layerSettings[`gap-analysis-${id}`]?.visibility || 1,
           },
         })
       );
