@@ -43,7 +43,7 @@ import ScenarioItem from './scenario-item';
 import ScenarioTypes from './types';
 
 const LINK_CLASSES =
-  'inline-block rounded-xl bg-gray-600 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-100';
+  'inline-block rounded-xl bg-gray-700 px-2.5 py-1 text-sm text-white transition-colors hover:bg-gray-600';
 
 export const ScenariosList: React.FC = () => {
   const queryClient = useQueryClient();
@@ -343,7 +343,6 @@ export const ScenariosList: React.FC = () => {
               </motion.div>
 
               <motion.div
-                // key="project-scenarios-empty"
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -10, opacity: 0 }}

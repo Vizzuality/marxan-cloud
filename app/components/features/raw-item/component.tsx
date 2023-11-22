@@ -65,6 +65,9 @@ export const Item: React.FC<ItemProps> = ({
                 'secondary-alt': !selected,
               }) as ComponentProps<typeof Button>['theme']
             }
+            className={cn({
+              'text-gray-900': !selected,
+            })}
             size="xs"
             onClick={onToggleSelected}
           >

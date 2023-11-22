@@ -1,4 +1,4 @@
-export default {
+export const SELECT_THEME = {
   dark: {
     container: 'text-white bg-gray-800 ring-1 ring-gray-600 rounded-3xl',
     open: 'ring-2 ring-primary-400 bg-gray-800 text-white rounded-2xl',
@@ -30,8 +30,8 @@ export default {
       disabled: 'text-gray-100',
     },
     item: {
-      base: 'text-sm text-gray-100',
-      highlighted: 'text-sm bg-gray-200 text-gray-900',
+      base: 'text-sm text-gray-900',
+      highlighted: 'text-sm bg-gray-100',
       disabled: 'text-sm opacity-50 pointer-events-none',
     },
   },
@@ -67,3 +67,5 @@ export default {
     },
   },
 };
+
+export default SELECT_THEME;
