@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState, useEffect } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-// import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -21,18 +20,17 @@ import Slider from 'components/forms/slider';
 import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
-import { TABS } from 'layout/project/navigation/constants';
 import Section from 'layout/section';
 
 import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
 import ProtectedAreasSelected from '../pa-selected';
 
-export const WDPAThreshold = ({ onGoBack }): JSX.Element => {
+export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
 
   const { addToast } = useToasts();
-  const { push, query } = useRouter();
+  const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const { wdpaCategories } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
@@ -137,7 +135,6 @@ export const WDPAThreshold = ({ onGoBack }): JSX.Element => {
         },
         {
           onSuccess: () => {
-            setSubmitting(false);
             addToast(
               'save-scenario-wdpa',
               <>
@@ -148,11 +145,9 @@ export const WDPAThreshold = ({ onGoBack }): JSX.Element => {
                 level: 'success',
               }
             );
-            push(`/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-cost-surface']}`);
+            onGoBack();
           },
           onError: () => {
-            setSubmitting(false);
-
             addToast(
               'error-scenario-wdpa',
               <>
@@ -164,10 +159,13 @@ export const WDPAThreshold = ({ onGoBack }): JSX.Element => {
               }
             );
           },
+          onSettled: () => {
+            setSubmitting(false);
+          },
         }
       );
     },
-    [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast, pid, push]
+    [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast, onGoBack]
   );
 
   useEffect(() => {
