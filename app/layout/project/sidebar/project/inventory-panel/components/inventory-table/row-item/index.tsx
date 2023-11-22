@@ -1,3 +1,5 @@
+import { useCallback, useRef, useState } from 'react';
+
 import { HiDotsHorizontal } from 'react-icons/hi';
 
 import Checkbox from 'components/forms/checkbox';
@@ -18,6 +20,12 @@ const RowItem = ({
   ActionsComponent,
 }: RowItem) => {
   const { id, name, scenarios, tag, isVisibleOnMap, isCustom } = item;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const onDismissMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
 
   return (
     <tr key={id} className="flex w-full align-top">
@@ -70,7 +78,7 @@ const RowItem = ({
             />
           </button>
 
-          <Popover modal>
+          <Popover open={isMenuOpen}>
             <PopoverTrigger asChild>
               <button
                 type="button"
@@ -78,17 +86,27 @@ const RowItem = ({
                   'h-5 w-5': true,
                   invisible: !isCustom,
                 })}
+                ref={buttonRef}
+                onClick={() => {
+                  setIsMenuOpen((prevState) => !prevState);
+                }}
               >
-                <HiDotsHorizontal className="h-4 w-4 text-white" />
+                <HiDotsHorizontal className="pointer-events-none h-4 w-4 text-white" />
               </button>
             </PopoverTrigger>
             <PopoverContent
+              hideWhenDetached
               className="w-auto rounded-2xl border-transparent p-0"
               side="bottom"
               sideOffset={5}
               align="start"
+              onInteractOutside={(evt) => {
+                if (evt.target !== buttonRef.current) {
+                  setIsMenuOpen(false);
+                }
+              }}
             >
-              <ActionsComponent item={item} />
+              <ActionsComponent item={item} onDismissMenu={onDismissMenu} />
             </PopoverContent>
           </Popover>
         </div>
