@@ -16,7 +16,7 @@ export function useProjectCostSurfaces<T = CostSurface[]>(
   const { data: session } = useSession();
 
   return useQuery({
-    queryKey: ['cost-surfaces', pid],
+    queryKey: ['cost-surfaces', pid, params],
     queryFn: async () =>
       JSONAPI.request<{ data: CostSurface[] }>({
         method: 'GET',
