@@ -105,7 +105,7 @@ export const ProjectsUploadBtn = (): JSX.Element => {
                         </div>
 
                         {u.disclaimer && (
-                          <div className="mt-20 text-sm text-gray-100">{u.disclaimer}</div>
+                          <div className="mt-20 text-sm text-gray-600">{u.disclaimer}</div>
                         )}
                       </div>
                     </button>

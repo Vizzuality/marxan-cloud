@@ -41,7 +41,7 @@ export const ProjectScenariosType: React.FC<ProjectScenariosTypeProps> = () => {
                   </div>
 
                   {s.disclaimer && (
-                    <div className="mt-20 text-sm text-gray-100">{s.disclaimer}</div>
+                    <div className="mt-20 text-sm text-gray-600">{s.disclaimer}</div>
                   )}
                 </div>
               </Link>
