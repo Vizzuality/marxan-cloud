@@ -1,4 +1,4 @@
-import { ComponentProps, useCallback, useEffect, useRef, useState } from 'react';
+import { ComponentProps, useCallback, useRef, useState } from 'react';
 
 import { Form as FormRFF, FormProps, Field } from 'react-final-form';
 
@@ -10,6 +10,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { motion } from 'framer-motion';
 import { sortBy } from 'lodash';
 import { HiOutlineArrowUpOnSquareStack } from 'react-icons/hi2';
+import { useEffectOnceWhen } from 'rooks';
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useCanEditScenario } from 'hooks/permissions';
@@ -57,10 +58,11 @@ export const GridSetupCostSurface = (): JSX.Element => {
     {},
     {
       select: (data) =>
-        sortBy(
-          data.filter(({ isDefault }) => !isDefault),
-          'name'
-        )?.map(({ id, name }) => ({ value: id, label: name })),
+        sortBy(data, 'name')?.map(({ id, name, isDefault }) => ({
+          value: id,
+          label: name,
+          isDefault,
+        })),
     }
   );
   const scenarioQuery = useScenario(sid, {
@@ -95,21 +97,23 @@ export const GridSetupCostSurface = (): JSX.Element => {
     setSuccessFile(null);
   }, []);
 
+  const defaultCostSurface = costSurfaceQuery.data?.find(({ isDefault }) => isDefault);
+
   const onChangeCostSurface = useCallback(
     (value: string) => {
       formRef.current.change('costSurfaceId', value);
 
-      dispatch(setSelectedCostSurface(value));
+      dispatch(setSelectedCostSurface(value ?? defaultCostSurface?.value));
       dispatch(
         setLayerSettings({
-          id: value,
+          id: value ?? defaultCostSurface?.value,
           settings: {
             visibility: true,
           },
         })
       );
     },
-    [dispatch, setSelectedCostSurface, setLayerSettings]
+    [dispatch, setSelectedCostSurface, setLayerSettings, defaultCostSurface]
   );
 
   const handleCostSurfaceChange = useCallback(
@@ -119,10 +123,20 @@ export const GridSetupCostSurface = (): JSX.Element => {
           { sid },
           {
             onSuccess: () => {
+              dispatch(setSelectedCostSurface(defaultCostSurface?.value));
+              dispatch(
+                setLayerSettings({
+                  id: defaultCostSurface?.value,
+                  settings: {
+                    visibility: true,
+                  },
+                })
+              );
+
               addToast(
                 'scenario-cost-surface-unlink-success',
                 <>
-                  <h2 className="font-medium">Cost surface unlinked successfully</h2>
+                  <h2 className="font-medium">Cost surface applied successfully</h2>
                 </>,
                 {
                   level: 'success',
@@ -149,6 +163,16 @@ export const GridSetupCostSurface = (): JSX.Element => {
         { sid, csid: data.costSurfaceId },
         {
           onSuccess: () => {
+            dispatch(setSelectedCostSurface(data.costSurfaceId));
+            dispatch(
+              setLayerSettings({
+                id: data.costSurfaceId,
+                settings: {
+                  visibility: true,
+                },
+              })
+            );
+
             addToast(
               'scenario-cost-surface-success',
               <>
@@ -174,24 +198,31 @@ export const GridSetupCostSurface = (): JSX.Element => {
         }
       );
     },
-    [linkScenarioMutation, unlinkScenarioMutation, sid, addToast]
+    [
+      linkScenarioMutation,
+      unlinkScenarioMutation,
+      sid,
+      addToast,
+      dispatch,
+      setSelectedCostSurface,
+      setLayerSettings,
+      defaultCostSurface,
+    ]
   );
 
-  useEffect(() => {
-    if (scenarioQuery.isSuccess) {
-      const costSurfaceId = scenarioQuery.data.costSurface?.id;
-      dispatch(setSelectedCostSurface(costSurfaceId));
+  useEffectOnceWhen(() => {
+    const costSurfaceId = scenarioQuery.data.costSurface.id;
 
-      dispatch(
-        setLayerSettings({
-          id: costSurfaceId,
-          settings: {
-            visibility: true,
-          },
-        })
-      );
-    }
-  }, [scenarioQuery, dispatch, setSelectedCostSurface, setLayerSettings]);
+    dispatch(setSelectedCostSurface(costSurfaceId));
+    dispatch(
+      setLayerSettings({
+        id: costSurfaceId,
+        settings: {
+          visibility: true,
+        },
+      })
+    );
+  }, Boolean(scenarioQuery.data?.id));
 
   return (
     <motion.div
@@ -235,7 +266,7 @@ export const GridSetupCostSurface = (): JSX.Element => {
         <FormRFF<FormFields>
           onSubmit={handleCostSurfaceChange}
           initialValues={{
-            costSurfaceId: scenarioQuery.data.costSurface?.id || null,
+            costSurfaceId: scenarioQuery.data?.costSurface?.id || null,
           }}
           keepDirtyOnReinitialize
         >
@@ -256,9 +287,10 @@ export const GridSetupCostSurface = (): JSX.Element => {
                       size="base"
                       theme="dark"
                       selected={fprops.values.costSurfaceId}
-                      options={costSurfaceQuery.data}
+                      options={costSurfaceQuery.data?.filter(({ isDefault }) => !isDefault)}
                       clearSelectionActive
                       onChange={onChangeCostSurface}
+                      clearSelectionLabel="Default cost surface"
                     />
                   )}
                 </Field>
