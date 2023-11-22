@@ -277,7 +277,7 @@ export function useSelectedFeatures(
             max: amountMax,
           },
           color: featureColorQueryState
-            ? featureColorQueryState.data.find(({ id }) => featureId === id)?.color
+            ? featureColorQueryState?.data?.find(({ id }) => featureId === id)?.color
             : null,
 
           // SPLIT

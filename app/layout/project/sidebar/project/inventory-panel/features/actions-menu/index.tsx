@@ -1,8 +1,8 @@
-import { useCallback, useState } from 'react';
+import { ComponentProps, useCallback, useState } from 'react';
 
 import Icon from 'components/icon';
 import Modal from 'components/modal/component';
-import { type DataItem } from 'layout/project/sidebar/project/inventory-panel/components/inventory-table';
+import RowItem from 'layout/project/sidebar/project/inventory-panel/components/inventory-table/row-item';
 import DeleteModal from 'layout/project/sidebar/project/inventory-panel/features/modals/delete';
 import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
 import { cn } from 'utils/cn';
@@ -19,7 +19,10 @@ const ICON_CLASSES = 'h-5 w-5 text-gray-100 group-hover:text-white';
 
 const ICON_DISABLED_CLASSES = 'text-gray-700';
 
-const ActionsMenu = ({ item }: { item: DataItem }): JSX.Element => {
+const ActionsMenu = ({
+  item,
+  onDismissMenu,
+}: Parameters<ComponentProps<typeof RowItem>['ActionsComponent']>[0]): JSX.Element => {
   const isDeletable = !item.isCustom || !item.scenarios;
 
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
@@ -27,16 +30,24 @@ const ActionsMenu = ({ item }: { item: DataItem }): JSX.Element => {
     delete: false,
   });
 
-  const handleModal = useCallback((modalKey: keyof typeof modalState, isVisible: boolean) => {
-    setModalState((prevState) => ({ ...prevState, [modalKey]: isVisible }));
-  }, []);
+  const handleModal = useCallback(
+    (modalKey: keyof typeof modalState, isVisible: boolean) => {
+      setModalState((prevState) => {
+        if (!isVisible) onDismissMenu();
+        return { ...prevState, [modalKey]: isVisible };
+      });
+    },
+    [onDismissMenu]
+  );
 
   return (
     <ul className="rounded-2xl border-gray-600">
       <li>
         <button
           type="button"
-          onClick={() => handleModal('edit', true)}
+          onClick={() => {
+            handleModal('edit', true);
+          }}
           className={cn({
             [BUTTON_CLASSES]: true,
             'rounded-t-2xl': true,
@@ -50,7 +61,9 @@ const ActionsMenu = ({ item }: { item: DataItem }): JSX.Element => {
           title="All features"
           open={modalState.edit}
           size="narrow"
-          onDismiss={() => handleModal('edit', false)}
+          onDismiss={() => {
+            handleModal('edit', false);
+          }}
         >
           <EditModal featureId={item.id} handleModal={handleModal} />
         </Modal>

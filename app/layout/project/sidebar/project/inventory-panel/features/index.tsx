@@ -68,7 +68,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     {
       select: ({ data }) => {
         return data?.map((feature) => {
-          const { color } = featureColorQueryState.data.find(({ id }) => feature.id === id) || {};
+          const { color } = featureColorQueryState?.data?.find(({ id }) => feature.id === id) || {};
 
           return {
             id: feature.id,
