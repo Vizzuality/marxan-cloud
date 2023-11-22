@@ -33,7 +33,7 @@ const DeleteModal = ({
   const allProjectWDPAsQuery = useProjectWDPAs(pid, {});
 
   const selectedWDPAs = useMemo(() => {
-    return allProjectWDPAsQuery.data?.filter(({ id }) => selectedWDPAIds.includes(id));
+    return allProjectWDPAsQuery.data?.filter(({ id }) => selectedWDPAIds.includes(id)) || [];
   }, [allProjectWDPAsQuery.data, selectedWDPAIds]);
 
   const WDPAsNames = selectedWDPAs.map(({ name }) => name);
