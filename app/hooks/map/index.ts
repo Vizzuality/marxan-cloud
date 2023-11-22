@@ -789,14 +789,16 @@ export function usePUGridLayer({
                   type: 'fill',
                   'source-layer': 'layer0',
                   layout: {
-                    visibility: getLayerVisibility(restLayerSettings[id]?.visibility || 1),
+                    visibility: getLayerVisibility(
+                      restLayerSettings[`gap-analysis-${id}`]?.visibility || 1
+                    ),
                   },
                   paint: {
                     'fill-color': COLORS.highlightFeatures,
                     'fill-opacity': [
                       'case',
                       ['any', ['in', id, ['get', 'featureList']]],
-                      0.5 * restLayerSettings[id]?.opacity || 1,
+                      0.5 * restLayerSettings[`gap-analysis-${id}`]?.opacity || 1,
                       0,
                     ],
                   },
