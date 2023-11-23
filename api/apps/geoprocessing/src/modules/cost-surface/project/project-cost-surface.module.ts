@@ -48,5 +48,6 @@ import { ProjectCostSurfacePersistencePort } from '@marxan-geoprocessing/modules
       useClass: ShapefileConverter,
     },
   ],
+  exports: [ProjectCostSurfacePersistencePort],
 })
 export class ProjectCostSurfaceModule {}

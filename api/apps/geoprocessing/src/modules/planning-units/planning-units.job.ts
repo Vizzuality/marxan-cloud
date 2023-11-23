@@ -11,6 +11,7 @@ import { validate } from 'class-validator';
 import { chunk } from 'lodash';
 import { EntityManager } from 'typeorm';
 import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
+import { ProjectCostSurfacePersistencePort } from '@marxan-geoprocessing/modules/cost-surface/ports/persistence/project-cost-surface-persistence.port';
 
 type CustomPlanningAreaJob = Required<
   Omit<
@@ -56,6 +57,7 @@ export class PlanningUnitsJobProcessor {
   private logger = new Logger('planning-units-job-processor');
 
   constructor(
+    private readonly repo: ProjectCostSurfacePersistencePort,
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) {}
@@ -262,6 +264,8 @@ grid.geom
 
         return geometries;
       });
+
+      await this.repo.updateCostSurfaceRange(job.data.costSurfaceId!);
       this.logger.debug(`Finished planning-units processing for ${job.id}`);
     } catch (err) {
       this.logger.error(err);

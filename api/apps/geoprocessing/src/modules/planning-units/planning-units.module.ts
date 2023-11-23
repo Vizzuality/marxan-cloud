@@ -6,9 +6,10 @@ import { ShapefileService, FileService } from '@marxan/shapefile-converter';
 import { PlanningUnitsService } from './planning-units.service';
 import { WorkerModule } from '../worker';
 import { PlanningUnitsJobProcessor } from './planning-units.job';
+import { ProjectCostSurfaceModule } from '@marxan-geoprocessing/modules/cost-surface/project/project-cost-surface.module';
 
 @Module({
-  imports: [TileModule, WorkerModule],
+  imports: [TileModule, WorkerModule, ProjectCostSurfaceModule],
   providers: [
     PlanningUnitsProcessor,
     ShapefileService,
