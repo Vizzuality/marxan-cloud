@@ -203,13 +203,14 @@ export class ProjectsCrudService extends AppBaseService<
       this.logger.debug(
         'creating planning unit job and assigning project to area',
       );
+      const defaultCostSurfaceId = getDefaultCostSurfaceIdFromProject(model);
       await Promise.all([
         this.planningUnitsService.create({
           ...createModel,
           planningUnitAreakm2: createModel.planningUnitAreakm2,
           planningUnitGridShape: createModel.planningUnitGridShape,
           projectId: model.id,
-          costSurfaceId: getDefaultCostSurfaceIdFromProject(model),
+          costSurfaceId: defaultCostSurfaceId,
         }),
         this.planningAreasService.assignProject({
           projectId: model.id,
