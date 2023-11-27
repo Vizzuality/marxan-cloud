@@ -23,7 +23,7 @@ const ActionsMenu = ({
   item,
   onDismissMenu,
 }: Parameters<ComponentProps<typeof RowItem>['ActionsComponent']>[0]): JSX.Element => {
-  const isDeletable = !item.isCustom || !item.scenarios;
+  const isDeletable = item.isCustom && !item.scenarios;
 
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
     edit: false,

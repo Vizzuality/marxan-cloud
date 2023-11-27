@@ -12,15 +12,19 @@ import TAG_SVG from 'svgs/ui/tag.svg?sprite';
 import RowItem from '../../components/inventory-table/row-item';
 
 const BUTTON_CLASSES =
-  'flex items-center px-4 py-2 w-full text-sm cursor-pointer bg-gray-800 hover:bg-gray-600 transition transition-colors space-x-2 group';
+  'enabled:group flex w-full cursor-pointer items-center space-x-2 bg-gray-800 px-4 py-2 text-sm transition-colors enabled:hover:bg-gray-700';
+
+const BUTTON_DISABLED_CLASSES = 'disabled:cursor-default disabled:text-gray-600';
 
 const ICON_CLASSES = 'h-5 w-5 text-gray-100 group-hover:text-white';
+
+const ICON_DISABLED_CLASSES = 'text-gray-700';
 
 const ActionsMenu = ({
   item,
   onDismissMenu,
 }: Parameters<ComponentProps<typeof RowItem>['ActionsComponent']>[0]): JSX.Element => {
-  const isDeletable = !item.isCustom && !item.scenarios;
+  const isDeletable = item.isCustom && !item.scenarios;
 
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
     edit: false,
@@ -46,7 +50,6 @@ const ActionsMenu = ({
           className={cn({
             [BUTTON_CLASSES]: true,
             'rounded-t-2xl': true,
-            'last:rounded-b-2xl': !isDeletable,
           })}
         >
           <Icon icon={TAG_SVG} className={ICON_CLASSES} />
@@ -62,34 +65,40 @@ const ActionsMenu = ({
           <EditModal wdpaId={item.id} handleModal={handleModal} />
         </Modal>
       </li>
-      {isDeletable && (
-        <li>
-          <button
-            type="button"
-            onClick={() => {
-              handleModal('delete', true);
-            }}
+      <li>
+        <button
+          type="button"
+          onClick={() => {
+            handleModal('delete', true);
+          }}
+          className={cn({
+            [BUTTON_CLASSES]: true,
+            'rounded-b-2xl': true,
+            [BUTTON_DISABLED_CLASSES]: !isDeletable,
+          })}
+          disabled={!isDeletable}
+        >
+          <Icon
+            icon={DELETE_SVG}
             className={cn({
-              [BUTTON_CLASSES]: true,
-              'rounded-b-2xl': true,
+              [ICON_CLASSES]: true,
+              [ICON_DISABLED_CLASSES]: !isDeletable,
             })}
-          >
-            <Icon icon={DELETE_SVG} className={ICON_CLASSES} />
-            <span>Delete</span>
-          </button>
-          <Modal
-            id="delete-feature-modal"
-            dismissable
-            open={modalState.delete}
-            size="narrow"
-            onDismiss={() => {
-              handleModal('delete', false);
-            }}
-          >
-            <DeleteModal selectedWDPAIds={[item.id]} />
-          </Modal>
-        </li>
-      )}
+          />
+          <span>Delete</span>
+        </button>
+        <Modal
+          id="delete-feature-modal"
+          dismissable
+          open={modalState.delete}
+          size="narrow"
+          onDismiss={() => {
+            handleModal('delete', false);
+          }}
+        >
+          <DeleteModal selectedWDPAIds={[item.id]} />
+        </Modal>
+      </li>
     </ul>
   );
 };
