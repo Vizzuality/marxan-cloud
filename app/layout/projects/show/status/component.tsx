@@ -43,7 +43,10 @@ export const ProjectStatus = (): JSX.Element => {
 
   // Done
   const JOB_DONE_REF = useRef<Job>(null);
-  const JOB_DONE = useProjectJobDone(JOBS, new Date(projectData?.lastModifiedAt).getTime());
+  const JOB_DONE = useProjectJobDone(
+    JOBS,
+    new Date(projectData?.metadata?.cache as number).getTime()
+  );
 
   // Running
   const JOB_RUNNING = useProjectJobRunning(JOBS, JOB_FAILURE);

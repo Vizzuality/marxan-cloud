@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 
 import groupBy from 'lodash/groupBy';
 
+import { Job } from 'types/api/job';
+
 import { TEXTS_FAILURE, TEXTS_RUNNING } from './constants';
 
 const getStatus = (arr) => {
@@ -10,7 +12,7 @@ const getStatus = (arr) => {
   return 'done';
 };
 
-export const useProjectJobs = (jobs) => {
+export const useProjectJobs = (jobs): Job[] => {
   return useMemo(() => {
     const groups = groupBy(jobs, (j) => {
       if (
@@ -66,7 +68,7 @@ export const useProjectTextFailure = (JOB_FAILURE) => {
   }, [JOB_FAILURE]);
 };
 
-export const useProjectJobDone = (jobs, lastJobCheck) => {
+export const useProjectJobDone = (jobs: Job[], lastJobCheck: number) => {
   return useMemo(() => {
     return jobs.find((j) => {
       const jobTimestamp = new Date(j.isoDate).getTime();

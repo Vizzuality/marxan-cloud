@@ -121,6 +121,29 @@ export const useProjectActionsDone = () => {
     [pid, mutate, addToast, queryClient]
   );
 
+  const onCostSurfaceUpload = useCallback(
+    (JOB_REF: MutableRefObject<Job>) => {
+      mutate(
+        {
+          id: `${pid}`,
+          data: {
+            metadata: {
+              cache: new Date().getTime(),
+            },
+          },
+        },
+        {
+          onSuccess: async () => {
+            JOB_REF.current = null;
+            await queryClient.invalidateQueries(['project', pid]);
+            await queryClient.invalidateQueries(['cost-surfaces', pid]);
+          },
+        }
+      );
+    },
+    [queryClient, pid, mutate]
+  );
+
   return useMemo(
     () => ({
       default: onDone,
@@ -129,7 +152,8 @@ export const useProjectActionsDone = () => {
       import: onCloneImportDone,
       clone: onCloneImportDone,
       legacy: onLegacyImportDone,
+      costSurface: onCostSurfaceUpload,
     }),
-    [onDone, onCloneImportDone, onLegacyImportDone]
+    [onDone, onCloneImportDone, onLegacyImportDone, onCostSurfaceUpload]
   );
 };
