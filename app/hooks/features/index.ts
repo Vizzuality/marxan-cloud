@@ -191,7 +191,9 @@ export function useSelectedFeatures(
       },
     }).then(({ data }) => data);
 
-  return useQuery(['selected-features', sid], fetchFeatures, {
+  console.log({ filters });
+
+  return useQuery(['selected-features', sid, filters], fetchFeatures, {
     ...queryOptions,
     enabled:
       !!sid && ((featureColorQueryState && featureColorQueryState.status === 'success') || true),
@@ -303,7 +305,34 @@ export function useSelectedFeatures(
         });
       }
 
-      return orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
+      console.log({ tag });
+      if (tag) {
+        const fuse = new Fuse(parsedData, {
+          keys: ['type'],
+          threshold: 0.25,
+        });
+
+        parsedData = fuse.search(tag).map((f) => {
+          return f.item;
+        });
+      }
+      // }
+
+      console.log({ parsedData });
+
+      // Sort
+      if (sort) {
+        parsedData.sort((a, b) => {
+          if (sort.startsWith('-')) {
+            const _sort = sort.substring(1);
+            return b[_sort].localeCompare(a[_sort]);
+          }
+
+          return a[sort].localeCompare(b[sort]);
+        });
+      }
+
+      return parsedData;
     },
     placeholderData: { data: {} as GeoFeatureSet },
   });
