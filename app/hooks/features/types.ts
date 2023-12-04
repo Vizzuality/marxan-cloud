@@ -2,6 +2,8 @@ import { AxiosRequestConfig } from 'axios';
 
 export interface UseFeaturesFiltersProps {
   search?: string;
+  sort?: string;
+  tag?: string;
 }
 
 export interface UseSaveSelectedFeaturesProps {
