@@ -8,7 +8,6 @@ import { useAppDispatch } from 'store/hooks';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
-import { sortBy } from 'lodash';
 import { HiOutlineArrowUpOnSquareStack } from 'react-icons/hi2';
 import { useEffectOnceWhen } from 'rooks';
 
@@ -58,11 +57,18 @@ export const GridSetupCostSurface = (): JSX.Element => {
     {},
     {
       select: (data) =>
-        sortBy(data, 'name')?.map(({ id, name, isDefault }) => ({
-          value: id,
-          label: name,
-          isDefault,
-        })),
+        data
+          ?.map(({ id, name, isDefault }) => ({
+            value: id,
+            label: isDefault ? 'Default cost surface' : name,
+            isDefault,
+          }))
+          .sort((a, b) => {
+            if (a.isDefault) return -1;
+            if (b.isDefault) return 1;
+
+            return a.label.localeCompare(b.label);
+          }),
     }
   );
   const scenarioQuery = useScenario(sid, {
@@ -287,10 +293,9 @@ export const GridSetupCostSurface = (): JSX.Element => {
                       size="base"
                       theme="dark"
                       selected={fprops.values.costSurfaceId}
-                      options={costSurfaceQuery.data?.filter(({ isDefault }) => !isDefault)}
-                      clearSelectionActive
+                      options={costSurfaceQuery.data}
                       onChange={onChangeCostSurface}
-                      clearSelectionLabel="Default cost surface"
+                      placeholder="Select a cost surface"
                     />
                   )}
                 </Field>
