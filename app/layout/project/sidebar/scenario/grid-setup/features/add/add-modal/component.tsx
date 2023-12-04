@@ -113,9 +113,10 @@ export const ScenariosFeaturesAdd = (): JSX.Element => {
           },
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
             setOpen(false);
-            queryClient.invalidateQueries(['selected-features', sid]);
+            await queryClient.invalidateQueries(['selected-features', sid]);
+            await queryClient.invalidateQueries(['targeted-features', sid]);
           },
           onSettled: () => {
             setSubmitting(false);

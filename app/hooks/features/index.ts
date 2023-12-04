@@ -172,7 +172,7 @@ export function useSelectedFeatures(
   queryOptions = {}
 ) {
   const { data: session } = useSession();
-  const { search } = filters;
+  const { search, sort, tag } = filters;
 
   const queryClient = useQueryClient();
 
@@ -271,6 +271,7 @@ export function useSelectedFeatures(
           id: featureId,
           name: alias || featureClassName,
           type: tag,
+          // type: Math.random() < 0.5 ? 'test' : 'andres',
           description,
           amountRange: {
             min: amountMin,
@@ -291,12 +292,12 @@ export function useSelectedFeatures(
         };
       });
 
-      // Filter
       if (search) {
         const fuse = new Fuse(parsedData, {
           keys: ['name'],
           threshold: 0.25,
         });
+
         parsedData = fuse.search(search).map((f) => {
           return f.item;
         });
@@ -314,7 +315,7 @@ export function useTargetedFeatures(
   queryOptions = {}
 ) {
   const { data: session } = useSession();
-  const { search } = filters;
+  const { search, sort } = filters;
 
   const fetchFeatures = () =>
     SCENARIOS.request({
@@ -325,10 +326,16 @@ export function useTargetedFeatures(
       },
       params: {
         disablePagination: true,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
       },
     }).then(({ data }) => data);
 
-  return useQuery(['targeted-features', sid], fetchFeatures, {
+  return useQuery(['targeted-features', sid, filters], fetchFeatures, {
     ...queryOptions,
     retry: false,
     enabled: !!sid,
@@ -405,6 +412,11 @@ export function useTargetedFeatures(
           name: alias || featureClassName,
           type: tag,
           description,
+          // todo: missing scenarioUsageCount from API
+          scenarios: d.scenarioUsageCount,
+          // todo: missing tag from API
+          tag: d.tag,
+          isCustom: d.metadata?.isCustom,
 
           // SPLIT
           splitOptions,
@@ -429,7 +441,16 @@ export function useTargetedFeatures(
       }
 
       // Sort
-      parsedData = orderBy(parsedData, ['name'], ['desc']);
+      if (sort) {
+        parsedData.sort((a, b) => {
+          if (sort.startsWith('-')) {
+            const _sort = sort.substring(1);
+            return b[_sort].localeCompare(a[_sort]);
+          }
+
+          return a[sort].localeCompare(b[sort]);
+        });
+      }
 
       parsedData = flatten(
         parsedData.map((s) => {
@@ -439,25 +460,27 @@ export function useTargetedFeatures(
 
           // Generate splitted features to target
           if (isSplitted) {
-            return splitFeaturesSelected
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((sf) => {
-                const { id: sfId, name: sfName, marxanSettings: sfMarxanSettings } = sf;
+            return (
+              splitFeaturesSelected
+                // .sort((a, b) => a.name.localeCompare(b.name))
+                .map((sf) => {
+                  const { id: sfId, name: sfName, marxanSettings: sfMarxanSettings } = sf;
 
-                return {
-                  ...sf,
-                  id: `${id}-${sfId}`,
-                  parentId: id,
-                  name: `${name} / ${sfName}`,
-                  splitted: true,
-                  splitSelected,
-                  splitFeaturesSelected,
-                  ...(!!sfMarxanSettings && {
-                    target: sfMarxanSettings.prop * 100,
-                    fpf: sfMarxanSettings.fpf,
-                  }),
-                };
-              });
+                  return {
+                    ...sf,
+                    id: `${id}-${sfId}`,
+                    parentId: id,
+                    name: `${name} / ${sfName}`,
+                    splitted: true,
+                    splitSelected,
+                    splitFeaturesSelected,
+                    ...(!!sfMarxanSettings && {
+                      target: sfMarxanSettings.prop * 100,
+                      fpf: sfMarxanSettings.fpf,
+                    }),
+                  };
+                })
+            );
           }
 
           // if (isIntersected) {
@@ -518,11 +541,9 @@ export function useSaveSelectedFeatures({
   };
 
   return useMutation(saveFeature, {
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables) => {
       const { id } = variables;
       queryClient.setQueryData(['selected-features', id], { data: data?.data });
-
-      console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
