@@ -45,7 +45,7 @@ const InventoryProjectHeader = (): JSX.Element => {
   );
 
   return (
-    <div className="mb-6 flex items-start justify-between">
+    <div className="flex items-start justify-between">
       <UnderModeration />
       <Title title={name} description={description} onEditTitle={onEditProjectName} />
       <div className="mt-4 flex items-center space-x-5">

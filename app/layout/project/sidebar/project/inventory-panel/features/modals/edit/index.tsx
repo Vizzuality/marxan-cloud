@@ -35,8 +35,10 @@ export type FormValues = { featureClassName: Feature['featureClassName']; tag: F
 const EditModal = ({
   featureId,
   handleModal,
+  onDone,
 }: {
   featureId: Feature['id'];
+  onDone?: () => void;
   handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
   const queryClient = useQueryClient();
@@ -98,6 +100,7 @@ const EditModal = ({
       Promise.all([editFeaturePromise, editFeatureTagPromise()])
         .then(async () => {
           await queryClient.invalidateQueries(['all-features', pid]);
+          onDone?.();
           handleModal('edit', false);
 
           addToast(
@@ -133,6 +136,7 @@ const EditModal = ({
       handleModal,
       pid,
       queryClient,
+      onDone,
     ]
   );
 
