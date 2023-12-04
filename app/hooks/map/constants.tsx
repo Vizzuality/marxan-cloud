@@ -354,7 +354,7 @@ export const LEGEND_LAYERS = {
   }) => {
     const { items, onChangeVisibility } = options;
 
-    return items?.map(({ id, name, min = 1, max = 100 }) => {
+    return items?.map(({ id, name, min, max }) => {
       // ? if the cost surface has a flat range, a gradient makes no sense
       if (min === max) {
         return {
@@ -393,7 +393,7 @@ export const LEGEND_LAYERS = {
           },
           {
             color: COLORS.cost[1],
-            value: `${max}`,
+            value: max,
           },
         ],
         onChangeVisibility: () => {
