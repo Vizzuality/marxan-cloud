@@ -38,7 +38,6 @@ COPY --chown=$USER:$USER package.json yarn.lock next.config.js \
 
 COPY --chown=$USER:$USER components ./components
 COPY --chown=$USER:$USER constants ./constants
-COPY --chown=$USER:$USER cypress ./cypress
 COPY --chown=$USER:$USER docs ./docs
 COPY --chown=$USER:$USER hoc ./hoc
 COPY --chown=$USER:$USER hooks ./hooks
