@@ -40,13 +40,17 @@ try:
         scenario_id, scenario_name, project_id = scenario
 
         # Insert new row in cost_surfaces
+        #
+        # We use scenario_id as the id for the cost_surface so that we can make
+        # the process idempotent, at least in terms of creating cost surfaces
+        # for existing scenarios.
         insert_cost_surface_sql = '''
             INSERT INTO cost_surfaces (id, name, min, max, is_default, project_id, is_migrated)
-            VALUES (gen_random_uuid(), %s, 0, 0, false, %s, true)
+            VALUES (%s, %s, 0, 0, false, %s, true)
             RETURNING id;
         '''
 
-        cur_api_db.execute(insert_cost_surface_sql, (scenario_name, project_id))
+        cur_api_db.execute(insert_cost_surface_sql, (scenario_id, scenario_name, project_id))
         cost_surface_id = cur_api_db.fetchone()[0]  # Retrieve the unique id for this new cost_surface
 
         # Update scenarios.cost_surface_id for this specific scenario
@@ -66,12 +70,16 @@ try:
         project_id = project[0]
 
         # Insert new row in cost_surfaces with project-specific information
+        #
+        # We use project_id as the id for the cost_surface so that we can make
+        # the process idempotent, at least in terms of creating default cost
+        # surfaces for existing projects.
         insert_cost_surface_for_project_sql = '''
             INSERT INTO cost_surfaces (id, project_id, min, max, is_default, name, is_migrated)
-            VALUES (gen_random_uuid(), %s, 1, 1, true, 'default', true);
+            VALUES (%s, %s, 1, 1, true, 'default', true);
         '''
 
-        cur_api_db.execute(insert_cost_surface_for_project_sql, (project_id,))
+        cur_api_db.execute(insert_cost_surface_for_project_sql, (project_id, project_id,))
 
     print("Successfully migrated API model data from marxan-api for:")
     print(len(all_scenarios), "scenarios")
@@ -108,18 +116,28 @@ try:
         min_max = cur_geo_db.fetchone()
         min_val, max_val = min_max if min_max else (None, None)
 
-        # If min and max are null, remove scenario and cost_surface from api_db
         if min_val is None or max_val is None:
-            cur_api_db.execute("DELETE FROM scenarios WHERE id = %s;", (scenario_id,))
-            cur_api_db.execute("DELETE FROM cost_surfaces WHERE id = %s;", (cost_surface_id,))
             orphan_scenario_ids.append(scenario_id)
-        else:
-            # Update min and max in the cost_surfaces table in the api_db
-            cur_api_db.execute("""
-                UPDATE cost_surfaces
-                SET min = %s, max = %s
-                WHERE id = %s;
-            """, (min_val, max_val, cost_surface_id))
+            print(f'''Could not find Min/Max for scenario {scenario_id}, cost surface {cost_surface_id}.
+            This may mean that no scenarios_pu_cost_data rows were created for this scenario.
+            This should never happen, so data for this scenario should be checked.
+            The scenario may be invalid, and it may need to be deleted.
+            ''')
+
+        # If min and max are null, remove scenario and cost_surface from api_db
+        if min_val is None:
+            min_val = 0
+            print(f'Setting min to 0 for scenario {scenario_id}, cost surface {cost_surface_id}')
+        if max_val is None:
+            max_val = 0
+            print(f'Setting max to 0 for scenario {scenario_id}, cost surface {cost_surface_id}')
+
+        # Update min and max in the cost_surfaces table in the api_db
+        cur_api_db.execute("""
+            UPDATE cost_surfaces
+            SET min = %s, max = %s
+            WHERE id = %s;
+        """, (min_val, max_val, cost_surface_id))
 
     #Default Cost Surface for projects
     cur_api_db.execute("SELECT id FROM projects;")
