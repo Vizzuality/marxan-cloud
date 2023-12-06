@@ -34,7 +34,7 @@ COPY --chown=$USER:$USER .yarnrc.docker.yml .yarnrc.yml
 
 COPY --chown=$USER:$USER package.json yarn.lock next.config.js \
     local.d.ts postcss.config.js tailwind.config.js \
-    cypress.json entrypoint.sh tsconfig.json ./
+    entrypoint.sh tsconfig.json ./
 
 COPY --chown=$USER:$USER components ./components
 COPY --chown=$USER:$USER constants ./constants
