@@ -29,7 +29,7 @@ case "$1" in
         ;;
     start)
         echo "Running Start"
-        exec yarn start geoprocessing
+        exec yarn geoprocessing:start:dev
         ;;
 
     *)
