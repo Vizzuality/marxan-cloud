@@ -81,11 +81,9 @@ jobs:
           sudo sh -c 'echo "127.0.0.1 ${{ secrets.AZURE_AKS_HOST }}" >> /etc/hosts'
 
       - name: Install kubectl
-        run: |
-          sudo curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --no-tty --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-          echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.25/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-          sudo apt-get update
-          sudo apt-get install -y kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: '1.25'
 
       - name: Config kubectl
         run: |
