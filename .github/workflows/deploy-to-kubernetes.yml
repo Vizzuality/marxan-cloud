@@ -41,7 +41,7 @@ jobs:
         uses: fountainhead/action-wait-for-check@v1.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Push Client Docker image to Docker Hub
+          checkName: Push Client Docker image to Azure Container Registry
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           intervalSeconds: 30
 
