@@ -54,6 +54,7 @@ COPY --chown=$USER:$USER utils ./utils
 
 RUN yarn policies set-version $YARN_VERSION
 RUN yarn install --immutable
+RUN yarn build
 
 EXPOSE 3000
 ENTRYPOINT ["./entrypoint.sh"]
