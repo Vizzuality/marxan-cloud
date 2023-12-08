@@ -16,6 +16,11 @@ resource "kubernetes_service" "client_service" {
   }
 }
 
+resource "random_password" "nextauth_secret" {
+  length  = 24
+  special = true
+}
+
 resource "kubernetes_deployment" "client_deployment" {
   metadata {
     name      = var.deployment_name
@@ -73,6 +78,11 @@ resource "kubernetes_deployment" "client_deployment" {
           env {
             name  = "NEXTAUTH_URL"
             value = var.site_url
+          }
+
+          env {
+            name  = "NEXTAUTH_SECRET"
+            value = random_password.nextauth_secret.result
           }
 
           env {
