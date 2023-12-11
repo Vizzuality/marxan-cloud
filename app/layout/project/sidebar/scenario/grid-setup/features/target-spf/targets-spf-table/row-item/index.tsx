@@ -51,6 +51,7 @@ const RowItem = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [featuresToSplit, setFeaturesToSplit] = useState<Feature['id'][]>([]);
+  console.log({ featuresToSplit });
 
   const onDismissMenu = useCallback(() => {
     setIsMenuOpen(false);
