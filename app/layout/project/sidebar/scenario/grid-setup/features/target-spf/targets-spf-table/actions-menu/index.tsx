@@ -3,6 +3,7 @@ import { ComponentProps, useCallback, useState } from 'react';
 import Icon from 'components/icon';
 import Modal from 'components/modal/component';
 import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
+import SplitModal from 'layout/project/sidebar/scenario/grid-setup/features/modals/split';
 import { cn } from 'utils/cn';
 
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
@@ -29,8 +30,9 @@ const ActionsMenu = ({
   const isDeletable = item.isCustom && !item.scenarios;
   const isSplitable = Boolean(item.splitOptions?.length);
 
-  const [modalState, setModalState] = useState<{ edit: boolean }>({
+  const [modalState, setModalState] = useState<{ edit: boolean; split: boolean }>({
     edit: false,
+    split: false,
   });
 
   const handleModal = useCallback(
@@ -76,7 +78,7 @@ const ActionsMenu = ({
           <button
             type="button"
             onClick={() => {
-              onSplitFeature(item.id);
+              handleModal('split', true);
             }}
             className={cn({
               [BUTTON_CLASSES]: true,
@@ -93,6 +95,21 @@ const ActionsMenu = ({
             />
             <span>Split</span>
           </button>
+          <Modal
+            id="split-feature-modal"
+            title="All features"
+            open={modalState.split}
+            size="narrow"
+            onDismiss={() => {
+              handleModal('split', false);
+            }}
+          >
+            <SplitModal
+              featureId={item.id}
+              handleModal={handleModal}
+              onSplitFeature={onSplitFeature}
+            />
+          </Modal>
         </li>
       )}
       <li>
