@@ -28,7 +28,7 @@ export type TargetsSPFTable = {
   sorting: string;
   selectedIds: Feature['id'][];
   onSortChange: (field: string) => void;
-  onSplitFeature: (id: Feature['id']) => void;
+  onSplitFeature?: (id: Feature['id']) => void;
   onSelectTag: (tag: string) => void;
   onToggleSeeOnMap: (id: Feature['id']) => void;
   onSelectRow: (evt: ChangeEvent<HTMLInputElement>) => void;

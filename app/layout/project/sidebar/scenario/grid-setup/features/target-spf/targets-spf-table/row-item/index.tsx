@@ -31,38 +31,26 @@ const RowItem = ({
   showDetails: boolean;
   onSelectRow: TargetsSPFTable['onSelectRow'];
   onToggleSeeOnMap: TargetsSPFTable['onToggleSeeOnMap'];
-  onSplitFeature: TargetsSPFTable['onSplitFeature'];
+  onSplitFeature?: TargetsSPFTable['onSplitFeature'];
   onClickTag: (tag: Feature['tag']) => void;
   onChangeRow: TargetsSPFTable['onChangeRow'];
   onDeleteFeature: (featureId: Feature['id']) => void;
   ActionsComponent: ({
     item,
     onDismissMenu,
-    onSplitFeature,
     onDeleteFeature,
   }: {
     item: DataItem;
     onDismissMenu: () => void;
-    onSplitFeature: (featureId: Feature['id']) => void;
     onDeleteFeature: (featureId: Feature['id']) => void;
   }) => JSX.Element;
 }) => {
   const { id, name, scenarios, type, marxanSettings, isVisibleOnMap, isCustom } = item;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const [featuresToSplit, setFeaturesToSplit] = useState<Feature['id'][]>([]);
-  console.log({ featuresToSplit });
 
   const onDismissMenu = useCallback(() => {
     setIsMenuOpen(false);
-  }, []);
-
-  const handleSplitFeature = useCallback((featureId: Feature['id']) => {
-    setFeaturesToSplit((prevFeaturesToSplit) =>
-      prevFeaturesToSplit.includes(featureId)
-        ? prevFeaturesToSplit.filter((id) => id !== featureId)
-        : [...prevFeaturesToSplit, featureId]
-    );
   }, []);
 
   const handleFeatureDeletion = useCallback(
@@ -160,7 +148,6 @@ const RowItem = ({
               <ActionsComponent
                 item={item}
                 onDismissMenu={onDismissMenu}
-                onSplitFeature={handleSplitFeature}
                 onDeleteFeature={handleFeatureDeletion}
               />
             </PopoverContent>
@@ -172,7 +159,6 @@ const RowItem = ({
           <RowDetails item={item} onChange={onChangeRow} />
         </td>
       )}
-      {featuresToSplit.includes(item.id) && <div>Split menu here</div>}
     </tr>
   );
 };

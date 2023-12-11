@@ -23,7 +23,6 @@ const ICON_DISABLED_CLASSES = 'text-gray-700';
 
 const ActionsMenu = ({
   item,
-  onSplitFeature,
   onDeleteFeature,
   onDismissMenu,
 }: Parameters<ComponentProps<typeof RowItem>['ActionsComponent']>[0]): JSX.Element => {
@@ -104,11 +103,7 @@ const ActionsMenu = ({
               handleModal('split', false);
             }}
           >
-            <SplitModal
-              featureId={item.id}
-              handleModal={handleModal}
-              onSplitFeature={onSplitFeature}
-            />
+            <SplitModal featureId={item.id} handleModal={handleModal} />
           </Modal>
         </li>
       )}
