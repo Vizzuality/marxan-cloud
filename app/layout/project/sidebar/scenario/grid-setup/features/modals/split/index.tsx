@@ -5,6 +5,7 @@ import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form'
 import { useRouter } from 'next/router';
 
 import { useProjectFeatures, useSelectedFeatures } from 'hooks/features';
+import { useSaveSelectedFeatures } from 'hooks/features';
 
 import Button from 'components/button';
 import Checkbox from 'components/forms/checkbox';
@@ -27,19 +28,21 @@ type SplitOptions = {
 const SplitModal = ({
   featureId,
   handleModal,
-  onSplitFeature,
 }: {
   featureId: Feature['id'];
   handleModal: (modalKey: 'edit' | 'split', isVisible: boolean) => void;
-  onSplitFeature: (featureId: Feature['id']) => void;
+  onSplitFeature?: (featureId: Feature['id']) => void;
 }): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
   const formRef = useRef<FormProps<FormValues>['form']>(null);
 
+  const [splitFeaturesSelected, setSplitFeaturesSelected] = useState<{ id: string }[]>([]);
+
   const featureQuery = useProjectFeatures(pid, featureId);
   const selectedFeaturesQuery = useSelectedFeatures(sid, {});
+  const selectedFeaturesMutation = useSaveSelectedFeatures({});
 
   const featureSplitOptions: SplitOptions[] = selectedFeaturesQuery.data?.find(
     (feature) => feature.id === featureId
@@ -57,10 +60,8 @@ const SplitModal = ({
     [featureSplitOptions]
   );
 
-  const [splitFeaturesSelected, setSplitFeaturesSelected] = useState<{ id: string }[]>([]);
-
   const onSplitFeaturesChanged = useCallback(
-    (e) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const newSplitFeaturesSelected = [...splitFeaturesSelected];
       const index = newSplitFeaturesSelected.findIndex(
         (s) => `${s.id}` === `${e.currentTarget.value}`
@@ -79,12 +80,48 @@ const SplitModal = ({
     [splitFeaturesSelected]
   );
 
-  const onSplitSubmit = useCallback(() => {
-    onSplitFeature(featureId);
-    //  añadir las splitFeaturesSelected a la featureId
+  const onSplitSubmit = useCallback(
+    (values) => {
+      const { splitOption } = values;
 
-    handleModal('split', false);
-  }, [splitFeaturesSelected, handleModal, onSplitFeature]);
+      selectedFeaturesMutation.mutate(
+        {
+          id: `${sid}`,
+          data: {
+            status: 'draft',
+            features: selectedFeaturesQuery.data.map((sf) => {
+              return {
+                featureId: sf.id,
+                kind: 'withGeoprocessing',
+                geoprocessingOperations: [
+                  {
+                    kind: 'split/v1',
+                    splitByProperty: splitOption,
+                    splits: splitFeaturesSelected.map((fts) => {
+                      return {
+                        value: fts.id,
+                        marxanSettings: {
+                          fpf: 1,
+                          prop: 0.5,
+                        },
+                      };
+                    }),
+                  },
+                ],
+              };
+            }),
+          },
+        },
+        {
+          onSuccess: () => {
+            handleModal('split', false);
+          },
+          onError: () => {},
+        }
+      );
+    },
+    [sid, selectedFeaturesMutation, selectedFeaturesQuery.data, splitFeaturesSelected, handleModal]
+  );
 
   return (
     <FormRFF<FormValues>
