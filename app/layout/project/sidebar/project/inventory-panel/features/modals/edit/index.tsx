@@ -38,8 +38,8 @@ const EditModal = ({
   onDone,
 }: {
   featureId: Feature['id'];
+  handleModal: (modalKey: 'split' | 'edit', isVisible: boolean) => void;
   onDone?: () => void;
-  handleModal: (modalKey: 'delete' | 'edit', isVisible: boolean) => void;
 }): JSX.Element => {
   const queryClient = useQueryClient();
   const { addToast } = useToasts();
