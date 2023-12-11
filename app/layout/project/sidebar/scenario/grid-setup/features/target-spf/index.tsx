@@ -17,6 +17,7 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Search from 'components/search';
+import FeaturesBulkActionMenu from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu';
 import FeaturesInfo from 'layout/project/sidebar/project/inventory-panel/features/info';
 import AddFeaturesModal from 'layout/project/sidebar/scenario/grid-setup/features/add/add-modal';
 import TargetsSPFTable from 'layout/project/sidebar/scenario/grid-setup/features/target-spf/targets-spf-table';

@@ -56,7 +56,6 @@ const AllTargetsSelector = ({
                   target: DEFAULT_INPUT_VALUES.target,
                 }));
               }
-
               setValues((prevValues) => ({
                 ...prevValues,
                 target: values.target,
