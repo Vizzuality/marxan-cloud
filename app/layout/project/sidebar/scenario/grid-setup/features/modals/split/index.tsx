@@ -65,6 +65,8 @@ const SplitModal = ({
     [featureSplitOptions]
   );
 
+  console.log({ splitFeaturesSelected });
+
   const onSplitFeaturesChanged = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newSplitFeaturesSelected = [...splitFeaturesSelected];
@@ -217,9 +219,11 @@ const SplitModal = ({
                   {(fprops) => (
                     <Field id="splitValues" {...fprops} className="relative">
                       <div className="flex justify-between">
-                        <div className="space-y-2">
+                        <div className="modal-checkbox-list max-h-48 w-full space-y-2 overflow-y-auto">
                           {getSplitOptionValues(values.splitOption)?.map((value) => {
-                            const checked = !!splitFeaturesSelected.length;
+                            const checked = !!splitFeaturesSelected.find(
+                              (sfs) => sfs.id === `${value.name}`
+                            );
                             return (
                               <div key={value.name} className="flex items-center space-x-2.5">
                                 <Checkbox
@@ -240,16 +244,19 @@ const SplitModal = ({
                             );
                           })}
                         </div>
+
                         {getSplitOptionValues(values.splitOption) && (
-                          <Button
-                            className="flex space-x-2"
-                            theme="secondary"
-                            size="xs"
-                            onClick={onClearSplitCheckedValues}
-                          >
-                            <p>Clear all</p>
-                            <Icon icon={CLOSE_SVG} className="h-2.5 w-2.5" />
-                          </Button>
+                          <div>
+                            <Button
+                              className="flex space-x-2 whitespace-nowrap"
+                              theme="secondary"
+                              size="xs"
+                              onClick={onClearSplitCheckedValues}
+                            >
+                              <p>Clear all</p>
+                              <Icon icon={CLOSE_SVG} className="h-2.5 w-2.5" />
+                            </Button>
+                          </div>
                         )}
                       </div>
                     </Field>
