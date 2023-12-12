@@ -14,6 +14,7 @@ export type DataItem = {
   type: Feature['tag'];
   marxanSettings: Record<'prop' | 'spf', number>;
   splitOptions: { key: string; label: string; values: { id: string; name: string }[] }[];
+  value?: string;
 };
 
 export type TargetsSPFTable = {
