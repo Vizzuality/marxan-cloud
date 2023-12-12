@@ -38,7 +38,7 @@ const EditModal = ({
   onDone,
 }: {
   featureId: Feature['id'];
-  handleModal: (modalKey: 'split' | 'edit', isVisible: boolean) => void;
+  handleModal: (modalKey: 'split' | 'edit' | 'delete', isVisible: boolean) => void;
   onDone?: () => void;
 }): JSX.Element => {
   const queryClient = useQueryClient();
