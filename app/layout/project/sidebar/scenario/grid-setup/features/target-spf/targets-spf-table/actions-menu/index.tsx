@@ -27,7 +27,8 @@ const ActionsMenu = ({
   onDismissMenu,
 }: Parameters<ComponentProps<typeof RowItem>['ActionsComponent']>[0]): JSX.Element => {
   const isDeletable = item.isCustom && !item.scenarios;
-  const isSplitable = Boolean(item.splitOptions?.length);
+
+  const isSplitable = Boolean(item.splitOptions?.length) && !item.value;
 
   const [modalState, setModalState] = useState<{ edit: boolean; split: boolean }>({
     edit: false,
