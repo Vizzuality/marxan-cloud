@@ -94,9 +94,10 @@ const TargetAndSPFFeatures = (): JSX.Element => {
 
         const splitFeatures = feature.splitFeaturesSelected.map((splitFeature) => ({
           ...splitFeature,
+          id: feature.id,
           parentId: feature.id,
           name: `${feature.name} / ${splitFeature.name}`,
-          isVisibleOnMap: selectedFeatures.includes(feature.id),
+          isVisibleOnMap: [...selectedFeatures, ...selectedContinuousFeatures].includes(feature.id),
           color: feature.color,
           amountRange: feature.amountRange,
           isCustom: feature.metadata?.isCustom,
@@ -105,7 +106,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           splitted: true,
           marxanSettings: {
             ...splitFeature.marxanSettings,
-            prop: feature.marxanSettings.prop * 100,
+            prop: (feature.marxanSettings?.prop || 50) * 100,
             ...(featureValues[splitFeature.id]?.target && {
               prop: featureValues[splitFeature.id].target,
             }),
@@ -123,13 +124,15 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           ...parsedData,
           {
             ...feature,
-            isVisibleOnMap: selectedFeatures.includes(feature.id),
+            isVisibleOnMap: [...selectedFeatures, ...selectedContinuousFeatures].includes(
+              feature.id
+            ),
             isCustom: feature.metadata?.isCustom,
             scenarioUsageCount: featureMetadata?.scenarioUsageCount,
             type: featureMetadata?.tag,
             marxanSettings: {
               ...feature.marxanSettings,
-              prop: feature.marxanSettings.prop * 100,
+              prop: (feature.marxanSettings?.prop || 50) * 100,
               ...(featureValues[feature.id]?.target && {
                 prop: featureValues[feature.id].target,
               }),
@@ -163,7 +166,14 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     }
 
     return parsedData;
-  }, [selectedFeaturesQuery.data, allFeaturesQuery.data, selectedFeatures, filters, featureValues]);
+  }, [
+    selectedFeaturesQuery.data,
+    allFeaturesQuery.data,
+    filters,
+    featureValues,
+    selectedContinuousFeatures,
+    selectedFeatures,
+  ]);
 
   const handleSearch = useDebouncedCallback(
     (value: Parameters<ComponentProps<typeof Search>['onChange']>[0]) => {
@@ -425,6 +435,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
                   splitFeaturesSelected,
                   splitFeaturesOptions,
                   intersectFeaturesSelected,
+                  splitSelected,
                   ...sf
                 }) => ({
                   ...sf,
