@@ -804,3 +804,12 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
     display: none;
   }
 }
+
+.modal-checkbox-list::-webkit-scrollbar {
+  display: none;
+}
+
+.modal-checkbox-list {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
