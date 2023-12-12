@@ -65,8 +65,6 @@ const SplitModal = ({
     [featureSplitOptions]
   );
 
-  console.log({ splitFeaturesSelected });
-
   const onSplitFeaturesChanged = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newSplitFeaturesSelected = [...splitFeaturesSelected];
