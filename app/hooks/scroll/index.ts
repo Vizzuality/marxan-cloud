@@ -31,7 +31,7 @@ const createCallback = (
  * @param {DebounceOptions} [options.debounceOptions={leading=true}]
  * - Options passed to lodash.debounce, see https://lodash.com/docs/4.17.15#debounce
  * @param {boolean} [options.triggerOnNoScroll=false]
- * - Triggers the onBottom callback when the page has no scrollbar
+ * - Triggers the onBottom callback when the page has no
  * @returns {RefObject} ref
  * - If passed to a element as a ref, e.g. a div it will register scrolling
  * to the bottom of that div instead of document viewport
