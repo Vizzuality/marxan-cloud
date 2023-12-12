@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
-import { QueryClient, useQueryClient } from 'react-query';
+import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
@@ -13,7 +13,10 @@ import Checkbox from 'components/forms/checkbox';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
+import Icon from 'components/icon';
 import { Feature } from 'types/api/feature';
+
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export type FormValues = {
   featureClassName: Feature['featureClassName'];
@@ -142,8 +145,20 @@ const SplitModal = ({
         }
       );
     },
-    [sid, selectedFeaturesMutation, selectedFeaturesQuery.data, splitFeaturesSelected, handleModal]
+    [
+      featureId,
+      queryClient,
+      sid,
+      selectedFeaturesMutation,
+      selectedFeaturesQuery.data,
+      splitFeaturesSelected,
+      handleModal,
+    ]
   );
+
+  const onClearSplitCheckedValues = useCallback(() => {
+    setSplitFeaturesSelected([]);
+  }, []);
 
   return (
     <FormRFF<FormValues>
@@ -182,8 +197,8 @@ const SplitModal = ({
 
                       <div className="space-y-2">
                         <Select
-                          theme="light"
-                          size="base"
+                          theme="modal"
+                          size="xs"
                           placeholder="Select..."
                           clearSelectionActive
                           clearSelectionLabel="Clear selection"
@@ -201,24 +216,41 @@ const SplitModal = ({
                 <FieldRFF<string> name="splitValues">
                   {(fprops) => (
                     <Field id="splitValues" {...fprops} className="relative">
-                      <div className="space-y-2">
-                        {getSplitOptionValues(values.splitOption)?.map((value) => (
-                          <div key={value.name} className="flex items-center space-x-2.5">
-                            <Checkbox
-                              id={`checkbox-${value.name}`}
-                              value={`${value.name}`}
-                              theme="light"
-                              className="h-4 w-4"
-                              onChange={onSplitFeaturesChanged}
-                            />
-                            <label
-                              htmlFor={`checkbox-${value.name}`}
-                              className="ml-2.5 inline-block max-w-sm text-xs"
-                            >
-                              {value.name}
-                            </label>
-                          </div>
-                        ))}
+                      <div className="flex justify-between">
+                        <div className="space-y-2">
+                          {getSplitOptionValues(values.splitOption)?.map((value) => {
+                            const checked = !!splitFeaturesSelected.length;
+                            return (
+                              <div key={value.name} className="flex items-center space-x-2.5">
+                                <Checkbox
+                                  id={`checkbox-${value.name}`}
+                                  value={`${value.name}`}
+                                  theme="light"
+                                  checked={checked}
+                                  className="h-4 w-4"
+                                  onChange={onSplitFeaturesChanged}
+                                />
+                                <label
+                                  htmlFor={`checkbox-${value.name}`}
+                                  className="ml-2.5 inline-block max-w-sm text-xs"
+                                >
+                                  {value.name}
+                                </label>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {getSplitOptionValues(values.splitOption) && (
+                          <Button
+                            className="flex space-x-2"
+                            theme="secondary"
+                            size="xs"
+                            onClick={onClearSplitCheckedValues}
+                          >
+                            <p>Clear all</p>
+                            <Icon icon={CLOSE_SVG} className="h-2.5 w-2.5" />
+                          </Button>
+                        )}
                       </div>
                     </Field>
                   )}
