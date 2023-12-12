@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
+import { QueryClient, useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
@@ -33,6 +34,7 @@ const SplitModal = ({
   handleModal: (modalKey: 'edit' | 'split', isVisible: boolean) => void;
   onSplitFeature?: (featureId: Feature['id']) => void;
 }): JSX.Element => {
+  const queryClient = useQueryClient();
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
 
@@ -90,30 +92,50 @@ const SplitModal = ({
           data: {
             status: 'draft',
             features: selectedFeaturesQuery.data.map((sf) => {
-              return {
-                featureId: sf.id,
-                kind: 'withGeoprocessing',
-                geoprocessingOperations: [
-                  {
-                    kind: 'split/v1',
-                    splitByProperty: splitOption,
-                    splits: splitFeaturesSelected.map((fts) => {
-                      return {
-                        value: fts.id,
-                        marxanSettings: {
-                          fpf: 1,
-                          prop: 0.5,
-                        },
-                      };
-                    }),
-                  },
-                ],
-              };
+              if (sf.id === featureId) {
+                return {
+                  featureId: sf.id,
+                  kind: 'withGeoprocessing',
+                  geoprocessingOperations: [
+                    {
+                      kind: 'split/v1',
+                      splitByProperty: splitOption,
+                      splits: splitFeaturesSelected.map((fts) => {
+                        return {
+                          value: fts.id,
+                          marxanSettings: {
+                            fpf: 1,
+                            prop: 0.5,
+                          },
+                        };
+                      }),
+                    },
+                  ],
+                };
+              }
+              if (sf.id !== featureId) {
+                const {
+                  metadata,
+                  id,
+                  name,
+                  description,
+                  amountRange,
+                  color,
+                  splitOptions,
+                  splitSelected,
+                  splitFeaturesSelected,
+                  splitFeaturesOptions,
+                  intersectFeaturesSelected,
+                  ...sfRest
+                } = sf;
+                return sfRest;
+              }
             }),
           },
         },
         {
           onSuccess: () => {
+            queryClient.invalidateQueries(['selected-features', sid]);
             handleModal('split', false);
           },
           onError: () => {},
