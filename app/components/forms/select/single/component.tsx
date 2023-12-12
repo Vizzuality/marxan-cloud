@@ -253,6 +253,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
                   <span
                     className={cn({
                       'ml-6': !!option.checkbox,
+                      [THEME[theme].item.clearSelectionLabel]: !option.value,
                     })}
                   >
                     {option.label}
