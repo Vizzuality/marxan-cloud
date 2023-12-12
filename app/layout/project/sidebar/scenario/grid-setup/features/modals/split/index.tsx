@@ -48,7 +48,7 @@ const SplitModal = ({
     (feature) => feature.id === featureId
   )?.splitOptions;
 
-  const SPLIT_OPTIONS = featureSplitOptions.map((splitOption) => ({
+  const SPLIT_OPTIONS = featureSplitOptions?.map((splitOption) => ({
     label: splitOption.label,
     value: splitOption.key,
   }));
