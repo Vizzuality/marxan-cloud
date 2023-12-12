@@ -34,7 +34,7 @@ const ActionsMenu = ({
   const { sid } = query as { sid: string };
   const queryClient = useQueryClient();
   const isDeletable = item.isCustom;
-  const isSplittable = Boolean(item.splitOptions?.length) && !item.value;
+  const isSplittable = Boolean(item.splitOptions?.length);
 
   const [modalState, setModalState] = useState<{ edit: boolean; split: boolean }>({
     edit: false,

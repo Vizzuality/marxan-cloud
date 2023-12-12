@@ -15,6 +15,7 @@ export const SELECT_THEME = {
       base: 'text-sm text-gray-400',
       highlighted: 'text-sm bg-gray-800 text-white',
       disabled: 'text-sm opacity-50 pointer-events-none',
+      clearSelectionLabel: '',
     },
   },
   light: {
@@ -33,6 +34,7 @@ export const SELECT_THEME = {
       base: 'text-sm text-gray-900',
       highlighted: 'text-sm bg-gray-100',
       disabled: 'text-sm opacity-50 pointer-events-none',
+      clearSelectionLabel: '',
     },
   },
   'light-square': {
@@ -51,6 +53,26 @@ export const SELECT_THEME = {
       base: 'text-sm text-gray-100',
       highlighted: 'text-sm bg-gray-200 text-gray-900',
       disabled: 'text-sm opacity-50 pointer-events-none',
+      clearSelectionLabel: '',
+    },
+  },
+  modal: {
+    container: 'text-gray-700 bg-white ring-1 ring-gray-900 rounded-lg',
+    open: 'ring-1 ring-primary-400 bg-white text-gray-700 rounded',
+    closed: 'text-gray-500',
+    prefix: {
+      base: 'text-gray-900',
+    },
+    icon: {
+      closed: 'text-gray-700',
+      open: 'text-primary-500 transform rotate-180',
+      disabled: 'text-gray-100',
+    },
+    item: {
+      base: 'text-sm text-gray-900',
+      highlighted: 'text-sm bg-gray-200 text-gray-900',
+      disabled: 'text-sm opacity-50 pointer-events-none',
+      clearSelectionLabel: 'font-semibold',
     },
   },
   states: {
@@ -61,9 +83,11 @@ export const SELECT_THEME = {
   sizes: {
     base: 'pl-4 pr-10 text-sm',
     s: 'pl-4 pr-10 text-sm',
+    xs: 'pl-4 pr-10 text-base',
     label: {
       base: 'py-3',
       s: 'py-1',
+      xs: 'py-2 text-base',
     },
   },
 };
