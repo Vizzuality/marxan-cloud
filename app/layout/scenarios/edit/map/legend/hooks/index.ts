@@ -138,7 +138,8 @@ export const useFeaturesLegend = () => {
     queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
 
   const selectedFeaturesQuery = useSelectedFeatures(sid);
-  const selectedFeaturesIds = selectedFeaturesQuery.data?.map(({ metadata: { id } }) => id) || [];
+  const selectedFeaturesIds =
+    selectedFeaturesQuery.data?.map(({ metadata: { id } = {} }) => id) || [];
 
   const projectFeaturesQuery = useAllFeatures(
     pid,
