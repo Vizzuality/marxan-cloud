@@ -24,7 +24,7 @@ const THEME = {
 };
 
 export interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
-  theme?: 'dark' | 'light';
+  theme?: 'dark' | 'light' | 'light-secondary';
   status?: 'none' | 'valid' | 'error' | 'disabled';
 }
 
