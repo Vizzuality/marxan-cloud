@@ -80,7 +80,7 @@ const RowItem = ({
         })}
       >
         <span className="inline-flex">{name}</span>
-        {isCustom && scenarioUsageCount && (
+        {Boolean(isCustom && scenarioUsageCount) && (
           <div className="mt-1.5 text-xs text-gray-400">
             Currently in use in{' '}
             <span className="rounded bg-blue-600 bg-opacity-10 px-1 text-blue-600">
