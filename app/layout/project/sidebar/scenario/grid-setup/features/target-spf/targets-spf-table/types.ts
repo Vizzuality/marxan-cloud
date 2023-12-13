@@ -1,11 +1,10 @@
 import { ChangeEvent } from 'react';
 
 import { Feature } from 'types/api/feature';
-import { WDPA } from 'types/api/wdpa';
 
 export type DataItem = {
   id: string;
-  attributes?: Omit<WDPA, 'id'>;
+  parentId: string;
   name: string;
   scenarioUsageCount: Feature['scenarioUsageCount'];
   tag?: Feature['tag'];

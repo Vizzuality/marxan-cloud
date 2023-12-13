@@ -74,7 +74,7 @@ export const ProjectMap = (): JSX.Element => {
   } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState<MapProps['bounds']>(null);
@@ -285,12 +285,6 @@ export const ProjectMap = (): JSX.Element => {
   useEffect(() => {
     centerMap({ ref: mapRef.current, isSidebarOpen });
   }, [isSidebarOpen]);
-
-  useEffect(() => {
-    if (featuresColorQuery.isSuccess) {
-      queryClient.setQueryData('feature-colors', featuresColorQuery.data);
-    }
-  }, [featuresColorQuery, queryClient]);
 
   const handleViewportChange = useCallback(
     (vw) => {

@@ -122,7 +122,7 @@ const ActionsMenu = ({
         <button
           type="button"
           onClick={() => {
-            onDeleteFeature(item.id);
+            onDeleteFeature(item);
           }}
           className={cn({
             [BUTTON_CLASSES]: true,

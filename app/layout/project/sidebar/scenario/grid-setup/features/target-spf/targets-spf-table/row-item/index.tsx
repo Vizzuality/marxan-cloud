@@ -34,7 +34,7 @@ const RowItem = ({
   onSplitFeature?: TargetsSPFTable['onSplitFeature'];
   onClickTag: (tag: Feature['tag']) => void;
   onChangeRow: TargetsSPFTable['onChangeRow'];
-  onDeleteFeature: (featureId: Feature['id']) => void;
+  onDeleteFeature: (feature: DataItem) => void;
   ActionsComponent: ({
     item,
     onDismissMenu,
@@ -42,7 +42,7 @@ const RowItem = ({
   }: {
     item: DataItem;
     onDismissMenu: () => void;
-    onDeleteFeature: (featureId: Feature['id']) => void;
+    onDeleteFeature: (feature: DataItem) => void;
   }) => JSX.Element;
 }) => {
   const { id, name, scenarioUsageCount, type, marxanSettings, isVisibleOnMap, isCustom } = item;
@@ -54,8 +54,8 @@ const RowItem = ({
   }, []);
 
   const handleFeatureDeletion = useCallback(
-    (featureId: Feature['id']) => {
-      onDeleteFeature(featureId);
+    (feature: DataItem) => {
+      onDeleteFeature(feature);
     },
     [onDeleteFeature]
   );

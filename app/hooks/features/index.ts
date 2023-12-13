@@ -2,12 +2,17 @@ import { useMemo } from 'react';
 
 import { useQuery, useMutation, useQueryClient, QueryObserverOptions } from 'react-query';
 
+import { useRouter } from 'next/router';
+
 import { AxiosRequestConfig } from 'axios';
+import chroma from 'chroma-js';
 import Fuse from 'fuse.js';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
 import partition from 'lodash/partition';
 import { useSession } from 'next-auth/react';
+
+import { COLORS } from 'hooks/map/constants';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
@@ -171,13 +176,17 @@ export function useSelectedFeatures(
   filters: UseFeaturesFiltersProps = {},
   queryOptions = {}
 ) {
+  const { query } = useRouter();
+  const { pid } = query as { pid: string };
   const { data: session } = useSession();
-  const { search, sort, tag } = filters;
+  const { search } = filters;
 
   const queryClient = useQueryClient();
 
-  const featureColorQueryState =
-    queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
+  // const featureColorQueryState =
+  //   queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
+
+  const featureColors = useColorFeatures(pid, sid);
 
   const fetchFeatures = () =>
     SCENARIOS.request({
@@ -193,8 +202,7 @@ export function useSelectedFeatures(
 
   return useQuery(['selected-features', sid], fetchFeatures, {
     ...queryOptions,
-    enabled:
-      !!sid && ((featureColorQueryState && featureColorQueryState.status === 'success') || true),
+    enabled: (!!sid && featureColors?.length > 0) || true,
     select: ({ data }) => {
       const { features = [] } = data;
 
@@ -271,16 +279,12 @@ export function useSelectedFeatures(
           id: featureId,
           name: alias || featureClassName,
           type: tag,
-          // type: Math.random() < 0.5 ? 'test' : 'andres',
           description,
           amountRange: {
             min: amountMin,
             max: amountMax,
           },
-          color: featureColorQueryState
-            ? featureColorQueryState?.data?.find(({ id }) => featureId === id)?.color
-            : null,
-
+          color: featureColors.find(({ id }) => featureId === id)?.color,
           // SPLIT
           splitOptions,
           splitSelected,
@@ -748,4 +752,26 @@ export function useProjectFeatures(
       select: (data) => data?.data.filter((f) => featureIds.includes(f.id)),
     }
   );
+}
+
+export function useColorFeatures(projectId: Project['id'], sid: Scenario['id']) {
+  const useAllFeaturesQuery = useAllFeatures(projectId, {});
+  const targetedFeaturesQuery = useTargetedFeatures(sid);
+
+  if (targetedFeaturesQuery.isSuccess && useAllFeaturesQuery.isSuccess) {
+    const data = [...(useAllFeaturesQuery.data?.data || []), ...targetedFeaturesQuery.data];
+    return data.map(({ id }, index) => {
+      const color =
+        data.length > COLORS['features-preview'].ramp.length
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(data.length)[index]
+          : COLORS['features-preview'].ramp[index];
+
+      return {
+        id,
+        color,
+      };
+    });
+  }
+
+  return [];
 }

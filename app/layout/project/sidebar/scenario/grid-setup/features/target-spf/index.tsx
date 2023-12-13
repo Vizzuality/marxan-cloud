@@ -68,11 +68,8 @@ const TargetAndSPFFeatures = (): JSX.Element => {
   const dispatch = useAppDispatch();
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setSelectedFeatures, setSelectedContinuousFeatures, setLayerSettings } =
-    scenarioSlice.actions;
-  const { selectedFeatures, selectedContinuousFeatures } = useAppSelector(
-    (state) => state[`/scenarios/${sid}/edit`]
-  );
+  const { setLayerSettings } = scenarioSlice.actions;
+  const { layerSettings } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const allFeaturesQuery = useAllFeatures(
     pid,
@@ -86,7 +83,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     keepPreviousData: true,
   });
 
-  const targedtedFeatures = useMemo(() => {
+  const targetedFeatures = useMemo(() => {
     let parsedData = [];
     selectedFeaturesQuery.data?.forEach((feature) => {
       if (feature.splitFeaturesSelected?.length > 0) {
@@ -94,10 +91,10 @@ const TargetAndSPFFeatures = (): JSX.Element => {
 
         const splitFeatures = feature.splitFeaturesSelected.map((splitFeature) => ({
           ...splitFeature,
-          id: feature.id,
+          id: `${feature.id}-${splitFeature.name}`,
           parentId: feature.id,
           name: `${feature.name} / ${splitFeature.name}`,
-          isVisibleOnMap: [...selectedFeatures, ...selectedContinuousFeatures].includes(feature.id),
+          isVisibleOnMap: layerSettings[`${feature.id}-${splitFeature.name}`]?.visibility ?? false,
           color: feature.color,
           amountRange: feature.amountRange,
           isCustom: feature.metadata?.isCustom,
@@ -124,9 +121,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           ...parsedData,
           {
             ...feature,
-            isVisibleOnMap: [...selectedFeatures, ...selectedContinuousFeatures].includes(
-              feature.id
-            ),
+            isVisibleOnMap: layerSettings[feature.id]?.visibility ?? false,
             isCustom: feature.metadata?.isCustom,
             scenarioUsageCount: featureMetadata?.scenarioUsageCount,
             type: featureMetadata?.tag,
@@ -166,14 +161,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     }
 
     return parsedData;
-  }, [
-    selectedFeaturesQuery.data,
-    allFeaturesQuery.data,
-    filters,
-    featureValues,
-    selectedContinuousFeatures,
-    selectedFeatures,
-  ]);
+  }, [selectedFeaturesQuery.data, allFeaturesQuery.data, filters, featureValues, layerSettings]);
 
   const handleSearch = useDebouncedCallback(
     (value: Parameters<ComponentProps<typeof Search>['onChange']>[0]) => {
@@ -219,42 +207,15 @@ const TargetAndSPFFeatures = (): JSX.Element => {
 
   const toggleSeeOnMap = useCallback(
     (id: Feature['id']) => {
-      const binaryFeatures = [...selectedFeatures];
-      const continuousFeatures = [...selectedContinuousFeatures];
-
-      const selectedFeature = targedtedFeatures.find(({ id: featureId }) => featureId === id);
+      const selectedFeature = targetedFeatures.find(({ id: featureId }) => featureId === id);
       const isContinuous =
         selectedFeature.amountRange.min !== null && selectedFeature.amountRange.max !== null;
 
-      const _id = selectedFeature.splitted ? selectedFeature.parentId : selectedFeature.id;
-
-      const isIncludedInBinary = binaryFeatures.includes(_id);
-      const isIncludedInContinuous = continuousFeatures.includes(_id);
-
-      if (isContinuous) {
-        if (!isIncludedInContinuous) {
-          continuousFeatures.push(_id);
-        } else {
-          const i = continuousFeatures.indexOf(_id);
-          continuousFeatures.splice(i, 1);
-        }
-
-        dispatch(setSelectedContinuousFeatures(continuousFeatures));
-      } else {
-        if (!isIncludedInBinary) {
-          binaryFeatures.push(_id);
-        } else {
-          const i = binaryFeatures.indexOf(_id);
-          binaryFeatures.splice(i, 1);
-        }
-        dispatch(setSelectedFeatures(binaryFeatures));
-      }
-
       dispatch(
         setLayerSettings({
-          id: _id,
+          id,
           settings: {
-            visibility: !(isIncludedInBinary || isIncludedInContinuous),
+            visibility: layerSettings[id] ? !layerSettings[id].visibility : true,
             color: selectedFeature?.color,
             ...(isContinuous && {
               amountRange: selectedFeature.amountRange,
@@ -263,20 +224,12 @@ const TargetAndSPFFeatures = (): JSX.Element => {
         })
       );
     },
-    [
-      dispatch,
-      setSelectedFeatures,
-      setLayerSettings,
-      selectedFeatures,
-      selectedContinuousFeatures,
-      setSelectedContinuousFeatures,
-      targedtedFeatures,
-    ]
+    [dispatch, setLayerSettings, targetedFeatures, layerSettings]
   );
 
   const onApplyAllTargets = useCallback(() => {
     setFeatureValues((prevValues) => {
-      const ids = targedtedFeatures.map(({ id }) => id);
+      const ids = targetedFeatures.map(({ id }) => id);
 
       return ids.reduce(
         (acc, featureId) => ({
@@ -290,11 +243,11 @@ const TargetAndSPFFeatures = (): JSX.Element => {
       );
     });
     setConfirmationTarget(null);
-  }, [confirmationTarget, targedtedFeatures]);
+  }, [confirmationTarget, targetedFeatures]);
 
   const onApplyAllSPF = useCallback(() => {
     setFeatureValues((prevValues) => {
-      const ids = targedtedFeatures.map(({ id }) => id);
+      const ids = targetedFeatures.map(({ id }) => id);
 
       return ids.reduce(
         (acc, featureId) => ({
@@ -308,17 +261,17 @@ const TargetAndSPFFeatures = (): JSX.Element => {
       );
     });
     setConfirmationFPF(null);
-  }, [confirmationFPF, targedtedFeatures]);
+  }, [confirmationFPF, targetedFeatures]);
 
   const handleSelectAllFeatures = useCallback(
     (evt: ChangeEvent<HTMLInputElement>) => {
       if (evt.target.checked) {
-        setSelectedFeatureIds(targedtedFeatures.map(({ id }) => id));
+        setSelectedFeatureIds(targetedFeatures.map(({ id }) => id));
       } else {
         setSelectedFeatureIds([]);
       }
     },
-    [targedtedFeatures]
+    [targetedFeatures]
   );
 
   const handleSelectFeature = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
@@ -348,14 +301,14 @@ const TargetAndSPFFeatures = (): JSX.Element => {
                 ...go,
                 splits: splits
                   .filter((s) => {
-                    return targedtedFeatures.find((f) => {
+                    return targetedFeatures.find((f) => {
                       return f.parentId === featureId && f.value === s.value;
                     });
                   })
                   .map((s) => {
                     const {
                       marxanSettings: { prop, fpf },
-                    } = targedtedFeatures.find((f) => {
+                    } = targetedFeatures.find((f) => {
                       return f.parentId === featureId && f.value === s.value;
                     });
 
@@ -401,7 +354,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     selectedFeaturesMutation,
     featureValues,
     selectedFeaturesQuery.data,
-    targedtedFeatures,
+    targetedFeatures,
   ]);
 
   const handleRowValues = useCallback((id, values) => {
@@ -415,14 +368,17 @@ const TargetAndSPFFeatures = (): JSX.Element => {
   }, []);
 
   const handleRowDeletion = useCallback(
-    (id) => {
+    (featureToRemove) => {
       selectedFeaturesMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             status: 'draft',
             features: selectedFeaturesQuery.data
-              .filter(({ id: featureId }) => featureId !== id)
+              .filter(({ id: featureId }) => {
+                if (!featureToRemove.splitted) return featureId !== featureToRemove.id;
+                return true;
+              })
               .map(
                 ({
                   metadata,
@@ -433,19 +389,38 @@ const TargetAndSPFFeatures = (): JSX.Element => {
                   color,
                   splitOptions,
                   splitFeaturesSelected,
+                  geoprocessingOperations,
                   splitFeaturesOptions,
                   intersectFeaturesSelected,
                   splitSelected,
                   ...sf
-                }) => ({
-                  ...sf,
-                })
+                }) => {
+                  if (featureToRemove.splitted) {
+                    return {
+                      ...sf,
+                      ...(geoprocessingOperations && {
+                        geoprocessingOperations: geoprocessingOperations.map((go) => ({
+                          ...go,
+                          splits: go.splits.filter((s) => {
+                            return s.value !== featureToRemove.value;
+                          }),
+                        })),
+                      }),
+                    };
+                  }
+
+                  return {
+                    ...sf,
+                    geoprocessingOperations,
+                  };
+                }
               ),
           },
         },
         {
           onSuccess: async () => {
             await queryClient.invalidateQueries(['selected-features', sid]);
+            await queryClient.invalidateQueries(['targeted-features', sid]);
           },
         }
       );
@@ -513,7 +488,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
         <div className="flex h-full flex-col overflow-hidden">
           <TargetsSPFTable
             loading={selectedFeaturesQuery.isFetching}
-            data={targedtedFeatures}
+            data={targetedFeatures}
             noDataMessage="No features found"
             columns={TARGET_SPF_TABLE_COLUMNS}
             sorting={filters.sort}
@@ -545,7 +520,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
         )}
         {displayBulkActions && (
           <FeaturesBulkActionMenu
-            features={targedtedFeatures}
+            features={targetedFeatures}
             selectedFeatureIds={selectedFeatureIds}
             onDone={() => {
               setSelectedFeatureIds([]);

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import chroma from 'chroma-js';
 import { Layer } from 'mapbox-gl';
 
 import { CostSurface } from 'types/api/cost-surface';
@@ -484,36 +483,25 @@ export function useTargetedPreviewLayers({
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
 
-    const { selectedFeatures = [] } = options;
+    const { layerSettings } = options;
 
-    const FEATURES = [...features]
-      .filter((ft) => selectedFeatures.includes(ft.id as string))
-      .sort((a, b) => {
-        const aIndex = selectedFeatures.indexOf(a.id as string);
-        const bIndex = selectedFeatures.indexOf(b.id as string);
-        return bIndex - aIndex;
-      });
+    const FEATURES = features.filter((ft) => Object.keys(layerSettings).includes(ft.id));
 
-    const { opacity = 1, visibility = true } = options || {};
-
-    const getLayerVisibility = () => {
+    const getLayerVisibility = (
+      visibility: UseTargetedPreviewLayers['options']['layerSettings'][string]['visibility']
+    ) => {
       if (!visibility) {
         return 'none';
       }
       return 'visible';
     };
 
-    return FEATURES.map((f, index) => {
-      const { id, parentId, splitted, value } = f;
+    return FEATURES.map((f) => {
+      const { id, parentId, value, splitSelected } = f;
 
-      const ID = splitted ? parentId : id;
+      const { opacity = 1, color } = layerSettings[id] || {};
 
-      const COLOR =
-        selectedFeatures.length > COLORS['features-preview'].ramp.length
-          ? chroma.scale(COLORS['features-preview'].ramp).colors(selectedFeatures.length)[
-              selectedFeatures.length - 1 - index
-            ]
-          : COLORS['features-preview'].ramp[selectedFeatures.length - 1 - index];
+      const _id = splitSelected ? parentId : id;
 
       return {
         id: `feature-${id}-targeted-preview-layer-${cache}`,
@@ -521,7 +509,7 @@ export function useTargetedPreviewLayers({
         source: {
           type: 'vector',
           tiles: [
-            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${ID}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${_id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`,
           ],
         },
         render: {
@@ -536,10 +524,10 @@ export function useTargetedPreviewLayers({
                 ],
               }),
               layout: {
-                visibility: getLayerVisibility(),
+                visibility: getLayerVisibility(layerSettings[id].visibility),
               },
               paint: {
-                'fill-color': COLOR,
+                'fill-color': color,
                 'fill-opacity': opacity,
               },
             },
@@ -553,7 +541,7 @@ export function useTargetedPreviewLayers({
                 ],
               }),
               layout: {
-                visibility: getLayerVisibility(),
+                visibility: getLayerVisibility(layerSettings[id].visibility),
               },
               paint: {
                 'line-color': '#000',
