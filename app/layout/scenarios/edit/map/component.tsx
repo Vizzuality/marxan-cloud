@@ -1,7 +1,5 @@
 import React, { ComponentProps, useCallback, useEffect, useState, useMemo, useRef } from 'react';
 
-import { useQueryClient } from 'react-query';
-
 import { useRouter } from 'next/router';
 
 import { useAppSelector, useAppDispatch } from 'store/hooks';
@@ -14,7 +12,12 @@ import { FiLayers } from 'react-icons/fi';
 
 import { useAccessToken } from 'hooks/auth';
 import { useProjectCostSurface } from 'hooks/cost-surface';
-import { useAllFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
+import {
+  useAllFeatures,
+  useColorFeatures,
+  useSelectedFeatures,
+  useTargetedFeatures,
+} from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
   useWDPAPreviewLayer,
@@ -49,7 +52,6 @@ import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import { TABS } from 'layout/project/navigation/constants';
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 import { MapProps } from 'types/map';
-import { cn } from 'utils/cn';
 import { centerMap } from 'utils/map';
 
 import { useScenarioLegend } from './legend/hooks';
@@ -67,7 +69,7 @@ export const ScenariosEditMap = (): JSX.Element => {
   const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const { query } = useRouter();
 
@@ -223,6 +225,8 @@ export const ScenariosEditMap = (): JSX.Element => {
     },
   });
 
+  const featureColors = useColorFeatures(pid, sid);
+
   const featuresColorQuery = useAllFeatures(
     pid,
     {
@@ -258,7 +262,7 @@ export const ScenariosEditMap = (): JSX.Element => {
       featuresRecipe,
       featureHoverId,
       selectedFeatures,
-      ...layerSettings['features-preview'],
+      layerSettings,
     },
   });
 
@@ -344,12 +348,6 @@ export const ScenariosEditMap = (): JSX.Element => {
     // ? As this flow is gone and the user is free to go wherever they want, we need to update the cache manually when the tab changes.
     if (tab) dispatch(setCache(Date.now()));
   }, [tab, dispatch, setCache]);
-
-  useEffect(() => {
-    if (featuresColorQuery.isSuccess) {
-      queryClient.setQueryData('feature-colors', featuresColorQuery.data);
-    }
-  }, [featuresColorQuery, queryClient]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);

@@ -16,7 +16,7 @@ const DeleteModal = ({
   onDismiss,
   onDone,
 }: {
-  features: (Feature & { name: string })[];
+  features: any[];
   selectedFeaturesIds: Feature['id'][];
   onDismiss?: ModalProps['onDismiss'];
   onDone?: () => void;
@@ -28,15 +28,15 @@ const DeleteModal = ({
 
   const selectedFeaturesQuery = useSelectedFeatures(sid);
 
-  const selectedFeatures = useMemo(
+  const featuresToRemove = useMemo(
     () => features.filter(({ id }) => selectedFeaturesIds.includes(id)) ?? [],
     [features, selectedFeaturesIds]
   );
 
-  const featureNames = selectedFeatures.map(({ name }) => name);
+  const featureNames = featuresToRemove.map(({ name }) => name);
 
   const handleBulkDelete = useCallback(() => {
-    const deletableFeatureIds = selectedFeatures.map(({ id }) => id);
+    const deletableFeatureIds = featuresToRemove.map(({ id }) => id);
 
     selectedFeaturesMutation.mutate(
       {
@@ -44,7 +44,9 @@ const DeleteModal = ({
         data: {
           status: 'draft',
           features: selectedFeaturesQuery.data
-            .filter(({ id: featureId }) => !deletableFeatureIds.includes(featureId))
+            .filter(({ id: featureId }) => {
+              return !deletableFeatureIds.includes(featureId);
+            })
             .map(
               ({
                 metadata,
@@ -55,30 +57,54 @@ const DeleteModal = ({
                 color,
                 splitOptions,
                 splitFeaturesSelected,
+                geoprocessingOperations,
                 splitFeaturesOptions,
                 intersectFeaturesSelected,
+                splitSelected,
                 ...sf
-              }) => ({
-                ...sf,
-              })
+              }) => {
+                if (splitSelected) {
+                  const featureValues = features
+                    .filter(({ id }) => deletableFeatureIds.includes(id))
+                    .map(({ value }) => value);
+
+                  return {
+                    ...sf,
+                    ...(geoprocessingOperations && {
+                      geoprocessingOperations: geoprocessingOperations.map((go) => ({
+                        ...go,
+                        splits: go.splits.filter((s) => {
+                          return !featureValues.includes(s.value);
+                        }),
+                      })),
+                    }),
+                  };
+                }
+
+                return {
+                  ...sf,
+                  geoprocessingOperations,
+                };
+              }
             ),
         },
       },
       {
         onSuccess: async () => {
           await queryClient.invalidateQueries(['selected-features', sid]);
+          await queryClient.invalidateQueries(['targeted-features', sid]);
           onDone?.();
-          onDismiss();
         },
       }
     );
   }, [
-    selectedFeatures,
-    onDismiss,
     queryClient,
     sid,
     selectedFeaturesMutation,
+    features,
     selectedFeaturesQuery.data,
+    onDone,
+    featuresToRemove,
   ]);
 
   return (

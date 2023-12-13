@@ -12,7 +12,7 @@ import {
 } from 'store/slices/projects/[id]';
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
-import { useAllFeatures } from 'hooks/features';
+import { useAllFeatures, useColorFeatures } from 'hooks/features';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useScenario } from 'hooks/scenarios';
 import { useProjectWDPAs } from 'hooks/wdpa';
@@ -122,12 +122,11 @@ export const useFeaturesLegend = () => {
     (state) => state['/projects/[id]']
   );
   const { query } = useRouter();
-  const { pid } = query as { pid: string };
+  const { pid, sid } = query as { pid: string; sid: string };
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
-  const featureColorQueryState =
-    queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
+  const featureColors = useColorFeatures(pid, sid);
 
   const dispatch = useAppDispatch();
   const projectFeaturesQuery = useAllFeatures(
@@ -140,17 +139,17 @@ export const useFeaturesLegend = () => {
           []
         ).map((feature) => ({
           ...feature,
-          color: featureColorQueryState?.data?.find(({ id }) => id === feature.id)?.color,
+          color: featureColors?.find(({ id }) => id === feature.id)?.color,
         })),
         continuousFeatures: (
           data?.filter(({ amountRange }) => amountRange.min !== null && amountRange.max !== null) ||
           []
         ).map((feature) => ({
           ...feature,
-          color: featureColorQueryState?.data?.find(({ id }) => id === feature.id)?.color,
+          color: featureColors?.find(({ id }) => id === feature.id)?.color,
         })),
       }),
-      enabled: featureColorQueryState?.status === 'success',
+      enabled: featureColors.length > 0,
     }
   );
 
