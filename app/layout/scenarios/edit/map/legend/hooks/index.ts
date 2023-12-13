@@ -13,6 +13,7 @@ import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
+import { useSolutions } from 'hooks/solutions';
 import { useWDPACategories } from 'hooks/wdpa';
 
 import { CostSurface } from 'types/api/cost-surface';
@@ -417,6 +418,7 @@ export const useFrequencyLegend = () => {
   const { query } = useRouter();
   const { sid } = query as { sid: string };
   const scenarioQuery = useScenario(sid);
+  const solutionsQuery = useSolutions(sid);
 
   const dispatch = useAppDispatch();
   const scenarioSlice = getScenarioEditSlice(sid);
@@ -426,7 +428,7 @@ export const useFrequencyLegend = () => {
   if (!scenarioQuery.data?.ranAtLeastOnce) return null;
 
   return LEGEND_LAYERS['frequency']({
-    numberOfRuns: scenarioQuery.data?.numberOfRuns,
+    numberOfRuns: solutionsQuery.data.length,
     onChangeVisibility: () => {
       dispatch(
         setLayerSettings({

@@ -14,6 +14,7 @@ export const SolutionsTablePage = (): JSX.Element => {
   const { sid } = query as { sid: string };
 
   const solutionsQuery = useSolutions(sid);
+
   const bestSolutionQuery = useBestSolution(sid, {});
 
   return (
