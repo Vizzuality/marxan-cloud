@@ -12,6 +12,7 @@ export type DataItem = {
   isVisibleOnMap: boolean;
   isCustom?: boolean;
   type: Feature['tag'];
+  splitted: boolean;
   marxanSettings: Record<'prop' | 'spf', number>;
   splitOptions: { key: string; label: string; values: { id: string; name: string }[] }[];
   value?: string;

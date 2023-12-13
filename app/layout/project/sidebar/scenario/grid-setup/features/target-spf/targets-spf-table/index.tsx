@@ -98,7 +98,7 @@ const TargetsSPFTable = ({
             <tbody className="block h-full divide-y divide-gray-600 py-2 align-baseline text-sm">
               {data.map((item) => (
                 <RowItem
-                  key={item.id}
+                  key={item.splitted ? `${item.id}-${item.value}` : `${item.id}`}
                   item={item}
                   selectedIds={selectedIds}
                   onSelectRow={onSelectRow}
