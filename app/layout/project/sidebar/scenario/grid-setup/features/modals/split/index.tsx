@@ -91,7 +91,7 @@ const SplitModal = ({
 
       selectedFeaturesMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             status: 'draft',
             features: selectedFeaturesQuery.data.map((sf) => {
@@ -204,7 +204,10 @@ const SplitModal = ({
                           clearSelectionLabel="Clear selection"
                           selected={values.splitOption}
                           options={SPLIT_OPTIONS}
-                          onChange={fprops.input.onChange}
+                          onChange={(v) => {
+                            fprops.input.onChange(v);
+                            setSplitFeaturesSelected([]);
+                          }}
                         />
                       </div>
                     </Field>
@@ -223,7 +226,7 @@ const SplitModal = ({
                               (sfs) => sfs.id === `${value.name}`
                             );
                             return (
-                              <div key={value.name} className="flex items-center space-x-2.5">
+                              <div key={value.name} className="flex items-center space-x-2.5 pl-1">
                                 <Checkbox
                                   id={`checkbox-${value.name}`}
                                   value={`${value.name}`}
