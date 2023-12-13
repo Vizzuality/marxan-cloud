@@ -64,7 +64,7 @@ export const ResumePage = (): JSX.Element => {
 
           {projectQuery.data?.planningUnitAreakm2 && (
             <div className={SECTION_CLASSES}>
-              <h3 className={TITLE_CLASSES}>Planning Area (KM2):</h3>
+              <h3 className={TITLE_CLASSES}>Planning Unit Grid Area (KM2):</h3>
               <p className={TEXT_CLASSES}>{projectQuery.data?.planningUnitAreakm2}</p>
             </div>
           )}
@@ -75,11 +75,6 @@ export const ResumePage = (): JSX.Element => {
               <p className={TEXT_CLASSES}>{projectQuery.data?.planningUnitGridShape}</p>
             </div>
           )}
-
-          <div className={SECTION_CLASSES}>
-            <h3 className={TITLE_CLASSES}>Planning Unit Grid Area:</h3>
-            <p className={TEXT_CLASSES}>{projectQuery.data.planningAreaName}</p>
-          </div>
         </div>
         <div>
           <div className={SECTION_CLASSES}>
@@ -95,6 +90,7 @@ export const ResumePage = (): JSX.Element => {
               <p className={TEXT_CLASSES}>Available PU: {PUDataQuery.data?.available.length}</p>
               <p className={TEXT_CLASSES}>Included PU: {PUDataQuery.data?.included.length}</p>
               <p className={TEXT_CLASSES}>Excluded PU: {PUDataQuery.data?.excluded.length}</p>
+              <p className={TEXT_CLASSES}>Total PU: {PUDataQuery.data?.total}</p>
             </div>
           </div>
         </div>

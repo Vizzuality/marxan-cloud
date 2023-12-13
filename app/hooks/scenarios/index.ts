@@ -574,6 +574,7 @@ export function useScenarioPU(
       excluded: ScenarioPlanningUnit['id'][];
       included: ScenarioPlanningUnit['id'][];
       available: ScenarioPlanningUnit['id'][];
+      total: number;
     }
   >
 ) {
@@ -613,11 +614,13 @@ export function useScenarioPU(
         const available = data
           .filter((p) => p.inclusionStatus === 'available' && p.setByUser)
           .map((p) => p.id);
+        const total = data.length;
 
         return {
           included,
           excluded,
           available,
+          total,
         };
       },
       ...queryOptions,
