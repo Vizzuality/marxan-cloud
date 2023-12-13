@@ -34,7 +34,7 @@ export type TargetsSPFTable = {
   onToggleSeeOnMap: (id: Feature['id']) => void;
   onSelectRow: (evt: ChangeEvent<HTMLInputElement>) => void;
   onSelectAll: (evt: ChangeEvent<HTMLInputElement>) => void;
-  onDeleteRow: (featureId: Feature['id']) => void;
+  onDeleteRow: (feature: DataItem) => void;
   onChangeRow: (featureId: Feature['id'], values: Record<'prop' | 'spf', number>) => void;
   ActionsComponent: ({ item }) => JSX.Element;
 };
