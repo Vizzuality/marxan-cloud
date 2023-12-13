@@ -290,7 +290,7 @@ export const useInventoryLegend = ({
             ]
           : []),
         {
-          name: 'Cost Surface',
+          name: 'Cost Surfacex',
           layers: useCostSurfaceLegend(),
         },
       ],

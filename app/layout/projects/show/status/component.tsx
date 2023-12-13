@@ -35,6 +35,7 @@ export const ProjectStatus = (): JSX.Element => {
   const { jobs = [] } = scenarioStatusData || {};
 
   // Jobs
+
   const JOBS = useProjectJobs(jobs);
 
   // Failure
