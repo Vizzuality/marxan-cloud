@@ -46,7 +46,7 @@ const RowItem = ({
           'w-52': tag,
         })}
       >
-        <span className="inline-flex">{name}</span>
+        <span className="inline-flex break-all">{name}</span>
         {isCustom && (
           <div className="mt-1.5 text-xs text-gray-400">
             Currently in use in{' '}
