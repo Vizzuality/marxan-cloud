@@ -12,7 +12,7 @@ export const RowDetails = ({ item, onChange }): JSX.Element => {
   const editable = useCanEditScenario(pid, sid);
   const { marxanSettings: { prop = 50, fpf = 1 } = {}, id } = item;
   const [values, setValues] = useState({
-    target: prop * 100,
+    target: prop,
     spf: fpf,
   });
 
