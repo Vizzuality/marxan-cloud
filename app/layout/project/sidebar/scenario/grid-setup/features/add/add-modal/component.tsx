@@ -60,7 +60,8 @@ export const ScenariosFeaturesAdd = (): JSX.Element => {
     const { value, onChange } = input;
     const selected = [...value];
 
-    const selectedIndex = selected.findIndex((f) => f === id);
+    const item = selected.find((f) => f === id);
+    const selectedIndex = selected.indexOf(item);
 
     if (selectedIndex !== -1) {
       selected.splice(selectedIndex, 1);
