@@ -85,7 +85,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
           {icon ?? null}
           <div
             className={cn({
-              'text-sm': true,
+              'break-all pr-1 text-sm': true,
               'text-white': theme === 'dark' || !theme,
               'text-gray-800': theme === 'light',
             })}
