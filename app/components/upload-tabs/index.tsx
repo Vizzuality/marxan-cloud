@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { useFeatureFlags } from 'hooks/feature-flags';
-
 import { cn } from 'utils/cn';
 
 const BUTTON_COMMON_CLASSES =
@@ -18,8 +16,6 @@ export const UploadFeatureTabs = ({
   mode: UploadFeatureMode;
   onChange: (mode: UploadFeatureMode) => void;
 }): JSX.Element => {
-  const { CSVUpload } = useFeatureFlags();
-
   return (
     <div className="flex w-full space-x-4 border-b border-gray-400 text-xs font-medium text-black">
       <button
@@ -34,19 +30,17 @@ export const UploadFeatureTabs = ({
         Shapefile
       </button>
 
-      {CSVUpload && (
-        <button
-          type="button"
-          className={cn({
-            [BUTTON_COMMON_CLASSES]: true,
-            [BUTTON_ACTIVE_CLASSES]: mode === 'csv',
-            [BUTTON_INACTIVE_CLASSES]: mode !== 'csv',
-          })}
-          onClick={() => onChange('csv')}
-        >
-          CSV
-        </button>
-      )}
+      <button
+        type="button"
+        className={cn({
+          [BUTTON_COMMON_CLASSES]: true,
+          [BUTTON_ACTIVE_CLASSES]: mode === 'csv',
+          [BUTTON_INACTIVE_CLASSES]: mode !== 'csv',
+        })}
+        onClick={() => onChange('csv')}
+      >
+        CSV
+      </button>
     </div>
   );
 };
