@@ -78,7 +78,7 @@ export const WebShotStatus = () => {
           ...globalThis.MARXAN,
           webshot_ready: true,
         };
-      }, 1000);
+      }, 10000);
     }
   }, [reportDataIsFetched]);
 
