@@ -5,6 +5,8 @@ import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
+import { HiOutlineArrowUpOnSquareStack } from 'react-icons/hi2';
+
 import {
   useAllPaginatedFeatures,
   useSaveSelectedFeatures,
@@ -16,12 +18,12 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
+import Uploader from 'layout/project/sidebar/project/inventory-panel/features/modals/upload';
 
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 import List from './list';
 import Toolbar from './toolbar';
-import Uploader from './uploader';
 
 export const ScenariosFeaturesAdd = (): JSX.Element => {
   const [open, setOpen] = useState(false);
@@ -29,6 +31,7 @@ export const ScenariosFeaturesAdd = (): JSX.Element => {
   const [search, setSearch] = useState(null);
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState('featureClassName');
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
@@ -163,9 +166,24 @@ export const ScenariosFeaturesAdd = (): JSX.Element => {
                 iconClassName="w-10 h-10 text-primary-500"
               />
 
-              {/* Field to upload */}
               <div className="mx-8 mb-5 mt-3">
-                <Uploader />
+                <Button
+                  className="dropzone w-full cursor-pointer py-1 hover:bg-gray-600"
+                  theme="secondary"
+                  size="base"
+                  onClick={() => {
+                    setUploadModalOpen(true);
+                  }}
+                >
+                  Upload your own features
+                  <HiOutlineArrowUpOnSquareStack className="absolute right-6 h-5 w-5 text-white" />
+                </Button>
+                <Uploader
+                  isOpen={uploadModalOpen}
+                  onDismiss={() => {
+                    setUploadModalOpen(false);
+                  }}
+                />
               </div>
 
               <Toolbar
