@@ -175,7 +175,7 @@ export const Navigation = (): JSX.Element => {
   }, [runJob, queryClient, sid]);
 
   return (
-    <nav className="z-20 flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-800 px-2 py-8">
+    <nav className="z-20 flex max-w-[70px] flex-col items-center justify-between bg-gray-800 px-2 py-8">
       <div className="flex flex-col">
         <Link href="/">
           <Image alt="Marxan logo" width={55} height={7} src={WHITE_LOGO_SVG} />

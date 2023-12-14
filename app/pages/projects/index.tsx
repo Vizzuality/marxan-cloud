@@ -15,7 +15,7 @@ const ProjectsPage = (): JSX.Element => {
     <Protected>
       <ProjectTitle title="" />
       <MetaIcons />
-      <ProjectLayout className="w-full flex-col">
+      <ProjectLayout className="h-fit w-full flex-col">
         <ProjectsWelcome />
         <ProjectsToolbar />
         <ProjectsList />
