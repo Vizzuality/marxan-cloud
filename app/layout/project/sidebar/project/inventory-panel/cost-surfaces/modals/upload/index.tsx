@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
@@ -50,6 +51,8 @@ export const CostSurfaceUploadModal = ({
   const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
+
+  const queryClient = useQueryClient();
 
   const uploadProjectCostSurfaceMutation = useUploadProjectCostSurface();
 
@@ -118,6 +121,7 @@ export const CostSurfaceUploadModal = ({
         {
           onSuccess: () => {
             setSuccessFile({ ...successFile });
+            queryClient.invalidateQueries(['cost-surfaces', pid]);
             onClose();
             addToast(
               'success-upload-cost-surface-file',
@@ -163,7 +167,7 @@ export const CostSurfaceUploadModal = ({
         }
       );
     },
-    [pid, addToast, onClose, uploadProjectCostSurfaceMutation, successFile]
+    [pid, addToast, onClose, uploadProjectCostSurfaceMutation, successFile, queryClient]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
