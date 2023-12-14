@@ -9,7 +9,8 @@ import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
 import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
 
-import AddFeaturesModal from './add-modal';
+import AddFeaturesModal from '../target-spf/modals/add';
+
 import ListFeatures from './list';
 
 export const ScenariosSidebarEditFeatures = ({ onContinue }): JSX.Element => {

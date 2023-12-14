@@ -19,7 +19,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Search from 'components/search';
 import FeaturesInfo from 'layout/project/sidebar/project/inventory-panel/features/info';
-import AddFeaturesModal from 'layout/project/sidebar/scenario/grid-setup/features/add/add-modal';
+import AddFeaturesModal from 'layout/project/sidebar/scenario/grid-setup/features/target-spf/modals/add';
 import TargetsSPFTable from 'layout/project/sidebar/scenario/grid-setup/features/target-spf/targets-spf-table';
 import ActionsMenu from 'layout/project/sidebar/scenario/grid-setup/features/target-spf/targets-spf-table/actions-menu';
 import Section from 'layout/section';
@@ -104,11 +104,11 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           marxanSettings: {
             ...splitFeature.marxanSettings,
             prop: (feature.marxanSettings?.prop || 50) * 100,
-            ...(featureValues[splitFeature.id]?.target && {
-              prop: featureValues[splitFeature.id].target,
+            ...(featureValues[`${feature.id}-${splitFeature.name}`]?.target && {
+              prop: featureValues[`${feature.id}-${splitFeature.name}`].target,
             }),
-            ...(featureValues[splitFeature.id]?.spf && {
-              fpf: featureValues[splitFeature.id].spf,
+            ...(featureValues[`${feature.id}-${splitFeature.name}`]?.spf && {
+              fpf: featureValues[`${feature.id}-${splitFeature.name}`].spf,
             }),
           },
         }));
@@ -533,7 +533,9 @@ const TargetAndSPFFeatures = (): JSX.Element => {
         description="The action cannot be reverted."
         open={!!confirmationTarget}
         onAccept={onApplyAllTargets}
-        onDismiss={() => {}}
+        onDismiss={() => {
+          setConfirmationTarget(null);
+        }}
       />
       <ConfirmationPrompt
         title={`Are you sure you want to change all feature SPFs to ${confirmationFPF}?`}
@@ -541,7 +543,9 @@ const TargetAndSPFFeatures = (): JSX.Element => {
         open={!!confirmationFPF}
         onAccept={onApplyAllSPF}
         onRefuse={() => setConfirmationFPF(null)}
-        onDismiss={() => {}}
+        onDismiss={() => {
+          setConfirmationFPF(null);
+        }}
       />
     </>
   );
