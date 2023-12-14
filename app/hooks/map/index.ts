@@ -483,7 +483,7 @@ export function useTargetedPreviewLayers({
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
 
-    const { layerSettings } = options;
+    const { layerSettings = {} } = options;
 
     const FEATURES = features.filter((ft) => Object.keys(layerSettings).includes(ft.id));
 
