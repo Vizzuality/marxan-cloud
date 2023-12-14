@@ -137,11 +137,11 @@ const SplitModal = ({
           },
         },
         {
-          onSuccess: () => {
-            queryClient.invalidateQueries(['selected-features', sid]);
+          onSuccess: async () => {
+            await queryClient.invalidateQueries(['targeted-features', sid]);
+            await queryClient.invalidateQueries(['selected-features', sid]);
             handleModal('split', false);
           },
-          onError: () => {},
         }
       );
     },
@@ -220,7 +220,7 @@ const SplitModal = ({
                   {(fprops) => (
                     <Field id="splitValues" {...fprops} className="relative">
                       <div className="flex justify-between">
-                        <div className="modal-checkbox-list max-h-48 w-full space-y-2 overflow-y-auto">
+                        <div className="modal-checkbox-list max-h-48 w-full space-y-2 overflow-y-auto pt-1">
                           {getSplitOptionValues(values.splitOption)?.map((value) => {
                             const checked = !!splitFeaturesSelected.find(
                               (sfs) => sfs.id === `${value.name}`

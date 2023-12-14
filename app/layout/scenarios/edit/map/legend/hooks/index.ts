@@ -236,7 +236,7 @@ export const useFeaturesLegend = () => {
 
   const uniqueBinaryFeatures = [
     ...binaryFeaturesItems,
-    ...targetedFeaturesByRange.binaryFeatures,
+    ...(targetedFeaturesByRange?.binaryFeatures || []),
   ].filter(
     (item, index, self) =>
       index === self.findIndex((t) => JSON.stringify(t) === JSON.stringify(item))
@@ -244,7 +244,7 @@ export const useFeaturesLegend = () => {
 
   const uniqueContinuousFeatures = [
     ...continuousFeaturesItems,
-    ...targetedFeaturesByRange.continuousFeatures,
+    ...(targetedFeaturesByRange?.continuousFeatures || []),
   ].filter(
     (item, index, self) =>
       index === self.findIndex((t) => JSON.stringify(t) === JSON.stringify(item))
