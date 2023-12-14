@@ -21,8 +21,6 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with
 - `NEXT_PUBLIC_FEATURE_FLAGS` (comma-separated list of feature flag strings,
   optional, default is an empty list): list features here in order to _enable_
   them in the frontend app; features available behind feature flags are:
-  - `split`: make _split_ functionality available for conservation features in
-    the frontend app
   - `strat`: make _stratification_ functionality available for conservation
     features in the frontend app
 
