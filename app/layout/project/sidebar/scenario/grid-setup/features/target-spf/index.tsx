@@ -85,6 +85,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
 
   const targetedFeatures = useMemo(() => {
     let parsedData = [];
+    console.log({ featureValues });
     selectedFeaturesQuery.data?.forEach((feature) => {
       if (feature.splitFeaturesSelected?.length > 0) {
         const featureMetadata = allFeaturesQuery.data?.find(({ id }) => id === feature.id);
@@ -103,7 +104,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           splitted: true,
           marxanSettings: {
             ...splitFeature.marxanSettings,
-            prop: (feature.marxanSettings?.prop || 50) * 100,
+            prop: splitFeature.marxanSettings?.prop * 100,
             ...(featureValues[`${feature.id}-${splitFeature.name}`]?.target && {
               prop: featureValues[`${feature.id}-${splitFeature.name}`].target,
             }),
@@ -127,7 +128,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
             type: featureMetadata?.tag,
             marxanSettings: {
               ...feature.marxanSettings,
-              prop: (feature.marxanSettings?.prop || 50) * 100,
+              prop: feature.marxanSettings?.prop * 100,
               ...(featureValues[feature.id]?.target && {
                 prop: featureValues[feature.id].target,
               }),
