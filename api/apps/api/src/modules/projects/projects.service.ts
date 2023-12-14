@@ -125,6 +125,7 @@ import {
 } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
+import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 export { validationFailed } from '../planning-areas';
 
 export const projectNotFound = Symbol(`project not found`);
@@ -191,16 +192,30 @@ export class ProjectsService {
       data: result.data.map((feature) => {
         return {
           ...feature,
-          amountRange: {
-            min: feature?.amountMin ?? null,
-            max: feature?.amountMax ?? null,
-          },
+          amountRange: this.transformMinMaxAmountsFromSquareMetresToSquareKmsForFeaturesFromShapefile(feature),
         };
       }),
       metadata: result.metadata,
     };
 
     return right(resultWithMappedAmountRange);
+  }
+
+  /**
+   * When reporting feature min/max ranges, amounts set by users for "legacy"
+   * features (that is, either features from legacy projects or features from
+   * CSV files with puvspr data - for both we set `isLegacy = true`) should
+   * be used verbatim; amounts calculated within the platform for features
+   * uploaded from shapefiles, instead, should be divided by 1M in order to
+   * report them in square km rather than in square metres (they are stored
+   * in square metres in the platform's backend).
+   */
+  transformMinMaxAmountsFromSquareMetresToSquareKmsForFeaturesFromShapefile(feature: Partial<GeoFeature> | undefined): { min: number | null, max: number | null } {
+    const min = feature?.amountMin ? (feature.isLegacy ? feature.amountMin : feature.amountMin / 1_000_000) : null;
+    const max = feature?.amountMax ? (feature.isLegacy ? feature.amountMax : feature.amountMax / 1_000_000) : null;
+    return {
+      min, max
+    };
   }
 
   async findAll(fetchSpec: FetchSpecification, info: ProjectsServiceRequest) {
