@@ -41,19 +41,17 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
       />
 
       <ul className="mt-1 flex w-full justify-between">
-        {items
-          .filter(({ value }) => !!value)
-          .map(({ value }) => (
-            <li
-              key={`${value}`}
-              className={cn({
-                'flex-shrink-0 text-xs': true,
-                [className.labels]: className.labels,
-              })}
-            >
-              {format(+parseInt(value, 10))}
-            </li>
-          ))}
+        {items.map(({ value }) => (
+          <li
+            key={`${value}`}
+            className={cn({
+              'flex-shrink-0 text-xs': true,
+              [className.labels]: className.labels,
+            })}
+          >
+            {format(+parseInt(value, 10))}
+          </li>
+        ))}
       </ul>
     </div>
   );
