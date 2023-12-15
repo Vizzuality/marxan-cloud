@@ -24,7 +24,7 @@ import {
   usePUGridLayer,
   useFeaturePreviewLayers,
   useBBOX,
-  useTargetedPreviewLayers,
+  // useTargetedPreviewLayers,
   useCostSurfaceLayer,
   useContinuousFeaturesLayers,
 } from 'hooks/map';
@@ -253,18 +253,18 @@ export const ScenariosEditMap = (): JSX.Element => {
     }
   );
 
-  const TargetedPreviewLayers = useTargetedPreviewLayers({
-    features: targetedFeaturesData,
-    cache,
-    active: targetedFeaturesData?.length > 0,
-    bbox,
-    options: {
-      featuresRecipe,
-      featureHoverId,
-      selectedFeatures,
-      layerSettings,
-    },
-  });
+  // const TargetedPreviewLayers = useTargetedPreviewLayers({
+  //   features: targetedFeaturesData,
+  //   cache,
+  //   active: targetedFeaturesData?.length > 0,
+  //   bbox,
+  //   options: {
+  //     featuresRecipe,
+  //     featureHoverId,
+  //     selectedFeatures,
+  //     layerSettings,
+  //   },
+  // });
 
   const PUGridLayer = usePUGridLayer({
     cache,
@@ -326,7 +326,7 @@ export const ScenariosEditMap = (): JSX.Element => {
     costSurfaceLayer,
     WDPApreviewLayer,
     ...FeaturePreviewLayers,
-    ...TargetedPreviewLayers,
+    // ...TargetedPreviewLayers,
     ...continuousFeaturesLayers,
   ].filter((l) => !!l);
 
@@ -548,6 +548,8 @@ export const ScenariosEditMap = (): JSX.Element => {
         return null;
     }
   };
+
+  console.log({ LAYERS });
 
   return (
     <div className="relative h-full w-full overflow-hidden">

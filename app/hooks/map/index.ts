@@ -240,7 +240,15 @@ export function useContinuousFeaturesLayers({
     if (!active) return [];
 
     return features.map((fid) => {
-      const { amountRange, color, opacity = 1 } = layerSettings[fid] || {};
+      const {
+        amountRange,
+        color,
+        opacity = 1,
+        split = 'amount',
+        parentId,
+      } = layerSettings[fid] || {};
+
+      const _id = split && split !== 'amount' ? parentId : fid;
 
       return {
         id: `continuous-features-layer-${pid}-${fid}`,
@@ -248,7 +256,7 @@ export function useContinuousFeaturesLayers({
         source: {
           type: 'vector',
           tiles: [
-            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/features/${fid}/preview/tiles/{z}/{x}/{y}.mvt`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/features/${_id}/preview/tiles/{z}/{x}/{y}.mvt`,
           ],
         },
         render: {
@@ -260,7 +268,7 @@ export function useContinuousFeaturesLayers({
                 'fill-color': [
                   'interpolate',
                   ['linear'],
-                  ['get', 'amount'],
+                  ['get', split],
                   amountRange.min,
                   COLORS.continuous.default,
                   amountRange.max,
