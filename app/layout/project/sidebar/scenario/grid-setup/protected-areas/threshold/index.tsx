@@ -120,51 +120,66 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
   const areProjectPAreasSelected = !!projectPAreasSelectedIds.length;
 
   const handleSubmit = useCallback(
-    (values) => {
-      setSubmitting(true);
-
+    (values, form) => {
       const { wdpaThreshold } = values;
 
-      saveScenarioProtectedAreasMutation.mutate(
-        {
-          id: `${sid}`,
-          data: {
-            areas: selectedProtectedAreas,
-            threshold: +(wdpaThreshold * 100).toFixed(0),
+      const thresholdTouched = form.getFieldState('wdpaThreshold')?.dirty;
+
+      if (thresholdTouched) {
+        setSubmitting(true);
+        saveScenarioProtectedAreasMutation.mutate(
+          {
+            id: `${sid}`,
+            data: {
+              areas: selectedProtectedAreas,
+              threshold: +(wdpaThreshold * 100).toFixed(0),
+            },
           },
-        },
-        {
-          onSuccess: () => {
-            addToast(
-              'save-scenario-wdpa',
-              <>
-                <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Scenario protected areas threshold saved</p>
-              </>,
-              {
-                level: 'success',
-              }
-            );
-          },
-          onError: () => {
-            addToast(
-              'error-scenario-wdpa',
-              <>
-                <h2 className="font-medium">Error!</h2>
-                <p className="text-sm">Scenario protected areas threshold not saved</p>
-              </>,
-              {
-                level: 'error',
-              }
-            );
-          },
-          onSettled: () => {
-            setSubmitting(false);
-          },
-        }
-      );
+          {
+            onSuccess: () => {
+              addToast(
+                'save-scenario-wdpa',
+                <>
+                  <h2 className="font-medium">Success!</h2>
+                  <p className="text-sm">Scenario protected areas threshold saved</p>
+                </>,
+                {
+                  level: 'success',
+                }
+              );
+            },
+            onError: () => {
+              addToast(
+                'error-scenario-wdpa',
+                <>
+                  <h2 className="font-medium">Error!</h2>
+                  <p className="text-sm">Scenario protected areas threshold not saved</p>
+                </>,
+                {
+                  level: 'error',
+                }
+              );
+            },
+            onSettled: () => {
+              setSubmitting(false);
+            },
+          }
+        );
+      }
+      if (!thresholdTouched) {
+        addToast(
+          'save-scenario-wdpa',
+          <>
+            <h2 className="font-medium"></h2>
+            <p className="text-sm">No modifications have been made to the protected areas.</p>
+          </>,
+          {
+            level: 'info',
+          }
+        );
+      }
     },
-    [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast, onGoBack]
+    [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast]
   );
 
   useEffect(() => {
@@ -205,7 +220,7 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
         </h3>
       </div>
       <FormRFF onSubmit={handleSubmit} initialValues={INITIAL_VALUES}>
-        {({ values, handleSubmit: RFFhandleSubmit, form }) => {
+        {({ values, handleSubmit: RFFhandleSubmit }) => {
           return (
             <form
               onSubmit={RFFhandleSubmit}
@@ -320,7 +335,7 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
                     size="lg"
                     type="submit"
                     className="relative px-20 md:px-9 lg:px-16 xl:px-20"
-                    disabled={submitting || !form.getFieldState('wdpaThreshold')?.dirty}
+                    disabled={submitting}
                   >
                     <span>Save</span>
                   </Button>
