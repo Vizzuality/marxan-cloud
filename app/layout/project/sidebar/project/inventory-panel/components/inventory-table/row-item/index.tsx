@@ -28,12 +28,12 @@ const RowItem = ({
   }, []);
 
   return (
-    <tr key={id} className="flex w-full align-top">
-      <td className="pb-2 pr-1 pt-5">
+    <tr key={id} className="flex w-full py-1 align-top">
+      <td className="py-2 pr-1">
         <Checkbox
           id={`select-${id}`}
           theme="light"
-          className="block h-4 w-4 checked:bg-blue-500"
+          className="mt-0.5 block h-4 w-4 checked:bg-blue-500"
           onChange={onSelectRow}
           value={id}
           checked={isCustom && selectedIds.includes(id)}
@@ -42,7 +42,7 @@ const RowItem = ({
       </td>
       <td
         className={cn({
-          'flex flex-col px-1 pb-2 pt-5': true,
+          'flex flex-col px-1 py-2': true,
           'w-52': tag,
         })}
       >
@@ -58,7 +58,7 @@ const RowItem = ({
         )}
       </td>
       {tag && (
-        <td className="w-28 px-6 pb-2 pt-5 text-xs">
+        <td className="w-28 px-6 py-2 text-xs">
           <div className="flex justify-center">
             <span className="whitespace-nowrap rounded-full bg-yellow-700 bg-opacity-10 px-2 py-1 text-yellow-700">
               {tag}
@@ -66,7 +66,7 @@ const RowItem = ({
           </div>
         </td>
       )}
-      <td className="w-22 ml-auto pb-2 pl-1 pr-2 pt-5">
+      <td className="w-22 ml-auto py-2 pl-1 pr-2">
         <div className="flex gap-6">
           <button type="button" onClick={() => onToggleSeeOnMap(id)}>
             <Icon
