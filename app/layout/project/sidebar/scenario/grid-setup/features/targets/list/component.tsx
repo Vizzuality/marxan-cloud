@@ -253,7 +253,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
 
   return (
     <FormRFF key="features-target" onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
-      {({ handleSubmit, values }) => (
+      {({ handleSubmit, form, values }) => (
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
@@ -364,7 +364,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
                   type="submit"
                   theme="primary"
                   size="lg"
-                  disabled={submitting}
+                  disabled={submitting || !form.getFieldState('features')?.dirty}
                 >
                   Save
                 </Button>

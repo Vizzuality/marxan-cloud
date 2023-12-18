@@ -314,13 +314,13 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
                   <span>Back</span>
                 </Button>
 
-                {editable && form.getFieldState('wdpaThreshold')?.dirty && (
+                {editable && (
                   <Button
                     theme="primary"
                     size="lg"
                     type="submit"
                     className="relative px-20 md:px-9 lg:px-16 xl:px-20"
-                    disabled={submitting}
+                    disabled={submitting || !form.getFieldState('wdpaThreshold')?.dirty}
                   >
                     <span>Save</span>
                   </Button>
