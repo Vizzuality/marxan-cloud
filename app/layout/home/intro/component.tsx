@@ -29,7 +29,7 @@ export const HomeIntro: React.FC = () => {
       style={{ backgroundColor }}
     >
       <HeroAnimation />
-      <Wrapper>
+      <Wrapper className="h-full">
         <div className="relative z-10 m-auto flex h-full w-full max-w-5xl flex-col justify-between py-8 md:mb-48 md:mt-52 md:py-0">
           <div className="lg:pr-80">
             <motion.h1
