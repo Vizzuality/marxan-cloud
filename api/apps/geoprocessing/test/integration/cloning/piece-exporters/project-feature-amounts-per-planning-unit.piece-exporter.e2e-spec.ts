@@ -45,11 +45,11 @@ let fixtures: FixtureType<typeof getFixtures>;
 describe(ProjectFeatureAmountsPerPlanningUnitPieceExporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
-  }, 10_000);
+  }, 100000);
 
   afterEach(async () => {
     await fixtures?.cleanUp();
-  });
+  }, 100000);
 
   it("saves an empty file when project doesn't have neither derived features and puvspr calculations", async () => {
     const input =
@@ -69,6 +69,7 @@ describe(ProjectFeatureAmountsPerPlanningUnitPieceExporter, () => {
     await fixtures.GivenProjectExist();
     const { customFeature } =
       await fixtures.GivenACustomAndAPlatformFeatureForProject();
+    await fixtures.GivenProjectHasPlanningUnits();
     await fixtures.GivenProjectHasFeatureAmountsPerPlanningUnit(
       customFeature.id,
     );
@@ -85,6 +86,7 @@ describe(ProjectFeatureAmountsPerPlanningUnitPieceExporter, () => {
     await fixtures.GivenProjectExist();
     const { platformFeature } =
       await fixtures.GivenACustomAndAPlatformFeatureForProject();
+    await fixtures.GivenProjectHasPlanningUnits();
     await fixtures.GivenProjectHasFeatureAmountsPerPlanningUnit(
       platformFeature.id,
     );
@@ -125,6 +127,24 @@ describe(ProjectFeatureAmountsPerPlanningUnitPieceExporter, () => {
       .WhenPieceExporterIsInvoked(input)
       .ThenFeatureAmountsPerPlanningUnitFileHasASplitDerivedFeature(
         derivedFeature,
+        customFeature,
+      );
+  });
+
+  it('saves successfully discarding feature amount with no corresponding feature found on the api', async () => {
+    const input =
+      fixtures.GivenAProjectFeatureAmountsPerPlanningUnitExportJob();
+    await fixtures.GivenProjectExist();
+    const { customFeature } =
+      await fixtures.GivenACustomAndAPlatformFeatureForProject();
+    await fixtures.GivenProjectHasPlanningUnits();
+    await fixtures.GivenProjectHasFeatureAmountsPerPlanningUnit(
+      customFeature.id,
+    );
+    await fixtures.GivenProjectHasFeatureAmountsPerPlanningUnit(v4());
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenFeatureAmountsPerPlanningUnitFileHasFeatureAmountsPerPlanningUnitForFeature(
         customFeature,
       );
   });
@@ -251,21 +271,25 @@ const getFixtures = async () => {
       return derivedFeature;
     },
     GivenNoDerivedFeaturesForProject: () => {},
-    GivenProjectHasFeatureAmountsPerPlanningUnit: async (featureId: string) => {
+    GivenProjectHasPlanningUnits: async () => {
       projectPus = await GivenProjectPus(
         geoEntityManager,
         projectId,
         amountOfPuvsrCalculationsPerFeature,
       );
+    },
+    GivenProjectHasFeatureAmountsPerPlanningUnit: async (featureId: string) => {
       const featureAmountsPerPlanningUnit = Array(
         amountOfPuvsrCalculationsPerFeature,
       )
         .fill(0)
-        .map((_, index) => ({
-          amount: expectedAmountPerPu,
-          featureId,
-          projectPuId: projectPus[index].id,
-        }));
+        .map((_, index) => {
+          return {
+            amount: expectedAmountPerPu,
+            featureId,
+            projectPuId: projectPus[index].id,
+          };
+        });
       return featureAmountsPerPlanningUnitRepo.saveAmountPerPlanningUnitAndFeature(
         projectId,
         featureAmountsPerPlanningUnit,

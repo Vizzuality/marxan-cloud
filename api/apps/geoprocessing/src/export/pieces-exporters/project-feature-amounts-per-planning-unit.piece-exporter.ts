@@ -107,16 +107,20 @@ export class ProjectFeatureAmountsPerPlanningUnitPieceExporter
     featureAmountPerPlanningUnit: FeatureAmountPerProjectPlanningUnit[],
     projectId: string,
   ) {
-    const featureIds = featureAmountPerPlanningUnit.map(
-      ({ featureId }) => featureId,
+    const featureIds = new Set(
+      featureAmountPerPlanningUnit.map(({ featureId }) => featureId),
     );
-
-    const featuresById = await this.getFeaturesById(featureIds);
+    const featuresById = await this.getFeaturesById([...featureIds]);
 
     const projectPusById = await this.getProjectPusById(projectId);
 
-    return featureAmountPerPlanningUnit.map(
-      ({ featureId, amount, projectPuId }) => {
+    // @TODO: Because the feature_amounts_per_planning_unit table is not accounted for in the clean up task, it can happen
+    // that when exporting after having deleted a feature, in the mapping below the feature info would not be found and
+    // cause an error. Because it's not clear whether deleting the feature_amount_per_pu records of the dangling feature
+    // in the clean up task has any implications, to avoid this error, the missing features are discarded.
+    return featureAmountPerPlanningUnit
+      .filter(({ featureId }) => featuresById[featureId])
+      .map(({ featureId, amount, projectPuId }) => {
         const feature = featuresById[featureId];
         return {
           amount,
@@ -124,8 +128,7 @@ export class ProjectFeatureAmountsPerPlanningUnitPieceExporter
           featureName: feature.featureName,
           isCustom: feature.isCustom,
         };
-      },
-    );
+      });
   }
 
   private async getFeaturesById(featureIds: string[]) {
