@@ -549,7 +549,7 @@ export const ScenariosEditMap = (): JSX.Element => {
     }
   };
 
-  console.log({ LAYERS });
+  // console.log({ LAYERS });
 
   return (
     <div className="relative h-full w-full overflow-hidden">

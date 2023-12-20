@@ -143,7 +143,8 @@ export const useFeaturesLegend = () => {
   const featureColors = useColorFeatures(pid, sid);
 
   const selectedFeaturesQuery = useSelectedFeatures(sid);
-  const selectedFeaturesIds = selectedFeaturesQuery.data?.map(({ metadata }) => metadata?.id) || [];
+  const selectedFeaturesIds =
+    selectedFeaturesQuery.data?.filter((s) => s.metadata).map(({ metadata: { id } }) => id) || [];
 
   const projectFeaturesQuery = useAllFeatures(
     pid,
@@ -200,8 +201,9 @@ export const useFeaturesLegend = () => {
 
   const targetedFeatures = useTargetedFeatures(sid);
 
-  const parsedTargetedFeatures = targetedFeatures.data?.map(
-    ({ id, name, splitted, parentId, splitSelected }) => {
+  const parsedTargetedFeatures = targetedFeatures.data
+    ?.filter(({ featureId }) => selectedFeaturesIds.includes(featureId))
+    ?.map(({ id, name, splitted, parentId, splitSelected }) => {
       const allFeatures = queryClient.getQueryData<any>(['all-features', pid], {
         exact: false,
       })?.data;
@@ -217,8 +219,7 @@ export const useFeaturesLegend = () => {
         split: splitSelected,
         color: featureColors?.find(({ id: featureId }) => featureId === id)?.color,
       };
-    }
-  );
+    });
 
   const targetedFeaturesByRange = parsedTargetedFeatures?.reduce(
     (acc, x) => ({
@@ -253,6 +254,8 @@ export const useFeaturesLegend = () => {
     (item, index, self) =>
       index === self.findIndex((t) => JSON.stringify(t) === JSON.stringify(item))
   );
+
+  // console.log({ uniqueBinaryFeatures, uniqueContinuousFeatures });
 
   return [
     ...LEGEND_LAYERS['binary-features']({

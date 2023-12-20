@@ -610,6 +610,7 @@ export function useUploadFeaturesShapefile({
     onSuccess: async (data, variables) => {
       const { id: projectId } = variables;
       await queryClient.invalidateQueries(['all-features', projectId]);
+      await queryClient.invalidateQueries(['all-paginated-features', projectId]);
     },
   });
 }
@@ -640,6 +641,7 @@ export function useUploadFeaturesCSV({
     onSuccess: async (data, variables) => {
       const { id: projectId } = variables;
       await queryClient.invalidateQueries(['all-features', projectId]);
+      await queryClient.invalidateQueries(['all-paginated-features', projectId]);
     },
   });
 }
@@ -701,6 +703,7 @@ export function useEditFeatureTag() {
       await queryClient.invalidateQueries(['feature', featureId]);
       await queryClient.invalidateQueries(['project-tags', projectId]);
       await queryClient.invalidateQueries(['all-features', projectId]);
+      await queryClient.invalidateQueries(['all-paginated-features', projectId]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
@@ -734,6 +737,7 @@ export function useDeleteFeatureTag() {
       const { featureId, projectId } = variables;
       await queryClient.invalidateQueries(['feature', featureId]);
       await queryClient.invalidateQueries(['all-features', projectId]);
+      await queryClient.invalidateQueries(['all-paginated-features', projectId]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);

@@ -101,6 +101,8 @@ export const ScenariosList: React.FC = () => {
           );
           await queryClient.invalidateQueries(['scenarios', pid]);
           await queryClient.invalidateQueries(['all-features', pid]);
+          await queryClient.invalidateQueries(['all-paginated-features', pid]);
+
           setDelete(null);
         },
         onError: () => {
