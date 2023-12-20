@@ -239,7 +239,11 @@ export function useContinuousFeaturesLayers({
   return useMemo(() => {
     if (!active) return [];
 
-    return features.map((fid) => {
+    const fs = [...features];
+
+    fs.reverse();
+
+    return fs.map((fid) => {
       const {
         amountRange,
         color,

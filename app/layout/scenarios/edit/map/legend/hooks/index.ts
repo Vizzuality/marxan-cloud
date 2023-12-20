@@ -299,6 +299,7 @@ export const useFeaturesLegend = () => {
           const i = newSelectedFeatures.indexOf(featureId);
           newSelectedFeatures.splice(i, 1);
         }
+
         dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
 
         dispatch(

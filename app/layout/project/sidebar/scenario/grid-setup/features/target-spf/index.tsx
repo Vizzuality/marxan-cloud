@@ -66,10 +66,14 @@ const TargetAndSPFFeatures = (): JSX.Element => {
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
 
   const dispatch = useAppDispatch();
-
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setLayerSettings } = scenarioSlice.actions;
-  const { layerSettings } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  const { setSelectedFeatures, setSelectedContinuousFeatures, setLayerSettings } =
+    scenarioSlice.actions;
+
+  const { selectedFeatures, selectedContinuousFeatures, layerSettings } = useAppSelector(
+    (state) => state[`/scenarios/${sid}/edit`]
+  );
 
   const allFeaturesQuery = useAllFeatures(
     pid,
@@ -85,7 +89,6 @@ const TargetAndSPFFeatures = (): JSX.Element => {
 
   const targetedFeatures = useMemo(() => {
     let parsedData = [];
-    console.log({ featureValues });
     selectedFeaturesQuery.data?.forEach((feature) => {
       if (feature.splitFeaturesSelected?.length > 0) {
         const featureMetadata = allFeaturesQuery.data?.find(({ id }) => id === feature.id);
@@ -208,19 +211,38 @@ const TargetAndSPFFeatures = (): JSX.Element => {
 
   const toggleSeeOnMap = useCallback(
     (id: Feature['id']) => {
-      const selectedFeature = targetedFeatures.find(({ id: featureId }) => featureId === id);
-      const isContinuous =
-        selectedFeature.amountRange.min !== null && selectedFeature.amountRange.max !== null;
+      const { color, amountRange } = targetedFeatures.find(({ id: featureId }) => featureId === id);
+      // const isContinuous =
+      //   selectedFeature.amountRange.min !== null && selectedFeature.amountRange.max !== null;
+
+      console.log(id, layerSettings);
+
+      const newSelectedFeatures = [...selectedContinuousFeatures];
+      const isIncluded = newSelectedFeatures.includes(id);
+
+      if (!isIncluded) {
+        newSelectedFeatures.push(id);
+      } else {
+        const i = newSelectedFeatures.indexOf(id);
+        newSelectedFeatures.splice(i, 1);
+      }
+      console.log(newSelectedFeatures);
+      dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
+
+      console.log(selectedContinuousFeatures);
 
       dispatch(
         setLayerSettings({
           id,
           settings: {
             visibility: layerSettings[id] ? !layerSettings[id].visibility : true,
-            color: selectedFeature?.color,
-            ...(isContinuous && {
-              amountRange: selectedFeature.amountRange,
-            }),
+            amountRange,
+            color,
+
+            // color: selectedFeature?.color,
+            // ...(isContinuous && {
+            //   amountRange: selectedFeature.amountRange,
+            // }),
           },
         })
       );
