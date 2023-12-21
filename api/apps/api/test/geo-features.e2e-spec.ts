@@ -20,7 +20,6 @@ import { range } from 'lodash';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { GivenUserExists } from './steps/given-user-exists';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -68,6 +67,74 @@ describe('GeoFeaturesModule (e2e)', () => {
     expect(response.body.data[0].attributes.amountRange).toEqual({
       min: null,
       max: null,
+    });
+  });
+
+  test('should include the min and max amount of the features in the proper units of measure', async () => {
+    const projectId = world.projectWithCountry; // doesn't really matter how the project is created for this test
+    const sqlName = 'generic_namidia_feature_data';
+    const featureId1 = await fixtures.GivenFeatureWithData(
+      'legacy',
+      sqlName,
+      projectId,
+    );
+    const featureId2 = await fixtures.GivenFeatureWithData(
+      'nonLegacyBelow1',
+      sqlName,
+      projectId,
+    );
+    const featureId3 = await fixtures.GivenFeatureWithData(
+      'nonLegacyOver1',
+      sqlName,
+      projectId,
+    );
+    await fixtures.GivenMinMaxAmountForFeature(
+      featureId1,
+      true,
+      22304094,
+      0.1234,
+    );
+    await fixtures.GivenMinMaxAmountForFeature(
+      featureId2,
+      false,
+      123456,
+      567890,
+    );
+    await fixtures.GivenMinMaxAmountForFeature(
+      featureId3,
+      false,
+      123456789,
+      567891234,
+    );
+    const response = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${world.projectWithCountry}/features`)
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(HttpStatus.OK);
+
+    const geoFeaturesForProject: any[] = response.body.data
+      .filter((element: any) =>
+        [featureId1, featureId2, featureId3].includes(element.id),
+      )
+      .sort((element: any) => element.name);
+    expect(geoFeaturesForProject.length).toBe(3);
+    expect(geoFeaturesForProject[0].attributes.featureClassName).toBe('legacy');
+    expect(geoFeaturesForProject[0].attributes.amountRange).toEqual({
+      min: 22304094,
+      max: 0.1234,
+    });
+    expect(geoFeaturesForProject[1].attributes.featureClassName).toBe(
+      'nonLegacyBelow1',
+    );
+    expect(geoFeaturesForProject[1].attributes.amountRange).toEqual({
+      min: parseFloat((0.123456).toFixed(4)),
+      max: parseFloat((0.56789).toFixed(4)),
+    });
+    expect(geoFeaturesForProject[2].attributes.featureClassName).toBe(
+      'nonLegacyOver1',
+    );
+    expect(geoFeaturesForProject[2].attributes.amountRange).toEqual({
+      min: Math.round(123.456789),
+      max: Math.round(567.891234),
     });
   });
 
@@ -215,6 +282,21 @@ export const getGeoFeatureFixtures = async (app: INestApplication) => {
   );
 
   return {
+    GivenMinMaxAmountForFeature: async (
+      featureId: string,
+      isLegacy: boolean,
+      min: number,
+      max: number,
+    ) => {
+      const feature = await featureRepo.findOneOrFail({
+        where: { id: featureId },
+      });
+      feature.isLegacy = isLegacy;
+      feature.amountMin = min;
+      feature.amountMax = max;
+
+      await featureRepo.save(feature);
+    },
     GivenFeatureWithData: async (
       name: string,
       sqlFilename: string,
@@ -244,9 +326,8 @@ export const getGeoFeatureFixtures = async (app: INestApplication) => {
       );
       const content = await fs.readFile(filePath, 'utf-8');
 
-      return geoEntityManager.query(
-        content.replace(/\$feature_id/g, featureId),
-      );
+      await geoEntityManager.query(content.replace(/\$feature_id/g, featureId));
+      return featureId;
     },
     GivenScenarioFeaturesData: async (
       featureClassName: string,

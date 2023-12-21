@@ -109,10 +109,7 @@ import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
 import stream from 'stream';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
-import {
-  ScenariosService,
-  SubmitProtectedAreaError,
-} from '@marxan-api/modules/scenarios/scenarios.service';
+import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 import {
   OutputProjectSummariesService,
   outputProjectSummaryNotFound,
@@ -126,6 +123,7 @@ import {
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
+
 export { validationFailed } from '../planning-areas';
 
 export const projectNotFound = Symbol(`project not found`);
@@ -192,7 +190,10 @@ export class ProjectsService {
       data: result.data.map((feature) => {
         return {
           ...feature,
-          amountRange: this.transformMinMaxAmountsFromSquareMetresToSquareKmsForFeaturesFromShapefile(feature),
+          amountRange:
+            this.transformMinMaxAmountsFromSquareMetresToSquareKmsForFeaturesFromShapefile(
+              feature,
+            ),
         };
       }),
       metadata: result.metadata,
@@ -210,12 +211,24 @@ export class ProjectsService {
    * report them in square km rather than in square metres (they are stored
    * in square metres in the platform's backend).
    */
-  transformMinMaxAmountsFromSquareMetresToSquareKmsForFeaturesFromShapefile(feature: Partial<GeoFeature> | undefined): { min: number | null, max: number | null } {
-    const min = feature?.amountMin ? (feature.isLegacy ? feature.amountMin : feature.amountMin / 1_000_000) : null;
-    const max = feature?.amountMax ? (feature.isLegacy ? feature.amountMax : feature.amountMax / 1_000_000) : null;
-    return {
-      min, max
-    };
+  transformMinMaxAmountsFromSquareMetresToSquareKmsForFeaturesFromShapefile(
+    feature: Partial<GeoFeature> | undefined,
+  ): { min: number | null; max: number | null } {
+    let minResult = feature?.amountMin ? feature?.amountMin : null;
+    let maxResult = feature?.amountMax ? feature?.amountMax : null;
+    if (!feature?.isLegacy) {
+      if (feature?.amountMin) {
+        const minKm2 = feature.amountMin / 1_000_000;
+        minResult =
+          minKm2 < 1 ? parseFloat(minKm2.toFixed(4)) : Math.round(minKm2);
+      }
+      if (feature?.amountMax) {
+        const maxKm2 = feature.amountMax / 1_000_000;
+        maxResult =
+          maxKm2 < 1 ? parseFloat(maxKm2.toFixed(4)) : Math.round(maxKm2);
+      }
+    }
+    return { min: minResult, max: maxResult };
   }
 
   async findAll(fetchSpec: FetchSpecification, info: ProjectsServiceRequest) {
