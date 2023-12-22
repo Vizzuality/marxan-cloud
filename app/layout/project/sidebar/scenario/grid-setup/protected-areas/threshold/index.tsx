@@ -120,52 +120,66 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
   const areProjectPAreasSelected = !!projectPAreasSelectedIds.length;
 
   const handleSubmit = useCallback(
-    (values) => {
-      setSubmitting(true);
-
+    (values, form) => {
       const { wdpaThreshold } = values;
 
-      saveScenarioProtectedAreasMutation.mutate(
-        {
-          id: `${sid}`,
-          data: {
-            areas: selectedProtectedAreas,
-            threshold: +(wdpaThreshold * 100).toFixed(0),
+      const thresholdTouched = form.getFieldState('wdpaThreshold')?.dirty;
+
+      if (thresholdTouched) {
+        setSubmitting(true);
+        saveScenarioProtectedAreasMutation.mutate(
+          {
+            id: `${sid}`,
+            data: {
+              areas: selectedProtectedAreas,
+              threshold: +(wdpaThreshold * 100).toFixed(0),
+            },
           },
-        },
-        {
-          onSuccess: () => {
-            addToast(
-              'save-scenario-wdpa',
-              <>
-                <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Scenario protected areas threshold saved</p>
-              </>,
-              {
-                level: 'success',
-              }
-            );
-            onGoBack();
-          },
-          onError: () => {
-            addToast(
-              'error-scenario-wdpa',
-              <>
-                <h2 className="font-medium">Error!</h2>
-                <p className="text-sm">Scenario protected areas threshold not saved</p>
-              </>,
-              {
-                level: 'error',
-              }
-            );
-          },
-          onSettled: () => {
-            setSubmitting(false);
-          },
-        }
-      );
+          {
+            onSuccess: () => {
+              addToast(
+                'save-scenario-wdpa',
+                <>
+                  <h2 className="font-medium">Success!</h2>
+                  <p className="text-sm">Scenario protected areas threshold saved</p>
+                </>,
+                {
+                  level: 'success',
+                }
+              );
+            },
+            onError: () => {
+              addToast(
+                'error-scenario-wdpa',
+                <>
+                  <h2 className="font-medium">Error!</h2>
+                  <p className="text-sm">Scenario protected areas threshold not saved</p>
+                </>,
+                {
+                  level: 'error',
+                }
+              );
+            },
+            onSettled: () => {
+              setSubmitting(false);
+            },
+          }
+        );
+      }
+      if (!thresholdTouched) {
+        addToast(
+          'save-scenario-wdpa',
+          <>
+            <h2 className="font-medium"></h2>
+            <p className="text-sm">No modifications have been made to the protected areas.</p>
+          </>,
+          {
+            level: 'info',
+          }
+        );
+      }
     },
-    [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast, onGoBack]
+    [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast]
   );
 
   useEffect(() => {
@@ -206,127 +220,130 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
         </h3>
       </div>
       <FormRFF onSubmit={handleSubmit} initialValues={INITIAL_VALUES}>
-        {({ values, handleSubmit: RFFhandleSubmit }) => (
-          <form
-            onSubmit={RFFhandleSubmit}
-            autoComplete="off"
-            className="relative flex w-full flex-grow flex-col overflow-hidden"
-          >
-            <Loading
-              visible={submitting}
-              className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
-              iconClassName="w-10 h-10 text-white"
-            />
+        {({ values, handleSubmit: RFFhandleSubmit }) => {
+          return (
+            <form
+              onSubmit={RFFhandleSubmit}
+              autoComplete="off"
+              className="relative flex w-full flex-grow flex-col overflow-hidden"
+            >
+              <Loading
+                visible={submitting}
+                className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
+                iconClassName="w-10 h-10 text-white"
+              />
 
-            <div className="relative flex flex-grow flex-col overflow-hidden">
-              <div className="relative overflow-y-auto overflow-x-visible px-0.5">
-                <div className="py-6">
-                  {/* WDPA */}
-                  <div>
-                    <FieldRFF
-                      name="wdpaThreshold"
-                      validate={composeValidators([{ presence: true }])}
-                    >
-                      {(flprops) => (
-                        <Field id="scenario-wdpaThreshold" {...flprops}>
-                          <div className="mb-3 flex items-center">
-                            <Label ref={labelRef} theme="dark" className="mr-3 uppercase">
-                              Set the threshold for protected areas
-                            </Label>
-                            <InfoButton>
-                              <div>
-                                <h4 className="mb-2.5 font-heading text-lg">
-                                  Threshold for Protected Areas
-                                </h4>
-                                <div className="space-y-2">
-                                  <p>
-                                    Refers to what percentage of a planning unit must be covered by
-                                    a protected area to be considered &quot;protected&quot; by
-                                    Marxan.
-                                  </p>
-                                  <p>
-                                    The following image shows an example setting a threshold of 50%:
-                                  </p>
+              <div className="relative flex flex-grow flex-col overflow-hidden">
+                <div className="relative overflow-y-auto overflow-x-visible px-0.5">
+                  <div className="py-6">
+                    {/* WDPA */}
+                    <div>
+                      <FieldRFF
+                        name="wdpaThreshold"
+                        validate={composeValidators([{ presence: true }])}
+                      >
+                        {(flprops) => (
+                          <Field id="scenario-wdpaThreshold" {...flprops}>
+                            <div className="mb-3 flex items-center">
+                              <Label ref={labelRef} theme="dark" className="mr-3 uppercase">
+                                Set the threshold for protected areas
+                              </Label>
+                              <InfoButton>
+                                <div>
+                                  <h4 className="mb-2.5 font-heading text-lg">
+                                    Threshold for Protected Areas
+                                  </h4>
+                                  <div className="space-y-2">
+                                    <p>
+                                      Refers to what percentage of a planning unit must be covered
+                                      by a protected area to be considered &quot;protected&quot; by
+                                      Marxan.
+                                    </p>
+                                    <p>
+                                      The following image shows an example setting a threshold of
+                                      50%:
+                                    </p>
+                                  </div>
+
+                                  <img src={THRESHOLD_IMG} alt="Threshold" />
                                 </div>
+                              </InfoButton>
+                            </div>
 
-                                <img src={THRESHOLD_IMG} alt="Threshold" />
-                              </div>
-                            </InfoButton>
-                          </div>
+                            <p className="mb-3 text-sm text-gray-400">
+                              Refers to what percentage of a planning unit must be covered by a
+                              protected area to be considered “protected”.
+                            </p>
 
-                          <p className="mb-3 text-sm text-gray-400">
-                            Refers to what percentage of a planning unit must be covered by a
-                            protected area to be considered “protected”.
-                          </p>
+                            <Slider
+                              labelRef={labelRef}
+                              theme="dark"
+                              defaultValue={values.wdpaThreshold}
+                              formatOptions={{
+                                style: 'percent',
+                              }}
+                              maxValue={1}
+                              minValue={0.01}
+                              step={0.01}
+                              disabled={!editable}
+                              onChange={(s) => {
+                                flprops.input.onChange(s);
+                                dispatch(setWDPAThreshold(s));
+                              }}
+                            />
+                          </Field>
+                        )}
+                      </FieldRFF>
+                    </div>
 
-                          <Slider
-                            labelRef={labelRef}
-                            theme="dark"
-                            defaultValue={values.wdpaThreshold}
-                            formatOptions={{
-                              style: 'percent',
-                            }}
-                            maxValue={1}
-                            minValue={0.01}
-                            step={0.01}
-                            disabled={!editable}
-                            onChange={(s) => {
-                              flprops.input.onChange(s);
-                              dispatch(setWDPAThreshold(s));
-                            }}
-                          />
-                        </Field>
-                      )}
-                    </FieldRFF>
+                    {areGlobalPAreasSelected && (
+                      <ProtectedAreasSelected
+                        options={GLOBAL_PA_OPTIONS}
+                        title="Selected protected areas:"
+                        isView
+                        wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
+                      />
+                    )}
+
+                    {areProjectPAreasSelected && (
+                      <ProtectedAreasSelected
+                        options={PROJECT_PA_OPTIONS}
+                        title="Uploaded protected areas:"
+                        isView
+                        wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
+                      />
+                    )}
                   </div>
-
-                  {areGlobalPAreasSelected && (
-                    <ProtectedAreasSelected
-                      options={GLOBAL_PA_OPTIONS}
-                      title="Selected protected areas:"
-                      isView
-                      wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
-                    />
-                  )}
-
-                  {areProjectPAreasSelected && (
-                    <ProtectedAreasSelected
-                      options={PROJECT_PA_OPTIONS}
-                      title="Uploaded protected areas:"
-                      isView
-                      wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
-                    />
-                  )}
                 </div>
               </div>
-            </div>
 
-            <div className="mt-5 flex justify-center space-x-4">
-              <Button
-                theme="secondary"
-                size="lg"
-                type="button"
-                className="relative px-20 md:px-9 lg:px-16 xl:px-20"
-                disabled={submitting}
-                onClick={onGoBack}
-              >
-                <span>Back</span>
-              </Button>
-
-              {editable && (
+              <div className="mt-5 flex justify-center space-x-4">
                 <Button
-                  theme="primary"
+                  theme="secondary"
                   size="lg"
-                  type="submit"
+                  type="button"
                   className="relative px-20 md:px-9 lg:px-16 xl:px-20"
                   disabled={submitting}
+                  onClick={onGoBack}
                 >
-                  <span>Save</span>
+                  <span>Back</span>
                 </Button>
-              )}
-            </div>
-          </form>
-        )}
+
+                {editable && (
+                  <Button
+                    theme="primary"
+                    size="lg"
+                    type="submit"
+                    className="relative px-20 md:px-9 lg:px-16 xl:px-20"
+                    disabled={submitting}
+                  >
+                    <span>Save</span>
+                  </Button>
+                )}
+              </div>
+            </form>
+          );
+        }}
       </FormRFF>
     </Section>
   );

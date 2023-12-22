@@ -12,7 +12,7 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import { useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 import { useCanEditScenario } from 'hooks/permissions';
-import { useSaveScenario, useScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
@@ -25,6 +25,8 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
   const [submitting, setSubmitting] = useState(false);
   const [confirmationTarget, setConfirmationTarget] = useState(null);
   const [confirmationFPF, setConfirmationFPF] = useState(null);
+
+  const { addToast } = useToasts();
 
   const queryClient = useQueryClient();
   const { query } = useRouter();
@@ -39,11 +41,6 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
   const editable = useCanEditScenario(pid, sid);
 
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
 
@@ -52,9 +49,6 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
     isFetching: targetedFeaturesIsFetching,
     isFetched: targetedFeaturesIsFetched,
   } = useTargetedFeatures(sid);
-
-  const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -137,76 +131,93 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
   }, []);
 
   const onSubmit = useCallback(
-    (values) => {
-      setSubmitting(true);
+    (values, form) => {
       const { features } = values;
 
-      const data = {
-        status: 'created',
-        features: selectedFeaturesData.map((sf) => {
-          const { featureId, kind, geoprocessingOperations } = sf;
+      const featuresFieldTouched = form.getFieldState('features')?.dirty;
 
-          if (kind === 'withGeoprocessing') {
+      if (featuresFieldTouched) {
+        setSubmitting(true);
+
+        const data = {
+          status: 'created',
+          features: selectedFeaturesData.map((sf) => {
+            const { featureId, kind, geoprocessingOperations } = sf;
+
+            if (kind === 'withGeoprocessing') {
+              return {
+                featureId,
+                kind,
+                geoprocessingOperations: geoprocessingOperations.map((go) => {
+                  const { splits } = go;
+
+                  return {
+                    ...go,
+                    splits: splits
+                      .filter((s) => {
+                        return features.find((f) => {
+                          return f.parentId === featureId && f.value === s.value;
+                        });
+                      })
+                      .map((s) => {
+                        const { target, fpf } = features.find((f) => {
+                          return f.parentId === featureId && f.value === s.value;
+                        });
+
+                        return {
+                          ...s,
+                          marxanSettings: {
+                            prop: target / 100 || 0.5,
+                            fpf,
+                          },
+                        };
+                      }),
+                  };
+                }),
+              };
+            }
+
+            const { target, fpf = 1 } = features.find((f) => f.featureId === featureId);
             return {
               featureId,
               kind,
-              geoprocessingOperations: geoprocessingOperations.map((go) => {
-                const { splits } = go;
-
-                return {
-                  ...go,
-                  splits: splits
-                    .filter((s) => {
-                      return features.find((f) => {
-                        return f.parentId === featureId && f.value === s.value;
-                      });
-                    })
-                    .map((s) => {
-                      const { target, fpf } = features.find((f) => {
-                        return f.parentId === featureId && f.value === s.value;
-                      });
-
-                      return {
-                        ...s,
-                        marxanSettings: {
-                          prop: target / 100 || 0.5,
-                          fpf,
-                        },
-                      };
-                    }),
-                };
-              }),
+              marxanSettings: {
+                prop: target / 100 || 0.5,
+                fpf,
+              },
             };
-          }
+          }),
+        };
 
-          const { target, fpf = 1 } = features.find((f) => f.featureId === featureId);
-          return {
-            featureId,
-            kind,
-            marxanSettings: {
-              prop: target / 100 || 0.5,
-              fpf,
+        selectedFeaturesMutation.mutate(
+          {
+            id: `${sid}`,
+            data,
+          },
+          {
+            onSuccess: async () => {
+              await queryClient.invalidateQueries(['selected-features', sid]);
             },
-          };
-        }),
-      };
-
-      selectedFeaturesMutation.mutate(
-        {
-          id: `${sid}`,
-          data,
-        },
-        {
-          onSuccess: async () => {
-            await queryClient.invalidateQueries(['selected-features', sid]);
-          },
-          onSettled: () => {
-            setSubmitting(false);
-          },
-        }
-      );
+            onSettled: () => {
+              setSubmitting(false);
+            },
+          }
+        );
+      }
+      if (!featuresFieldTouched) {
+        addToast(
+          'save-selected-features',
+          <>
+            <h2 className="font-medium"></h2>
+            <p className="text-sm">No modifications have been made to the selected features.</p>
+          </>,
+          {
+            level: 'info',
+          }
+        );
+      }
     },
-    [sid, queryClient, selectedFeaturesData, selectedFeaturesMutation]
+    [sid, queryClient, selectedFeaturesData, selectedFeaturesMutation, addToast]
   );
 
   const toggleSeeOnMap = useCallback(
