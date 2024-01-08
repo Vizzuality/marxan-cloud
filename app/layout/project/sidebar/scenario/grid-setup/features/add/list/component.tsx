@@ -37,7 +37,7 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setFeatures, setLayerSettings, setSelectedFeatures, setSelectedContinuousFeatures } =
     scenarioSlice.actions;
-  const { selectedFeatures, selectedContinuousFeatures, layerSettings } = useSelector(
+  const { selectedFeatures, selectedContinuousFeatures, layerSettings, features } = useSelector(
     (state) => state[`/scenarios/${sid}/edit`]
   );
 
@@ -204,6 +204,7 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
   const onSubmit = useCallback(
     (values) => {
       const { features } = values;
+
       const data = getFeaturesRecipe(features);
       setSubmitting(true);
 
