@@ -283,7 +283,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
                           />
 
                           <ConfirmationPrompt
-                            title={`Are you sure you want to change all feature targets to ${confirmationTarget?.v}?`}
+                            title={`Are you sure you want to set target to ${confirmationTarget?.v} for all the features currently selected?`}
                             description="The action cannot be reverted."
                             open={!!confirmationTarget}
                             onAccept={() => {
@@ -294,7 +294,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
                           />
 
                           <ConfirmationPrompt
-                            title={`Are you sure you want to change all feature SPFs to ${confirmationFPF?.v}?`}
+                            title={`Are you sure you want to set SPF to ${confirmationFPF?.v} for all the features currently selected?`}
                             description="The action cannot be reverted."
                             open={!!confirmationFPF}
                             onAccept={() => onChangeFPFAll(confirmationFPF)}

@@ -204,7 +204,7 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
   const onSubmit = useCallback(
     (values) => {
       const { features } = values;
-      console.log({ onSubmit: features });
+
       const data = getFeaturesRecipe(features);
       setSubmitting(true);
 
