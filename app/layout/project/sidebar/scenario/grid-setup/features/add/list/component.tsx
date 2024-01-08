@@ -41,8 +41,6 @@ export const ScenariosFeaturesList = ({ onContinue }): JSX.Element => {
     (state) => state[`/scenarios/${sid}/edit`]
   );
 
-  console.log({ featuresRedux: features });
-
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const editable = useCanEditScenario(pid, sid);

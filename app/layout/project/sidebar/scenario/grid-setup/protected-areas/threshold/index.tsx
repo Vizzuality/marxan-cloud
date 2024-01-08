@@ -120,64 +120,48 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
   const areProjectPAreasSelected = !!projectPAreasSelectedIds.length;
 
   const handleSubmit = useCallback(
-    (values, form) => {
+    (values) => {
       const { wdpaThreshold } = values;
 
-      const thresholdTouched = form.getFieldState('wdpaThreshold')?.dirty;
-
-      if (thresholdTouched) {
-        setSubmitting(true);
-        saveScenarioProtectedAreasMutation.mutate(
-          {
-            id: `${sid}`,
-            data: {
-              areas: selectedProtectedAreas,
-              threshold: +(wdpaThreshold * 100).toFixed(0),
-            },
+      setSubmitting(true);
+      saveScenarioProtectedAreasMutation.mutate(
+        {
+          id: `${sid}`,
+          data: {
+            areas: selectedProtectedAreas,
+            threshold: +(wdpaThreshold * 100).toFixed(0),
           },
-          {
-            onSuccess: () => {
-              addToast(
-                'save-scenario-wdpa',
-                <>
-                  <h2 className="font-medium">Success!</h2>
-                  <p className="text-sm">Scenario protected areas threshold saved</p>
-                </>,
-                {
-                  level: 'success',
-                }
-              );
-            },
-            onError: () => {
-              addToast(
-                'error-scenario-wdpa',
-                <>
-                  <h2 className="font-medium">Error!</h2>
-                  <p className="text-sm">Scenario protected areas threshold not saved</p>
-                </>,
-                {
-                  level: 'error',
-                }
-              );
-            },
-            onSettled: () => {
-              setSubmitting(false);
-            },
-          }
-        );
-      }
-      if (!thresholdTouched) {
-        addToast(
-          'save-scenario-wdpa',
-          <>
-            <h2 className="font-medium"></h2>
-            <p className="text-sm">No modifications have been made to the protected areas.</p>
-          </>,
-          {
-            level: 'info',
-          }
-        );
-      }
+        },
+        {
+          onSuccess: () => {
+            addToast(
+              'save-scenario-wdpa',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Scenario protected areas threshold saved</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          },
+          onError: () => {
+            addToast(
+              'error-scenario-wdpa',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Scenario protected areas threshold not saved</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+          onSettled: () => {
+            setSubmitting(false);
+          },
+        }
+      );
     },
     [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast]
   );
