@@ -309,57 +309,58 @@ export const ScenariosList: React.FC = () => {
             )}
           </div>
           {!hasScenarios && !search && !hasFilters && scenariosIsFetched && (
-            <div className="flex flex-col space-y-2">
-              <motion.div
-                // key="project-scenarios-empty"
-                initial={{ y: -10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -10, opacity: 0 }}
-                className="flex flex-col items-center space-y-9 rounded-3xl bg-gray-800 bg-cover bg-right bg-no-repeat py-10"
-                style={{
-                  backgroundImage: `url(${bgScenariosDashboard})`,
-                }}
-              >
-                <div className="mx-12 mt-48 flex flex-col items-center">
-                  <p className="mt-1 text-center font-sans text-xs font-medium text-gray-400">
-                    Before we can show you any results, we&lsquo;ll need you to{' '}
-                    <span className="text-white">
-                      upload some features, protected areas or cost surface
-                    </span>{' '}
-                    that are essential to the analysis.
-                  </p>
-                </div>
-                <div className="mx-10 flex flex-wrap justify-center gap-2">
-                  <Link href={`/projects/${pid}/?tab=protected-areas`}>
-                    <div className={LINK_CLASSES}>Upload Protected Areas</div>
-                  </Link>
-                  <Link href={`/projects/${pid}/?tab=cost-surface`}>
-                    <div className={LINK_CLASSES}>Upload Cost Surface</div>
-                  </Link>
-                  <Link href={`/projects/${pid}/?tab=features`}>
-                    <div className={LINK_CLASSES}>Upload Features</div>
-                  </Link>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ y: -10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -10, opacity: 0 }}
-                className="flex h-fit items-center justify-center rounded-3xl bg-gray-800 py-6"
-              >
-                <Button
-                  theme="primary"
-                  size="base"
-                  className="!px-5"
-                  disabled={!editable}
-                  onClick={() => setModal(true)}
+            <ScrollArea className="h-full overflow-hidden">
+              <div className="flex flex-col space-y-2">
+                <motion.div
+                  initial={{ y: -10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -10, opacity: 0 }}
+                  className="flex flex-col items-center space-y-9 rounded-3xl bg-gray-800 bg-cover bg-right bg-no-repeat py-10"
+                  style={{
+                    backgroundImage: `url(${bgScenariosDashboard})`,
+                  }}
                 >
-                  <span className="mr-5">Create scenario</span>
-                  <Icon icon={PLUS_SVG} className="h-4 w-4" />
-                </Button>
-              </motion.div>
-            </div>
+                  <div className="mx-12 mt-48 flex flex-col items-center">
+                    <p className="mt-1 text-center font-sans text-xs font-medium text-gray-400">
+                      Before we can show you any results, we&lsquo;ll need you to{' '}
+                      <span className="text-white">
+                        upload some features, protected areas or cost surface
+                      </span>{' '}
+                      that are essential to the analysis.
+                    </p>
+                  </div>
+                  <div className="mx-10 flex flex-wrap justify-center gap-2">
+                    <Link href={`/projects/${pid}/?tab=protected-areas`}>
+                      <div className={LINK_CLASSES}>Upload Protected Areas</div>
+                    </Link>
+                    <Link href={`/projects/${pid}/?tab=cost-surface`}>
+                      <div className={LINK_CLASSES}>Upload Cost Surface</div>
+                    </Link>
+                    <Link href={`/projects/${pid}/?tab=features`}>
+                      <div className={LINK_CLASSES}>Upload Features</div>
+                    </Link>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ y: -10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -10, opacity: 0 }}
+                  className="flex h-fit items-center justify-center rounded-3xl bg-gray-800 py-6"
+                >
+                  <Button
+                    theme="primary"
+                    size="base"
+                    className="!px-5"
+                    disabled={!editable}
+                    onClick={() => setModal(true)}
+                  >
+                    <span className="mr-5">Create scenario</span>
+                    <Icon icon={PLUS_SVG} className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+              </div>
+            </ScrollArea>
           )}
 
           {(hasScenarios || search || hasFilters) && (
