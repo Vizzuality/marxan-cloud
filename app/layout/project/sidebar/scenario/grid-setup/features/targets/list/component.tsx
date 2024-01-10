@@ -191,6 +191,7 @@ export const ScenariosFeaturesTargets = ({ onGoBack }: { onGoBack: () => void })
         {
           onSuccess: async () => {
             await queryClient.invalidateQueries(['selected-features', sid]);
+            await queryClient.invalidateQueries(['pre-gap-analysis', sid]);
           },
           onSettled: () => {
             setSubmitting(false);
