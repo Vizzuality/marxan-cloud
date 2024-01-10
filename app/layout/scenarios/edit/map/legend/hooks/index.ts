@@ -9,7 +9,7 @@ import { orderBy, sortBy } from 'lodash';
 
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useAllFeatures, useSelectedFeatures } from 'hooks/features';
-import { useAllGapAnalysis } from 'hooks/gap-analysis';
+import { useAllGapAnalysis, usePreGapAnalysis } from 'hooks/gap-analysis';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
@@ -378,16 +378,7 @@ export const useGapAnalysisLegend = () => {
     (state) => state[`/scenarios/${sid}/edit`]
   );
 
-  const gapAnalysisQuery = useAllGapAnalysis(sid, {
-    select: (data) =>
-      sortBy(
-        data.map(({ id, featureClassName }) => ({
-          id,
-          name: featureClassName,
-        })),
-        ['name']
-      ),
-  });
+  const gapAnalysisQuery = usePreGapAnalysis(sid, {});
 
   return LEGEND_LAYERS['gap-analysis']({
     items: gapAnalysisQuery.data,
