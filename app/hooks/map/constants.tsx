@@ -511,14 +511,6 @@ export const LEGEND_LAYERS = {
           value: '0',
         },
         {
-          color: COLORS.frequency[1],
-          value: null,
-        },
-        {
-          color: COLORS.frequency[2],
-          value: null,
-        },
-        {
           color: COLORS.frequency[3],
           value: '100',
         },
