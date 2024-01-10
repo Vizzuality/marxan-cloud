@@ -29,7 +29,7 @@ export const HelpTooltip = ({ title, subtitle, content }: HelpTooltipProps) => {
         </div>
       </header>
 
-      <div className="mt-5 text-sm text-gray-100" style={{ maxWidth: 330 }}>
+      <div className="mt-5 text-sm text-gray-600" style={{ maxWidth: 330 }}>
         {content}
       </div>
     </div>
