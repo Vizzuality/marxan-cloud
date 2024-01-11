@@ -253,9 +253,9 @@ grid.geom
                  SELECT ppu.id, round(pug.area / 1000000) as area, $1
                     FROM projects_pu ppu
                  INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
-                 WHERE ppu.geom_id = $2
+                 WHERE ppu.geom_id = $2 AND ppu.project_id = $3
                 `,
-                  [job.data.costSurfaceId, geometryId],
+                  [job.data.costSurfaceId, geometryId, job.data.projectId],
                 );
               });
             },
