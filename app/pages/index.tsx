@@ -14,6 +14,7 @@ import PartnersList from 'layout/home/partners';
 import Support from 'layout/home/support';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
+import UpcomingChanges from 'layout/upcoming-changes';
 
 export const getServerSideProps = withUser();
 
@@ -39,6 +40,7 @@ const Home: React.FC = () => {
         className="overflow-x-hidden overflow-y-auto"
       >
         <Header className="absolute" size="lg" theme="transparent" />
+        <UpcomingChanges />
         <Intro />
         <Support />
         <Banner />
