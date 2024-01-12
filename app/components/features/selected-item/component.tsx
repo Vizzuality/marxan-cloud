@@ -83,7 +83,7 @@ export const Item: React.FC<ItemProps> = ({
 }: ItemProps) => {
   const [splitOpen, setSplitOpen] = useState(!!splitSelected);
 
-  const { strat } = useFeatureFlags();
+  const { split, strat } = useFeatureFlags();
 
   // EVENTS
   const onSplitChanged = useCallback(
@@ -137,7 +137,7 @@ export const Item: React.FC<ItemProps> = ({
           <h2 className="font-heading text-sm">{name}</h2>
 
           <div className="mr-3 flex space-x-2">
-            {editable && !!OPTIONS.length && (
+            {editable && split && !!OPTIONS.length && (
               <Tooltip
                 arrow
                 placement="top"
@@ -204,7 +204,7 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         </div>
 
-        {splitOpen && (
+        {split && splitOpen && (
           <div>
             <div className="mt-3 flex items-center space-x-2 font-heading tracking-wide">
               <h4 className="text-xxs uppercase text-white">
@@ -299,7 +299,7 @@ export const Item: React.FC<ItemProps> = ({
         )}
       </header>
 
-      {splitSelected && splitOpen && (
+      {splitSelected && split && splitOpen && (
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked =
