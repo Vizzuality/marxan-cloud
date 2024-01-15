@@ -4,6 +4,8 @@ import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
+import { useFeatureFlags } from 'hooks/feature-flags';
+
 import Icon from 'components/icon';
 import Modal from 'components/modal/component';
 import EditModal from 'layout/project/sidebar/project/inventory-panel/features/modals/edit';
@@ -35,6 +37,7 @@ const ActionsMenu = ({
   const queryClient = useQueryClient();
   const isDeletable = item.isCustom;
   const isSplittable = Boolean(item.splitOptions?.length);
+  const { split } = useFeatureFlags();
 
   const [modalState, setModalState] = useState<{ edit: boolean; split: boolean }>({
     edit: false,
@@ -83,7 +86,7 @@ const ActionsMenu = ({
           <EditModal featureId={item.id} handleModal={handleModal} onDone={onDoneEditing} />
         </Modal>
       </li>
-      {isSplittable && (
+      {isSplittable && split && (
         <li>
           <button
             type="button"
