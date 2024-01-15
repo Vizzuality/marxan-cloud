@@ -24,7 +24,7 @@ export const Uploader = ({
   onClose,
 }: PropsWithChildren<UploaderProps>): JSX.Element => {
   return (
-    <div className="mb-5 mt-3">
+    <div>
       <Button
         className="dropzone w-full cursor-pointer py-1 hover:bg-gray-600"
         theme="secondary"

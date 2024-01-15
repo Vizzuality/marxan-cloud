@@ -74,6 +74,8 @@ const EditBulkModal = ({
         editFeaturesTagsBulk(pid, selectedFeaturesIds, session, data)
           .then(async () => {
             await queryClient.invalidateQueries(['all-features', pid]);
+            await queryClient.invalidateQueries(['all-paginated-features', pid]);
+
             handleModal('edit', false);
 
             addToast(
@@ -103,6 +105,8 @@ const EditBulkModal = ({
         deleteFeaturesTagsBulk(pid, selectedFeaturesIds, session)
           .then(async () => {
             await queryClient.invalidateQueries(['all-features', pid]);
+            await queryClient.invalidateQueries(['all-paginated-features', pid]);
+
             handleModal('edit', false);
 
             addToast(

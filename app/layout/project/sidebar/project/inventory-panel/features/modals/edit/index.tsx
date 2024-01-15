@@ -100,6 +100,8 @@ const EditModal = ({
       Promise.all([editFeaturePromise, editFeatureTagPromise()])
         .then(async () => {
           await queryClient.invalidateQueries(['all-features', pid]);
+          await queryClient.invalidateQueries(['all-paginated-features', pid]);
+
           onDone?.();
           handleModal('edit', false);
 

@@ -4,13 +4,15 @@ import { cn } from 'utils/cn';
 
 export interface WrapperProps {
   children: ReactNode;
+  className?: string;
 }
 
-export const Wrapper: React.FC<WrapperProps> = ({ children }: WrapperProps) => {
+export const Wrapper: React.FC<WrapperProps> = ({ children, className }: WrapperProps) => {
   return (
     <div
       className={cn({
-        'mx-auto flex h-full w-full flex-grow flex-col px-10 md:container': true,
+        'mx-auto flex w-full flex-col px-10 md:container': true,
+        [className]: !!className,
       })}
     >
       {children}

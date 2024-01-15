@@ -143,7 +143,8 @@ export const useFeaturesLegend = () => {
   const featureColors = useColorFeatures(pid, sid);
 
   const selectedFeaturesQuery = useSelectedFeatures(sid);
-  const selectedFeaturesIds = selectedFeaturesQuery.data?.map(({ metadata }) => metadata?.id) || [];
+  const selectedFeaturesIds =
+    selectedFeaturesQuery.data?.filter((s) => s.metadata).map(({ metadata: { id } }) => id) || [];
 
   const projectFeaturesQuery = useAllFeatures(
     pid,
@@ -200,21 +201,25 @@ export const useFeaturesLegend = () => {
 
   const targetedFeatures = useTargetedFeatures(sid);
 
-  const parsedTargetedFeatures = targetedFeatures.data?.map(({ id, name, splitted, parentId }) => {
-    const allFeatures = queryClient.getQueryData<any>(['all-features', pid], {
-      exact: false,
-    })?.data;
+  const parsedTargetedFeatures = targetedFeatures.data
+    ?.filter(({ featureId }) => selectedFeaturesIds.includes(featureId))
+    ?.map(({ id, name, splitted, parentId, splitSelected }) => {
+      const allFeatures = queryClient.getQueryData<any>(['all-features', pid], {
+        exact: false,
+      })?.data;
 
-    const f = allFeatures?.find(({ id: featureId }) => (splitted ? parentId : id === featureId));
+      const _id = splitted ? parentId : id;
+      const f = allFeatures?.find(({ id: featureId }) => _id === featureId);
 
-    return {
-      id,
-      name,
-      amountRange: f?.amountRange || {},
-      splitted,
-      color: featureColors?.find(({ id: featureId }) => featureId === id)?.color,
-    };
-  });
+      return {
+        id,
+        name,
+        parentId,
+        amountRange: f?.amountRange || {},
+        split: splitSelected,
+        color: featureColors?.find(({ id: featureId }) => featureId === id)?.color,
+      };
+    });
 
   const targetedFeaturesByRange = parsedTargetedFeatures?.reduce(
     (acc, x) => ({
@@ -250,6 +255,8 @@ export const useFeaturesLegend = () => {
       index === self.findIndex((t) => JSON.stringify(t) === JSON.stringify(item))
   );
 
+  // console.log({ uniqueBinaryFeatures, uniqueContinuousFeatures });
+
   return [
     ...LEGEND_LAYERS['binary-features']({
       items: uniqueBinaryFeatures,
@@ -280,21 +287,20 @@ export const useFeaturesLegend = () => {
     ...LEGEND_LAYERS['continuous-features']({
       items: uniqueContinuousFeatures,
       onChangeVisibility: (featureId: Feature['id']) => {
-        const { color, amountRange, splitted } =
+        const { color, amountRange, split, parentId } =
           uniqueContinuousFeatures.find(({ id }) => id === featureId) || {};
 
         const newSelectedFeatures = [...selectedContinuousFeatures];
         const isIncluded = newSelectedFeatures.includes(featureId);
 
-        if (!splitted) {
-          if (!isIncluded) {
-            newSelectedFeatures.push(featureId);
-          } else {
-            const i = newSelectedFeatures.indexOf(featureId);
-            newSelectedFeatures.splice(i, 1);
-          }
-          dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
+        if (!isIncluded) {
+          newSelectedFeatures.push(featureId);
+        } else {
+          const i = newSelectedFeatures.indexOf(featureId);
+          newSelectedFeatures.splice(i, 1);
         }
+
+        dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
 
         dispatch(
           setLayerSettings({
@@ -303,6 +309,8 @@ export const useFeaturesLegend = () => {
               visibility: !isIncluded,
               amountRange,
               color,
+              split,
+              parentId,
             },
           })
         );

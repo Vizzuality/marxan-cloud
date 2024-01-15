@@ -25,6 +25,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with
     the frontend app
   - `strat`: make _stratification_ functionality available for conservation
     features in the frontend app
+  - `upcomingChanges`: displays a banner warning about the upcoming changes to the app
 
 - `NEXT_PUBLIC_CONTACT_EMAIL`: Email address to be used for general contact inquiries.
 

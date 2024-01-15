@@ -69,7 +69,7 @@ const InventoryTable = ({
             </tr>
           </thead>
           <ScrollArea className="h-full">
-            <tbody className="block h-full divide-y divide-gray-600 pb-4 pl-1 align-baseline text-sm">
+            <tbody className="block h-full divide-y divide-gray-600 pb-4 pl-1 text-sm">
               {data.map((item) => (
                 <RowItem
                   key={item.id}

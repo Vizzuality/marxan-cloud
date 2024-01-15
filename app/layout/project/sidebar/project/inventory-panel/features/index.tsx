@@ -25,7 +25,7 @@ const FEATURES_TABLE_COLUMNS = [
   {
     name: 'tag',
     text: 'Type',
-    className: 'flex flex-1 justify-start py-2 pl-14',
+    className: 'flex flex-1 justify-start pl-14',
   },
 ];
 
