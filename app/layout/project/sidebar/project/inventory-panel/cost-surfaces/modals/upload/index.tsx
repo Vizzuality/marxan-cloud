@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
-import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
@@ -10,7 +9,7 @@ import { AxiosError, isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 
 import { useUploadProjectCostSurface } from 'hooks/cost-surface';
-import { useDownloadShapefileTemplate } from 'hooks/projects';
+import { useDownloadShapefileTemplate, useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -52,7 +51,11 @@ export const CostSurfaceUploadModal = ({
 
   const { addToast } = useToasts();
 
-  const queryClient = useQueryClient();
+  const projectMutation = useSaveProject({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
 
   const uploadProjectCostSurfaceMutation = useUploadProjectCostSurface();
 
@@ -121,8 +124,7 @@ export const CostSurfaceUploadModal = ({
         {
           onSuccess: () => {
             setSuccessFile({ ...successFile });
-            queryClient.invalidateQueries(['cost-surfaces', pid]);
-            onClose();
+
             addToast(
               'success-upload-cost-surface-file',
               <>
@@ -133,6 +135,17 @@ export const CostSurfaceUploadModal = ({
                 level: 'success',
               }
             );
+
+            onClose();
+
+            projectMutation.mutate({
+              id: pid,
+              data: {
+                metadata: {
+                  cache: new Date().getTime(),
+                },
+              },
+            });
           },
           onError: (error: AxiosError | Error) => {
             let errors: { status: number; title: string }[] = [];
@@ -167,7 +180,7 @@ export const CostSurfaceUploadModal = ({
         }
       );
     },
-    [pid, addToast, onClose, uploadProjectCostSurfaceMutation, successFile, queryClient]
+    [pid, addToast, onClose, uploadProjectCostSurfaceMutation, successFile, projectMutation]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
