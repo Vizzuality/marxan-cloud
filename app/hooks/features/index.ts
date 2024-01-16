@@ -2,12 +2,17 @@ import { useMemo } from 'react';
 
 import { useQuery, useMutation, useQueryClient, QueryObserverOptions } from 'react-query';
 
+import { useRouter } from 'next/router';
+
 import { AxiosRequestConfig } from 'axios';
+import chroma from 'chroma-js';
 import Fuse from 'fuse.js';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
 import partition from 'lodash/partition';
 import { useSession } from 'next-auth/react';
+
+import { COLORS } from 'hooks/map/constants';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
@@ -171,13 +176,17 @@ export function useSelectedFeatures(
   filters: UseFeaturesFiltersProps = {},
   queryOptions = {}
 ) {
+  const { query } = useRouter();
+  const { pid } = query as { pid: string };
   const { data: session } = useSession();
   const { search } = filters;
 
   const queryClient = useQueryClient();
 
-  const featureColorQueryState =
-    queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
+  // const featureColorQueryState =
+  //   queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
+
+  const featureColors = useColorFeatures(pid, sid);
 
   const fetchFeatures = () =>
     SCENARIOS.request({
@@ -193,8 +202,7 @@ export function useSelectedFeatures(
 
   return useQuery(['selected-features', sid], fetchFeatures, {
     ...queryOptions,
-    enabled:
-      !!sid && ((featureColorQueryState && featureColorQueryState.status === 'success') || true),
+    enabled: (!!sid && featureColors?.length > 0) || true,
     select: ({ data }) => {
       const { features = [] } = data;
 
@@ -276,10 +284,7 @@ export function useSelectedFeatures(
             min: amountMin,
             max: amountMax,
           },
-          color: featureColorQueryState
-            ? featureColorQueryState?.data?.find(({ id }) => featureId === id)?.color
-            : null,
-
+          color: featureColors.find(({ id }) => featureId === id)?.color,
           // SPLIT
           splitOptions,
           splitSelected,
@@ -291,12 +296,12 @@ export function useSelectedFeatures(
         };
       });
 
-      // Filter
       if (search) {
         const fuse = new Fuse(parsedData, {
           keys: ['name'],
           threshold: 0.25,
         });
+
         parsedData = fuse.search(search).map((f) => {
           return f.item;
         });
@@ -314,7 +319,7 @@ export function useTargetedFeatures(
   queryOptions = {}
 ) {
   const { data: session } = useSession();
-  const { search } = filters;
+  const { search, sort } = filters;
 
   const fetchFeatures = () =>
     SCENARIOS.request({
@@ -325,10 +330,16 @@ export function useTargetedFeatures(
       },
       params: {
         disablePagination: true,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
       },
     }).then(({ data }) => data);
 
-  return useQuery(['targeted-features', sid], fetchFeatures, {
+  return useQuery(['targeted-features', sid, filters], fetchFeatures, {
     ...queryOptions,
     retry: false,
     enabled: !!sid,
@@ -405,6 +416,11 @@ export function useTargetedFeatures(
           name: alias || featureClassName,
           type: tag,
           description,
+          // todo: missing scenarioUsageCount from API
+          scenarios: d.scenarioUsageCount,
+          // todo: missing tag from API
+          tag: d.tag,
+          isCustom: d.metadata?.isCustom,
 
           // SPLIT
           splitOptions,
@@ -429,7 +445,16 @@ export function useTargetedFeatures(
       }
 
       // Sort
-      parsedData = orderBy(parsedData, ['name'], ['desc']);
+      if (sort) {
+        parsedData.sort((a, b) => {
+          if (sort.startsWith('-')) {
+            const _sort = sort.substring(1);
+            return b[_sort].localeCompare(a[_sort]);
+          }
+
+          return a[sort].localeCompare(b[sort]);
+        });
+      }
 
       parsedData = flatten(
         parsedData.map((s) => {
@@ -439,25 +464,27 @@ export function useTargetedFeatures(
 
           // Generate splitted features to target
           if (isSplitted) {
-            return splitFeaturesSelected
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((sf) => {
-                const { id: sfId, name: sfName, marxanSettings: sfMarxanSettings } = sf;
+            return (
+              splitFeaturesSelected
+                // .sort((a, b) => a.name.localeCompare(b.name))
+                .map((sf) => {
+                  const { id: sfId, name: sfName, marxanSettings: sfMarxanSettings } = sf;
 
-                return {
-                  ...sf,
-                  id: `${id}-${sfId}`,
-                  parentId: id,
-                  name: `${name} / ${sfName}`,
-                  splitted: true,
-                  splitSelected,
-                  splitFeaturesSelected,
-                  ...(!!sfMarxanSettings && {
-                    target: sfMarxanSettings.prop * 100,
-                    fpf: sfMarxanSettings.fpf,
-                  }),
-                };
-              });
+                  return {
+                    ...sf,
+                    id: `${id}-${sfId}`,
+                    parentId: id,
+                    name: `${name} / ${sfName}`,
+                    splitted: true,
+                    splitSelected,
+                    splitFeaturesSelected,
+                    ...(!!sfMarxanSettings && {
+                      target: sfMarxanSettings.prop * 100,
+                      fpf: sfMarxanSettings.fpf,
+                    }),
+                  };
+                })
+            );
           }
 
           // if (isIntersected) {
@@ -518,11 +545,9 @@ export function useSaveSelectedFeatures({
   };
 
   return useMutation(saveFeature, {
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables) => {
       const { id } = variables;
       queryClient.setQueryData(['selected-features', id], { data: data?.data });
-
-      console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -727,4 +752,26 @@ export function useProjectFeatures(
       select: (data) => data?.data.filter((f) => featureIds.includes(f.id)),
     }
   );
+}
+
+export function useColorFeatures(projectId: Project['id'], sid: Scenario['id']) {
+  const useAllFeaturesQuery = useAllFeatures(projectId, {});
+  const targetedFeaturesQuery = useTargetedFeatures(sid);
+
+  if (targetedFeaturesQuery.isSuccess && useAllFeaturesQuery.isSuccess) {
+    const data = [...(useAllFeaturesQuery.data?.data || []), ...targetedFeaturesQuery.data];
+    return data.map(({ id }, index) => {
+      const color =
+        data.length > COLORS['features-preview'].ramp.length
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(data.length)[index]
+          : COLORS['features-preview'].ramp[index];
+
+      return {
+        id,
+        color,
+      };
+    });
+  }
+
+  return [];
 }

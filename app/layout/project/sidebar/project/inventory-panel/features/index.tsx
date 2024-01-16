@@ -1,7 +1,5 @@
 import { useCallback, useState, ChangeEvent, useEffect } from 'react';
 
-import { useQueryClient } from 'react-query';
-
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -11,7 +9,7 @@ import {
   setLayerSettings,
 } from 'store/slices/projects/[id]';
 
-import { useAllFeatures } from 'hooks/features';
+import { useAllFeatures, useColorFeatures } from 'hooks/features';
 
 import ActionsMenu from 'layout/project/sidebar/project/inventory-panel/features/actions-menu';
 import FeaturesBulkActionMenu from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu';
@@ -46,12 +44,9 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
   });
   const [selectedFeaturesIds, setSelectedFeaturesIds] = useState<Feature['id'][]>([]);
   const { query } = useRouter();
-  const { pid } = query as { pid: string };
+  const { pid, sid } = query as { pid: string; sid: string };
 
-  const queryClient = useQueryClient();
-
-  const featureColorQueryState =
-    queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
+  const featureColors = useColorFeatures(pid, sid);
 
   const allFeaturesQuery = useAllFeatures(
     pid,
@@ -68,7 +63,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     {
       select: ({ data }) => {
         return data?.map((feature) => {
-          const { color } = featureColorQueryState?.data?.find(({ id }) => feature.id === id) || {};
+          const { color } = featureColors?.find(({ id }) => feature.id === id) || {};
 
           return {
             id: feature.id,
@@ -83,7 +78,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
       },
       placeholderData: { data: [] },
       keepPreviousData: true,
-      enabled: featureColorQueryState?.status === 'success',
+      enabled: featureColors.length > 0,
     }
   );
 

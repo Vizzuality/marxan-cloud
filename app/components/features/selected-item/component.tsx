@@ -181,7 +181,6 @@ export const Item: React.FC<ItemProps> = ({
                 ) : (
                   <HiEyeOff className="h-4 w-4" />
                 )}
-                {/* <Icon className="h-4 w-4" icon={isShown ? SHOW_SVG : HIDE_SVG} /> */}
               </button>
             </Tooltip>
 

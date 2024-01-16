@@ -240,7 +240,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
         <div
           className={cn({
             'c-multi-select-dropdown': true,
-            'z-50': true,
+            'z-[60]': true,
             // The content of `<Menu />` must always be in the DOM so that Downshift can get the ref
             // to the `<ul />` element through `getMenuProps`
             invisible: !isOpen,

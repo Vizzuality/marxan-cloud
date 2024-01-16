@@ -1,8 +1,8 @@
 import { ReactNode, FocusEventHandler } from 'react';
 
 interface SelectThemeProps {
-  theme: 'dark' | 'light' | 'light-square';
-  size: 'base' | 's';
+  theme: 'dark' | 'light' | 'light-square' | 'modal';
+  size: 'base' | 's' | 'xs';
   status?: 'none' | 'error' | 'valid';
   maxHeight?: number | string;
 }
