@@ -8,7 +8,7 @@ export const ProjectLayout = ({
   className,
 }: PropsWithChildren<{ className?: string }>): JSX.Element => {
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       <Navigation />
       {children && (
         <main
