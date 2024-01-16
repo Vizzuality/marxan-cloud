@@ -49,7 +49,7 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
               [className.labels]: className.labels,
             })}
           >
-            {format(+parseInt(value, 10))}
+            {format(+value)}
           </li>
         ))}
       </ul>
