@@ -15,7 +15,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 export const useScenarioActionsDone = () => {
   const { query } = useRouter();
-  const { sid } = query as { sid: string };
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const dispatch = useDispatch();
   const scenarioSlice = getScenarioEditSlice(sid);
@@ -45,7 +45,7 @@ export const useScenarioActionsDone = () => {
 
       scenarioMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
               tab: ScenarioSidebarTabs.PLANNING_UNIT,
@@ -96,7 +96,7 @@ export const useScenarioActionsDone = () => {
     (JOB_REF) => {
       scenarioMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
               tab: ScenarioSidebarTabs.PLANNING_UNIT,
@@ -141,7 +141,7 @@ export const useScenarioActionsDone = () => {
     (JOB_REF) => {
       scenarioMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
               tab: ScenarioSidebarTabs.FEATURES,
@@ -178,7 +178,7 @@ export const useScenarioActionsDone = () => {
     (JOB_REF) => {
       scenarioMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             metadata: mergeScenarioStatusMetaData(
               scenarioData?.metadata,
@@ -193,10 +193,10 @@ export const useScenarioActionsDone = () => {
           },
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
             dispatch(setJob(null));
             dispatch(setCache(Date.now()));
-            queryClient.invalidateQueries(['scenarios-cost-surface', sid]);
+            await queryClient.invalidateQueries(['cost-surfaces', pid]);
             JOB_REF.current = null;
           },
           onError: () => {
@@ -214,6 +214,7 @@ export const useScenarioActionsDone = () => {
       );
     },
     [
+      pid,
       sid,
       scenarioMutation,
       scenarioData?.metadata,
@@ -230,7 +231,7 @@ export const useScenarioActionsDone = () => {
     (JOB_REF) => {
       scenarioMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             metadata: mergeScenarioStatusMetaData(
               scenarioData?.metadata,
@@ -272,7 +273,7 @@ export const useScenarioActionsDone = () => {
     (JOB_REF) => {
       scenarioMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             metadata: mergeScenarioStatusMetaData(
               scenarioData?.metadata,
@@ -315,7 +316,7 @@ export const useScenarioActionsDone = () => {
     (JOB_REF) => {
       scenarioMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
               tab: ScenarioSidebarTabs.SOLUTIONS,
@@ -351,7 +352,7 @@ export const useScenarioActionsDone = () => {
     (JOB_REF) => {
       scenarioMutation.mutate(
         {
-          id: `${sid}`,
+          id: sid,
           data: {
             metadata: mergeScenarioStatusMetaData(
               scenarioData?.metadata,

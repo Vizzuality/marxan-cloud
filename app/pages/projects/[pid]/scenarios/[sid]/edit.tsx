@@ -25,6 +25,7 @@ import GridSetupPlanningUnits from 'layout/project/sidebar/scenario/grid-setup/p
 import GridSetupProtectedAreas from 'layout/project/sidebar/scenario/grid-setup/protected-areas';
 import SolutionsOverview from 'layout/project/sidebar/scenario/solutions/overview';
 import SolutionsTargetAchievements from 'layout/project/sidebar/scenario/solutions/target-achievement';
+import ProjectStatus from 'layout/projects/show/status/component';
 import Protected from 'layout/protected';
 import ScenarioLock from 'layout/scenarios/edit/lock';
 import ScenarioEditMap from 'layout/scenarios/edit/map';
@@ -108,6 +109,7 @@ const EditScenarioPage = (): JSX.Element => {
           </ScenariosEditSidebar>
         </Sidebar>
         <ScenarioEditMap />
+        <ProjectStatus />
         <ScenarioStatus />
         <ScenarioLock />
       </ProjectLayout>

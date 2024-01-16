@@ -4,6 +4,7 @@ export const TEXTS_RUNNING = {
   clone: () => 'Cloning project...',
   import: () => 'Importing project...',
   legacy: () => 'Importing legacy project...',
+  costSurface: () => 'Processing cost surface...',
 };
 
 export const TEXTS_FAILURE = {
@@ -12,4 +13,5 @@ export const TEXTS_FAILURE = {
   clone: () => 'Fail cloning project',
   import: () => 'Fail importing project',
   legacy: () => 'Fail importing legacy project',
+  costSurface: () => 'Fail Processing cost surface',
 };

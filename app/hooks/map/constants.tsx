@@ -393,7 +393,7 @@ export const LEGEND_LAYERS = {
           },
           {
             color: COLORS.cost[1],
-            value: `${max}`,
+            value: max,
           },
         ],
         onChangeVisibility: () => {
