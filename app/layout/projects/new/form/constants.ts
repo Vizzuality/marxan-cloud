@@ -18,4 +18,4 @@ export const PA_OPTIONS = [
     label: 'No, I don’t have a planning region or planning unit shapefile',
     value: 'regular',
   },
-];
+] as const;
