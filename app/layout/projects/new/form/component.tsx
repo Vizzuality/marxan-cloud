@@ -42,11 +42,11 @@ import REGION_PU from 'images/info-buttons/img_planning_region_grid.png';
 import { DEFAULT_AREA, PA_OPTIONS } from './constants';
 
 export type NewProjectFields = {
-  PAOptionSelected: string;
+  PAOptionSelected: (typeof PA_OPTIONS)[number]['value'];
   countryId: string;
   planningAreaGridId: string;
   planningUnitAreakm2: number;
-  planningUnitGridShape: string;
+  planningUnitGridShape: 'hexagon' | 'square' | 'from_shapefile';
   planningAreaId: string;
   adminAreaLevel1Id: string;
   adminAreaLevel2Id: string;
@@ -79,16 +79,28 @@ const ProjectForm = ({ onFormUpdate }: ProjectFormProps): JSX.Element => {
 
   const onSubmit = (values: NewProjectFields) => {
     const v = { ...values };
-    const { planningAreaGridId } = v;
+    const { planningAreaGridId, planningAreaId, adminAreaLevel1Id, adminAreaLevel2Id } = v;
     delete v.PAOptionSelected;
     delete v.planningAreaGridId;
+
+    if (planningAreaGridId || planningAreaId) {
+      delete v.countryId;
+      delete v.adminAreaLevel1Id;
+      delete v.adminAreaLevel2Id;
+    }
+
+    if (adminAreaLevel1Id || adminAreaLevel2Id) {
+      delete v.planningAreaId;
+    }
 
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the user
     const data = {
       ...v,
-      ...(planningAreaGridId && { planningAreaId: planningAreaGridId }),
-      ...(planningAreaGridId && { planningUnitGridShape: 'from_shapefile' }),
+      ...(planningAreaGridId && {
+        planningAreaId: planningAreaGridId,
+        planningUnitGridShape: 'from_shapefile',
+      }),
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
     } satisfies NewProjectFields & { organizationId: string };
 
@@ -341,7 +353,7 @@ const ProjectForm = ({ onFormUpdate }: ProjectFormProps): JSX.Element => {
                                   placeholder="Select option..."
                                   initialSelected={PAOptionSelected}
                                   options={OPTIONS}
-                                  onChange={(value: string) => {
+                                  onChange={(value: NewProjectFields['PAOptionSelected']) => {
                                     form.change('PAOptionSelected', value);
                                     setPAOptionSelected(value);
                                     resetPlanningArea(form);
