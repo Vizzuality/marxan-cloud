@@ -23,6 +23,7 @@ export interface Project {
   planningAreaName?: string;
   metadata?: {
     [key: string]: unknown;
+    cache: number;
   };
 }
 

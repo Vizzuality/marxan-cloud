@@ -39,7 +39,7 @@ export const ProjectStatus = (): JSX.Element => {
   const JOBS = useProjectJobs(jobs);
 
   // Failure
-  const JOB_FAILURE = useProjectJobFailure(JOBS, new Date(projectData?.lastModifiedAt).getTime());
+  const JOB_FAILURE = useProjectJobFailure(JOBS, projectData?.metadata?.cache);
   const TEXT_FAILURE = useProjectTextFailure(JOB_FAILURE);
 
   // Done
