@@ -35,14 +35,6 @@ export class SplitQuery {
       planningAreaId: isDefined(planningAreaLocation)
         ? `$${parameters.push(planningAreaLocation.id)}`
         : `NULL`,
-      protectedAreaIds:
-        protectedAreaFilterByIds.length > 0
-          ? protectedAreaFilterByIds
-              .map((id) => `$${parameters.push(id)}`)
-              .join(', ')
-          : undefined,
-      protectedArea:
-        protectedAreaFilterByIds.length > 0 ? 'protected.area' : 'NULL',
       baseFeatureId: `$${parameters.push(singleSplitFeature.baseFeatureId)}`,
       apiFeatureId: `$${parameters.push(apiFeatureId)}`,
       westBbox: [
@@ -57,26 +49,10 @@ export class SplitQuery {
         `$${parameters.push(eastBbox[2])}`,
         `$${parameters.push(eastBbox[3])}`,
       ],
-      totalArea: isDefined(planningAreaLocation)
-        ? `st_area(st_transform(st_intersection(pa.the_geom, fd.the_geom), 3410))`
-        : `NULL`,
     };
     const planningAreaJoin = isDefined(planningAreaLocation)
       ? `left join ${planningAreaLocation.tableName} as pa on pa.id = ${fields.planningAreaId}`
       : ``;
-    const protectedArea = fields.protectedAreaIds
-      ? `st_area(
-          st_transform(
-            st_intersection(
-              st_intersection(pa.the_geom, fd.the_geom), 
-              (
-                select st_union(wdpa.the_geom) as area
-                from wdpa where  wdpa.id in (${fields.protectedAreaIds})
-              )
-            )
-          ,3410)
-        )`
-      : 'NULL';
     const query = `
       insert into scenario_features_preparation as sfp (feature_class_id,
                                                         api_feature_id,
@@ -99,6 +75,19 @@ export class SplitQuery {
               ? `and trim('"' FROM fpkv.value::text) = trim('"' FROM ${fields.filterByValue}::text)`
               : ``
           }
+      ),
+      total_amounts as (
+        select feature_id, SUM(amount) as total_amount from feature_amounts_per_planning_unit
+        where feature_id = ${fields.baseFeatureId}
+        group by feature_id
+      ),
+      protected_amounts as (
+        select spd.scenario_id, fappu.feature_id, SUM(fappu.amount) as protected_amount
+        from scenarios_pu_data spd inner join feature_amounts_per_planning_unit fappu on fappu.project_pu_id = spd.project_pu_id
+        where spd.lockin_status = 1 and fappu.feature_id = ${
+          fields.baseFeatureId
+        } and spd.scenario_id = ${fields.scenarioId}
+        group by spd.scenario_id, fappu.feature_id
       )
       select fd.id,
             ${fields.apiFeatureId},
@@ -107,12 +96,16 @@ export class SplitQuery {
              ${fields.fpf},
              ${fields.target},
              ${fields.prop},
-             ${fields.totalArea},
-             ${protectedArea}
+             (select total_amount from total_amounts ta where ta.feature_id = ${
+               fields.baseFeatureId
+             }),
+             (select protected_amount from protected_amounts pa where pa.feature_id = ${
+               fields.baseFeatureId
+             } and pa.scenario_id = ${fields.scenarioId})
       from split
              join features_data as fd
                   on (split.feature_data_id = fd.id)
-        ${planningAreaJoin} 
+        ${planningAreaJoin}
         where st_intersects(ST_MakeEnvelope(${fields.westBbox
           .map((coordinate) => coordinate)
           .join(',')}, 4326), fd.the_geom)
