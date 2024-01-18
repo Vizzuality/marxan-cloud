@@ -294,7 +294,7 @@ export class ProjectsService {
   ): Promise<
     Either<
       GetProjectErrors | typeof forbiddenError | typeof projectNotFound,
-      { from: string; to: string; query: {} }
+      { from: string; to: string; query: Record<string, unknown> }
     >
   > {
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
@@ -890,10 +890,13 @@ export class ProjectsService {
    **/
   private idToGid(gid: string): PlanningGids {
     const myArray = gid.split('.');
-    return myArray.reduce((acc: {}, curr: string, idx: number) => {
-      const key = idx === 0 ? 'countryId' : `adminAreaLevel${idx}Id`;
-      return { ...acc, [key]: curr };
-    }, {});
+    return myArray.reduce(
+      (acc: Record<string, unknown>, curr: string, idx: number) => {
+        const key = idx === 0 ? 'countryId' : `adminAreaLevel${idx}Id`;
+        return { ...acc, [key]: curr };
+      },
+      {},
+    );
   }
 
   async addProtectedAreaFor(

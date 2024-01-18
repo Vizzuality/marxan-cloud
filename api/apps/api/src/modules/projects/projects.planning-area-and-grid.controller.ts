@@ -267,7 +267,7 @@ export class ProjectPlanningAreaAndGridController {
       result.right.to,
     );
 
-    req.query = result.right.query;
+    req.query = result.right.query as typeof req.query;
 
     return await this.proxyService.proxyTileRequest(req, response);
   }
