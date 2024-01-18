@@ -214,8 +214,8 @@ export class ProjectsService {
   transformMinMaxAmountsFromSquareMetresToSquareKmsForFeaturesFromShapefile(
     feature: Partial<GeoFeature> | undefined,
   ): { min: number | null; max: number | null } {
-    let minResult = feature?.amountMin ? feature?.amountMin : null;
-    let maxResult = feature?.amountMax ? feature?.amountMax : null;
+    let minResult = feature?.amountMin ?? null;
+    let maxResult = feature?.amountMax ?? null;
     if (!feature?.isLegacy) {
       if (feature?.amountMin) {
         const minKm2 = feature.amountMin / 1_000_000;
