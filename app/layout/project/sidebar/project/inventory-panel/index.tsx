@@ -62,7 +62,7 @@ const InventoryPanel = (): JSX.Element => {
   } = panel;
 
   return (
-    <Section className="relative flex flex-col space-y-2 overflow-hidden">
+    <Section className="relative flex flex-col space-y-4 overflow-hidden">
       <header className="flex items-center justify-between">
         <div className="space-y-1">
           <span className="text-xs font-semibold text-blue-500">Inventory Panel</span>

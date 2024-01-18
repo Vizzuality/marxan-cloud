@@ -85,7 +85,6 @@ const TargetAndSPFFeatures = (): JSX.Element => {
 
   const targetedFeatures = useMemo(() => {
     let parsedData = [];
-    console.log({ featureValues });
     selectedFeaturesQuery.data?.forEach((feature) => {
       if (feature.splitFeaturesSelected?.length > 0) {
         const featureMetadata = allFeaturesQuery.data?.find(({ id }) => id === feature.id);
@@ -457,11 +456,11 @@ const TargetAndSPFFeatures = (): JSX.Element => {
         />
         {filters.type && (
           <div className="flex items-center space-x-2 text-xs">
-            <span className=" space-x-3">
+            <span className="space-x-2">
               <span>Filtering by: </span>
               <button
                 type="button"
-                className="inline-block rounded-2xl bg-yellow-500/10 px-3 py-0.5 text-yellow-500 transition-colors hover:bg-yellow-500 hover:text-gray-900"
+                className="inline-block rounded-2xl bg-yellow-500 bg-opacity-20 px-3 py-0.5 text-yellow-500 transition-colors hover:bg-yellow-600 hover:text-gray-900"
                 onClick={() => handleTagFilter(null)}
               >
                 {filters.type}
@@ -469,12 +468,12 @@ const TargetAndSPFFeatures = (): JSX.Element => {
             </span>
             <button
               type="button"
-              className="group inline-flex justify-center rounded-full border border-gray-400 p-1 transition-colors hover:border-transparent"
+              className="group inline-flex justify-center rounded-full border border-gray-700 p-1.5 transition-colors hover:border-white"
               onClick={() => handleTagFilter(null)}
             >
               <Icon
                 icon={CLOSE_SVG}
-                className="inline-block h-2 w-2 text-gray-400 transition-colors group-hover:text-white"
+                className="inline-block h-2 w-2 text-white transition-colors group-hover:text-white"
               />
             </button>
           </div>

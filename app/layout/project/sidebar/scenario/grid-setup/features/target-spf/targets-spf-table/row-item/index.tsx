@@ -95,7 +95,7 @@ const RowItem = ({
           <div className="flex justify-center">
             <button
               type="button"
-              className="cursor-pointer whitespace-nowrap rounded-full bg-yellow-700 bg-opacity-10 px-2 py-1 text-yellow-700"
+              className="cursor-pointer whitespace-nowrap rounded-full bg-yellow-600 px-2 py-1 text-gray-900"
               onClick={() => {
                 onClickTag(type);
               }}

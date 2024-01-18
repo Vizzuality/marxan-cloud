@@ -18,6 +18,7 @@ const InventoryTable = ({
   onToggleSeeOnMap,
   onSelectRow,
   onSelectAll,
+  onSelectTag,
   ActionsComponent,
 }: InventoryTable): JSX.Element => {
   const noData = !loading && data?.length === 0;
@@ -77,6 +78,7 @@ const InventoryTable = ({
                   selectedIds={selectedIds}
                   onSelectRow={onSelectRow}
                   onToggleSeeOnMap={onToggleSeeOnMap}
+                  onSelectTag={onSelectTag}
                   ActionsComponent={ActionsComponent}
                 />
               ))}
