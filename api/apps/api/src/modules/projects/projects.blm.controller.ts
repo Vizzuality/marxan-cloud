@@ -12,7 +12,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { projectResource } from './project.api.entity';
 import {
   ApiBearerAuth,
   ApiOkResponse,

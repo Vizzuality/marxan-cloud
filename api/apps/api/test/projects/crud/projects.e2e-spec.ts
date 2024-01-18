@@ -29,18 +29,14 @@ describe('ProjectsModule (e2e)', () => {
     it('should succeed when giving minimum required data', async () => {
       const userToken = await api.utils.createWorkingUser();
 
-      const {
-        body: organizationResponse,
-      } = await api.requests.organizations
+      const { body: organizationResponse } = await api.requests.organizations
         .createOrganization(userToken)
         .expect(HttpStatus.CREATED);
       const projectData = {
         ...E2E_CONFIG.projects.valid.minimal(),
         organizationId: organizationResponse.data.id,
       };
-      const {
-        body: projectResponse,
-      } = await api.requests.projects
+      const { body: projectResponse } = await api.requests.projects
         .createProject(userToken, projectData)
         .expect(HttpStatus.CREATED);
 
@@ -136,7 +132,8 @@ describe('ProjectsModule (e2e)', () => {
     it('should fail when creating a second project using the same custom planning area as another project', async () => {
       await fixtures.GivenCustomPlanningAreaWasCreated();
       await fixtures.GivenPrivateProjectWithCustomPlanningAreaWasCreated();
-      const result = await fixtures.WhenCreatingAnotherProjectWithSameCustomPlanningArea();
+      const result =
+        await fixtures.WhenCreatingAnotherProjectWithSameCustomPlanningArea();
       fixtures.ThenCreationOfProjectWithAlreadySpentCustomPlanningAreaShouldFail(
         result,
       );
@@ -157,9 +154,7 @@ describe('ProjectsModule (e2e)', () => {
       const { body: userProjects } = await api.requests.projects
         .listProjects(userToken)
         .expect(HttpStatus.OK);
-      const {
-        body: anotherUserProjects,
-      } = await api.requests.projects
+      const { body: anotherUserProjects } = await api.requests.projects
         .listProjects(anotherUserToken)
         .expect(HttpStatus.OK);
 
@@ -185,9 +180,7 @@ describe('ProjectsModule (e2e)', () => {
         description: 'cannotBeFound',
       });
 
-      const {
-        body: projectsResponse,
-      } = await api.requests.projects
+      const { body: projectsResponse } = await api.requests.projects
         .listProjects(userToken)
         .expect(HttpStatus.OK);
 
@@ -215,9 +208,7 @@ describe('ProjectsModule (e2e)', () => {
       const userToken = await api.utils.createWorkingUser();
       await api.utils.createWorkingProjectWithScenario(userToken);
 
-      const {
-        body: projectsResponse,
-      } = await api.requests.projects
+      const { body: projectsResponse } = await api.requests.projects
         .listProjects(userToken, { include: ['scenarios'] })
         .expect(HttpStatus.OK);
 
@@ -234,9 +225,7 @@ describe('ProjectsModule (e2e)', () => {
       await api.requests.projects
         .deleteProject(userToken, data.id)
         .expect(HttpStatus.OK);
-      const {
-        body: projectsResponse,
-      } = await api.requests.projects
+      const { body: projectsResponse } = await api.requests.projects
         .listProjects(userToken)
         .expect(HttpStatus.OK);
 
@@ -245,16 +234,13 @@ describe('ProjectsModule (e2e)', () => {
 
     it('should succeed with a project with scenarios', async () => {
       const userToken = await api.utils.createWorkingUser();
-      const { data } = await api.utils.createWorkingProjectWithScenario(
-        userToken,
-      );
+      const { data } =
+        await api.utils.createWorkingProjectWithScenario(userToken);
 
       await api.requests.projects
         .deleteProject(userToken, data.id)
         .expect(HttpStatus.OK);
-      const {
-        body: projectsResponse,
-      } = await api.requests.projects
+      const { body: projectsResponse } = await api.requests.projects
         .listProjects(userToken)
         .expect(HttpStatus.OK);
 
@@ -266,16 +252,13 @@ describe('ProjectsModule (e2e)', () => {
       const anotherUser = await api.utils.createWorkingUser({
         email: 'another@email.com',
       });
-      const { data } = await api.utils.createWorkingProjectWithScenario(
-        userToken,
-      );
+      const { data } =
+        await api.utils.createWorkingProjectWithScenario(userToken);
 
       await api.requests.projects
         .deleteProject(anotherUser, data.id)
         .expect(HttpStatus.FORBIDDEN);
-      const {
-        body: projectsResponse,
-      } = await api.requests.projects
+      const { body: projectsResponse } = await api.requests.projects
         .listProjects(userToken)
         .expect(HttpStatus.OK);
 

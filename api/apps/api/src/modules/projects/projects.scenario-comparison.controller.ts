@@ -19,7 +19,6 @@ import {
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 
-import { projectResource } from './project.api.entity';
 import { ProjectsService } from './projects.service';
 import { Response } from 'express';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';

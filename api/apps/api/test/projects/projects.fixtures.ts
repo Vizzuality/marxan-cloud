@@ -5,7 +5,11 @@ import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ComponentId, ComponentLocation } from '@marxan/cloning/domain';
 import { HttpStatus } from '@nestjs/common';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule, getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
+import {
+  TypeOrmModule,
+  getEntityManagerToken,
+  getRepositoryToken,
+} from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import * as request from 'supertest';
