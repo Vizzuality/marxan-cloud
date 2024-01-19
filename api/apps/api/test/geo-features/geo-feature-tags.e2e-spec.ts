@@ -250,6 +250,30 @@ describe('GeoFeatureTag PATCH (e2e)', () => {
     await fixtures.ThenFeatureHasTag(projectId, featureId, newTag);
   });
 
+  test('should update the tag of the geo feature with trimmed down leading and trailing white spaces', async () => {
+    // ARRANGE
+    const projectId = await fixtures.GivenProject('someProject');
+    const featureId = await fixtures.GivenFeatureOnProject(
+      projectId,
+      'someFeature',
+    );
+    await fixtures.GivenTagOnFeature(projectId, featureId, 'oldTag');
+    const newPaddedTag = '  padded TAG     ';
+
+    // ACT
+    const response = await fixtures.WhenPatchingAGeoFeatureTag(
+      projectId,
+      featureId,
+      newPaddedTag,
+    );
+
+    // ASSERT
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body.data.type).toBe('geo_features');
+    expect(response.body.data.attributes.featureClassName).toBe('someFeature');
+    await fixtures.ThenFeatureHasTag(projectId, featureId, newPaddedTag.trim());
+  });
+
   test('should tag the feature properly, even if the feature does not previously have a tag', async () => {
     // ARRANGE
     const projectId = await fixtures.GivenProject('someProject');

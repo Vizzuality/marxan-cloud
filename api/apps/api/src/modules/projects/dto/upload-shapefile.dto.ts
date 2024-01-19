@@ -5,6 +5,7 @@ import {
   tagMaxLengthErrorMessage,
 } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { IsValidTagNameValidator } from '@marxan-api/modules/geo-feature-tags/validators/is-valid-tag-name.custom.validator';
+import { Transform } from 'class-transformer';
 
 export class UploadShapefileDTO {
   @ApiProperty()
@@ -18,7 +19,9 @@ export class UploadShapefileDTO {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
   @Validate(IsValidTagNameValidator)
+  @Transform((value: string): string => value.trim())
   @MaxLength(tagMaxlength, {
     message: tagMaxLengthErrorMessage,
   })

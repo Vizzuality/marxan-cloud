@@ -71,6 +71,30 @@ test(`if tagging info is included in DTO and valid, created feature should be ta
   await fixtures.ThenGeoFeatureTagIsCreated(name, tag);
 });
 
+test(`if tagging info is included in, the feature's tag should be trimmed down of white spaces `, async () => {
+  // ARRANGE
+  const name = 'someFeature';
+  const description = 'someDescrip';
+  const paddedTag = '   paddedTag    ';
+  await fixtures.GivenProjectPusWithGeometryForProject();
+
+  // ACT
+  const result = await fixtures.WhenUploadingCustomFeature(
+    name,
+    description,
+    paddedTag,
+  );
+
+  // ASSERT
+  await fixtures.ThenGeoFeaturesAreCreated(
+    result,
+    name,
+    description,
+    paddedTag.trim(),
+  );
+  await fixtures.ThenGeoFeatureTagIsCreated(name, paddedTag.trim());
+});
+
 test(`if there is already an existing feature with a tag that has equivalent capitalization to the one included in the custom feature DTO, the existing one will be used for the new feature`, async () => {
   // ARRANGE
   const equivalentTag = 'some-Tag';
