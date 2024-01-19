@@ -242,6 +242,29 @@ describe('Projects Tag PATCH (e2e)', () => {
     await fixtures.ThenFeatureHasTag(projectId1, featureId11, 'updatedTAG');
     await fixtures.ThenFeatureHasTag(projectId1, featureId14, 'updatedTAG');
   });
+
+  test('should update all feature tag rows that match exactly with the tag to be updated trimmed down of leading and trailing white spaces', async () => {
+    // ARRANGE
+    const projectId = await fixtures.GivenProject('someProject');
+    const featureId1 = await fixtures.GivenFeatureOnProject(projectId, 'f1');
+    const featureId2 = await fixtures.GivenFeatureOnProject(projectId, 'f2');
+
+    await fixtures.GivenTagOnFeature(projectId, featureId1, 'toBeUpdated');
+    await fixtures.GivenTagOnFeature(projectId, featureId2, 'toBeUpdated');
+    const paddedTag = '   paddedTAG        ';
+
+    //ACT
+    const response = await fixtures.WhenPatchingAProjectTag(
+      projectId,
+      'toBeUpdated',
+      paddedTag,
+    );
+
+    //ASSERT
+    expect(response.status).toBe(HttpStatus.OK);
+    await fixtures.ThenFeatureHasTag(projectId, featureId1, paddedTag.trim());
+    await fixtures.ThenFeatureHasTag(projectId, featureId2, paddedTag.trim());
+  });
 });
 
 describe('Projects Tag DELETE (e2e)', () => {
