@@ -84,8 +84,6 @@ https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991
 ## Cost surface
 If someone uploads a cost surface, they should be able to download the cost surface uploaded and the template. For doing this we need:
 
-#### Get current cost surface 'GET' `​/api​/v1​/scenarios​/{id}​/cost-surface`
-It should return a .zip file if the user has already uploaded one. Otherwise null.
 
 #### Get min-max range 'GET' `​/api​/v1​/scenarios​/{id}​/cost-surface/range`
 Migrate the current endpoint that is returning the min and max to this one. Just a naming change

@@ -139,13 +139,7 @@ export function useEditWDPA({
   return useMutation(saveProjectWDPA);
 }
 
-export function useUploadWDPAsShapefile({
-  requestConfig = {
-    method: 'POST',
-  },
-}: {
-  requestConfig?: AxiosRequestConfig<FormData>;
-}) {
+export function useUploadWDPAsShapefile() {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
 
@@ -156,13 +150,13 @@ export function useUploadWDPAsShapefile({
   const uploadWDPAShapefile = ({ id, data }: { id: Project['id']; data: FormData }) => {
     return UPLOADS.request<{ success: true }>({
       url: `/projects/${id}/protected-areas/shapefile`,
+      method: 'POST',
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
         'Content-Type': 'multipart/form-data',
       },
-      ...requestConfig,
-    } as typeof requestConfig);
+    });
   };
 
   return useMutation(uploadWDPAShapefile, {

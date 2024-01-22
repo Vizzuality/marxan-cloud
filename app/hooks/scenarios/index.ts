@@ -31,8 +31,6 @@ import {
   UploadScenarioPUProps,
   UseSaveScenarioPUProps,
   SaveScenarioPUProps,
-  UploadPAProps,
-  UseUploadPAProps,
   UseDuplicateScenarioProps,
   DuplicateScenarioProps,
   UseCancelRunScenarioProps,
@@ -539,29 +537,6 @@ export function useUploadScenarioPU({
       console.info('Error', error, variables, context);
     },
   });
-}
-
-// CUSTOM PROTECTED AREAS
-export function useUploadPA({
-  requestConfig = {
-    method: 'POST',
-  },
-}: UseUploadPAProps) {
-  const { data: session } = useSession();
-
-  const uploadPAShapefile = ({ id, data }: UploadPAProps) => {
-    return UPLOADS.request({
-      url: `scenarios/${id}/protected-areas/shapefile`,
-      data,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'multipart/form-data',
-      },
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(uploadPAShapefile);
 }
 
 // PLANNING UNITS
