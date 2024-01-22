@@ -50,7 +50,7 @@ export const WDPAUploadModal = ({
 
   const { addToast } = useToasts();
 
-  const uploadWDPAsShapefileMutation = useUploadWDPAsShapefile({});
+  const uploadPAMutation = useUploadWDPAsShapefile();
 
   useEffect(() => {
     return () => {
@@ -112,7 +112,7 @@ export const WDPAUploadModal = ({
       data.append('file', file);
       data.append('name', name);
 
-      uploadWDPAsShapefileMutation.mutate(
+      uploadPAMutation.mutate(
         { data, id: pid },
         {
           onSuccess: () => {
@@ -163,7 +163,7 @@ export const WDPAUploadModal = ({
         }
       );
     },
-    [pid, addToast, onClose, uploadWDPAsShapefileMutation, successFile]
+    [pid, addToast, onClose, uploadPAMutation, successFile]
   );
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({

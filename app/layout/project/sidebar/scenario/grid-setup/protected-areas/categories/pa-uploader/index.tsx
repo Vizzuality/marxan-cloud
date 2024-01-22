@@ -12,8 +12,8 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { motion } from 'framer-motion';
 
 import { useCanEditScenario } from 'hooks/permissions';
-import { useUploadPA } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
+import { useUploadWDPAsShapefile } from 'hooks/wdpa';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -30,13 +30,7 @@ import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-export interface ProtectedAreaUploaderProps {
-  input: any;
-}
-
-export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
-  input,
-}: ProtectedAreaUploaderProps) => {
+export const ProtectedAreaUploader = ({ input }): JSX.Element => {
   const queryClient = useQueryClient();
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
@@ -56,11 +50,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
   const editable = useCanEditScenario(pid, sid);
 
-  const uploadPAMutation = useUploadPA({
-    requestConfig: {
-      method: 'POST',
-    },
-  });
+  const uploadPAMutation = useUploadWDPAsShapefile();
 
   useEffect(() => {
     return () => {
