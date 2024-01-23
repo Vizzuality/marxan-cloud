@@ -150,10 +150,13 @@ export const useScenarioActionsDone = () => {
           },
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
             dispatch(setJob(null));
             dispatch(setCache(Date.now()));
             dispatch(setSubTab(null));
+            await queryClient.invalidateQueries(['selected-features', sid]);
+            await queryClient.invalidateQueries(['targeted-features', sid]);
+            await queryClient.invalidateQueries(['pre-gap-analysis', sid]);
             JOB_REF.current = null;
           },
           onError: () => {
