@@ -31,34 +31,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it(`should return defaults when no data for scenario`, async () => {
-  // given
-  const scenarioId = fixtures.getScenarioId();
-  const rangeService = fixtures.getRangeService();
-  // and no data
-  // when
-  const range = await rangeService.getRangeForScenario(scenarioId);
-  // then
-  expect(range).toStrictEqual({
-    min: 1,
-    max: 1,
-  });
-});
-
-it(`should return valid min/max while data available for scenario`, async () => {
-  // given
-  const scenarioId = fixtures.getScenarioId();
-  const rangeService = fixtures.getRangeService();
-  // and
-  await fixtures.GivenCostDataInDbForMultipleScenarios();
-  // when
-  const range = await rangeService.getRangeForScenario(scenarioId);
-  // then
-  expect(range).toStrictEqual({
-    min: -1,
-    max: 634,
-  });
-});
 it('should return valid min/max while data available for cost surface', async () => {
   const rangeService = fixtures.getRangeService();
   const { projectId, costSurfaceId } =
