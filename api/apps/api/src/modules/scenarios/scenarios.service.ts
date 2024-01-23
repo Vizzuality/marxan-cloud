@@ -44,7 +44,7 @@ import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { SpecificationService } from './specification';
-import { CostRange, CostRangeService } from './cost-range-service';
+import { CostRangeService } from './cost-range-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 import {
@@ -89,8 +89,6 @@ import {
 } from '@marxan-api/modules/blm/values/blm-repos';
 
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
-import { SetInitialCostSurfaceError } from '@marxan-api/modules/cost-surface/application/set-initial-cost-surface.command';
-import { UpdateCostSurface } from '@marxan-api/modules/cost-surface/application/update-cost-surface.command';
 import { DeleteScenario } from '@marxan-api/modules/cost-surface/infra/delete-scenario.command';
 import {
   lockedByAnotherUser,
@@ -268,7 +266,6 @@ export class ScenariosService {
       | typeof blmCreationFailure
       | ProjectNotReady
       | ProjectDoesntExist
-      | SetInitialCostSurfaceError
       | typeof scenarioNotCreated
       | typeof costSurfaceNotFound
       | typeof linkCostSurfaceToScenarioFailed,
@@ -554,29 +551,6 @@ export class ScenariosService {
           }
         : {}),
     };
-  }
-
-  async processCostSurfaceShapefile(
-    scenarioId: string,
-    userId: string,
-    file: Express.Multer.File,
-  ): Promise<
-    Either<
-      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
-      void
-    >
-  > {
-    const userCanEditScenario =
-      await this.scenarioAclService.canEditScenarioAndOwnsLock(
-        userId,
-        scenarioId,
-      );
-    if (isLeft(userCanEditScenario)) {
-      return userCanEditScenario;
-    }
-
-    await this.commandBus.execute(new UpdateCostSurface(scenarioId, file));
-    return right(void 0);
   }
 
   async uploadLockInShapeFile(
