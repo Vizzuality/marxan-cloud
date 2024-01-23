@@ -1,4 +1,4 @@
-import { useCallback, useState, ChangeEvent, useEffect } from 'react';
+import { useCallback, useState, ChangeEvent, useEffect, ComponentProps, useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -9,11 +9,16 @@ import {
   setLayerSettings,
 } from 'store/slices/projects/[id]';
 
+import Fuse from 'fuse.js';
+
 import { useAllFeatures, useColorFeatures } from 'hooks/features';
 
+import Icon from 'components/icon';
 import ActionsMenu from 'layout/project/sidebar/project/inventory-panel/features/actions-menu';
 import FeaturesBulkActionMenu from 'layout/project/sidebar/project/inventory-panel/features/bulk-action-menu';
 import { Feature } from 'types/api/feature';
+
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 import InventoryTable, { type DataItem } from '../components/inventory-table';
 
@@ -31,6 +36,7 @@ const FEATURES_TABLE_COLUMNS = [
 
 const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   const {
     selectedFeatures: visibleFeatures,
@@ -166,12 +172,39 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     [dispatch, visibleFeatures, allFeaturesQuery.data, selectedContinuousFeatures]
   );
 
+  const handleSelectTag = useCallback(
+    (tag: Parameters<ComponentProps<typeof InventoryTable>['onSelectTag']>[0]) => {
+      setSelectedTag(tag);
+      setSelectedFeaturesIds([]);
+    },
+    []
+  );
+
+  const clearTag = useCallback(() => {
+    setSelectedTag(null);
+  }, []);
+
   const displayBulkActions = selectedFeaturesIds.length > 0;
 
-  const data: DataItem[] = allFeaturesQuery.data?.map((feature) => ({
-    ...feature,
-    isVisibleOnMap: layerSettings[feature.id]?.visibility ?? false,
-  }));
+  const data: DataItem[] = useMemo(() => {
+    let d = allFeaturesQuery.data?.map((feature) => ({
+      ...feature,
+      isVisibleOnMap: layerSettings[feature.id]?.visibility ?? false,
+    }));
+
+    if (selectedTag) {
+      const fuse = new Fuse(d, {
+        keys: ['tag'],
+        threshold: 0.25,
+      });
+
+      d = fuse.search(selectedTag).map((f) => {
+        return f.item;
+      });
+    }
+
+    return d;
+  }, [allFeaturesQuery.data, layerSettings, selectedTag]);
 
   useEffect(() => {
     if (allFeaturesQuery.isRefetching) {
@@ -180,7 +213,29 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
   }, [allFeaturesQuery.isRefetching]);
 
   return (
-    <div className="flex flex-col space-y-6 overflow-hidden">
+    <div className="flex flex-col space-y-4 overflow-hidden">
+      {selectedTag && (
+        <span className="space-x-2 text-xs">
+          <span>Filtering by: </span>
+          <button
+            type="button"
+            className="inline-block rounded-2xl bg-yellow-500 bg-opacity-20 px-3 py-0.5 text-yellow-500 transition-colors hover:bg-yellow-600 hover:text-gray-900"
+            onClick={clearTag}
+          >
+            {selectedTag}
+          </button>
+          <button
+            type="button"
+            className="group inline-flex justify-center rounded-full border border-gray-700 p-1.5 transition-colors hover:border-white"
+            onClick={clearTag}
+          >
+            <Icon
+              icon={CLOSE_SVG}
+              className="inline-block h-2 w-2 text-white transition-colors group-hover:text-white"
+            />
+          </button>
+        </span>
+      )}
       <div className="h-full overflow-hidden">
         <InventoryTable
           loading={allFeaturesQuery.isFetching}
@@ -193,6 +248,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
           onSelectAll={handleSelectAll}
           onSelectRow={handleSelectFeature}
           onToggleSeeOnMap={toggleSeeOnMap}
+          onSelectTag={handleSelectTag}
           ActionsComponent={ActionsMenu}
         />
       </div>

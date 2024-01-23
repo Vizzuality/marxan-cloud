@@ -27,5 +27,6 @@ export type InventoryTable = {
   onToggleSeeOnMap: (id: string) => void;
   onSelectRow: (evt: ChangeEvent<HTMLInputElement>) => void;
   onSelectAll: (evt: ChangeEvent<HTMLInputElement>) => void;
+  onSelectTag?: (tag: DataItem['tag']) => void;
   ActionsComponent: ({ item }) => JSX.Element;
 };

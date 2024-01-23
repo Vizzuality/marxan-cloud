@@ -7,6 +7,7 @@ export type RowItem = {
   selectedIds: string[];
   onSelectRow: (evt: ChangeEvent<HTMLInputElement>) => void;
   onToggleSeeOnMap: (id: string) => void;
+  onSelectTag?: (tag: DataItem['tag']) => void;
   ActionsComponent: ({
     item,
     onDismissMenu,

@@ -190,8 +190,13 @@ const EditableTitle = ({
               <FieldRFF<FormFields['description']> name="description">
                 {({ input }) => (
                   <div className="relative w-full">
-                    <div className="relative">
-                      <div>
+                    <div
+                      className={cn({
+                        relative: true,
+                        'pb-4': input.value?.length,
+                      })}
+                    >
+                      <>
                         <p className="invisible absolute left-0 top-0 font-heading text-sm font-normal text-white">
                           {input.value}
                         </p>
@@ -218,7 +223,7 @@ const EditableTitle = ({
                             }
                           }}
                         />
-                      </div>
+                      </>
                       <p className="line-clamp-3 font-heading text-sm font-normal text-white">
                         {input.value}
                       </p>
