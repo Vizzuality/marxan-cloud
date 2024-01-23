@@ -337,25 +337,11 @@ const TargetAndSPFFeatures = (): JSX.Element => {
       }),
     };
 
-    selectedFeaturesMutation.mutate(
-      {
-        id: sid,
-        data,
-      },
-      {
-        onSuccess: async () => {
-          await queryClient.invalidateQueries(['selected-features', sid]);
-        },
-      }
-    );
-  }, [
-    sid,
-    queryClient,
-    selectedFeaturesMutation,
-    featureValues,
-    selectedFeaturesQuery.data,
-    targetedFeatures,
-  ]);
+    selectedFeaturesMutation.mutate({
+      id: sid,
+      data,
+    });
+  }, [sid, selectedFeaturesMutation, featureValues, selectedFeaturesQuery.data, targetedFeatures]);
 
   const handleRowValues = useCallback((id, values) => {
     setFeatureValues((prevValues) => ({
