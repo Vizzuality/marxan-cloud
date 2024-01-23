@@ -28,21 +28,6 @@ export class CostRangeService {
     return { min: costRange?.min ?? 1, max: costRange?.max ?? 1 };
   }
 
-  async getRangeForScenario(scenarioId: string): Promise<CostRange> {
-    const { min, max } = (
-      await this.geoEntityManager.query(
-        `
-      SELECT MIN(spcd.cost) as min, MAX(spcd.cost) as max
-      FROM scenarios_pu_data spd
-      LEFT JOIN scenarios_pu_cost_data spcd on spd.id = spcd.scenarios_pu_data_id
-      WHERE scenario_id = $1;
-    `,
-        [scenarioId],
-      )
-    )[0];
-    return { min: min ?? 1, max: max ?? 1 };
-  }
-
   async updateCostSurfaceRange(costSurfaceId: string): Promise<void> {
     const { min, max } = await this.getCostRangeForUpdate(costSurfaceId);
     await this.apiEntityManager

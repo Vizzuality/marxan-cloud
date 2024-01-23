@@ -1165,16 +1165,6 @@ export class ScenariosService {
     );
   }
 
-  async getCostRange(
-    scenarioId: string,
-    userId: string,
-  ): Promise<Either<typeof forbiddenError, CostRange>> {
-    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
-      return left(forbiddenError);
-    }
-    return right(await this.costService.getRangeForScenario(scenarioId));
-  }
-
   async resetLockStatus(
     scenarioId: string,
     userId: string,
