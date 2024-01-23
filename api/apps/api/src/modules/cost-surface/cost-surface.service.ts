@@ -113,12 +113,14 @@ export class CostSurfaceService {
       max,
     });
     const costSurface = await this.costSurfaceRepository.save(instance);
-    const result = await this.calculateCost.forShapefile(
+    const _result = await this.calculateCost.forShapefile(
       projectId,
       costSurface.id,
       file,
     );
-    // TODO: Handle error! Delete cost surface!
+    /**
+     * @todo: Handle error! Delete cost surface!
+     */
     return right(void 0);
   }
 
