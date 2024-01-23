@@ -40,6 +40,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ApiEvent } from '@marxan-api/modules/api-events/api-event.api.entity';
+import { costSurfaceDefaultName } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 export const getProjectCostSurfaceFixtures = async () => {
   const app = await bootstrapApplication(
@@ -106,7 +107,7 @@ export const getProjectCostSurfaceFixtures = async () => {
     },
 
     GivenProject: async (projectName: string, roles?: ProjectRoles[]) => {
-      const { projectId, cleanup } = await GivenProjectExists(
+      const { projectId } = await GivenProjectExists(
         app,
         token,
         {
@@ -478,7 +479,7 @@ export const getProjectCostSurfaceFixtures = async () => {
     },
     ThenADefaultCostSurfaceWasCreated: async (projectId: string) => {
       const costSurface = await costSurfaceRepo.findOne({
-        where: { projectId, name: 'default', isDefault: true },
+        where: { projectId, name: costSurfaceDefaultName, isDefault: true },
       });
 
       expect(costSurface).toBeDefined();
