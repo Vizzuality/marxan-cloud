@@ -42,6 +42,8 @@ export const cannotDeleteDefaultCostSurface = Symbol(
   `cannot delete default cost surface`,
 );
 
+export const costSurfaceDefaultName = 'Cost Surface - default';
+
 export interface CostRange {
   min: number;
   max: number;
@@ -62,7 +64,7 @@ export class CostSurfaceService {
 
   createDefaultCostSurfaceModel(): CostSurface {
     return this.costSurfaceRepository.create({
-      name: 'default',
+      name: costSurfaceDefaultName,
       min: 1,
       max: 1,
       isDefault: true,
@@ -107,7 +109,7 @@ export class CostSurfaceService {
     const min = 1;
     const max = 10;
     const instance = this.costSurfaceRepository.create({
-      name: costSurfaceDto?.name ?? 'default',
+      name: costSurfaceDto?.name ?? costSurfaceDefaultName,
       projectId,
       min,
       max,

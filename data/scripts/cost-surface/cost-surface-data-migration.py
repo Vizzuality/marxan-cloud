@@ -1,6 +1,5 @@
 import psycopg2
 
-
 dry_run = True
 
 # Connect to Database 1
@@ -68,7 +67,7 @@ try:
         # Insert new row in cost_surfaces with project-specific information
         insert_cost_surface_for_project_sql = '''
             INSERT INTO cost_surfaces (id, project_id, min, max, is_default, name, is_migrated)
-            VALUES (gen_random_uuid(), %s, 1, 1, true, 'default', true);
+            VALUES (gen_random_uuid(), %s, 1, 1, true, 'Cost Surface - default', true);
         '''
 
         cur_api_db.execute(insert_cost_surface_for_project_sql, (project_id,))
