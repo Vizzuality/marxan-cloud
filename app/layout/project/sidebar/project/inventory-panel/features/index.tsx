@@ -88,17 +88,6 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     }
   );
 
-  const featureIds = allFeaturesQuery.data
-    ?.filter(({ isCustom }) => isCustom)
-    .map((feature) => feature.id);
-
-  const handleSelectAll = useCallback(
-    (evt: ChangeEvent<HTMLInputElement>) => {
-      setSelectedFeaturesIds(evt.target.checked ? featureIds : []);
-    },
-    [featureIds]
-  );
-
   const handleSelectFeature = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
     if (evt.target.checked) {
       setSelectedFeaturesIds((prevSelectedFeatures) => [...prevSelectedFeatures, evt.target.value]);
@@ -205,6 +194,15 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
 
     return d;
   }, [allFeaturesQuery.data, layerSettings, selectedTag]);
+
+  const featureIds = data?.filter(({ isCustom }) => isCustom).map((feature) => feature.id);
+
+  const handleSelectAll = useCallback(
+    (evt: ChangeEvent<HTMLInputElement>) => {
+      setSelectedFeaturesIds(evt.target.checked ? featureIds : []);
+    },
+    [featureIds]
+  );
 
   useEffect(() => {
     if (allFeaturesQuery.isRefetching) {
