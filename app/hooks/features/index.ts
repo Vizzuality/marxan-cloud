@@ -181,11 +181,6 @@ export function useSelectedFeatures(
   const { data: session } = useSession();
   const { search } = filters;
 
-  const queryClient = useQueryClient();
-
-  // const featureColorQueryState =
-  //   queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
-
   const featureColors = useColorFeatures(pid, sid);
 
   const fetchFeatures = () =>

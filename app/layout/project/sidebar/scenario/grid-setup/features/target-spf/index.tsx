@@ -407,6 +407,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           onSuccess: async () => {
             await queryClient.invalidateQueries(['selected-features', sid]);
             await queryClient.invalidateQueries(['targeted-features', sid]);
+            await queryClient.invalidateQueries(['pre-gap-analysis', sid]);
           },
         }
       );
