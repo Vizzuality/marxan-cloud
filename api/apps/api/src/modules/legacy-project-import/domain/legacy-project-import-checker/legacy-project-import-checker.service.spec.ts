@@ -36,9 +36,8 @@ it.each(
   async (kind) => {
     const id = await fixtures.GivenLegacyProjectImport(kind);
 
-    const result = await fixtures.WhenHasImportedLegacyProjectMethodIsCalled(
-      id,
-    );
+    const result =
+      await fixtures.WhenHasImportedLegacyProjectMethodIsCalled(id);
 
     fixtures.ThenFalseIsReturned(result);
   },

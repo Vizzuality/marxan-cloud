@@ -46,12 +46,9 @@ export class SelectionUpdateService {
     const idsToAdd: string[] = [];
     const idsToRemove: string[] = [];
     const projectScopedIdsRemoved: string[] = [];
-
     // TODO refactor to pieces
-    const { areas } = await this.selectionGetService.getGlobalProtectedAreas(
-      project,
-    );
-
+    const { areas } =
+      await this.selectionGetService.getGlobalProtectedAreas(project);
     for (const currentAreaState of currentSelection) {
       const entry = newSelection.find(
         (item) => item.id === currentAreaState.id,
@@ -121,8 +118,7 @@ export class SelectionUpdateService {
        */
       try {
         await this.apiEvents.create({
-          kind:
-            API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__submitted__v1__alpha1,
+          kind: API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__submitted__v1__alpha1,
           topic: scenario.id,
         });
       } catch (error: unknown) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useDispatch } from 'react-redux';
 
@@ -6,52 +6,52 @@ import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 import { withProject } from 'hoc/projects';
-import { withScenario, withScenarioLock } from 'hoc/scenarios';
+import { withScenario, withScenarioLock, withSolutions } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { ScenarioSidebarTabs } from 'utils/tabs';
-
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
-import Header from 'layout/header';
-import Help from 'layout/help/button';
-import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
+import ProjectLayout from 'layout/project';
+import { TABS } from 'layout/project/navigation/constants';
+import Sidebar from 'layout/project/sidebar';
+import AdvancedSettingsBLMCalibration from 'layout/project/sidebar/scenario/advanced-settings/blm-calibration';
+import AdvancedSettingsOverview from 'layout/project/sidebar/scenario/advanced-settings/overview';
+import GridSetupCostSurface from 'layout/project/sidebar/scenario/grid-setup/cost-surface';
+import GridSetupFeatures from 'layout/project/sidebar/scenario/grid-setup/features';
+import GridSetupGAPAnalysis from 'layout/project/sidebar/scenario/grid-setup/gap-analysis';
+import GridSetupPlanningUnits from 'layout/project/sidebar/scenario/grid-setup/planning-unit-status';
+import GridSetupProtectedAreas from 'layout/project/sidebar/scenario/grid-setup/protected-areas';
+import SolutionsOverview from 'layout/project/sidebar/scenario/solutions/overview';
+import SolutionsTargetAchievements from 'layout/project/sidebar/scenario/solutions/target-achievement';
+import ProjectStatus from 'layout/projects/show/status/component';
 import Protected from 'layout/protected';
-import SidebarEditFeatures from 'layout/scenarios/edit/features';
 import ScenarioLock from 'layout/scenarios/edit/lock';
 import ScenarioEditMap from 'layout/scenarios/edit/map';
-import SidebarEditAnalysis from 'layout/scenarios/edit/parameters';
-import SidebarEditPlanningUnit from 'layout/scenarios/edit/planning-unit';
-import SidebarSolutions from 'layout/scenarios/edit/solutions';
 import ScenarioStatus from 'layout/scenarios/edit/status';
+import NewScenario from 'layout/scenarios/new/name';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
-import Wrapper from 'layout/wrapper';
 
-export const getServerSideProps = withProtection(withUser(
-  withProject(withScenario(withScenarioLock())),
-));
+export const getServerSideProps = withProtection(
+  withUser(withProject(withScenario(withScenarioLock(withSolutions()))))
+);
 
-const EditScenarioPage: React.FC = () => {
-  const [submitting, setSubmitting] = useState(false);
+const EditScenarioPage = (): JSX.Element => {
   const { query } = useRouter();
-  const { sid } = query;
-  const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
+  const { sid, tab } = query as { sid: string; tab: string };
+  const scenarioQuery = useScenario(sid);
+  const { metadata } = scenarioQuery.data || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const {
-    tab: metaTab,
-    subtab: metaSubtab,
-    lastJobCheck,
-  } = scenarioEditingMetadata || {};
+
+  const { tab: metaTab, subtab: metaSubtab, lastJobCheck } = scenarioEditingMetadata || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
-  const saveScenarioMutation = useSaveScenario({
+  const { mutate } = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
     },
@@ -65,10 +65,8 @@ const EditScenarioPage: React.FC = () => {
 
   // If fo some reason we dont't have lastJobCheck set in the metadata, let's add one
   useEffect(() => {
-    if (!lastJobCheck && !submitting) {
-      setSubmitting(true);
-
-      saveScenarioMutation.mutate({
+    if (!lastJobCheck && !scenarioQuery.isSuccess) {
+      mutate({
         id: `${sid}`,
         data: {
           metadata: {
@@ -79,45 +77,42 @@ const EditScenarioPage: React.FC = () => {
             },
           },
         },
-      }, {
-        onSuccess: () => {
-          setSubmitting(false);
-        },
-        onError: () => {
-          setSubmitting(false);
-        },
       });
     }
-  }, [sid, submitting, metadata, scenarioEditingMetadata, lastJobCheck, saveScenarioMutation]);
+  }, [lastJobCheck, metadata, mutate, scenarioEditingMetadata, scenarioQuery.isSuccess, sid]);
 
   return (
     <Protected>
       <Title title="Edit" />
-
       <MetaIcons />
+      <ProjectLayout className="z-10">
+        <Sidebar>
+          <ScenariosEditSidebar>
+            {!tab && <NewScenario />}
 
-      <DocumentationLink />
-      <Help />
+            {/* // ? grid setup */}
+            {tab === TABS['scenario-protected-areas'] && <GridSetupProtectedAreas />}
+            {tab === TABS['scenario-cost-surface'] && <GridSetupCostSurface />}
+            {tab === TABS['scenario-planning-unit-status'] && <GridSetupPlanningUnits />}
+            {[TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab) && (
+              <GridSetupFeatures />
+            )}
+            {tab === TABS['scenario-gap-analysis'] && <GridSetupGAPAnalysis />}
 
-      <main className="flex flex-col w-screen h-screen">
-        <Header size="base" />
+            {/* // ? advanced settings */}
+            {tab === TABS['scenario-advanced-settings'] && <AdvancedSettingsOverview />}
+            {tab === TABS['scenario-blm-calibration'] && <AdvancedSettingsBLMCalibration />}
 
-        <div className="flex flex-col py-2.5 overflow-hidden flex-grow">
-          <Wrapper>
-            <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
-              <ScenariosEditSidebar>
-                <SidebarEditPlanningUnit key={ScenarioSidebarTabs.PLANNING_UNIT} />
-                <SidebarEditFeatures key={ScenarioSidebarTabs.FEATURES} />
-                <SidebarEditAnalysis key={ScenarioSidebarTabs.PARAMETERS} />
-                <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
-              </ScenariosEditSidebar>
-              <ScenarioEditMap />
-            </div>
-          </Wrapper>
-        </div>
+            {/* // ? solutions */}
+            {tab === TABS['scenario-solutions'] && <SolutionsOverview />}
+            {tab === TABS['scenario-target-achievement'] && <SolutionsTargetAchievements />}
+          </ScenariosEditSidebar>
+        </Sidebar>
+        <ScenarioEditMap />
+        <ProjectStatus />
         <ScenarioStatus />
         <ScenarioLock />
-      </main>
+      </ProjectLayout>
     </Protected>
   );
 };

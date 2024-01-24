@@ -1,4 +1,4 @@
-import { PlanningUnit } from 'types/project-model';
+import { PlanningUnit } from 'types/api/project';
 
 export interface PlanningUnitGridProps {
   unit: PlanningUnit;

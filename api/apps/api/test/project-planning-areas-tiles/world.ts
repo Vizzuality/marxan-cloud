@@ -1,10 +1,7 @@
-import { Repository } from 'typeorm';
 import { INestApplication, Logger } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
 
 import { E2E_CONFIG } from '../e2e.config';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
 
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
@@ -13,10 +10,6 @@ import { decodeMvt } from '@marxan/utils/geo/decode-mvt';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 
 export const createWorld = async (app: INestApplication) => {
-  const projectsRepo: Repository<Project> = app.get(
-    getRepositoryToken(Project),
-  );
-
   const jwtToken = await GivenUserIsLoggedIn(app);
 
   const organization = await OrganizationsTestUtils.createOrganization(
@@ -119,13 +112,7 @@ export const createWorld = async (app: INestApplication) => {
         .expect(200)
         .responseType('blob')
         .buffer()
-        .then((response) => response.body)
-        .catch((error) => {
-          Logger.error(error);
-          throw new Error(
-            `[step] Could not access project planning area tiles`,
-          );
-        }),
+        .then((response) => response.body),
     WhenRequestingTileForProjectPlanningGrid: async (projectId: string) =>
       request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/grid/tiles/9/189/291.mvt`)
@@ -139,26 +126,13 @@ export const createWorld = async (app: INestApplication) => {
           throw new Error(`[step] Could not access project grid tiles`);
         }),
 
-    ThenItContainsPlanningAreaTile: async (mvt: Buffer) => {
+    ThenItContainsPlanningAreaTile: (mvt: Buffer) => {
       const tile = decodeMvt(mvt);
       expect(tile.layers).toBeDefined();
     },
-    ThenItContainsGridTile: async (mvt: Buffer) => {
+    ThenItContainsGridTile: (mvt: Buffer) => {
       const tile = decodeMvt(mvt);
       expect(tile.layers).toBeDefined();
-    },
-    cleanup: async () => {
-      await projectsRepo.delete({
-        organization: {
-          id: organization.data.id,
-        },
-      });
-
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        jwtToken,
-        organization.data.id,
-      );
     },
   };
 };

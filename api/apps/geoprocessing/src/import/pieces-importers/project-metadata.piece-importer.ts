@@ -16,14 +16,15 @@ import {
 @Injectable()
 @PieceImportProvider()
 export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ProjectMetadataPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ProjectMetadataPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -113,14 +114,8 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const {
-      uris,
-      pieceResourceId,
-      projectId,
-      piece,
-      ownerId,
-      resourceName,
-    } = input;
+    const { uris, pieceResourceId, projectId, piece, ownerId, resourceName } =
+      input;
 
     try {
       if (uris.length !== 1) {
@@ -176,6 +171,25 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
           .into('project_blms')
           .values({ id: projectId, ...projectMetadata.blmRange })
           .execute();
+
+        if (projectMetadata?.outputSummaryZip) {
+          await em
+            .createQueryBuilder()
+            .insert()
+            .into('output_project_summaries')
+            .values({
+              project_id: projectId,
+              summary_zipped_data: Buffer.from(
+                projectMetadata.outputSummaryZip,
+                'base64',
+              ),
+            })
+            .execute();
+        } else {
+          this.logger.log(
+            `No output summary data for project ${projectId}: the source project may not have any scenarios run yet.`,
+          );
+        }
       });
     } catch (e) {
       this.logger.error(e);

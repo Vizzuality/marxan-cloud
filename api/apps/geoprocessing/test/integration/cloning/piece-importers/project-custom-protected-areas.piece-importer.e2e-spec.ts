@@ -11,7 +11,6 @@ import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructu
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -24,6 +23,7 @@ import { GenerateRandomGeometries } from '../fixtures';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -44,7 +44,8 @@ describe(ProjectCustomProtectedAreasPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoProjectCustomProtectedAreasFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoProjectCustomProtectedAreasFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -52,7 +53,8 @@ describe(ProjectCustomProtectedAreasPieceImporter, () => {
   });
 
   it('imports project custom protected areas', async () => {
-    const archiveLocation = await fixtures.GivenValidProjectCustomProtectedAreasFile();
+    const archiveLocation =
+      await fixtures.GivenValidProjectCustomProtectedAreasFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -71,13 +73,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([ProtectedArea]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ProjectCustomProtectedAreasPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ProjectCustomProtectedAreasPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const userId = v4();
 
@@ -160,7 +161,9 @@ const getFixtures = async () => {
         ThenCustomProtectedAreasShouldBeAddedToProject: async () => {
           await sut.run(input);
 
-          const protectedAreas = await protectedAreasRepo.find({ projectId });
+          const protectedAreas = await protectedAreasRepo.find({
+            where: { projectId },
+          });
 
           expect(protectedAreas.length).toEqual(
             validProjectCustomProtectedAreasFile.length,

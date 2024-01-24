@@ -6,34 +6,30 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import cx from 'classnames';
 import { motion } from 'framer-motion';
-import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useScenario } from 'hooks/scenarios';
 
-import HelpBeacon from 'layout/help/beacon';
 // import Recalculate from 'layout/scenarios/edit/tabs/recalculate';
 
 import Tabs from 'components/tabs';
 import { TabsProps } from 'components/tabs/component';
+import HelpBeacon from 'layout/help/beacon';
+import { cn } from 'utils/cn';
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { TABS, STATUS } from './constants';
 import { ScenariosSidebarTabsProps } from './types';
 
 export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { query } = useRouter();
-  const { sid } = query;
-  const {
-    data: scenarioData,
-    isFetched: scenarioFetched,
-  } = useScenario(sid);
+  const { sid } = query as { sid: string };
+  const { data: scenarioData, isFetched: scenarioFetched } = useScenario(sid);
 
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const {
-    status: metaStatus,
-  } = scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
+  const { status: metaStatus } =
+    scenarioEditingMetadata || SCENARIO_EDITING_META_DATA_DEFAULT_VALUES;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
@@ -54,11 +50,14 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
     });
   }, [metaStatus]);
 
-  const onSelectedTab = useCallback((t) => {
-    const TAB = TABS.find((T) => T.id === t);
-    dispatch(setTab(t));
-    dispatch(setSubTab(TAB.subtab));
-  }, [dispatch, setTab, setSubTab]);
+  const onSelectedTab = useCallback(
+    (t) => {
+      const TAB = TABS.find((T) => T.id === t);
+      dispatch(setTab(t));
+      dispatch(setSubTab(TAB.subtab));
+    },
+    [dispatch, setTab, setSubTab]
+  );
 
   if (!sid) return null;
 
@@ -67,81 +66,56 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
       id="scenarios-tabs"
       title="the marxan workflow"
       subtitle="Steps to follow for the analysis"
-      content={(
+      content={
         <div className="space-y-2">
           <p>
-            This tab will show the steps needed to complete a
-            conservation plan using Marxan. The logical workflow
-            requires you to take some actions at each step
-            as follows:
+            This tab will show the steps needed to complete a conservation plan using Marxan. The
+            logical workflow requires you to take some actions at each step as follows:
           </p>
 
-          <ul className="pl-6 space-y-1 list-decimal">
+          <ul className="list-decimal space-y-1 pl-6">
             <li>
-              The
-              {' '}
-              <b> Planning units</b>
-              {' '}
-              stage allows you to include conservation areas in your conservation plan,
-              adjust or exlude other areas you don&apos;t want to consider, and include
-              cost surfaces.
+              The <b> Planning units</b> stage allows you to include conservation areas in your
+              conservation plan, adjust or exlude other areas you don&apos;t want to consider, and
+              include cost surfaces.
             </li>
             <li>
-              Then you will
-              add all the features you want to conserve
-              and decide how much to conserve of each
-              in
-              {' '}
-              <b> Features</b>
-              .
+              Then you will add all the features you want to conserve and decide how much to
+              conserve of each in <b> Features</b>.
             </li>
             <li>
-              Next you will be able to review the current conservation coverage
-              of your features in the network based on your actions in Step 1,
-              and Calibrate your settings in
-              {' '}
-              <b> Parameters</b>
-              .
+              Next you will be able to review the current conservation coverage of your features in
+              the network based on your actions in Step 1, and Calibrate your settings in{' '}
+              <b> Parameters</b>.
             </li>
             <li>
-              Finally, in the
-              {' '}
-              <b> Solutions</b>
-              {' '}
-              stage you will be able to run and view your results.
+              Finally, in the <b> Solutions</b> stage you will be able to run and view your results.
               You can make modifications to any of these stages as you go along.
             </li>
           </ul>
-
         </div>
-      )}
+      }
     >
-
       <motion.div
         key="scenario-tabs"
         className="mt-2.5"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-
         <div
-          className={cx({
-            'bg-gray-700 rounded-4xl': true,
-            'flex flex-col flex-grow': true,
+          className={cn({
+            'rounded-[40px] bg-gray-800': true,
+            'flex flex-grow flex-col': true,
           })}
         >
           <div
-            className={cx({
-              'flex flex-col flex-grow px-10': true,
+            className={cn({
+              'flex flex-grow flex-col px-10': true,
             })}
           >
-            <div className="flex flex-col flex-grow py-0.5 px-0.5">
+            <div className="flex flex-grow flex-col px-0.5 py-0.5">
               {scenarioFetched && (
-                <Tabs
-                  items={TABS_PARSED}
-                  selected={tab}
-                  onSelected={onSelectedTab}
-                />
+                <Tabs items={TABS_PARSED} selected={tab} onSelected={onSelectedTab} />
               )}
 
               {/* <Recalculate
@@ -152,7 +126,6 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
           </div>
         </div>
       </motion.div>
-
     </HelpBeacon>
   );
 };

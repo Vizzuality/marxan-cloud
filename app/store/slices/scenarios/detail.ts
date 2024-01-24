@@ -1,16 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 import { injectReducer } from 'store';
-import { Solution } from 'types/project-model';
+import { Solution } from 'types/api/solution';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 
 interface ScenarioShowStateProps {
-  tab: string,
-  subtab: string,
-  selectedSolution: Solution,
+  tab: string;
+  subtab: string;
+  selectedSolution: Solution;
   // FEATURES
-  highlightFeatures: string[],
+  highlightFeatures: string[];
   // SETTINGS
-  layerSettings: Record<string, Record<string, unknown>>
+  layerSettings: Record<string, Record<string, unknown>>;
 }
 
 const initialState = {
@@ -43,10 +44,13 @@ export function getScenarioSlice(id) {
       },
 
       // SETTINGS
-      setLayerSettings: (state, action: PayloadAction<{
-        id: string,
-        settings: Record<string, unknown>
-      }>) => {
+      setLayerSettings: (
+        state,
+        action: PayloadAction<{
+          id: string;
+          settings: Record<string, unknown>;
+        }>
+      ) => {
         const { id: layerId, settings } = action.payload;
         const newSettings = {
           ...state.layerSettings,

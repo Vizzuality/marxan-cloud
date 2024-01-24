@@ -28,16 +28,17 @@ type ProjectSelectResult = {
 @Injectable()
 @PieceExportProvider()
 export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    PlanningAreaCustomPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(PlanningAreaCustomPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -47,9 +48,7 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const projectId = input.resourceId;
-    const [project]: [
-      ProjectSelectResult,
-    ] = await this.apiEntityManager
+    const [project]: [ProjectSelectResult] = await this.apiEntityManager
       .createQueryBuilder()
       .select('planning_unit_grid_shape')
       .addSelect('planning_unit_area_km2')
@@ -63,14 +62,13 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const [planningArea]: [
-      PlanningAreaSelectResult,
-    ] = await this.geoprocessingEntityManager
-      .createQueryBuilder()
-      .select('ST_AsEWKB(the_geom)', 'ewkb')
-      .from(PlanningArea, 'pa')
-      .where('project_id = :projectId', { projectId })
-      .execute();
+    const [planningArea]: [PlanningAreaSelectResult] =
+      await this.geoprocessingEntityManager
+        .createQueryBuilder()
+        .select('ST_AsEWKB(the_geom)', 'ewkb')
+        .from(PlanningArea, 'pa')
+        .where('project_id = :projectId', { projectId })
+        .execute();
 
     if (!planningArea) {
       const errorMessage = `Custom planning area not found for project with ID: ${projectId}`;

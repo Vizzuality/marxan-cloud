@@ -1,0 +1,94 @@
+{
+  "logging": {
+    "muteAll": "API_LOGGING_MUTE_ALL"
+  },
+  "network": {
+    "cors": {
+      "origins": [
+        "http://localhost:3010"
+      ]
+    }
+  },
+  "redis": {
+    "host": "marxan-redis",
+    "port": 3050,
+    "password": null,
+    "useTLS": false,
+    "concurrency": 50
+  },
+  "postgresApi": {
+    "url": null,
+    "port": 5432,
+    "host": null,
+    "username": null,
+    "password": null,
+    "database": null,
+    "runMigrationsOnStartup": false,
+    "logging": "error"
+  },
+  "postgresGeoApi": {
+    "url": null,
+    "port": 5432,
+    "host": null,
+    "username": null,
+    "password": null,
+    "database": null,
+    "runMigrationsOnStartup": false,
+    "logging": "error"
+  },
+  "api": {
+    "url": "http://api:3000",
+    "daemonListenPort": 3000
+  },
+  "jobOptions": {
+    "removeOnComplete": 100,
+    "removeOnFail": 1000,
+    "attempts": 3,
+    "timeout": 60000
+  },
+  "auth": {
+    "jwt": {
+      "expiresIn": "2h"
+    }
+  },
+  "geoprocessing": {
+    "url": "http://geoprocessing:3000"
+  },
+  "storage": {
+    "sharedFileStorage": {
+      "localPath": "/tmp/storage"
+    }
+  },
+  "marxan": {
+    "inputFiles": {
+      "inputDat": {
+        "ioSettings": {
+          "INPUTDIR": "input",
+          "PUNAME": "pu.dat",
+          "SPECNAME": "spec.dat",
+          "PUVSPRNAME": "puvspr.dat",
+          "BOUNDNAME": "bound.dat",
+          "OUTPUTDIR": "output"
+        }
+      }
+    }
+  },
+  "fileUploads": {
+    "limits": {
+    }
+  },
+  "sparkpost": {
+    "apikey": "invalidSparkpostApikey",
+    "origin": "https://api.eu.sparkpost.com:443"
+  },
+  "application": {
+    "baseUrl": "http://localhost:3000"
+  },
+  "passwordReset": {
+    "tokenPrefix": "/auth/reset-password?token=",
+    "expiration": 1800000
+  },
+  "signUpConfirmation": {
+    "tokenPrefix": "/auth/sign-up-confirmation?token="
+  }
+}

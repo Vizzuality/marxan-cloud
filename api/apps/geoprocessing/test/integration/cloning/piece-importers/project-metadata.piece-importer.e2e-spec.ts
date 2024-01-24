@@ -14,7 +14,6 @@ import {
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -30,6 +29,9 @@ import {
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { ProjectSourcesEnum } from '@marxan/projects';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
+import * as archiver from 'archiver';
+import { readableToBuffer } from '@marxan/utils';
 
 interface ProjectSelectResult {
   name: string;
@@ -72,9 +74,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenOrganization();
     await fixtures.GivenUser();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      marxanSource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(marxanSource);
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -87,9 +88,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenOrganization();
     await fixtures.GivenUser();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      legacySource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(legacySource);
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -103,9 +103,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenUser();
 
     const resourceName = 'custom project name!!';
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      marxanSource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(marxanSource);
     const input = fixtures.GivenJobInput(archiveLocation, resourceName);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -119,9 +118,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenUser();
     await fixtures.GivenProject();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      marxanSource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(marxanSource);
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -133,9 +131,8 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenUser();
     await fixtures.GivenProject();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
-      legacySource,
-    );
+    const archiveLocation =
+      await fixtures.GivenValidProjectMetadataFile(legacySource);
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -153,13 +150,12 @@ const getFixtures = async () => {
       }),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ProjectMetadataPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ProjectMetadataPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const organizationId = v4();
   const userId = v4();
@@ -176,6 +172,14 @@ const getFixtures = async () => {
 
   const expectedMetadata = { foo: 'bar' };
 
+  const summaryZipStream = archiver('zip', { zlib: { level: 9 } });
+  summaryZipStream.append('This is a test of super awesome zipping', {
+    name: 'awesome-test.txt',
+  });
+  await summaryZipStream.finalize();
+  const summaryZipBuffer = await readableToBuffer(summaryZipStream);
+  const summaryZipEncoded = summaryZipBuffer.toString('base64');
+
   const validProjectMetadataFileContent: (
     sources: ProjectSourcesEnum,
   ) => ProjectMetadataContent = (sources: ProjectSourcesEnum) => ({
@@ -188,6 +192,7 @@ const getFixtures = async () => {
       values: [],
     },
     metadata: expectedMetadata,
+    outputSummaryZip: summaryZipEncoded,
     sources,
   });
 
@@ -277,9 +282,7 @@ const getFixtures = async () => {
         ) => {
           await sut.run(input);
 
-          const [project]: [
-            ProjectSelectResult,
-          ] = await entityManager
+          const [project]: [ProjectSelectResult] = await entityManager
             .createQueryBuilder()
             .select()
             .from('projects', 'p')
@@ -297,9 +300,7 @@ const getFixtures = async () => {
           expect(project.created_by).toEqual(userId);
           expect(project.sources).toEqual(sources);
 
-          const [blmRange]: [
-            BlmRange,
-          ] = await entityManager
+          const [blmRange]: [BlmRange] = await entityManager
             .createQueryBuilder()
             .select()
             .from('project_blms', 'pblms')
@@ -307,6 +308,16 @@ const getFixtures = async () => {
             .execute();
 
           expect(blmRange).toMatchObject(validFileContent.blmRange);
+
+          const [outputSummary]: {
+            summaryZip: Buffer;
+          }[] = await entityManager
+            .createQueryBuilder()
+            .select('summary_zipped_data', 'summaryZip')
+            .from('output_project_summaries', 'ops')
+            .where('ops.project_id = :projectId', { projectId })
+            .execute();
+          expect(outputSummary.summaryZip).toMatchObject(summaryZipBuffer);
         },
       };
     },

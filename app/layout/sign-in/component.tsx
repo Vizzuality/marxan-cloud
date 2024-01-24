@@ -2,34 +2,28 @@ import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import omit from 'lodash/omit';
-
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { signIn } from 'next-auth/client';
+import omit from 'lodash/omit';
+import { signIn } from 'next-auth/react';
 
 import { useToasts } from 'hooks/toast';
-
-import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
-import {
-  composeValidators,
-} from 'components/forms/validations';
+import { composeValidators } from 'components/forms/validations';
 import Loading from 'components/loading';
+import Wrapper from 'layout/wrapper';
 
 import AUTHENTICATION from 'services/authentication';
 
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
 
-export interface SignInProps {
-
-}
+export interface SignInProps {}
 
 export const SignIn: React.FC<SignInProps> = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -37,46 +31,55 @@ export const SignIn: React.FC<SignInProps> = () => {
   const router = useRouter();
   const { callbackUrl } = router.query;
 
-  const handleSubmit = useCallback(async (data) => {
-    setSubmitting(true);
-    try {
-      const signUpResponse = await AUTHENTICATION
-        .request({
+  const handleSubmit = useCallback(
+    async (data) => {
+      setSubmitting(true);
+      try {
+        const signUpResponse = await AUTHENTICATION.request({
           method: 'POST',
           url: '/sign-in',
           data: omit(data, 'checkbox'),
         });
-      if (signUpResponse.status === 201) {
-        await signIn('credentials', { ...data, callbackUrl });
-      }
-    } catch (error) {
-      addToast('error-signin', (
-        <>
-          <h2 className="font-medium">Error!</h2>
-          <p className="text-sm">Invalid username or password.</p>
-        </>
-      ), {
-        level: 'error',
-      });
 
-      setSubmitting(false);
-      console.error(error);
-    }
-  }, [addToast, callbackUrl]);
+        if (signUpResponse.status === 201) {
+          await signIn('credentials', { ...data, callbackUrl });
+        }
+      } catch (error) {
+        addToast(
+          'error-signin',
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Invalid username or password.</p>
+          </>,
+          {
+            level: 'error',
+          }
+        );
+
+        setSubmitting(false);
+        console.error(error);
+      }
+    },
+    [addToast, callbackUrl]
+  );
 
   return (
     <Wrapper>
-      <FormRFF
-        onSubmit={handleSubmit}
-      >
+      <FormRFF onSubmit={handleSubmit}>
         {(props) => (
-          <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex items-center justify-center h-full">
+          <form
+            onSubmit={props.handleSubmit}
+            autoComplete="off"
+            className="relative flex h-full items-center justify-center"
+          >
             <div className="w-full max-w-xs">
-              <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Start planning!</h2>
+              <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-700">
+                Start planning!
+              </h2>
 
               <Loading
                 visible={submitting}
-                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
+                className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-white bg-opacity-90"
                 iconClassName="w-10 h-10 text-primary-500"
               />
 
@@ -88,7 +91,9 @@ export const SignIn: React.FC<SignInProps> = () => {
                 >
                   {(fprops) => (
                     <Field id="login-username" {...fprops}>
-                      <Label theme="light" className="mb-3 uppercase">Email</Label>
+                      <Label theme="light" className="mb-3 uppercase">
+                        Email
+                      </Label>
                       <Input theme="light" type="email" icon={EMAIL_SVG} />
                     </Field>
                   )}
@@ -97,21 +102,19 @@ export const SignIn: React.FC<SignInProps> = () => {
 
               {/* PASSWORD */}
               <div className="mt-5">
-                <FieldRFF
-                  name="password"
-                  validate={composeValidators([{ presence: true }])}
-                >
+                <FieldRFF name="password" validate={composeValidators([{ presence: true }])}>
                   {(fprops) => (
                     <Field id="login-password" {...fprops}>
-                      <Label theme="light" className="mb-3 uppercase">Password</Label>
+                      <Label theme="light" className="mb-3 uppercase">
+                        Password
+                      </Label>
                       <Input theme="light" type="password" icon={PASSWORD_SVG} />
 
                       <Link
                         href="/auth/forgot-password"
+                        className="mt-2 inline-block text-sm text-gray-600 underline"
                       >
-                        <a href="/auth/forgot-password" className="inline-block mt-2 text-sm text-gray-500 underline">
-                          Forgot password?
-                        </a>
+                        Forgot password?
                       </Link>
                     </Field>
                   )}
@@ -119,18 +122,24 @@ export const SignIn: React.FC<SignInProps> = () => {
               </div>
 
               <div className="mt-10">
-                <Button theme="primary" size="lg" type="submit" disabled={submitting} className="w-full">
+                <Button
+                  theme="primary"
+                  size="lg"
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full"
+                >
                   Sign in
                 </Button>
               </div>
 
-              <div className="mt-5 text-sm text-center text-black">
-                Don&apos;t have an account?
-                {' '}
-                <Link href="/auth/sign-up"><a href="/auth/sign-up" className="underline">Sign up</a></Link>
+              <div className="mt-5 text-center text-sm text-black">
+                Don&apos;t have an account?{' '}
+                <Link href="/auth/sign-up" className="underline">
+                  Sign up
+                </Link>
               </div>
             </div>
-
           </form>
         )}
       </FormRFF>

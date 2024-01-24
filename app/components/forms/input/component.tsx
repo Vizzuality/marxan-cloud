@@ -1,19 +1,18 @@
 import React, { InputHTMLAttributes } from 'react';
 
 import { useFocus } from '@react-aria/interactions';
-import cx from 'classnames';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: {
-    base:
-      'w-full leading-tight text-white bg-gray-800 bg-opacity-0 focus:outline-none focus:bg-gray-700',
+    base: 'w-full leading-tight text-white bg-gray-900 bg-opacity-0 focus:outline-none focus:bg-gray-800',
     status: {
-      none: 'border-gray-500',
-      valid: 'border-gray-500',
-      error: 'border-red-500',
-      disabled: 'border-gray-500 opacity-50',
+      none: 'border-gray-700',
+      valid: 'border-gray-700',
+      error: 'border-red-600',
+      disabled: 'border-gray-600 opacity-50',
     },
     icon: 'text-white',
     mode: {
@@ -22,15 +21,14 @@ const THEME = {
     },
   },
   light: {
-    base:
-      'w-full leading-tight text-gray-800 bg-white focus:outline-none focus:bg-gray-100',
+    base: 'w-full leading-tight text-gray-900 bg-white focus:outline-none focus:bg-gray-200',
     status: {
-      none: 'border-gray-800',
-      valid: 'border-gray-800',
-      error: 'border-red-500',
-      disabled: 'border-gray-800 opacity-50',
+      none: 'border-gray-900',
+      valid: 'border-gray-900',
+      error: 'border-red-600',
+      disabled: 'border-gray-900 opacity-50',
     },
-    icon: 'text-gray-800 text-opacity-50',
+    icon: 'text-gray-900 text-opacity-50',
     mode: {
       normal: 'border rounded',
       dashed: 'border-dashed border-b',
@@ -78,8 +76,8 @@ export const Input: React.FC<InputProps> = ({
       {icon && (
         <Icon
           icon={icon}
-          className={cx({
-            'absolute w-4 h-4 transform -translate-y-1/2 top-1/2 left-3': true,
+          className={cn({
+            'absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform': true,
             [THEME[theme].icon]: true,
           })}
         />
@@ -89,7 +87,7 @@ export const Input: React.FC<InputProps> = ({
         {...props}
         ref={onReady}
         disabled={disabled}
-        className={cx({
+        className={cn({
           'form-input': true,
           [THEME[theme].base]: true,
           [THEME[theme].status[st]]: true,

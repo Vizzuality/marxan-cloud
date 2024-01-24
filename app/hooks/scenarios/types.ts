@@ -3,105 +3,62 @@ import { AxiosRequestConfig } from 'axios';
 export interface UseScenariosOptionsProps {
   search?: string;
   sort?: string;
-  filters?: Record<string, unknown>
-}
-
-export interface UseSaveScenarioProps {
-  requestConfig?: AxiosRequestConfig
-}
-
-export interface SaveScenarioProps {
-  id?: string,
-  data: any
+  filters?: Record<string, unknown>;
 }
 
 export interface UseDeleteScenarioProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DeleteScenarioProps {
-  id: string
+  id: string;
 }
 
 export interface UseSaveScenarioLockProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveScenarioLockProps {
-  sid?: string
+  sid?: string;
 }
 
 export interface UseDeleteScenarioLockProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DeleteScenarioLockProps {
-  sid?: string,
+  sid?: string;
 }
 
 export interface UseUploadScenarioPUProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface UploadScenarioPUProps {
-  id?: string,
-  data: FormData,
-}
-
-export interface UseDownloadScenarioCostSurfaceProps {
-  requestConfig?: AxiosRequestConfig
-}
-
-export interface DownloadScenarioCostSurfaceProps {
-  id?: string,
-}
-
-export interface UseUploadScenarioCostSurfaceProps {
-  requestConfig?: AxiosRequestConfig
-}
-
-export interface UploadScenarioCostSurfaceProps {
-  id?: string,
-  data: any,
+  id?: string;
+  data: FormData;
 }
 
 export interface UseSaveScenarioPUProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveScenarioPUProps {
-  id?: string,
-  data: any
-}
-
-// useUploadPA
-export interface UseUploadPAProps {
-  requestConfig?: AxiosRequestConfig
-}
-export interface UploadPAProps {
-  id?: string,
-  data: any,
+  id?: string;
+  data: any;
 }
 
 // useDuplicateScenario
 export interface UseDuplicateScenarioProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DuplicateScenarioProps {
   sid: string | string[];
 }
 
-export interface UseRunScenarioProps {
-  requestConfig?: AxiosRequestConfig
-}
-
-export interface RunScenarioProps {
-  id: string | string[];
-}
-
 export interface UseCancelRunScenarioProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface CancelRunScenarioProps {
@@ -110,25 +67,34 @@ export interface CancelRunScenarioProps {
 
 // useSaveScenarioCalibrationRange
 export interface UseSaveScenarioCalibrationRangeProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 export interface SaveScenarioCalibrationRangeProps {
-  sid?: string,
-  data: any,
+  sid?: string;
+  data: any;
 }
 
 export interface UseDownloadScenarioReportProps {
-  requestConfig?: AxiosRequestConfig,
-  projectName: string,
-  scenarioName: string,
-  runId: string,
+  requestConfig?: AxiosRequestConfig;
+  projectName: string;
+  scenarioName: string;
+  runId: number | string;
 }
 
 export interface DownloadScenarioReportProps {
-  sid: string,
+  sid: string;
   solutionId: string;
 }
 
 export interface UseBlmImageProps {
   [q: string]: any;
+}
+
+export type PlanningUnitState = 'available' | 'locked-in' | 'locked-out';
+
+export interface ScenarioPlanningUnit {
+  id: string;
+  defaultStatus: PlanningUnitState;
+  inclusionStatus: PlanningUnitState;
+  setByUser: boolean;
 }

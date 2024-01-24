@@ -1,37 +1,66 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
-  "moduleDirectories": ["node_modules", "src"],
-  "testTimeout": 10000,
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "moduleDirectories": [
+    "node_modules",
+    "src"
+  ],
+  "testTimeout": 60000,
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.ts$": "ts-jest"
+  },
+  "setupFilesAfterEnv": [
+    "<rootDir>/utils/set-env-vars.ts",
+    "<rootDir>/utils/handle-database.ts"
+  ],
+  "transformIgnorePatterns": [
+    "<rootDir>/node_modules/(?!(axios)/)"
+  ],
+  "testRunner": "jasmine2",
+  "snapshotFormat": {
+    "escapeString": true,
+    "printBasicPrototype": true
   },
   "moduleNameMapper": {
     "@marxan-api/(.*)": "<rootDir>/../src/$1",
-    "^@marxan/utils": ["<rootDir>/../../../libs/utils/src"],
-    "^@marxan/utils/(.*)$": ["<rootDir>/../../../libs/utils/src/$1"],
+    "^@marxan/utils": [
+      "<rootDir>/../../../libs/utils/src"
+    ],
+    "^@marxan/utils/(.*)$": [
+      "<rootDir>/../../../libs/utils/src/$1"
+    ],
     "^@marxan/scenarios-planning-unit": [
       "<rootDir>/../../../libs/scenarios-planning-unit/src"
     ],
     "^@marxan/scenarios-planning-unit/(.*)$": [
       "<rootDir>/../../../libs/scenarios-planning-unit/src/$1"
     ],
-    "^@marxan/admin-regions": ["<rootDir>/../../../libs/admin-regions/src"],
+    "^@marxan/admin-regions": [
+      "<rootDir>/../../../libs/admin-regions/src"
+    ],
     "^@marxan/admin-regions/(.*)$": [
       "<rootDir>/../../../libs/admin-regions/src/$1"
     ],
-    "^@marxan/api-events": ["<rootDir>/../../../libs/api-events/src"],
-    "^@marxan/api-events/(.*)$": ["<rootDir>/../../../libs/api-events/src/$1"],
+    "^@marxan/api-events": [
+      "<rootDir>/../../../libs/api-events/src"
+    ],
+    "^@marxan/api-events/(.*)$": [
+      "<rootDir>/../../../libs/api-events/src/$1"
+    ],
     "^@marxan-jobs/planning-unit-geometry": [
       "<rootDir>/../../../libs/planning-unit-geometry/src"
     ],
     "^@marxan-jobs/planning-unit-geometry/(.*)$": [
       "<rootDir>/../../../libs/planning-unit-geometry/src/$1"
     ],
-    "@marxan/scenario-cost-surface/(.*)": "<rootDir>/../../../libs/scenario-cost-surface/src/$1",
-    "@marxan/scenario-cost-surface": "<rootDir>/../../../libs/scenario-cost-surface/src",
+    "@marxan/artifact-cache/(.*)": "<rootDir>/../../../libs/artifact-cache/src/$1",
+    "@marxan/artifact-cache": "<rootDir>/../../../libs/artifact-cache/src",
     "@marxan/marxan-input/(.*)": "<rootDir>/../../../libs/marxan-input/src/$1",
     "@marxan/marxan-input": "<rootDir>/../../../libs/marxan-input/src",
     "@marxan/marxan-output": "<rootDir>/../../../libs/marxan-output/src",
@@ -59,8 +88,8 @@
     "@marxan/planning-units-grid": "<rootDir>/../../../libs/planning-units-grid/src",
     "@marxan/protected-areas/(.*)": "<rootDir>/../../../libs/protected-areas/src/$1",
     "@marxan/protected-areas": "<rootDir>/../../../libs/protected-areas/src",
-    "@marxan/puvspr-calculations/(.*)": "<rootDir>/../../../libs/puvspr-calculations/src/$1",
-    "@marxan/puvspr-calculations": "<rootDir>/../../../libs/puvspr-calculations/src",
+    "@marxan/feature-amounts-per-planning-unit/(.*)": "<rootDir>/../../../libs/feature-amounts-per-planning-unit/src/$1",
+    "@marxan/feature-amounts-per-planning-unit": "<rootDir>/../../../libs/feature-amounts-per-planning-unit/src",
     "@marxan/specification/(.*)": "<rootDir>/../../../libs/specification/src/$1",
     "@marxan/specification": "<rootDir>/../../../libs/specification/src",
     "@marxan/tiles/(.*)": "<rootDir>/../../../libs/tiles/src/$1",
@@ -84,6 +113,8 @@
     "@marxan/geofeatures/(.*)": "<rootDir>/../../../libs/geofeatures/src/$1",
     "@marxan/geofeatures": "<rootDir>/../../../libs/geofeatures/src",
     "@marxan/domain-ids/(.*)": "<rootDir>/../../../libs/domain-ids/src/$1",
-    "@marxan/domain-ids": "<rootDir>/../../../libs/domain-ids/src"
+    "@marxan/domain-ids": "<rootDir>/../../../libs/domain-ids/src",
+    "@marxan/cost-surfaces/(.*)": "<rootDir>/../../../libs/cost-surfaces/src/$1",
+    "@marxan/cost-surfaces": "<rootDir>/../../../libs/cost-surfaces/src"
   }
 }

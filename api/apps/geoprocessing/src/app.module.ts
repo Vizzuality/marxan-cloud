@@ -10,9 +10,9 @@ import { PlanningUnitsModule } from '@marxan-geoprocessing/modules/planning-unit
 import { TileModule } from '@marxan-geoprocessing/modules/tile/tile.module';
 import { FeaturesModule } from '@marxan-geoprocessing/modules/features/features.module';
 import { ApiEventsModule } from '@marxan-geoprocessing/modules/api-events/api-events.module';
-import { SurfaceCostModule } from '@marxan-geoprocessing/modules/surface-cost/surface-cost.module';
+import { CostSurfaceModule } from '@marxan-geoprocessing/modules/cost-surface/cost-surface.module';
 import { ScenarioPlanningUnitsInclusionModule } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/scenario-planning-units-inclusion.module';
-import { CostTemplateModule } from '@marxan-geoprocessing/modules/scenarios';
+import { FileTemplateModule } from '@marxan-geoprocessing/modules/scenarios';
 import { PlanningAreaModule } from '@marxan-geoprocessing/modules/planning-area/planning-area.module';
 import { ScenariosModule } from '@marxan-geoprocessing/modules/scenarios/scenarios.module';
 import { ScenarioProtectedAreaCalculationModule } from '@marxan-geoprocessing/modules/scenario-protected-area-calculation/scenario-protected-area-calculation.module';
@@ -23,6 +23,8 @@ import { PingController } from '@marxan-geoprocessing/modules/ping/ping.controll
 import { LegacyProjectImportModule } from './legacy-project-import/legacy-project-import.module';
 import { UnusedResourcesCleanUpModule } from './modules/unused-resources-cleanup/unused-resources-cleanup.module';
 import { CleanupTasksModule } from './modules/cleanup-tasks/cleanup-tasks.module';
+import { ProjectCostSurfaceModule } from '@marxan-geoprocessing/modules/cost-surface/project/project-cost-surface.module';
+import { ScenarioCostSurfaceModule } from '@marxan-geoprocessing/modules/cost-surface/scenario/scenario-cost-surface.module';
 
 @Module({
   imports: [
@@ -35,14 +37,16 @@ import { CleanupTasksModule } from './modules/cleanup-tasks/cleanup-tasks.module
       ...geoprocessingConnections.apiDB,
       keepConnectionAlive: true,
     }),
-    CostTemplateModule,
+    FileTemplateModule,
     AdminAreasModule,
     PlanningUnitsModule,
     TileModule,
     ProtectedAreasModule,
     FeaturesModule,
     ApiEventsModule,
-    SurfaceCostModule,
+    CostSurfaceModule,
+    ProjectCostSurfaceModule,
+    ScenarioCostSurfaceModule,
     ScenarioPlanningUnitsInclusionModule,
     ScenarioProtectedAreaCalculationModule,
     PlanningAreaModule,

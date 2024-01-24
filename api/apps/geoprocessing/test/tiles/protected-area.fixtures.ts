@@ -6,6 +6,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import { v4 } from 'uuid';
 import { ProtectedArea } from '@marxan/protected-areas';
+import { seedFeatures } from '../utils/seeds/seed-features';
+import { seedWdpa } from '../utils/seeds/seed-wdpa';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -20,6 +22,10 @@ export const getFixtures = async () => {
 
   return {
     projectId,
+    seed: async () => {
+      await seedFeatures(app);
+      await seedWdpa(app);
+    },
     GivenCustomProtectedAreaWasCreated: async () => {
       await wdpaRepo.query(
         `

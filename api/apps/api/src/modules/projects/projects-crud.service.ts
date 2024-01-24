@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { assertDefined, isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommandBus } from '@nestjs/cqrs';
@@ -6,15 +6,11 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
-import { UsersService } from '@marxan-api/modules/users/users.service';
-import { ScenariosCrudService } from '@marxan-api/modules/scenarios/scenarios-crud.service';
 import { PlanningUnitsService } from '@marxan-api/modules/planning-units';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
-import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
-import { CountriesService } from '@marxan-api/modules/countries/countries.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { User } from '@marxan-api/modules/users/user.api.entity';
@@ -33,6 +29,8 @@ import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dt
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { PublishedProject } from '../published-project/entities/published-project.api.entity';
+import { CostSurfaceId } from '@marxan-api/modules/projects/planning-unit-grid/project.id';
+import { getDefaultCostSurfaceIdFromProject } from '@marxan-api/modules/projects/get-default-project-cost-surface';
 
 const projectFilterKeyNames = [
   'name',
@@ -43,7 +41,7 @@ const projectFilterKeyNames = [
 ] as const;
 type ProjectFilterKeys = keyof Pick<
   Project,
-  typeof projectFilterKeyNames[number]
+  (typeof projectFilterKeyNames)[number]
 >;
 type ProjectFilters = Record<ProjectFilterKeys, string[]>;
 
@@ -57,14 +55,6 @@ export class ProjectsCrudService extends AppBaseService<
   constructor(
     @InjectRepository(Project)
     protected readonly repository: Repository<Project>,
-    @Inject(forwardRef(() => ScenariosCrudService))
-    protected readonly scenariosService: ScenariosCrudService,
-    @Inject(UsersService) protected readonly usersService: UsersService,
-    @Inject(AdminAreasService)
-    protected readonly adminAreasService: AdminAreasService,
-    @Inject(CountriesService)
-    protected readonly countriesService: CountriesService,
-    @Inject(PlanningUnitsService)
     private readonly planningUnitsService: PlanningUnitsService,
     private readonly planningAreasService: PlanningAreasService,
     @InjectRepository(UsersProjectsApiEntity)
@@ -125,11 +115,11 @@ export class ProjectsCrudService extends AppBaseService<
   /**
    * Apply service-specific filters.
    */
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<Project>,
     filters: ProjectFilters,
     _info?: ProjectsRequest,
-  ): SelectQueryBuilder<Project> {
+  ): Promise<SelectQueryBuilder<Project>> {
     this._processBaseFilters<ProjectFilters>(
       query,
       filters,
@@ -194,6 +184,7 @@ export class ProjectsCrudService extends AppBaseService<
       await this.commandBus.execute(
         new SetProjectGridFromShapefile(
           new ProjectId(model.id),
+          new CostSurfaceId(getDefaultCostSurfaceIdFromProject(model)),
           createModel.planningAreaId,
           model.bbox,
         ),
@@ -212,54 +203,14 @@ export class ProjectsCrudService extends AppBaseService<
       this.logger.debug(
         'creating planning unit job and assigning project to area',
       );
+      const defaultCostSurfaceId = getDefaultCostSurfaceIdFromProject(model);
       await Promise.all([
         this.planningUnitsService.create({
           ...createModel,
           planningUnitAreakm2: createModel.planningUnitAreakm2,
           planningUnitGridShape: createModel.planningUnitGridShape,
           projectId: model.id,
-        }),
-        this.planningAreasService.assignProject({
-          projectId: model.id,
-          planningAreaGeometryId: createModel.planningAreaId,
-        }),
-      ]);
-    }
-  }
-
-  async actionAfterUpdate(
-    model: Project,
-    createModel: UpdateProjectDTO,
-    _info?: ProjectsRequest,
-  ): Promise<void> {
-    if (
-      createModel?.planningUnitGridShape ===
-        PlanningUnitGridShape.FromShapefile &&
-      createModel.planningAreaId
-    ) {
-      await this.commandBus.execute(
-        new SetProjectGridFromShapefile(
-          new ProjectId(model.id),
-          createModel.planningAreaId,
-          model.bbox,
-        ),
-      );
-      return;
-    }
-    if (
-      createModel.planningUnitAreakm2 &&
-      createModel?.planningUnitGridShape &&
-      (createModel.countryId ||
-        createModel.adminAreaLevel1Id ||
-        createModel.adminAreaLevel2Id ||
-        createModel.planningAreaId)
-    ) {
-      await Promise.all([
-        this.planningUnitsService.create({
-          ...createModel,
-          planningUnitAreakm2: createModel.planningUnitAreakm2,
-          planningUnitGridShape: createModel.planningUnitGridShape,
-          projectId: model.id,
+          costSurfaceId: defaultCostSurfaceId,
         }),
         this.planningAreasService.assignProject({
           projectId: model.id,
@@ -291,9 +242,8 @@ export class ProjectsCrudService extends AppBaseService<
     _info?: ProjectsRequest,
   ): Promise<Project> {
     const ids: MultiplePlanningAreaIds = entity;
-    const idAndName = await this.planningAreasService.getPlanningAreaIdAndName(
-      ids,
-    );
+    const idAndName =
+      await this.planningAreasService.getPlanningAreaIdAndName(ids);
     if (isDefined(idAndName)) {
       entity.planningAreaId = idAndName.planningAreaId;
       entity.planningAreaName = idAndName.planningAreaName;
@@ -312,11 +262,11 @@ export class ProjectsCrudService extends AppBaseService<
     return entity;
   }
 
-  extendGetByIdQuery(
+  async extendGetByIdQuery(
     query: SelectQueryBuilder<Project>,
     fetchSpecification?: FetchSpecification,
     info?: ProjectsRequest,
-  ): SelectQueryBuilder<Project> {
+  ): Promise<SelectQueryBuilder<Project>> {
     /**
      * Bring in publicMetadata (if the project has been made public). This is
      * used in the `@AfterLoad()` event listener to set the `isPublic` property
@@ -411,7 +361,8 @@ export class ProjectsCrudService extends AppBaseService<
     return [await Promise.all(extendedEntities), entitiesAndCount[1]];
   }
 
-  locatePlanningAreaEntity = this.planningAreasService.locatePlanningAreaEntity.bind(
-    this.planningAreasService,
-  );
+  locatePlanningAreaEntity =
+    this.planningAreasService.locatePlanningAreaEntity.bind(
+      this.planningAreasService,
+    );
 }

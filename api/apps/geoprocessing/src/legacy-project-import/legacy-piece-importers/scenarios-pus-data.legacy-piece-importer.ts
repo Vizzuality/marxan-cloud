@@ -16,7 +16,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/These';
 import { chunk } from 'lodash';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { geoprocessingConnections } from '../../ormconfig';
 import {
@@ -29,17 +29,19 @@ import { PuDatReader, PuDatRow } from './file-readers/pu-dat.reader';
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class ScenarioPusDataLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ScenarioPusDataLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly puDatReader: PuDatReader,
     private readonly datFileDelimiterFinder: DatFileDelimiterFinder,
     @InjectEntityManager(geoprocessingConnections.default.name)
     private readonly geoEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioPusDataLegacyProjectPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.ScenarioPusData;
@@ -61,9 +63,8 @@ export class ScenarioPusDataLegacyProjectPieceImporter
   private async getPuDatData(fileLocation: string) {
     const firstLineReadable = await this.getPuDatReabale(fileLocation);
 
-    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      firstLineReadable,
-    );
+    const delimiterOrError =
+      await this.datFileDelimiterFinder.findDelimiter(firstLineReadable);
     if (isLeft(delimiterOrError))
       this.logAndThrow(
         'Invalid delimiter in pu.dat file. Use either comma or tabulator as your file delimiter.',

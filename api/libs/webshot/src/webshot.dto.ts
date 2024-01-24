@@ -30,7 +30,13 @@ export class WebshotPngConfig extends WebshotConfig {
   screenshotOptions?: ScreenshotOptions;
 }
 
-export class WebshotPdfConfig extends WebshotConfig {
+export class WebshotBasicPdfConfig extends WebshotConfig {
+  @ApiPropertyOptional()
+  @IsOptional()
+  pdfOptions?: PDFOptions;
+}
+
+export class WebshotPdfReportConfig extends WebshotConfig {
   @ApiPropertyOptional()
   @IsOptional()
   pdfOptions?: PDFOptions;

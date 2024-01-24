@@ -1,24 +1,20 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState, PropsWithChildren } from 'react';
 
-import { useSession, signOut } from 'next-auth/client';
+import { useSession, signOut } from 'next-auth/react';
 
 import { useMe } from 'hooks/me';
 
-import GuideRequest from 'layout/guide-request';
-
 import Modal from 'components/modal';
+import GuideRequest from 'layout/guide-request';
 
 // const TIME_INTERVAL = 1000 * 60 * 10; // 10 min
 // const SESSION_BUFFER_TIME = 30 * 60 * 1000; // 30 min
 
-interface ProtectedProps {
-  children: ReactNode
-}
-
-const Protected: React.FC = ({ children }: ProtectedProps) => {
-  const { user } = useMe();
-  const [session, loading] = useSession();
+const Protected = ({ children }: PropsWithChildren) => {
+  const { data: user } = useMe();
+  const { data: session, status } = useSession();
   const [modal, setModal] = useState(false);
+  const loading = status === 'loading';
 
   useEffect(() => {
     const { id: userId } = user;

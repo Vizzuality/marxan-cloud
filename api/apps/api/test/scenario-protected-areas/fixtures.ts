@@ -17,10 +17,10 @@ import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
+import { insertWdpaQuery } from './insert-wdpa-query';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
-  const cleanups: (() => Promise<void>)[] = [];
   const commands: ICommand[] = [];
 
   const wdpa: Repository<ProtectedArea> = app.get(
@@ -46,7 +46,7 @@ export const getFixtures = async () => {
     getRepositoryToken(UsersScenariosApiEntity),
   );
 
-  const { cleanup, projectId } = await GivenProjectExists(app, ownerToken, {
+  const { projectId } = await GivenProjectExists(app, ownerToken, {
     name: `scenario-pa-${new Date().getTime()}`,
     countryId: countryCode,
     adminAreaLevel1Id,
@@ -56,20 +56,8 @@ export const getFixtures = async () => {
     commands.push(command);
   });
 
-  cleanups.push(cleanup);
-  cleanups.push(() =>
-    wdpa
-      .delete({
-        projectId,
-      })
-      .then(() => void 0),
-  );
-
   return {
-    cleanup: async () => {
-      await Promise.all(cleanups.map((clean) => clean()));
-      await app.close();
-    },
+    GivenProjectExists: () => projectId,
     GivenScenarioInsideNAM41WasCreated: async () => {
       const { id } = await GivenScenarioExists(app, projectId, ownerToken);
       scenarioId = id;
@@ -106,34 +94,81 @@ export const getFixtures = async () => {
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/protected-areas`)
         .set('Authorization', `Bearer ${userWithNoRoleToken}`),
-    ThenItContainsRelevantWdpa: async (response: unknown) => {
+    WhenGettingProtectedAreasListForProject: async (projectId: string) =>
+      request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/protected-areas`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .then((response) => response.body),
+    WhenGettingProtectedAreasListForProjectWithSearch: async (
+      projectId: string,
+      search: string,
+    ) =>
+      request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/protected-areas?q=${search}`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .then((response) => response.body),
+
+    WhenGettingProtectedAreasListForProjectWithFilter: async (
+      projectId: string,
+      filterColumn: string,
+      filterValue: string,
+    ) =>
+      request(app.getHttpServer())
+        .get(
+          `/api/v1/projects/${projectId}/protected-areas?filter[${filterColumn}]=${filterValue}`,
+        )
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .then((response) => response.body),
+    WhenGettingProtectedAreasListForProjectWithSort: async (
+      projectId: string,
+      sortValue: string,
+    ) =>
+      request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/protected-areas?sort=${sortValue}`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .then((response) => response.body),
+    ThenItContainsRelevantWdpa: async (response: any) => {
       expect(response).toEqual([
-        {
-          id: 'II',
-          kind: 'global',
-          name: 'II',
-          selected: false,
-        },
         {
           id: 'III',
           kind: 'global',
-          name: 'III',
-          selected: false,
-        },
-        {
-          id: 'Not Applicable',
-          kind: 'global',
-          name: 'Not Applicable',
-          selected: false,
-        },
-        {
-          id: 'Not Reported',
-          kind: 'global',
-          name: 'Not Reported',
+          name: 'IUCN III',
           selected: false,
         },
       ]);
     },
+    ThenItContainsListOfProjectProtectedAreas: async (response: any) => {
+      response.data.sort();
+      expect(response.data).toHaveLength(2);
+      expect(response.data[0].attributes.isCustom).toBe(false);
+      expect(response.data[1].attributes.name).toBe('custom protected area');
+      expect(response.data[1].attributes.scenarioUsageCount).toBe(1);
+      expect(response.data[1].attributes.isCustom).toBe(true);
+    },
+    ThenItContainsSearchedProtectedAreas: async (response: any) => {
+      response.data.sort();
+      expect(response.data).toHaveLength(1);
+      expect(response.data[0].attributes.isCustom).toBe(true);
+      expect(response.data[0].attributes.name).toBe('custom protected area');
+      expect(response.data[0].attributes.scenarioUsageCount).toBe(1);
+    },
+    ThenItContainsFilteredProtectedAreas: async (response: any) => {
+      response.data.sort();
+      expect(response.data).toHaveLength(1);
+      expect(response.data[0].attributes.isCustom).toBe(false);
+      expect(response.data[0].attributes.name).toBe('IUCN III');
+      expect(response.data[0].attributes.scenarioUsageCount).toBe(1);
+    },
+
+    ThenItContainsSortedProtectedAreas: async (response: any) => {
+      response.data.sort();
+      expect(response.data).toHaveLength(2);
+      expect(response.data[0].attributes.isCustom).toBe(true);
+      expect(response.data[0].attributes.name).toBe('custom protected area');
+      expect(response.data[1].attributes.isCustom).toBe(false);
+      expect(response.data[1].attributes.name).toBe('IUCN III');
+    },
+
     GivenCustomProtectedAreaWasAddedToProject: async () => {
       const ids: { id: string }[] = await wdpa.query(
         `
@@ -159,6 +194,9 @@ export const getFixtures = async () => {
         ],
       );
       return ids[0].id;
+    },
+    GivenGlobalProtectedAreaWasCreated: async (iucnCategory: IUCNCategory) => {
+      await wdpa.query(insertWdpaQuery(iucnCategory));
     },
     ThenItContainsSelectedCustomArea: async (
       response: ProtectedAreaDto[],
@@ -264,7 +302,7 @@ export const getFixtures = async () => {
       expect(response.find((e) => e.id === category)).toEqual({
         id: category,
         kind: `global`,
-        name: category,
+        name: 'IUCN ' + category,
         selected: true,
       });
     },
@@ -275,7 +313,7 @@ export const getFixtures = async () => {
       expect(response.find((e) => e.id === category)).toEqual({
         id: category,
         kind: `global`,
-        name: category,
+        name: 'IUCN ' + category,
         selected: false,
       });
     },
@@ -283,16 +321,20 @@ export const getFixtures = async () => {
       scenario: string,
     ) => {
       expect(
-        (commands.find(
-          (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
-        ) as CalculatePlanningUnitsProtectionLevel | undefined)?.scenarioId,
+        (
+          commands.find(
+            (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
+          ) as CalculatePlanningUnitsProtectionLevel | undefined
+        )?.scenarioId,
       ).toEqual(scenario);
     },
     ThenCalculationsOfProtectionLevelWereNotTriggered: async () => {
       expect(
-        (commands.find(
-          (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
-        ) as CalculatePlanningUnitsProtectionLevel | undefined)?.scenarioId,
+        (
+          commands.find(
+            (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
+          ) as CalculatePlanningUnitsProtectionLevel | undefined
+        )?.scenarioId,
       ).toEqual(undefined);
     },
     ThenForbiddenIsReturned: (response: request.Response) => {

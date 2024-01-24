@@ -2,9 +2,8 @@ import React, { useCallback } from 'react';
 
 import { ViewportProps } from 'react-map-gl';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ZOOM_IN_SVG from 'svgs/map/zoom-in.svg?sprite';
 import ZOOM_OUT_SVG from 'svgs/map/zoom-out.svg?sprite';
@@ -15,11 +14,7 @@ export interface ZoomControlProps {
   onZoomChange: (zoom: number) => void;
 }
 
-export const ZoomControl = ({
-  className,
-  viewport,
-  onZoomChange,
-}: ZoomControlProps) => {
+export const ZoomControl = ({ className, viewport, onZoomChange }: ZoomControlProps) => {
   const { zoom, maxZoom, minZoom } = viewport;
 
   const increaseZoom = useCallback(
@@ -28,7 +23,7 @@ export const ZoomControl = ({
 
       onZoomChange(zoom + 1 > maxZoom ? maxZoom : zoom + 1);
     },
-    [zoom, maxZoom, onZoomChange],
+    [zoom, maxZoom, onZoomChange]
   );
 
   const decreaseZoom = useCallback(
@@ -37,22 +32,22 @@ export const ZoomControl = ({
 
       onZoomChange(zoom - 1 < minZoom ? minZoom : zoom - 1);
     },
-    [zoom, minZoom, onZoomChange],
+    [zoom, minZoom, onZoomChange]
   );
 
   return (
     <div
-      className={cx({
+      className={cn({
         'inline-flex flex-col': true,
         [className]: !!className,
       })}
     >
       <button
         aria-label="zoom-in"
-        className={cx({
-          'mb-0.5 p-0.5 rounded-t-4xl text-white bg-black focus:outline-none': true,
-          'hover:bg-gray-700 active:bg-gray-600': zoom !== maxZoom,
-          'opacity-50 cursor-default': zoom === maxZoom,
+        className={cn({
+          'mb-0.5 rounded-t-full bg-black p-0.5 text-white focus:outline-none': true,
+          'hover:bg-gray-800 active:bg-gray-700': zoom !== maxZoom,
+          'cursor-default opacity-50': zoom === maxZoom,
         })}
         type="button"
         disabled={zoom === maxZoom}
@@ -62,10 +57,10 @@ export const ZoomControl = ({
       </button>
       <button
         aria-label="zoom-out"
-        className={cx({
-          'p-0.5 rounded-b-4xl text-white bg-black focus:outline-none': true,
-          'hover:bg-gray-700 active:bg-gray-600': zoom !== minZoom,
-          'opacity-50 cursor-default': zoom === minZoom,
+        className={cn({
+          'rounded-b-full bg-black p-0.5 text-white focus:outline-none': true,
+          'hover:bg-gray-800 active:bg-gray-700': zoom !== minZoom,
+          'cursor-default opacity-50': zoom === minZoom,
         })}
         type="button"
         disabled={zoom === minZoom}

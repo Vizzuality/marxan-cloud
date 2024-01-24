@@ -4,7 +4,6 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
@@ -22,6 +21,7 @@ import {
   readSavedFile,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -73,13 +73,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([PlanningArea]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      PlanningAreaCustomPieceExporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [PlanningAreaCustomPieceExporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const organizationId = v4();
   const planningAreaId = v4();
@@ -139,9 +138,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<PlanningAreaCustomContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<PlanningAreaCustomContent>(savedStrem);
           expect(content.puAreaKm2).toBe(500);
           expect(content.puGridShape).toBe(PlanningUnitGridShape.Square);
           const geom = content.planningAreaGeom;

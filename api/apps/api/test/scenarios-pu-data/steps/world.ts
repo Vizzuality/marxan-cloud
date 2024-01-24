@@ -22,9 +22,8 @@ export const createWorld = async (app: INestApplication): Promise<World> => {
   const entityManager = app.get<EntityManager>(
     getEntityManagerToken(DbConnections.geoprocessingDB),
   );
-  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
-    ProjectsPuEntity,
-  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> =
+    entityManager.getRepository(ProjectsPuEntity);
   const geomsRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );
@@ -34,7 +33,7 @@ export const createWorld = async (app: INestApplication): Promise<World> => {
     GivenScenarioPuDataExists: () =>
       GivenScenarioPuDataExists(entityManager, projectId, scenarioId),
     cleanup: async () => {
-      const projectPus = await projectsPuRepo.find({ projectId });
+      const projectPus = await projectsPuRepo.find({ where: { projectId } });
       await geomsRepo.delete({ id: In(projectPus.map((pu) => pu.geomId)) });
     },
   };

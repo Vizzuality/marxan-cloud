@@ -67,3 +67,21 @@ export const GivenProjectsPu = async (
   const rows = await entityManager.save(ProjectsPuEntity, scenarioPuData);
   return rows as ProjectsPuEntity[];
 };
+
+export const GivenCostSurfacePuDataExists = async (
+  entityManager: EntityManager,
+  costSurfaceId: string,
+  projectId: string,
+): Promise<void> => {
+  await entityManager
+    .getRepository(ProjectsPuEntity)
+    .findOneOrFail({ where: { projectId } });
+  await entityManager.query(
+    `INSERT INTO cost_surface_pu_data (projects_pu_id, cost, cost_surface_id)
+                    SELECT ppu.id, round(pug.area / 1000000) as area, $1
+                    FROM projects_pu ppu
+                    INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
+                    WHERE ppu.project_id = $2`,
+    [costSurfaceId, projectId],
+  );
+};

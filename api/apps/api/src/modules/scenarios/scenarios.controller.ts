@@ -40,7 +40,6 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { plainToClass } from 'class-transformer';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
@@ -76,7 +75,6 @@ import { ScenarioFeaturesGapDataService } from '../scenarios-features/scenario-f
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
 import { ScenarioFeaturesOutputGapDataService } from '../scenarios-features/scenario-features-output-gap-data.service';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
-import { CostRangeDto } from './dto/cost-range.dto';
 import {
   AsyncJobDto,
   JsonApiAsyncJobMeta,
@@ -102,19 +100,24 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { BaseTilesOpenApi } from '@marxan/tiles';
-import { WebshotPdfConfig } from '@marxan/webshot';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 import { setImagePngResponseHeadersForSuccessfulRequests } from '@marxan/utils';
 import { forbiddenError } from '../access-control';
 import { scenarioNotFound } from '../blm/values/blm-repos';
 import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
+import { WebshotPdfReportConfig } from '@marxan/webshot/webshot.dto';
+import { ClearLockStatusParams } from '@marxan-api/modules/scenarios/dto/clear-lock-status-param.dto';
+import { CostRangeDto } from '@marxan-api/modules/scenarios/dto/cost-range.dto';
+import { plainToClass } from 'class-transformer';
+import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
+import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
 
 const marxanRunTag = 'Marxan Run';
-const marxanRunFiles = 'Marxan Run - Files';
+export const marxanRunFiles = 'Marxan Run - Files';
 
 @ImplementsAcl()
 @UseGuards(JwtAuthGuard)
@@ -136,6 +139,8 @@ export class ScenariosController {
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
+    private readonly projectsService: ProjectsService,
+    private readonly costSurfaceService: CostSurfaceService,
   ) {}
 
   @ApiOperation({
@@ -333,6 +338,7 @@ export class ScenariosController {
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
         userId: req.user.id,
+        projectId: dto.projectId,
         resourceType: scenarioResource.name.plural,
       });
     }
@@ -391,21 +397,62 @@ export class ScenariosController {
     return await this.geoFeatureSetSerializer.serialize(result.right);
   }
 
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
+  @ApiOperation({
+    description:
+      'Links a Cost Surface to a Scenario, and applies costs on the Geoprocessing DB',
+  })
+  @ApiParam({
+    name: 'scenarioId',
+    description: 'Id of the Scenario that the Cost Surface will be applied',
+    required: true,
+  })
+  @ApiParam({
+    name: 'costSurfaceId',
+    description:
+      'Id of the Cost Surface that will be applied to the given Scenario',
+    required: true,
+  })
   @ApiTags(asyncJobTag)
-  @Post(`:id/cost-surface/shapefile`)
-  async processCostSurfaceShapefile(
-    @Param('id') scenarioId: string,
+  @Post(`:scenarioId/cost-surface/:costSurfaceId`)
+  async linkCostSurfaceToScenario(
+    @Param('scenarioId') scenarioId: string,
+    @Param('costSurfaceId') costSurfaceId: string,
     @Req() req: RequestWithAuthenticatedUser,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<JsonApiAsyncJobMeta> {
-    await ensureShapefileHasRequiredFiles(file);
-
-    const result = await this.service.processCostSurfaceShapefile(
-      scenarioId,
+  ): Promise<true> {
+    const result = await this.costSurfaceService.linkCostSurfaceToScenario(
       req.user.id,
-      file,
+      scenarioId,
+      costSurfaceId,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        scenarioId,
+        costSurfaceId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    return true;
+  }
+
+  @ApiOperation({
+    description: `Unlinks the currently applied CostSurface from the given Scenario, and links back the default Cost Surface of the Scenario's Project`,
+  })
+  @ApiParam({
+    name: 'scenarioId',
+    description: 'Id of the Scenario that will have its Cost Surface unlinked',
+    required: true,
+  })
+  @ApiTags(asyncJobTag)
+  @Delete(`:scenarioId/cost-surface/`)
+  async unlinkCostSurfaceToScenario(
+    @Param('scenarioId') scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const result = await this.costSurfaceService.unlinkCostSurfaceFromScenario(
+      req.user.id,
+      scenarioId,
     );
 
     if (isLeft(result)) {
@@ -416,23 +463,6 @@ export class ScenariosController {
       });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
-  }
-
-  @Get(`:id/cost-surface`)
-  @ApiOkResponse({ type: CostRangeDto })
-  async getCostRange(
-    @Param('id') scenarioId: string,
-    @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<CostRangeDto> {
-    const result = await this.service.getCostRange(scenarioId, req.user.id);
-    if (isLeft(result)) {
-      throw mapAclDomainToHttpError(result.left, {
-        scenarioId,
-        userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
-      });
-    }
-    return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
   }
 
   @ApiConsumesShapefile()
@@ -524,6 +554,56 @@ export class ScenariosController {
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
+  @ApiTags(asyncJobTag)
+  @ApiParam({
+    name: 'id',
+    description: 'scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @ApiQuery({
+    name: 'kind',
+    description:
+      'status kind to be cleared - locked-in, locked-out or available',
+    type: String,
+    required: true,
+    example: 'locked-in',
+  })
+  @ApiOkResponse()
+  @ApiParam({
+    name: 'id',
+    description: 'Scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @ApiParam({
+    name: 'kind',
+    description:
+      'Status kind to be cleared - locked-in, locked-out or available',
+    example: 'locked-in',
+  })
+  @Delete(':id/planning-units/status/:kind')
+  async clearPlanningUnitsStatus(
+    @Param() params: ClearLockStatusParams,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<JsonApiAsyncJobMeta> {
+    const result = await this.service.clearLockStatuses(
+      params.id,
+      req.user.id,
+      params.kind,
+    );
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        scenarioId: params.id,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    return AsyncJobDto.forScenario().asJsonApiMetadata();
+  }
+
   @Delete(`:id/planning-units`)
   @ApiOkResponse()
   async resetPlanningUnitsLockStatus(
@@ -597,16 +677,17 @@ export class ScenariosController {
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesGapData>[]> {
-    const result = await this.scenarioFeaturesGapDataService.findAllPaginatedAcl(
-      fetchSpecification,
-      {
-        params: {
-          scenarioId: id,
-          searchPhrase: featureClassAndAliasFilter,
+    const result =
+      await this.scenarioFeaturesGapDataService.findAllPaginatedAcl(
+        fetchSpecification,
+        {
+          params: {
+            scenarioId: id,
+            searchPhrase: featureClassAndAliasFilter,
+          },
+          authenticatedUser: req.user,
         },
-        authenticatedUser: req.user,
-      },
-    );
+      );
 
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
@@ -927,16 +1008,17 @@ export class ScenariosController {
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
-    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginatedAcl(
-      fetchSpecification,
-      {
-        params: {
-          scenarioId: id,
-          searchPhrase: featureClassAndAliasFilter,
+    const result =
+      await this.scenarioFeaturesOutputGapDataService.findAllPaginatedAcl(
+        fetchSpecification,
+        {
+          params: {
+            scenarioId: id,
+            searchPhrase: featureClassAndAliasFilter,
+          },
+          authenticatedUser: req.user,
         },
-        authenticatedUser: req.user,
-      },
-    );
+      );
 
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
@@ -981,6 +1063,8 @@ export class ScenariosController {
     return this.scenarioSolutionSerializer.serialize(result.right);
   }
 
+  @ImplementsAcl()
+  @UseGuards(JwtAuthGuard)
   @ApiTags(marxanRunFiles)
   @Header('Content-Type', 'text/csv')
   @ApiOkResponse({
@@ -991,17 +1075,17 @@ export class ScenariosController {
   @ApiOperation({
     description: `Uploaded cost surface data`,
   })
-  @Get(`:id/marxan/dat/pu.dat`)
-  async getScenarioCostSurface(
-    @Param('id', ParseUUIDPipe) id: string,
+  @Get(`:scenarioId/marxan/dat/pu.dat`)
+  async getPuDatFile(
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Res() res: Response,
   ): Promise<void> {
-    const result = await this.service.getCostSurfaceCsv(id, req.user.id, res);
+    const result = await this.service.getPuDatCsv(scenarioId, req.user.id, res);
 
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
-        scenarioId: id,
+        scenarioId,
         userId: req.user.id,
         resourceType: scenarioResource.name.plural,
       });
@@ -1054,38 +1138,6 @@ export class ScenariosController {
       });
     }
     return await this.getProtectedAreasForScenario(scenarioId, req);
-  }
-
-  @ApiConsumesShapefile({ withGeoJsonResponse: false })
-  @ApiOperation({
-    description:
-      'Upload shapefile for with protected areas for project&scenario',
-  })
-  @GeometryFileInterceptor(GeometryKind.Complex)
-  @ApiTags(asyncJobTag)
-  @Post(':id/protected-areas/shapefile')
-  async shapefileForProtectedArea(
-    @Param('id') scenarioId: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: RequestWithAuthenticatedUser,
-    @Body() dto: UploadShapefileDto,
-  ): Promise<JsonApiAsyncJobMeta> {
-    await ensureShapefileHasRequiredFiles(file);
-
-    const outcome = await this.service.addProtectedAreaFor(
-      scenarioId,
-      file,
-      { authenticatedUser: req.user },
-      dto,
-    );
-    if (isLeft(outcome)) {
-      throw mapAclDomainToHttpError(outcome.left, {
-        scenarioId,
-        userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
-      });
-    }
-    return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
   @ApiOperation({
@@ -1286,7 +1338,7 @@ export class ScenariosController {
   @Header('content-type', 'application/pdf')
   @Post('/:scenarioId/solutions/report')
   async getSummaryReportForProject(
-    @Body() config: WebshotPdfConfig,
+    @Body() config: WebshotPdfReportConfig,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,

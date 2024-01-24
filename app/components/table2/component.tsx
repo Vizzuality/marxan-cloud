@@ -1,16 +1,10 @@
 import React, { useEffect } from 'react';
 
-import {
-  useTable,
-  useFlexLayout,
-  usePagination,
-  useSortBy,
-} from 'react-table';
-
-import cx from 'classnames';
+import { useTable, useFlexLayout, usePagination, useSortBy } from 'react-table';
 
 import Icon from 'components/icon';
 import Loading from 'components/loading';
+import { cn } from 'utils/cn';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
@@ -35,12 +29,15 @@ export const Table2: React.FC<Table2Props> = ({
   onPageChange,
   onSortChange,
 }: Table2Props) => {
-  const DEFAULT_COLUMN = React.useMemo(() => ({
-    // When using the useFlexLayout:
-    minWidth: 30, // minWidth is only used as a limit for resizing
-    width: 150, // width is used for both the flex-basis and flex-grow
-    maxWidth: 200, // maxWidth is only used as a limit for resizing
-  }), []);
+  const DEFAULT_COLUMN = React.useMemo(
+    () => ({
+      // When using the useFlexLayout:
+      minWidth: 30, // minWidth is only used as a limit for resizing
+      width: 150, // width is used for both the flex-basis and flex-grow
+      maxWidth: 200, // maxWidth is only used as a limit for resizing
+    }),
+    []
+  );
 
   const {
     getTableProps,
@@ -83,7 +80,7 @@ export const Table2: React.FC<Table2Props> = ({
     },
     useFlexLayout,
     useSortBy,
-    usePagination,
+    usePagination
   );
 
   useEffect(() => {
@@ -106,13 +103,11 @@ export const Table2: React.FC<Table2Props> = ({
 
   return (
     <div className="relative -mx-10">
-      <div {...getTableProps()} className="relative w-full mb-2 bg-white rounded-t-3xl">
+      <div {...getTableProps()} className="relative mb-2 w-full rounded-t-3xl bg-white">
         <div>
           {headerGroups.map((headerGroup) => {
-            const {
-              key: headerGroupKey,
-              ...restHeaderGroupProps
-            } = headerGroup.getHeaderGroupProps();
+            const { key: headerGroupKey, ...restHeaderGroupProps } =
+              headerGroup.getHeaderGroupProps();
 
             return (
               <div
@@ -121,22 +116,18 @@ export const Table2: React.FC<Table2Props> = ({
                 className="sticky top-0 z-10 px-10"
               >
                 {headerGroup.headers.map((column) => {
-                  const {
-                    id, canSort, sortDescFirst, toggleSortBy,
-                  } = column;
+                  const { id, canSort, sortDescFirst, toggleSortBy } = column;
 
-                  const {
-                    key: headerKey,
-                    ...restHeaderProps
-                  } = column.getHeaderProps();
+                  const { key: headerKey, ...restHeaderProps } = column.getHeaderProps();
 
                   return (
                     <div
                       role="presentation"
                       key={headerKey}
                       {...restHeaderProps}
-                      className={cx({
-                        'flex items-center py-5 pr-5 space-x-2 text-xs font-medium uppercase font-heading': true,
+                      className={cn({
+                        'flex items-center space-x-2 py-5 pr-5 font-heading text-xs font-medium uppercase':
+                          true,
                         'cursor-pointer': canSort,
                       })}
                       {...(canSort && {
@@ -155,9 +146,9 @@ export const Table2: React.FC<Table2Props> = ({
                       {sortSelected && sortSelected.id === column.id && (
                         <Icon
                           icon={ARROW_DOWN_SVG}
-                          className={cx({
-                            'w-3 h-3': true,
-                            'transform rotate-180': !sortSelected.desc,
+                          className={cn({
+                            'h-3 w-3': true,
+                            'rotate-180 transform': !sortSelected.desc,
                           })}
                         />
                       )}
@@ -168,32 +159,22 @@ export const Table2: React.FC<Table2Props> = ({
             );
           })}
         </div>
-        <div className="relative tbody" style={{ minHeight: 50 }}>
+        <div className="tbody relative" style={{ minHeight: 50 }}>
           {rows.map((row) => {
             prepareRow(row);
 
-            const {
-              key: rowKey,
-              ...restRowProps
-            } = row.getRowProps();
+            const { key: rowKey, ...restRowProps } = row.getRowProps();
 
             return (
-              <div
-                key={rowKey}
-                {...restRowProps}
-                className="px-10 border-t border-gray-100"
-              >
+              <div key={rowKey} {...restRowProps} className="border-t border-gray-200 px-10">
                 {row.cells.map((cell) => {
-                  const {
-                    key: cellKey,
-                    ...restCellProps
-                  } = cell.getCellProps();
+                  const { key: cellKey, ...restCellProps } = cell.getCellProps();
 
                   return (
                     <div
                       key={cellKey}
                       {...restCellProps}
-                      className={cx({
+                      className={cn({
                         'py-5 pr-5': true,
                         [cell?.column?.className]: !!cell?.column?.className,
                       })}
@@ -207,9 +188,9 @@ export const Table2: React.FC<Table2Props> = ({
           })}
 
           {loading && (
-            <div className="absolute bottom-0 left-0 flex items-center justify-center w-full h-full">
+            <div className="absolute bottom-0 left-0 flex h-full w-full items-center justify-center">
               <Loading
-                className="flex items-center justify-center w-full h-full bg-white bg-opacity-50"
+                className="flex h-full w-full items-center justify-center bg-white bg-opacity-50"
                 iconClassName="w-10 h-10"
                 visible
               />

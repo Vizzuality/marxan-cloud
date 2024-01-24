@@ -8,16 +8,16 @@ import { ScheduleDbCleanupForFailedLegacyProjectImport } from './schedule-db-cle
 @CommandHandler(ScheduleDbCleanupForFailedLegacyProjectImport)
 export class ScheduleDbCleanupForFailedLegacyProjectImportHandler
   implements
-    IInferredCommandHandler<ScheduleDbCleanupForFailedLegacyProjectImport> {
+    IInferredCommandHandler<ScheduleDbCleanupForFailedLegacyProjectImport>
+{
+  private readonly logger: Logger = new Logger(
+    ScheduleDbCleanupForFailedLegacyProjectImportHandler.name,
+  );
+
   constructor(
     @Inject(failedLegacyProjectImportDbCleanupQueueToken)
     private readonly queue: Queue<FailedLegacyProjectImportDbCleanupJobInput>,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(
-      ScheduleDbCleanupForFailedLegacyProjectImportHandler.name,
-    );
-  }
+  ) {}
 
   async execute({
     projectId,

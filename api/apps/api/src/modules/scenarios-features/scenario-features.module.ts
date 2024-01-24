@@ -10,7 +10,7 @@ import {
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { CqrsModule } from '@nestjs/cqrs';
-import { ApiEventsModule } from '../api-events/api-events.module';
+import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import { CreateFeaturesSaga } from './create-features.saga';
 import { CreateFeaturesHandler } from './create-features.handler';
 import { CopyDataProvider, CopyOperation, CopyQuery } from './copy';
@@ -27,12 +27,12 @@ import {
 } from './stratification';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { ComputeArea } from './compute-area.service';
-import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/infra/legacy-project-import.repository.module';
-import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
+import { FeatureAmountsPerPlanningUnitModule } from '@marxan/feature-amounts-per-planning-unit';
 import { SplitFeatureConfigMapper } from '../scenarios/specification/split-feature-config.mapper';
 import { FeatureHashModule } from '../features-hash/features-hash.module';
 import { SplitCreateFeatures } from './split/split-create-features.service';
 import { Project } from '../projects/project.api.entity';
+import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
 
 @Module({
   imports: [
@@ -47,11 +47,12 @@ import { Project } from '../projects/project.api.entity';
       DbConnections.geoprocessingDB,
     ),
     FeatureHashModule,
-    PuvsprCalculationsModule.for(DbConnections.geoprocessingDB),
+    FeatureAmountsPerPlanningUnitModule.for(DbConnections.geoprocessingDB),
     ProjectsModule,
     ApiEventsModule,
     IntersectWithPuModule,
     AccessControlModule,
+    GeoFeaturesModule,
   ],
   providers: [
     ScenarioFeaturesService,

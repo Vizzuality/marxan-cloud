@@ -6,7 +6,6 @@ import { MarxanExecutionMetadataContent } from '@marxan/cloning/infrastructure/c
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
@@ -19,6 +18,7 @@ import {
   readSavedFile,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -64,13 +64,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([MarxanExecutionMetadataGeoEntity]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      MarxanExecutionMetadataPieceExporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [MarxanExecutionMetadataPieceExporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const scenarioId = v4();
 
@@ -128,9 +127,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStream = file.right;
-          const content = await readSavedFile<MarxanExecutionMetadataContent>(
-            savedStream,
-          );
+          const content =
+            await readSavedFile<MarxanExecutionMetadataContent>(savedStream);
           expect(content.marxanExecutionMetadata).toHaveLength(
             amountOfMarxanRuns,
           );

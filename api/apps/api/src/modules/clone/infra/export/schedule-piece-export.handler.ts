@@ -1,6 +1,6 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { ExportJobInput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { Inject, Logger } from '@nestjs/common';
 import {
@@ -16,7 +16,10 @@ import { SchedulePieceExport } from './schedule-piece-export.command';
 
 @CommandHandler(SchedulePieceExport)
 export class SchedulePieceExportHandler
-  implements IInferredCommandHandler<SchedulePieceExport> {
+  implements IInferredCommandHandler<SchedulePieceExport>
+{
+  private readonly logger: Logger = new Logger(SchedulePieceExportHandler.name);
+
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__piece__submitted__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__export__piece__submitted__v1__alpha,
@@ -28,10 +31,7 @@ export class SchedulePieceExportHandler
     private readonly queue: Queue<ExportJobInput>,
     private readonly eventBus: EventBus,
     private readonly exportRepository: ExportRepository,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(SchedulePieceExportHandler.name);
-  }
+  ) {}
 
   async execute({ exportId, componentId }: SchedulePieceExport): Promise<void> {
     const exportInstance = await this.exportRepository.find(exportId);
@@ -59,6 +59,10 @@ export class SchedulePieceExportHandler
       piece,
       resourceId,
     }));
+
+    if (piece === ClonePiece.ScenarioInputFolder) {
+      this.logger.log('SCENARIO INPUT FOLDER');
+    }
 
     const job = await this.queue.add(`export-piece`, {
       piece,

@@ -13,7 +13,7 @@ import {
 import { SpecificationRepository } from '@marxan-api/modules/specification/application/specification.repository';
 import { Specification } from '@marxan-api/modules/specification/domain';
 import { SingleSplitConfigFeatureValue } from '@marxan/features-hash';
-import { PuvsprCalculationsService } from '@marxan/puvspr-calculations';
+import { FeatureAmountsPerPlanningUnitService } from '@marxan/feature-amounts-per-planning-unit';
 import { SpecificationOperation } from '@marxan/specification';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -22,7 +22,7 @@ import { isLeft, left, right } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
 import { GeoFeatureDtoMapper } from '../../specification/geo-feature-dto.mapper';
 import { SplitFeatureConfigMapper } from '../../specification/split-feature-config.mapper';
-import { PuvrsprDatFactory } from './puvspr.dat.factory';
+import { PuvsprDatFeatureAmountsService } from '@marxan-api/modules/scenarios/input-files/puvspr.dat.processor/puvspr.dat.feature-amounts.service';
 
 export type PuvrsprDatRow = {
   speciesId: number;
@@ -38,14 +38,13 @@ export class PuvsprDatProcessor {
     private readonly scenarioSpecificationsRepo: ScenarioSpecificationRepo,
     private readonly specificationsRepo: SpecificationRepository,
     private readonly geoFeatureMapper: GeoFeatureDtoMapper,
-    private readonly puvsprCalculationsService: PuvsprCalculationsService,
+    private readonly featureAmountsPerPlanningUnitService: FeatureAmountsPerPlanningUnitService,
     private readonly splitConfigHasher: SingleConfigFeatureValueHasher,
     private readonly splitFeatureConfigMapper: SplitFeatureConfigMapper,
-    private readonly puvsprDatFactory: PuvrsprDatFactory,
+    private readonly puvsprFeatureAmounts: PuvsprDatFeatureAmountsService,
   ) {}
 
   async getPuvsprDatRows(
-    isLegacy: boolean,
     scenarioId: string,
     projectId: string,
   ): Promise<PuvrsprDatRow[]> {
@@ -57,22 +56,23 @@ export class PuvsprDatProcessor {
 
     const featuresIds = await this.getFeaturesIds(specification);
 
-    const featuresIdsWithSpeciesId = await this.puvsprCalculationsService.computeSpeciesId(
-      featuresIds,
-      scenarioId,
-    );
+    const featuresIdsWithSpeciesId =
+      await this.featureAmountsPerPlanningUnitService.computeSpeciesId(
+        featuresIds,
+        scenarioId,
+      );
 
-    const featuresAmountPerPlanningUnit = await this.getAmountPerPlanningUnitAndFeature(
-      isLegacy,
-      projectId,
-      scenarioId,
-      featuresIds,
-    );
+    const featuresAmountPerPlanningUnit =
+      await this.puvsprFeatureAmounts.getAmountPerPlanningUnitAndFeature(
+        projectId,
+        featuresIds,
+      );
 
     return featuresIdsWithSpeciesId.flatMap(({ featureId, speciesId }) => {
-      const amountPerPlanningUnitOfFeature = featuresAmountPerPlanningUnit.filter(
-        (row) => row.featureId === featureId,
-      );
+      const amountPerPlanningUnitOfFeature =
+        featuresAmountPerPlanningUnit.filter(
+          (row) => row.featureId === featureId,
+        );
 
       return amountPerPlanningUnitOfFeature.map(({ amount, puId }) => ({
         speciesId,
@@ -83,9 +83,8 @@ export class PuvsprDatProcessor {
   }
 
   private async getSpecification(scenarioId: string) {
-    const scenarioSpecification = await this.scenarioSpecificationsRepo.find(
-      scenarioId,
-    );
+    const scenarioSpecification =
+      await this.scenarioSpecificationsRepo.find(scenarioId);
     if (!scenarioSpecification) {
       return left(false);
     }
@@ -129,21 +128,6 @@ export class PuvsprDatProcessor {
     const splitFeatureIds = await this.getSplitFeatureIds(featureConfigs);
 
     return copyFeatureIds.concat(splitFeatureIds);
-  }
-
-  private async getAmountPerPlanningUnitAndFeature(
-    isLegacy: boolean,
-    projectId: string,
-    scenarioId: string,
-    fetaureIds: string[],
-  ) {
-    const puvspr = this.puvsprDatFactory.getPuvsrDat(isLegacy);
-
-    return puvspr.getAmountPerPlanningUnitAndFeature(
-      projectId,
-      scenarioId,
-      fetaureIds,
-    );
   }
 
   private getCopyFeatureIds(

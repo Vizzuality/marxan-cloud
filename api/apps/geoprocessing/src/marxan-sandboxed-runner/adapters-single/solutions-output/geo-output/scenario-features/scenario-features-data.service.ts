@@ -19,9 +19,10 @@ export class ScenarioFeaturesDataService {
     scenarioId: string,
     legacyProjectImport: boolean,
   ): Promise<FeatureIdToScenarioFeatureData> {
-    return (legacyProjectImport
-      ? this.legacyProjectImportScenarioIdMapper
-      : this.scenarioIdMapper
+    return (
+      legacyProjectImport
+        ? this.legacyProjectImportScenarioIdMapper
+        : this.scenarioIdMapper
     ).getMapping(scenarioId);
   }
 

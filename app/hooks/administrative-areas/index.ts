@@ -1,54 +1,44 @@
-import { useMemo } from 'react';
-
 import { useQuery } from 'react-query';
 
-import { useSession } from 'next-auth/client';
-import { Region } from 'types/country-model';
+import { useSession } from 'next-auth/react';
+
+import { Region, SubRegion } from 'types/api/location';
 
 import ADMINISTRATIVE_AREAS from 'services/administrative-areas';
 
-import {
-  UseAdministrativeAreasProps,
-  UseAdministrativeAreasResponse,
-} from './types';
-
-export function useAdministrativeAreas(props: UseAdministrativeAreasProps):
-UseAdministrativeAreasResponse {
-  const [session] = useSession();
+export function useAdministrativeAreas(props: { id: Region['id']; includeAll?: boolean }) {
+  const { data: session } = useSession();
   const { includeAll, id } = props;
 
-  const query = useQuery(['administrative areas', id], async () => ADMINISTRATIVE_AREAS.request({
-    method: 'GET',
-    url: `/${id}/subdivisions`,
-    params: {
-      'page[size]': includeAll ? 6000 : 25,
-      omitFields: 'theGeom',
-      sort: 'name2',
-    },
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }), {
-    enabled: !!id,
-  });
+  return useQuery(
+    ['administrative areas', id],
+    async () =>
+      ADMINISTRATIVE_AREAS.request<{ data: SubRegion[] }>({
+        method: 'GET',
+        url: `/${id}/subdivisions`,
+        params: {
+          'page[size]': includeAll ? 6000 : 25,
+          omitFields: 'theGeom',
+          sort: 'name2',
+        },
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }),
+    {
+      enabled: !!id,
+      select: (data) => {
+        const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
 
-  const { data } = query;
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(data?.data?.data) ? data?.data?.data : [];
-
-    const regions: Region[] = parsedData.map((r) => ({
-      name: r.name2,
-      id: r.id,
-      level: 2,
-      bbox: r.bbox,
-      minPuAreaSize: r.minPuAreaSize,
-      maxPuAreaSize: r.maxPuAreaSize,
-    }));
-
-    return {
-      ...query,
-      data: regions,
-    };
-  }, [query, data?.data?.data]);
+        return parsedData.map((r) => ({
+          name: r.name2,
+          id: r.id,
+          level: 2,
+          bbox: r.bbox,
+          minPuAreaSize: r.minPuAreaSize,
+          maxPuAreaSize: r.maxPuAreaSize,
+        }));
+      },
+    }
+  );
 }

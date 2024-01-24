@@ -1,6 +1,6 @@
 import { QueryClient } from 'react-query';
 
-import { getSession } from 'next-auth/client';
+import { getSession } from 'next-auth/react';
 import { dehydrate } from 'react-query/hydration';
 
 import USERS from 'services/users';
@@ -49,7 +49,7 @@ export function withUser(getServerSidePropsFunc?: Function) {
 
     if (!session) {
       if (getServerSidePropsFunc) {
-        const SSPF = await getServerSidePropsFunc(context) || {};
+        const SSPF = (await getServerSidePropsFunc(context)) || {};
 
         return {
           props: {
@@ -63,22 +63,23 @@ export function withUser(getServerSidePropsFunc?: Function) {
       };
     }
 
-    await queryClient.prefetchQuery('me', () => USERS.request({
-      method: 'GET',
-      url: '/me',
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    })
-      .then((response) => {
+    await queryClient.prefetchQuery('me', () =>
+      USERS.request({
+        method: 'GET',
+        url: '/me',
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then((response) => {
         if (response.status > 500) {
           return new Error('prefetchQuery "me" error');
         }
         return response.data;
-      }));
+      })
+    );
 
     if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context) || {};
+      const SSPF = (await getServerSidePropsFunc(context)) || {};
 
       const { dehydratedState: prevDehydratedState } = SSPF.props;
       const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
@@ -110,7 +111,7 @@ export function withAdmin(getServerSidePropsFunc?: Function) {
 
     if (!session) {
       if (getServerSidePropsFunc) {
-        const SSPF = await getServerSidePropsFunc(context) || {};
+        const SSPF = (await getServerSidePropsFunc(context)) || {};
 
         return {
           props: {
@@ -137,7 +138,7 @@ export function withAdmin(getServerSidePropsFunc?: Function) {
     }
 
     if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context) || {};
+      const SSPF = (await getServerSidePropsFunc(context)) || {};
 
       const { dehydratedState: prevDehydratedState } = SSPF.props;
       const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
@@ -188,9 +189,7 @@ export function withoutProtection(getServerSidePropsFunc?: Function) {
     }
 
     return {
-      props: {
-
-      },
+      props: {},
     };
   };
 }

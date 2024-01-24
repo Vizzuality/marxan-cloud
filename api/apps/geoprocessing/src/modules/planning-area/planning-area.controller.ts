@@ -97,9 +97,8 @@ export class PlanningAreaController {
     @Param() tileSpecification: TileSpecification,
     @Res() response: Response,
   ): Promise<Response> {
-    const tile: Buffer = await this.planningAreaTilesService.findTile(
-      tileSpecification,
-    );
+    const tile: Buffer =
+      await this.planningAreaTilesService.findTile(tileSpecification);
     setTileResponseHeadersForSuccessfulRequests(response);
     return response.send(tile);
   }
@@ -121,9 +120,8 @@ export class PlanningAreaController {
     @Param() tileSpecification: TileSpecification,
     @Res() response: Response,
   ): Promise<Response> {
-    const tile: Buffer = await this.planningAreaGridTilesService.findTile(
-      tileSpecification,
-    );
+    const tile: Buffer =
+      await this.planningAreaGridTilesService.findTile(tileSpecification);
     setTileResponseHeadersForSuccessfulRequests(response);
     return response.send(tile);
   }

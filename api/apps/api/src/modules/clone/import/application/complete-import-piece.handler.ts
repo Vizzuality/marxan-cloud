@@ -17,15 +17,15 @@ import { ImportRepository } from './import.repository.port';
 
 @CommandHandler(CompleteImportPiece)
 export class CompleteImportPieceHandler
-  implements IInferredCommandHandler<CompleteImportPiece> {
+  implements IInferredCommandHandler<CompleteImportPiece>
+{
+  private readonly logger: Logger = new Logger(CompleteImportPieceHandler.name);
+
   constructor(
     private readonly importRepository: ImportRepository,
     private readonly eventPublisher: EventPublisher,
     private readonly commandBus: CommandBus,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(CompleteImportPieceHandler.name);
-  }
+  ) {}
 
   private async markImportAsFailed(
     importId: ImportId,
@@ -47,9 +47,8 @@ export class CompleteImportPieceHandler
         return;
       }
 
-      const importAggregate = this.eventPublisher.mergeObjectContext(
-        importInstance,
-      );
+      const importAggregate =
+        this.eventPublisher.mergeObjectContext(importInstance);
 
       const result = importAggregate.completePiece(componentId);
 

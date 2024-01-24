@@ -10,7 +10,8 @@ import { Either, left, right } from 'fp-ts/lib/Either';
 
 @Injectable()
 export class LegacyProjectImportCheckerFake
-  implements LegacyProjectImportChecker {
+  implements LegacyProjectImportChecker
+{
   private legacyProjectImportWithPendingImports: string[] = [];
 
   constructor(

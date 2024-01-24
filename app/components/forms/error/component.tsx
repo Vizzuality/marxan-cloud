@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
-import cx from 'classnames';
+
+import { cn } from 'utils/cn';
 
 export interface ErrorProps {
   children: ReactNode;
@@ -7,18 +8,15 @@ export interface ErrorProps {
   className?: string;
 }
 
-export const Error: React.FC<ErrorProps> = ({
-  children,
-  visible,
-  className,
-}: ErrorProps) => {
+export const Error: React.FC<ErrorProps> = ({ children, visible, className }: ErrorProps) => {
   if (!visible) return null;
 
   return (
-    <div className={cx({
-      'px-3 py-1 mb-5 text-sm text-red-500 bg-red-100 border border-red-500 rounded': true,
-      [className]: !!className,
-    })}
+    <div
+      className={cn({
+        'mb-5 rounded border border-red-600 bg-red-200 px-3 py-1 text-sm text-red-600': true,
+        [className]: !!className,
+      })}
     >
       {children}
     </div>

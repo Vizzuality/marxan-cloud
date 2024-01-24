@@ -1,8 +1,8 @@
 import { ReactNode, FocusEventHandler } from 'react';
 
 interface SelectThemeProps {
-  theme: 'dark' | 'light' | 'light-square';
-  size: 'base' | 's';
+  theme: 'dark' | 'light' | 'light-square' | 'modal';
+  size: 'base' | 's' | 'xs';
   status?: 'none' | 'error' | 'valid';
   maxHeight?: number | string;
 }
@@ -14,7 +14,7 @@ interface SelectStatusProps {
 }
 
 interface SelectDataProps {
-  options?: SelectOptionProps[];
+  options?: Readonly<SelectOptionProps[]>;
   placeholder?: string;
   prefix?: string;
   initialSelected?: string | string[];
@@ -28,10 +28,7 @@ interface SelectDataProps {
   removeSelected?: boolean;
 }
 
-export interface SelectProps extends
-  SelectStatusProps,
-  SelectDataProps,
-  SelectThemeProps {
+export interface SelectProps extends SelectStatusProps, SelectDataProps, SelectThemeProps {
   onChange?: (selection: string | string[]) => void;
   onSelect?: (option: SelectOptionProps | SelectOptionProps[]) => void;
   onFocus?: FocusEventHandler;
@@ -46,21 +43,16 @@ export interface SelectOptionProps {
   checkbox?: boolean;
 }
 
-export interface SelectMenuProps extends
-  SelectStatusProps,
-  SelectThemeProps {
+export interface SelectMenuProps extends SelectStatusProps, SelectThemeProps {
   children: ReactNode;
   opened: boolean;
-  attributes: Record<string, unknown>,
+  attributes: Record<string, unknown>;
 }
 
-export interface SelectToggleProps extends
-  SelectStatusProps,
-  SelectDataProps,
-  SelectThemeProps {
+export interface SelectToggleProps extends SelectStatusProps, SelectDataProps, SelectThemeProps {
   opened: boolean;
   selectedItems: SelectOptionProps[];
   getToggleButtonProps: (e?: any) => any;
   getDropdownProps?: (e?: any) => any;
-  update?: () => void
+  update?: () => void;
 }

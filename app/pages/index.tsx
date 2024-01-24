@@ -18,7 +18,7 @@ import UpcomingChanges from 'layout/upcoming-changes';
 
 export const getServerSideProps = withUser();
 
-const Home: React.FC = () => {
+const Home = (): JSX.Element => {
   const { asPath } = useRouter();
 
   return (
@@ -36,9 +36,7 @@ const Home: React.FC = () => {
         twitterCard="summary"
         twitterSite="@Marxan_Planning"
       />
-      <main
-        className="overflow-x-hidden overflow-y-auto"
-      >
+      <main className="overflow-y-auto overflow-x-hidden">
         <Header className="absolute" size="lg" theme="transparent" />
         <UpcomingChanges />
         <Intro />

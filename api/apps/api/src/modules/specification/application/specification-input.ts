@@ -93,7 +93,8 @@ export class SpecificationFeatureSplit implements FeatureConfigSplit {
 }
 
 export class SpecificationFeatureStratification
-  implements FeatureConfigStratification {
+  implements FeatureConfigStratification
+{
   @Equals(SpecificationOperation.Stratification)
   operation: SpecificationOperation.Stratification =
     SpecificationOperation.Stratification;

@@ -62,11 +62,11 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
     return right(await super.findAllPaginated(fetchSpecification, info));
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ScenarioFeaturesGapData>,
     filters?: FiltersSpecification['filter'],
     info?: UserSearchCriteria,
-  ): SelectQueryBuilder<ScenarioFeaturesGapData> {
+  ): Promise<SelectQueryBuilder<ScenarioFeaturesGapData>> {
     const scenarioId = info?.params?.scenarioId;
     if (scenarioId) {
       return query.andWhere(`${this.alias}.scenarioId = :scenarioId`, {
@@ -125,7 +125,8 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
      * Here we extend feature protection gap data (from geodb) with feature
      * metadata (name, etc.) from apidb.
      */
-    const scenarioFeaturesData: ScenarioFeaturesGapData[] = entitiesAndCount[0] as ScenarioFeaturesGapData[];
+    const scenarioFeaturesData: ScenarioFeaturesGapData[] =
+      entitiesAndCount[0] as ScenarioFeaturesGapData[];
     const featureIds: string[] = scenarioFeaturesData.map((i) => i.featureId);
 
     if (featureIds.length === 0) {

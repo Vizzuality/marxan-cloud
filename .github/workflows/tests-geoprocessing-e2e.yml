@@ -1,0 +1,37 @@
+name: Tests - Geoprocessing e2e tests
+on:
+  push:
+    paths:
+      - 'api/**'
+      - 'geoprocessing/**'
+      - '.github/**'
+  workflow_dispatch:
+
+jobs:
+
+  test-geoprocessing-e2e:
+    name: E2E tests - Geoprocessing
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        test-suite:
+          - 'cost-template'
+          - 'integration/cloning'
+          - 'integration/cost-surface'
+          - 'integration/legacy-project-import'
+          - 'integration/marxan-run'
+          - 'integration/planning-areas'
+          - 'integration/planning-unit-grid'
+          - 'integration/planning-unit-inclusion'
+          - 'integration/protected-areas'
+          - 'tiles'
+          - 'worker-module'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run CI tests via make task
+        run: TEST_SUITE_PATH="${{ matrix.test-suite }}" make test-e2e-geoprocessing environment=ci

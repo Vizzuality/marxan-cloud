@@ -6,7 +6,8 @@ import { MarkExportAsSubmitted } from './mark-export-as-submitted.command';
 
 @CommandHandler(MarkExportAsSubmitted)
 export class MarkExportAsSubmittedHandler
-  implements IInferredCommandHandler<MarkExportAsSubmitted> {
+  implements IInferredCommandHandler<MarkExportAsSubmitted>
+{
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__submitted__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__export__submitted__v1__alpha,

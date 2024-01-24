@@ -25,14 +25,15 @@ type SelectProjectBlmResult = {
 @Injectable()
 @PieceExportProvider()
 export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ProjectMetadataPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ProjectMetadataPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -67,9 +68,28 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const [blmRange]: [
-      SelectProjectBlmResult,
-    ] = await this.entityManager
+    const [outputSummary]: {
+      summaryZip: Buffer;
+    }[] = await this.entityManager
+      .createQueryBuilder()
+      .select('summary_zipped_data', 'summaryZip')
+      .from('output_project_summaries', 'ops')
+      .where('ops.project_id = :projectId', { projectId })
+      .execute();
+
+    /**
+     * Projects may not have any summary data if no scenarios have ever run.
+     * This is a normal situation: in this case, we just log this for reference.
+     */
+    if (!outputSummary?.summaryZip) {
+      const warningMessage = `${ProjectMetadataPieceExporter.name} - Output Summary for project with id ${projectId} does not exist.`;
+      this.logger.log(warningMessage);
+    }
+    const summaryZip64 = outputSummary?.summaryZip
+      ? outputSummary.summaryZip.toString('base64')
+      : undefined;
+
+    const [blmRange]: [SelectProjectBlmResult] = await this.entityManager
       .createQueryBuilder()
       .select(['values', 'defaults', 'range'])
       .from('project_blms', 'pblms')
@@ -89,6 +109,7 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       blmRange,
       metadata: projectData.metadata ?? undefined,
       sources: projectData.sources,
+      outputSummaryZip: summaryZip64,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(

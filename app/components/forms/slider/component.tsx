@@ -4,7 +4,8 @@ import { useNumberFormatter } from '@react-aria/i18n';
 import { setInteractionModality } from '@react-aria/interactions';
 import { useSlider } from '@react-aria/slider';
 import { useSliderState } from '@react-stately/slider';
-import cx from 'classnames';
+
+import { cn } from 'utils/cn';
 
 import Thumb from './thumb';
 import Value from './value';
@@ -13,17 +14,17 @@ const THEME = {
   dark: {
     base: 'relative w-full h-12 pt-8 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-white rounded',
-    track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
+    track: 'w-full h-1.5 bg-gray-400 rounded opacity-20',
   },
   light: {
     base: 'relative w-full h-12 pt-8 touch-action-none',
-    filledTrack: 'absolute left-0 h-1.5 bg-gray-800 rounded',
-    track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
+    filledTrack: 'absolute left-0 h-1.5 bg-gray-900 rounded',
+    track: 'w-full h-1.5 bg-gray-400 rounded opacity-20',
   },
   'dark-small': {
     base: 'relative w-full h-12 pt-8 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-black rounded',
-    track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
+    track: 'w-full h-1.5 bg-gray-400 rounded opacity-20',
   },
 };
 
@@ -48,7 +49,7 @@ export interface SliderProps {
   /**
    * Whether to allow the user to click the output and edit it directly. Defaults to `true`
    */
-  allowEdit?: boolean,
+  allowEdit?: boolean;
   /**
    * Format of the value
    */
@@ -110,8 +111,7 @@ export const Slider: React.FC<SliderProps> = ({
   const propsOverride = {
     // `useSliderState` is expecting `value` and `defaultValue` to be arrays
     value: rest.value !== undefined ? [rest.value] : undefined,
-    defaultValue:
-      rest.defaultValue !== undefined ? [rest.defaultValue] : undefined,
+    defaultValue: rest.defaultValue !== undefined ? [rest.defaultValue] : undefined,
     onChange: onChangeOverride,
     isDisabled: disabled,
     // `useSliderState` expects a `label` attribute for accessibility, but this is worked around in
@@ -142,7 +142,7 @@ export const Slider: React.FC<SliderProps> = ({
       step,
     },
     sliderState,
-    trackRef,
+    trackRef
   );
 
   // When the user clicks the external `<label />`, the hidden range input is focused but the
@@ -168,16 +168,12 @@ export const Slider: React.FC<SliderProps> = ({
   return (
     <div
       {...groupProps}
-      className={cx({
+      className={cn({
         [THEME[theme].base]: true,
         'opacity-30': status === 'disabled',
       })}
     >
-      <div
-        {...trackProps}
-        ref={trackRef}
-        className="relative flex items-center w-full h-full"
-      >
+      <div {...trackProps} ref={trackRef} className="relative flex h-full w-full items-center">
         <div
           className={THEME[theme].filledTrack}
           style={{

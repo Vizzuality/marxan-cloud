@@ -19,7 +19,8 @@ import { ExportResourcePieces } from './export-resource-pieces.port';
 
 @CommandHandler(ExportProject)
 export class ExportProjectHandler
-  implements IInferredCommandHandler<ExportProject> {
+  implements IInferredCommandHandler<ExportProject>
+{
   constructor(
     private readonly resourcePieces: ExportResourcePieces,
     private readonly exportRepository: ExportRepository,
@@ -35,7 +36,9 @@ export class ExportProjectHandler
     newProjectId: string,
     ownerId: string,
   ) {
-    const project = await this.projectRepo.findOneOrFail(existingProjectId);
+    const project = await this.projectRepo.findOneOrFail({
+      where: { id: existingProjectId },
+    });
     await this.projectRepo.save({
       id: newProjectId,
       name: project.name + ' - copy',

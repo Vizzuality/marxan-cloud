@@ -1,6 +1,22 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { geoFeatureResource, GeoFeatureResult } from './geo-feature.geo.entity';
-import { GeoFeaturesService } from './geo-features.service';
+import {
+  GeoFeaturesService,
+  featureNameAlreadyInUse,
+  featureNotEditable,
+  featureNotFound,
+} from './geo-features.service';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -20,7 +36,16 @@ import {
 } from 'nestjs-base-service';
 import { Request, Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
-import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import {
+  ImplementsAcl,
+  IsMissingAclImplementation,
+} from '@marxan-api/decorators/acl.decorator';
+import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
+import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
+import { UpdateFeatureNameDto } from './dto/update-feature-name.dto';
+import { isLeft } from 'fp-ts/Either';
+import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -31,7 +56,8 @@ import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator
 )
 export class GeoFeaturesController {
   constructor(
-    public readonly service: GeoFeaturesService,
+    private readonly geoFeatureService: GeoFeaturesService,
+    public readonly geoFeaturesTagService: GeoFeatureTagsService,
     private readonly proxyService: ProxyService,
   ) {}
 
@@ -48,8 +74,40 @@ export class GeoFeaturesController {
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<GeoFeatureResult> {
-    const results = await this.service.findAllPaginated(fetchSpecification);
-    return this.service.serialize(results.data, results.metadata);
+    const results =
+      await this.geoFeatureService.findAllPaginated(fetchSpecification);
+    return this.geoFeatureService.serialize(results.data, results.metadata);
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: `Updates the name of a feature with the given id`,
+  })
+  @ApiParam({
+    name: 'featureId',
+    description: 'Id of the feature to be edited',
+  })
+  @ApiTags(inlineJobTag)
+  @Patch(`:featureId`)
+  async updateGeoFeature(
+    @Param('featureId') featureId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() body: UpdateFeatureNameDto,
+  ) {
+    const result = await this.geoFeatureService.updateFeatureForProject(
+      req.user.id,
+      featureId,
+      body,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        featureId,
+        featureClassName: body.featureClassName,
+      });
+    } else {
+      return this.geoFeatureService.serialize(result.right);
+    }
   }
 
   @ApiOperation({

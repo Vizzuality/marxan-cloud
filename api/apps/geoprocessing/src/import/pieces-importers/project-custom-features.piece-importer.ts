@@ -21,17 +21,19 @@ import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/uti
 @Injectable()
 @PieceImportProvider()
 export class ProjectCustomFeaturesPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ProjectCustomFeaturesPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ProjectCustomFeaturesPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -82,23 +84,44 @@ export class ProjectCustomFeaturesPieceImporter
 
       await this.apiEntityManager.transaction(async (apiEm) => {
         const featureIdByClassName: Record<string, string> = {};
-        const insertValues = features.map(({ data, ...feature }) => {
+        const featureInsertValues: any[] = [];
+        const featureTagInsertValues: any[] = [];
+        features.forEach(({ data, tag, ...feature }) => {
           const featureId = v4();
           featureIdByClassName[feature.feature_class_name] = featureId;
 
-          return {
+          featureInsertValues.push({
             ...feature,
             project_id: projectId,
             id: featureId,
-          };
+          });
+
+          if (tag) {
+            featureTagInsertValues.push({
+              project_id: projectId,
+              feature_id: featureId,
+              tag,
+            });
+          }
         });
 
         await Promise.all(
-          insertValues.map((values) =>
+          featureInsertValues.map((values) =>
             apiEm
               .createQueryBuilder()
               .insert()
               .into('features')
+              .values(values)
+              .execute(),
+          ),
+        );
+
+        await Promise.all(
+          featureTagInsertValues.map((values) =>
+            apiEm
+              .createQueryBuilder()
+              .insert()
+              .into('project_feature_tags')
               .values(values)
               .execute(),
           ),
@@ -117,7 +140,7 @@ export class ProjectCustomFeaturesPieceImporter
             properties: data.properties,
             source: data.source,
             featureId: featureIdByClassName[feature_class_name],
-            amountFromLegacyProject: data.amount_from_legacy_project,
+            amount: data.amount,
             projectPuId: projectPuPuid
               ? projectPusMap[projectPuPuid]
               : undefined,

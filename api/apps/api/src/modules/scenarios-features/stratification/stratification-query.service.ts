@@ -59,6 +59,8 @@ export class StratificationQuery {
 
     const hasSubSetFilter = (input.selectSubSets ?? []).length > 0;
     const hasSplit = isDefined(input.splitByProperty);
+    // @TODO Because the feature stratification was abandoned for the time being, the changes for the switch from
+    // area to amounts related to issue 562 could not be properly tested, but are left donehere for consistency with the other operations
     const query = `
       with inserted_features_data as (
         insert into features_data (the_geom, properties, source, feature_id)
@@ -80,6 +82,19 @@ export class StratificationQuery {
         )}') as x(
          value varchar, target float8, fpf float8, prop float8
         )
+      ),
+      total_amounts as (
+        select feature_id, SUM(amount) as total_amount from feature_amounts_per_planning_unit
+        where feature_id = ${fields.baseFeatureId}
+        group by feature_id
+      ),
+      protected_amounts as (
+        select spd.scenario_id, fappu.feature_id, SUM(fappu.amount) as protected_amount
+        from scenarios_pu_data spd inner join feature_amounts_per_planning_unit fappu on fappu.project_pu_id = spd.project_pu_id
+        where spd.lockin_status = 1 and fappu.feature_id = ${
+          fields.baseFeatureId
+        } and spd.scenario_id = ${fields.scenarioId}
+        group by spd.scenario_id, fappu.feature_id
       )
       insert into scenario_features_preparation as sfp (feature_class_id,
                                                         scenario_id,
@@ -95,8 +110,12 @@ export class StratificationQuery {
              subsets.fpf,
              subsets.target,
              subsets.prop,
-             ${fields.totalArea},
-             ${fields.protectedArea}
+             (select total_amount from total_amounts ta where ta.feature_id = ${
+               fields.baseFeatureId
+             }),
+             (select protected_amount from protected_amounts pa where pa.feature_id = ${
+               fields.baseFeatureId
+             } and pa.scenario_id = ${fields.scenarioId})
       from inserted_features_data ifd
              ${planningAreaJoin}
              ${

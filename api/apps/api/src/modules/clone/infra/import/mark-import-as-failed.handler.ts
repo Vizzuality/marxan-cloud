@@ -9,7 +9,10 @@ import { MarkImportAsFailed } from './mark-import-as-failed.command';
 
 @CommandHandler(MarkImportAsFailed)
 export class MarkImportAsFailedHandler
-  implements IInferredCommandHandler<MarkImportAsFailed> {
+  implements IInferredCommandHandler<MarkImportAsFailed>
+{
+  private readonly logger: Logger = new Logger(MarkImportAsFailedHandler.name);
+
   private importEventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__import__failed__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__import__failed__v1__alpha,
@@ -22,10 +25,7 @@ export class MarkImportAsFailedHandler
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly importRepository: ImportRepository,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(MarkImportAsFailedHandler.name);
-  }
+  ) {}
 
   async findPreviousEvent(
     kind: API_EVENT_KINDS,
@@ -55,12 +55,8 @@ export class MarkImportAsFailedHandler
       );
       return;
     }
-    const {
-      resourceKind,
-      resourceId,
-      projectId,
-      isCloning,
-    } = importInstance.toSnapshot();
+    const { resourceKind, resourceId, projectId, isCloning } =
+      importInstance.toSnapshot();
 
     const importKind = this.importEventMapper[resourceKind];
 

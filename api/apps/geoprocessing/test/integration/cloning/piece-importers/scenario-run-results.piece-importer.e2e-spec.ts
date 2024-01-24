@@ -20,7 +20,6 @@ import {
 } from '@marxan/marxan-output';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -38,6 +37,7 @@ import {
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -70,7 +70,8 @@ describe(ScenarioRunResultsPieceImporter, () => {
   it('fails if projects planning units amount does not match', async () => {
     await fixtures.GivenScenario();
     await fixtures.GivenScenarioPuData();
-    const archiveLocation = await fixtures.GivenScenarioRunResultsFileWithLeastProjectsPu();
+    const archiveLocation =
+      await fixtures.GivenScenarioRunResultsFileWithLeastProjectsPu();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -114,13 +115,12 @@ const getFixtures = async () => {
       ]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioRunResultsPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioRunResultsPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const scenarioId = v4();
   const projectId = v4();
   const organizationId = v4();
@@ -278,10 +278,8 @@ const getFixtures = async () => {
       );
       const invalidScenarioRunResultsFileContent: ScenarioRunResultsContent = {
         blmResults: validScenarioRunResultsFileContent.blmResults,
-        marxanRunResults: validScenarioRunResultsFileContent.marxanRunResults.slice(
-          0,
-          1,
-        ),
+        marxanRunResults:
+          validScenarioRunResultsFileContent.marxanRunResults.slice(0, 1),
         outputSummaries: validScenarioRunResultsFileContent.outputSummaries,
       };
 

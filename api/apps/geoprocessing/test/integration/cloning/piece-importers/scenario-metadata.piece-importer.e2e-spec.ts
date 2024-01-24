@@ -12,7 +12,6 @@ import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/c
 import { BlmRange } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -26,6 +25,7 @@ import {
   GivenScenarioExists,
   GivenUserExists,
 } from '../fixtures';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 interface ScenarioSelectResult {
   name: string;
@@ -66,40 +66,47 @@ describe(ScenarioMetadataPieceImporter, () => {
 
   it('imports scenario metadata creating a new scenario (project import process)', async () => {
     const resourceKind = ResourceKind.Project;
-    await fixtures.GivenProject();
+    const costSurfaceId = v4();
+    await fixtures.GivenProject(costSurfaceId);
     await fixtures.GivenUser();
 
     const archiveLocation = await fixtures.GivenValidScenarioMetadataFile(
       resourceKind,
+      costSurfaceId,
     );
     const input = fixtures.GivenJobInput(archiveLocation, resourceKind);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenScenarioMetadataShouldBeImported();
+      .ThenScenarioMetadataShouldBeImported(costSurfaceId);
   });
 
   it('imports scenario metadata creating a new scenario with solutions locked (project import process)', async () => {
     const resourceKind = ResourceKind.Project;
     const solutionsAreLocked = true;
-    await fixtures.GivenProject();
+    const costSurfaceId = v4();
+    await fixtures.GivenProject(costSurfaceId);
+
     await fixtures.GivenUser();
 
     const archiveLocation = await fixtures.GivenValidScenarioMetadataFile(
       resourceKind,
+      costSurfaceId,
     );
     const input = fixtures.GivenJobInput(archiveLocation, resourceKind);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenScenarioMetadataShouldBeImported();
+      .ThenScenarioMetadataShouldBeImported(costSurfaceId);
   });
 
   it('imports scenario metadata updating an existing scenario (scenario cloning process)', async () => {
     const resourceKind = ResourceKind.Scenario;
-    await fixtures.GivenScenario();
+    const costSurfaceId = v4();
+    await fixtures.GivenScenario(costSurfaceId);
     await fixtures.GivenUser();
 
     const archiveLocation = await fixtures.GivenValidScenarioMetadataFile(
       resourceKind,
+      costSurfaceId,
     );
     const input = fixtures.GivenJobInput(
       archiveLocation,
@@ -107,17 +114,19 @@ describe(ScenarioMetadataPieceImporter, () => {
     );
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenScenarioMetadataShouldBeImported();
+      .ThenScenarioMetadataShouldBeImported(costSurfaceId);
   });
 
   it('imports scenario metadata updating an existing scenario with solutions locked (scenario cloning process)', async () => {
     const resourceKind = ResourceKind.Scenario;
     const solutionsAreLocked = true;
-    await fixtures.GivenScenario();
+    const costSurfaceId = v4();
+    await fixtures.GivenScenario(costSurfaceId);
     await fixtures.GivenUser();
 
     const archiveLocation = await fixtures.GivenValidScenarioMetadataFile(
       resourceKind,
+      costSurfaceId,
       solutionsAreLocked,
     );
     const input = fixtures.GivenJobInput(
@@ -126,7 +135,7 @@ describe(ScenarioMetadataPieceImporter, () => {
     );
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenScenarioMetadataShouldBeImported(solutionsAreLocked);
+      .ThenScenarioMetadataShouldBeImported(costSurfaceId, solutionsAreLocked);
   });
 });
 
@@ -140,13 +149,12 @@ const getFixtures = async () => {
       }),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioMetadataPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioMetadataPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const scenarioId = v4();
   const projectId = v4();
   const organizationId = v4();
@@ -161,8 +169,12 @@ const getFixtures = async () => {
   );
 
   const validScenarioMetadataFileContent: (
+    costSurfaceId: string,
     solutionsAreLocked: boolean,
-  ) => ScenarioMetadataContent = (solutionsAreLocked = false) => ({
+  ) => ScenarioMetadataContent = (
+    costSurfaceId: string,
+    solutionsAreLocked = false,
+  ) => ({
     name: `test scenario - ${scenarioId}`,
     description: 'scenario description',
     blm: 10,
@@ -174,7 +186,9 @@ const getFixtures = async () => {
     },
     ranAtLeastOnce: true,
     solutionsAreLocked,
+    projectScenarioId: 1,
     type: 'marxan',
+    cost_surface_id: costSurfaceId,
   });
 
   return {
@@ -188,15 +202,24 @@ const getFixtures = async () => {
       await DeleteUser(entityManager, userId);
     },
     GivenUser: () => GivenUserExists(entityManager, userId, projectId),
-    GivenProject: () => {
-      return GivenProjectExists(entityManager, projectId, organizationId);
+    GivenProject: (costSurfaceId: string) => {
+      return GivenProjectExists(
+        entityManager,
+        projectId,
+        organizationId,
+        {},
+        costSurfaceId,
+      );
     },
-    GivenScenario: () => {
+    GivenScenario: (costSurfaceId: string) => {
       return GivenScenarioExists(
         entityManager,
         scenarioId,
         projectId,
         organizationId,
+        {},
+        {},
+        costSurfaceId,
       );
     },
     GivenJobInput: (
@@ -235,6 +258,7 @@ const getFixtures = async () => {
     },
     GivenValidScenarioMetadataFile: async (
       resourceKind: ResourceKind,
+      costSurfaceId: string,
       solutionsAreLocked = false,
     ) => {
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
@@ -247,7 +271,9 @@ const getFixtures = async () => {
       const uriOrError = await fileRepository.saveCloningFile(
         exportId,
         Readable.from(
-          JSON.stringify(validScenarioMetadataFileContent(solutionsAreLocked)),
+          JSON.stringify(
+            validScenarioMetadataFileContent(costSurfaceId, solutionsAreLocked),
+          ),
         ),
         relativePath,
       );
@@ -266,13 +292,12 @@ const getFixtures = async () => {
           );
         },
         ThenScenarioMetadataShouldBeImported: async (
+          costSurfaceId: string,
           solutionsAreLocked = false,
         ) => {
           await sut.run(input);
 
-          const [scenario]: [
-            ScenarioSelectResult,
-          ] = await entityManager
+          const [scenario]: [ScenarioSelectResult] = await entityManager
             .createQueryBuilder()
             .select()
             .from('scenarios', 's')
@@ -280,6 +305,7 @@ const getFixtures = async () => {
             .execute();
 
           const validScenarioMetadataContent = validScenarioMetadataFileContent(
+            costSurfaceId,
             solutionsAreLocked,
           );
           expect(scenario.name).toEqual(validScenarioMetadataContent.name);
@@ -297,9 +323,7 @@ const getFixtures = async () => {
           expect(scenario.type).toEqual(validScenarioMetadataContent.type);
           expect(scenario.created_by).toEqual(userId);
 
-          const [blmRange]: [
-            BlmRange,
-          ] = await entityManager
+          const [blmRange]: [BlmRange] = await entityManager
             .createQueryBuilder()
             .select()
             .from('scenario_blms', 'pblms')

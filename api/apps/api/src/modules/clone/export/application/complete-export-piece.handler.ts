@@ -13,15 +13,15 @@ import { ExportRepository } from './export-repository.port';
 
 @CommandHandler(CompleteExportPiece)
 export class CompleteExportPieceHandler
-  implements IInferredCommandHandler<CompleteExportPiece> {
+  implements IInferredCommandHandler<CompleteExportPiece>
+{
+  private readonly logger: Logger = new Logger(CompleteExportPieceHandler.name);
+
   constructor(
     private readonly exportRepository: ExportRepository,
     private readonly eventPublisher: EventPublisher,
     private readonly eventBus: EventBus,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(CompleteExportPieceHandler.name);
-  }
+  ) {}
 
   async execute({
     exportId,
@@ -38,9 +38,8 @@ export class CompleteExportPieceHandler
           );
         }
 
-        const exportAggregate = this.eventPublisher.mergeObjectContext(
-          exportInstance,
-        );
+        const exportAggregate =
+          this.eventPublisher.mergeObjectContext(exportInstance);
 
         const result = exportAggregate.completeComponent(
           componentId,

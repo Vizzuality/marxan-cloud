@@ -6,7 +6,7 @@ import {
   LegacyProjectImportFilesRepository,
   LegacyProjectImportStoragePath,
 } from '@marxan/legacy-project-import';
-import { Logger, Module, Scope } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfig } from '../../../utils/config.utils';
@@ -30,6 +30,7 @@ import { MarkLegacyProjectImportPieceAsFailedHandler } from './mark-legacy-proje
 import { RunLegacyProjectImportHandler } from './run-legacy-project-import.handler';
 import { StartLegacyProjectImportHandler } from './start-legacy-project-import.handler';
 import { UpdateSolutionsAreLockedHandler } from './update-solutions-are-locked-to-legacy-project-import.handler';
+import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { UpdateSolutionsAreLockedHandler } from './update-solutions-are-locked-t
     ]),
     LegacyProjectImportRepositoryModule,
     SpecificationModule,
+    CostSurfaceModule,
   ],
   providers: [
     {
@@ -75,7 +77,6 @@ import { UpdateSolutionsAreLockedHandler } from './update-solutions-are-locked-t
     CancelLegacyProjectImportHandler,
     MarkLegacyProjectImportAsCanceledHandler,
     UpdateSolutionsAreLockedHandler,
-    { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })
 export class LegacyProjectImportApplicationModule {}

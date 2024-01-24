@@ -14,6 +14,7 @@ export type ProjectMetadataContent = {
   blmRange: BlmRange;
   metadata?: Record<string, unknown>;
   sources: ProjectSourcesEnum;
+  outputSummaryZip?: string;
 };
 
 export const projectMetadataRelativePath = 'project-metadata.json';

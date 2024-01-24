@@ -36,6 +36,10 @@ interface ProjectsPuSelectResult {
 @Injectable()
 @PieceImportProvider()
 export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioRunResultsPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
@@ -45,10 +49,7 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
       geoprocessingConnections.apiDB.name,
     )
     private readonly outputSummariesRepo: Repository<ScenariosOutputResultsApiEntity>,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioRunResultsPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return piece === ClonePiece.ScenarioRunResults;

@@ -35,10 +35,8 @@ export class PlanningUnitsFilters {
 @Injectable()
 export class PlanningUnitsService {
   private readonly logger: Logger = new Logger(PlanningUnitsService.name);
-  constructor(
-    @Inject(TileService)
-    private readonly tileService: TileService,
-  ) {}
+
+  constructor(private readonly tileService: TileService) {}
 
   /**
    * @todo findTile for entity:(already created grid for a scenario with join options of other entities)
@@ -51,13 +49,8 @@ export class PlanningUnitsService {
     tileSpecification: tileSpecification,
     filters?: PlanningUnitsFilters,
   ): Promise<Buffer> {
-    const {
-      z,
-      x,
-      y,
-      planningUnitGridShape,
-      planningUnitAreakm2,
-    } = tileSpecification;
+    const { z, x, y, planningUnitGridShape, planningUnitAreakm2 } =
+      tileSpecification;
 
     const inputProjection = 3857;
 
@@ -82,6 +75,7 @@ export class PlanningUnitsService {
       customQuery,
     });
   }
+
   /**
    * @param x x param of a tiler system
    * @param y y param of a tiler system
@@ -100,9 +94,8 @@ export class PlanningUnitsService {
     filters?: PlanningUnitsFilters,
   ): string {
     const gridShapeFn = gridShapeFnMapping[planningUnitGridShape];
-    const gridSize = calculateGridSize[planningUnitGridShape](
-      planningUnitAreakm2,
-    );
+    const gridSize =
+      calculateGridSize[planningUnitGridShape](planningUnitAreakm2);
     // 156412 references to m per pixel at z level 0 at the equator in EPSG:3857
     const ratioPixelExtent = gridSize / (156412 / 2 ** z);
     /**
@@ -121,6 +114,7 @@ export class PlanningUnitsService {
 
     return query;
   }
+
   /**
    * @param filters including only bounding box of the area where the grids would be generated
    *

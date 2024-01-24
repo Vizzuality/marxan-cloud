@@ -1,8 +1,7 @@
 import React from 'react';
 
-import PublishedItem from 'layout/community/published-projects/list/table/item';
-
 import Icon from 'components/icon';
+import PublishedItem from 'layout/community/published-projects/list/table/item';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -16,25 +15,28 @@ export const CommunityProjectsTable: React.FC<CommunityProjectsTableProps> = ({
   if (!data || !data.length) return null;
 
   return (
-    <table className="w-full mt-10">
+    <table className="mt-10 w-full">
       <thead>
         <tr>
           <th className="py-2.5 pr-16 font-normal">
-            <h4 className="text-sm text-left whitespace-nowrap">Location</h4>
+            <h4 className="whitespace-nowrap text-left text-sm">Location</h4>
           </th>
-          <th className="py-2.5 pr-16 font-normal w-full">
-            <h4 className="text-sm text-left whitespace-nowrap">Name</h4>
-          </th>
-          <th className="py-2.5 pr-16 font-normal">
-            <h4 className="text-sm text-left whitespace-nowrap">Creator</h4>
+          <th className="w-full py-2.5 pr-16 font-normal">
+            <h4 className="whitespace-nowrap text-left text-sm">Name</h4>
           </th>
           <th className="py-2.5 pr-16 font-normal">
-            <h4 className="text-sm text-left whitespace-nowrap">Location</h4>
+            <h4 className="whitespace-nowrap text-left text-sm">Creator</h4>
+          </th>
+          <th className="py-2.5 pr-16 font-normal">
+            <h4 className="whitespace-nowrap text-left text-sm">Location</h4>
           </th>
           <th className="py-2.5 font-normal">
             <div className="flex flex-row">
-              <h4 className="text-sm text-left whitespace-nowrap">Copy to my account</h4>
-              <Icon icon={ARROW_DOWN_SVG} className="w-3.5 h-3.5 ml-2 text-white transform rotate-90" />
+              <h4 className="whitespace-nowrap text-left text-sm">Copy to my account</h4>
+              <Icon
+                icon={ARROW_DOWN_SVG}
+                className="ml-2 h-3.5 w-3.5 rotate-90 transform text-white"
+              />
             </div>
           </th>
         </tr>
@@ -43,7 +45,15 @@ export const CommunityProjectsTable: React.FC<CommunityProjectsTableProps> = ({
       <tbody>
         {data.map((pp) => {
           const {
-            id: pid, name, description, creators, resources, company, pngData, location, exportId,
+            id: pid,
+            name,
+            description,
+            creators,
+            resources,
+            company,
+            pngData,
+            location,
+            exportId,
           } = pp;
 
           return (

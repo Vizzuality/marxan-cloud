@@ -1,7 +1,8 @@
 import React, { ButtonHTMLAttributes } from 'react';
 
 import chroma from 'chroma-js';
-import cx from 'classnames';
+
+import { cn } from 'utils/cn';
 
 const SIZE = {
   s: 'h-8 w-8',
@@ -28,16 +29,17 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <div
-      className={cx({
-        'relative z-0 hover:z-10 flex items-center justify-center bg-transparent bg-cover bg-no-repeat bg-center border-2 border-gray-700 rounded-full focus:outline-none': true,
+      className={cn({
+        'relative z-0 flex items-center justify-center rounded-full border-2 border-gray-800 bg-transparent bg-cover bg-center bg-no-repeat hover:z-10 focus:outline-none':
+          true,
         'text-white': contrast > 2.5,
         'text-black': contrast < 2.5,
         [SIZE[size]]: true,
         [className]: !!className,
       })}
       style={{
-        ...bgImage && { backgroundImage: `url(${bgImage})` },
-        ...bgColor && { backgroundColor: bgColor },
+        ...(bgImage && { backgroundImage: `url(${bgImage})` }),
+        ...(bgColor && { backgroundColor: bgColor }),
       }}
     >
       {children}

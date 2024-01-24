@@ -8,7 +8,7 @@ export function useProjectRole(projectId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
 
-  const meId = me?.data?.id;
+  const meId = me?.id;
 
   const projectRole = projectUsers?.find((r) => r.user.id === meId)?.roleName;
 
@@ -23,7 +23,7 @@ export function useOwnsProject(projectId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
 
-  const meId = me?.data?.id;
+  const meId = me?.id;
 
   const isOwner = projectUsers?.find((r) => r.user.id === meId)?.roleName === 'project_owner';
 
@@ -36,7 +36,7 @@ export function useCanEditProject(projectId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
 
-  const meId = me?.data?.id;
+  const meId = me?.id;
 
   const editorRoles = ['project_owner', 'project_contributor'];
 
@@ -53,7 +53,7 @@ export function useOwnsScenario(projectId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
 
-  const meId = me?.data?.id;
+  const meId = me?.id;
 
   const isOwner = projectUsers?.find((r) => r.user.id === meId)?.roleName === 'project_owner';
 
@@ -67,7 +67,7 @@ export function useCanEditScenario(projectId, scenarioId) {
   const { data: projectUsers } = useProjectUsers(projectId);
   const isLockMe = useScenarioLockMe(scenarioId);
 
-  const meId = me?.data?.id;
+  const meId = me?.id;
 
   const editorRoles = ['project_owner', 'project_contributor'];
 

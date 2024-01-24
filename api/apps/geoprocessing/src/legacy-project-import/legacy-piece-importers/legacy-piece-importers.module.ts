@@ -8,7 +8,8 @@ import {
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import { FilesModule, ShapefilesModule } from '@marxan/shapefile-converter';
-import { HttpModule, Logger, Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScenarioFeaturesModule } from '../../marxan-sandboxed-runner/adapters-single/solutions-output/geo-output/scenario-features/scenario-features.module';
 import { SolutionsReaderService } from '../../marxan-sandboxed-runner/adapters-single/solutions-output/geo-output/solutions/output-file-parsing/solutions-reader.service';

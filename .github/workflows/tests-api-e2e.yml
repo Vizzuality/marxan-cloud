@@ -1,0 +1,62 @@
+name: Tests - API e2e tests
+on:
+  push:
+    paths:
+      - 'api/**'
+      - 'geoprocessing/**'
+      - '.github/**'
+  workflow_dispatch:
+
+jobs:
+
+  test-api-e2e:
+    name: E2E tests - API
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        test-suite:
+          - 'access-control'
+          - 'api-events'
+          - 'async-jobs-garbage-collector'
+          - 'business-critical'
+          - 'calculate-pu-protection-level'
+          - 'cloning'
+          - 'files-repository'
+          - 'geo-features'
+          - 'implicit-permissions'
+          - 'integration'
+          - 'legacy-project-import'
+          - 'projects/blm-calibration'
+          - 'projects/crud'
+          - 'projects/project-feature-tags'
+          - 'projects/user-projects'
+          - 'projects/cost-surfaces'
+          - 'projects/project-cloning'
+          - 'projects/project-scenario-comparison'
+          - 'projects/project-summaries'
+          - 'projects/published-projects'
+          - 'project-jobs-status'
+          - 'project-planning-areas-tiles'
+          - 'project-planning-units'
+          - 'project-protected-areas'
+          - 'scenario-cost-template'
+          - 'scenario-difference-map-tiles'
+          - 'scenario-features'
+          - 'scenario-input-files'
+          - 'scenario-locks'
+          - 'scenario-protected-areas'
+          - 'scenario-pu-change'
+          - 'scenario-run-results'
+          - 'scenarios'
+          - 'scenario-solutions'
+          - 'scenarios-pu-data'
+          - 'upload-feature'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run CI tests via make task
+        run: TEST_SUITE_PATH="${{ matrix.test-suite }}" make test-e2e-api environment=ci

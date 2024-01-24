@@ -17,7 +17,7 @@ type FeatureData = {
   the_geom: string;
   properties: Record<string, string | number>;
   source: GeometrySource;
-  amount_from_legacy_project: number | null;
+  amount: number | null;
   projectPuPuid: number | undefined;
 };
 
@@ -30,6 +30,7 @@ export type ProjectCustomFeature = {
   creation_status: JobStatus;
   list_property_keys: string[];
   is_legacy: boolean;
+  tag: string;
   data: FeatureData[];
 };
 

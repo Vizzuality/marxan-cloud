@@ -29,7 +29,7 @@ export const getFixtures = async () => {
   const projectId = v4();
   return {
     cleanup: async () => {
-      const projectPus = await projectsPuRepo.find({ projectId });
+      const projectPus = await projectsPuRepo.find({ where: { projectId } });
 
       await puGeoRepo.delete({
         id: In(projectPus.map((pu) => pu.geomId)),
@@ -138,11 +138,20 @@ export const getFixtures = async () => {
         },
       });
       expect(pa?.bbox).toEqual([
-        20.752019662388175,
-        14.905718900381117,
-        -17.234315429826474,
+        20.752019662388175, 14.905718900381117, -17.234315429826474,
         -22.6302376121737,
       ]);
+    },
+    async ThenThePUCostOfThatPlanningAreaIsCreated(planingAreaId: string) {
+      const costForPlanningArea = await puGeoRepo.query(
+        `select * from cost_surface_pu_data join projects_pu pp on cost_surface_pu_data.projects_pu_id = pp.id where pp.planning_area_id = $1`,
+        [planingAreaId],
+      );
+      const pusForProject = await projectsPuRepo.query(
+        `select * from projects_pu where planning_area_id = $1`,
+        [planingAreaId],
+      );
+      expect(costForPlanningArea.length).toEqual(pusForProject.length);
     },
   };
 };

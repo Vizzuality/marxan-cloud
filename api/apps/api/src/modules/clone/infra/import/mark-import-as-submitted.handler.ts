@@ -8,7 +8,12 @@ import { MarkImportAsSubmitted } from './mark-import-as-submitted.command';
 
 @CommandHandler(MarkImportAsSubmitted)
 export class MarkImportAsSubmittedHandler
-  implements IInferredCommandHandler<MarkImportAsSubmitted> {
+  implements IInferredCommandHandler<MarkImportAsSubmitted>
+{
+  private readonly logger: Logger = new Logger(
+    MarkImportAsSubmittedHandler.name,
+  );
+
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__import__submitted__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__import__submitted__v1__alpha,
@@ -17,10 +22,7 @@ export class MarkImportAsSubmittedHandler
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly importRepository: ImportRepository,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(MarkImportAsSubmittedHandler.name);
-  }
+  ) {}
 
   async execute({ importId }: MarkImportAsSubmitted): Promise<void> {
     const importInstance = await this.importRepository.find(importId);

@@ -2,31 +2,33 @@ import stringEntropy from 'fast-password-entropy';
 import type { FieldValidator, FieldState } from 'final-form';
 import validate from 'validate.js';
 
-export const composeValidators = (validations: any[]) => (
-  value: unknown,
-  allValues: Record<string, unknown>,
-  meta?: FieldState<unknown>,
-): FieldValidator<unknown>[] => {
-  if (validations) {
-    const errors = validations.map((validator: unknown) => {
-      if (typeof validator === 'function') {
-        return validator(value, allValues, meta);
+export const composeValidators =
+  (validations: any[]) =>
+  (
+    value: unknown,
+    allValues: Record<string, unknown>,
+    meta?: FieldState<unknown>
+  ): FieldValidator<unknown>[] => {
+    if (validations) {
+      const errors = validations.map((validator: unknown) => {
+        if (typeof validator === 'function') {
+          return validator(value, allValues, meta);
+        }
+
+        if (validator) {
+          return validate.single(value, validator);
+        }
+
+        return undefined;
+      }, []);
+
+      if (errors.some((e) => !!e)) {
+        return errors;
       }
-
-      if (validator) {
-        return validate.single(value, validator);
-      }
-
-      return undefined;
-    }, []);
-
-    if (errors.some((e) => !!e)) {
-      return errors;
     }
-  }
 
-  return undefined;
-};
+    return undefined;
+  };
 
 export const booleanValidator = (value) => {
   if (!value) return 'Error';

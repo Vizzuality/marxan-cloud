@@ -1,33 +1,54 @@
-import { getSession } from 'next-auth/client';
+import { AxiosResponse, isAxiosError } from 'axios';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 import PROJECTS from 'services/projects';
 
-export default async function handler(req, res) {
-  const session = await getSession({ req });
+interface PublishProjectBody {
+  name: string;
+  description: string;
+  location: string;
+  creators: {
+    avatarDataUrl: string;
+    displayName: string;
+    id: string;
+    roleName: string;
+  }[];
+  // todo: improve typing of resources
+  resources: object[];
+  featuredScenarioId: string;
+  company: string;
+  config: {
+    baseUrl: string;
+  };
+}
 
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const baseUrl = process.env.NEXT_PUBLIC_URL || req.headers.origin;
-
-  const { pid } = req.query;
+  const { pid } = req.query as { pid: string };
 
   try {
-    await PROJECTS.request({
-      method: 'POST',
-      url: `${pid}/publish`,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'application/json',
-        Cookie: req?.headers?.cookie,
-      },
-      data: {
-        ...req.body,
+    await PROJECTS.post<unknown, AxiosResponse<unknown>, PublishProjectBody>(
+      `${pid}/publish`,
+      {
+        ...(req.body as PublishProjectBody),
         config: {
           baseUrl,
         },
       },
-    });
+      {
+        headers: {
+          ...(req?.headers?.authorization && { Authorization: req.headers.authorization }),
+          'Content-Type': 'application/json',
+          Cookie: req?.headers?.cookie,
+        },
+      }
+    );
   } catch (error) {
-    res.status(error.response.status).send(error.response.statusText);
-    return;
+    if (isAxiosError(error)) {
+      return res.status(error.response.status).send(error.response.statusText);
+    }
+
+    return res.status(500).send((error as Error).message);
   }
 
   res.status(200).send({});

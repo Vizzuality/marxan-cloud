@@ -59,9 +59,8 @@ export class UserCommand {
       }
     });
 
-    const user: Partial<User> = await this.authenticationService.createCLIUser(
-      newUser,
-    );
+    const user: Partial<User> =
+      await this.authenticationService.createCLIUser(newUser);
 
     console.log(
       `User account created. You can now login using '${user.email}' and your password.`,

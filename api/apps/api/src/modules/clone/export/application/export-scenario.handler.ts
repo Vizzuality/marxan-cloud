@@ -17,7 +17,8 @@ import {
 
 @CommandHandler(ExportScenario)
 export class ExportScenarioHandler
-  implements IInferredCommandHandler<ExportScenario> {
+  implements IInferredCommandHandler<ExportScenario>
+{
   constructor(
     private readonly resourcePieces: ExportResourcePieces,
     private readonly exportRepository: ExportRepository,
@@ -30,13 +31,17 @@ export class ExportScenarioHandler
     existingScenarioId: string,
     newScenarioId: string,
   ) {
-    const scenario = await this.scenarioRepo.findOneOrFail(existingScenarioId);
+    const scenario = await this.scenarioRepo.findOneOrFail({
+      where: { id: existingScenarioId },
+    });
     await this.scenarioRepo.save({
       id: newScenarioId,
       name: scenario.name + ' - copy',
       projectId: scenario.projectId,
       metadata: scenario.metadata,
+      costSurfaceId: scenario.costSurfaceId,
     });
+    // No need to inform projectScenarioId, because it will be generated automatically by the trigger
   }
 
   async execute({

@@ -29,7 +29,9 @@ export class ScenarioCheckerFake implements ScenarioChecker {
   async hasPendingBlmCalibration(
     scenarioId: string,
   ): Promise<Either<ScenarioDoesntExist, boolean>> {
-    const scenario = await this.scenarioRepo.findOne(scenarioId);
+    const scenario = await this.scenarioRepo.findOne({
+      where: { id: scenarioId },
+    });
     if (!scenario) return left(scenarioDoesntExist);
 
     return right(this.scenarioWithPendingBlmCalibration.includes(scenarioId));
@@ -38,7 +40,9 @@ export class ScenarioCheckerFake implements ScenarioChecker {
   async hasPendingMarxanRun(
     scenarioId: string,
   ): Promise<Either<ScenarioDoesntExist, boolean>> {
-    const scenario = await this.scenarioRepo.findOne(scenarioId);
+    const scenario = await this.scenarioRepo.findOne({
+      where: { id: scenarioId },
+    });
     if (!scenario) return left(scenarioDoesntExist);
 
     return right(this.scenarioWithPendingMarxanRun.includes(scenarioId));
@@ -47,7 +51,9 @@ export class ScenarioCheckerFake implements ScenarioChecker {
   async hasPendingImport(
     scenarioId: string,
   ): Promise<Either<ScenarioDoesntExist, boolean>> {
-    const scenario = await this.scenarioRepo.findOne(scenarioId);
+    const scenario = await this.scenarioRepo.findOne({
+      where: { id: scenarioId },
+    });
     if (!scenario) return left(scenarioDoesntExist);
 
     return right(this.scenarioWithPendingImports.includes(scenarioId));
@@ -56,7 +62,9 @@ export class ScenarioCheckerFake implements ScenarioChecker {
   async hasPendingExport(
     scenarioId: string,
   ): Promise<Either<ScenarioDoesntExist, boolean>> {
-    const scenario = await this.scenarioRepo.findOne(scenarioId);
+    const scenario = await this.scenarioRepo.findOne({
+      where: { id: scenarioId },
+    });
     if (!scenario) return left(scenarioDoesntExist);
 
     return right(this.scenarioWithPendingExports.includes(scenarioId));

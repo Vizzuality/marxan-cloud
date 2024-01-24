@@ -11,7 +11,8 @@ import { ClonePiece } from './domain/clone-piece';
 
 @ValidatorConstraint()
 export class IsExportConfigPiecesConstraint
-  implements ValidatorConstraintInterface {
+  implements ValidatorConstraintInterface
+{
   public async validate(value: any) {
     const validations: boolean[] = [];
 

@@ -1,11 +1,7 @@
-import React from 'react';
-
 import { withProtection, withUser } from 'hoc/auth';
 
-import Header from 'layout/header';
-import Help from 'layout/help/button';
-import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
+import ProjectLayout from 'layout/project';
 import ProjectsList from 'layout/projects/all/list';
 import ProjectsToolbar from 'layout/projects/all/toolbar';
 import ProjectsWelcome from 'layout/projects/all/welcome';
@@ -14,23 +10,16 @@ import ProjectTitle from 'layout/title/project-title';
 
 export const getServerSideProps = withProtection(withUser());
 
-const ProjectsPage: React.FC = () => {
+const ProjectsPage = (): JSX.Element => {
   return (
     <Protected>
       <ProjectTitle title="" />
-
       <MetaIcons />
-
-      <main>
-        <Header size="base" />
-
+      <ProjectLayout className="h-fit w-full flex-col">
         <ProjectsWelcome />
         <ProjectsToolbar />
         <ProjectsList />
-
-        <DocumentationLink />
-        <Help />
-      </main>
+      </ProjectLayout>
     </Protected>
   );
 };

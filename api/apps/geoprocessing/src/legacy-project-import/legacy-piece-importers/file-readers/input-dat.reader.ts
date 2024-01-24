@@ -60,9 +60,10 @@ export class InputDatReader {
     inputDat.forEach(([variableName, stringValue]) => {
       const isKey = this.isKeyInInputDatFile(variableName);
       if (!isKey) return;
-      const value = this.variablesTransfromer[
-        variableName as keyof MarxanParameters
-      ](stringValue);
+      const value =
+        this.variablesTransfromer[variableName as keyof MarxanParameters](
+          stringValue,
+        );
       marxanParameters[variableName] = value;
     });
     return marxanParameters;

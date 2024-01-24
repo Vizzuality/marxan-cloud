@@ -11,6 +11,7 @@
 # next.js
 /.next/
 /out/
+next-env.d.ts
 
 # production
 /build
@@ -25,19 +26,28 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 
 # vercel
 .vercel
 
-# cypress
-/cypress/screenshots
-/cypress/videos
+# Yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
-# storybook
-storybook-static
+
+# TypeScript
+tsconfig.tsbuildinfo
 
 report.*
+
+# e2e testing
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/e2e/.auth

@@ -14,15 +14,18 @@ import {
   StartLegacyProjectImport,
   StartLegacyProjectImportResponse,
 } from './start-legacy-project-import.command';
+import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
 @CommandHandler(StartLegacyProjectImport)
 export class StartLegacyProjectImportHandler
-  implements IInferredCommandHandler<StartLegacyProjectImport> {
+  implements IInferredCommandHandler<StartLegacyProjectImport>
+{
   constructor(
     @InjectRepository(Project)
     private readonly projectRepo: Repository<Project>,
     @InjectRepository(Scenario)
     private readonly scenarioRepo: Repository<Scenario>,
+    private readonly costSurfaceService: CostSurfaceService,
     @InjectRepository(Organization)
     private readonly organizationRepo: Repository<Organization>,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
@@ -50,10 +53,16 @@ export class StartLegacyProjectImportHandler
         description,
       });
 
+      const costSurface =
+        await this.costSurfaceService.createDefaultCostSurfaceForProject(
+          project.id,
+        );
+
       const scenarioName = name + ' - scenario';
       const scenario = await this.scenarioRepo.save({
         name: scenarioName,
         projectId: project.id,
+        costSurfaceId: costSurface.id,
       });
 
       return right({
@@ -86,9 +95,8 @@ export class StartLegacyProjectImportHandler
       ownerId,
     );
 
-    const legacyProjectImportSavedOrError = await this.legacyProjectImportRepository.save(
-      legacyProjectImport,
-    );
+    const legacyProjectImportSavedOrError =
+      await this.legacyProjectImportRepository.save(legacyProjectImport);
 
     if (isLeft(legacyProjectImportSavedOrError))
       return legacyProjectImportSavedOrError;

@@ -48,6 +48,17 @@ test(`returns full query with all parameters`, async () => {
   // then
   expect(fixPrettierQuirk(query.query)).toEqual(`
       with inserted_sfp as (
+        with total_amounts as (
+          select feature_id, SUM(amount) as total_amount from feature_amounts_per_planning_unit
+          where feature_id = $3
+          group by feature_id
+        ),
+        protected_amounts as (
+          select spd.scenario_id, fappu.feature_id, SUM(fappu.amount) as protected_amount
+          from scenarios_pu_data spd inner join feature_amounts_per_planning_unit fappu on fappu.project_pu_id = spd.project_pu_id
+          where spd.lockin_status = 1 and fappu.feature_id = $3 and spd.scenario_id = $4
+          group by spd.scenario_id, fappu.feature_id
+        )
         insert into scenario_features_preparation as sfp (feature_class_id,
                                                           api_feature_id,
                                                           scenario_id,
@@ -65,17 +76,8 @@ test(`returns full query with all parameters`, async () => {
                  $6,
                  $7,
                  $8,
-                 coalesce(areas_cache.total_area, st_area(st_transform(st_intersection(pa.the_geom, fd.the_geom), 3410))),
-                 coalesce(areas_cache.current_pa, st_area(st_transform(st_intersection(st_intersection(pa.the_geom, fd.the_geom), (
-                 select st_union(wdpa.the_geom) as area
-                 from wdpa where st_intersects(st_makeenvelope(
-                  $9,
-                  $11,
-                  $10,
-                  $12,
-                  4326
-                ), wdpa.the_geom) and wdpa.id in ($13::uuid, $14::uuid)
-            )),3410))),
+                 (select total_amount from total_amounts ta where ta.feature_id = $3),
+                 (select protected_amount from protected_amounts pa where pa.feature_id = $3 and pa.scenario_id = $4) ,
                  md5hash
           from features_data as fd
           inner join (
@@ -83,27 +85,26 @@ test(`returns full query with all parameters`, async () => {
             FROM feature_properties_kv fpkv
             WHERE feature_id = $1
             and fpkv.key = $2
-            and trim('"' FROM fpkv.value::text) = trim('"' FROM $15::text)
+            and trim('"' FROM fpkv.value::text) = trim('"' FROM $9::text)
             ) sfpkv
             ON sfpkv.feature_data_id = fd.id
-          left join planning_area_table as pa on pa.id = $16
+          left join planning_area_table as pa on pa.id = $10
 
         cross join md5(
                 pa.hash || '|' || fd.id || '|' ||
-                $9::double precision || '|' ||
                 $11::double precision || '|' ||
-                $10::double precision || '|' ||
-                $12::double precision
-                || '|' ||$13::text ||  $14::text
+                $13::double precision || '|' ||
+                $12::double precision || '|' ||
+                $14::double precision
+                || '|' ||$15::text ||  $16::text
             ) as md5hash
 
-          left join areas_cache on areas_cache.hash = md5hash
           where feature_id = $1
           and st_intersects(st_makeenvelope(
-          $9,
           $11,
-          $10,
-          $12, 4326), fd.the_geom)
+          $13,
+          $12,
+          $14, 4326), fd.the_geom)
           returning sfp.id as id, sfp.hash as hash, sfp.total_area as total_area, sfp.current_pa as current_pa
       ), inserted_cache as (
           insert into areas_cache (hash, total_area, current_pa)
@@ -121,14 +122,14 @@ test(`returns full query with all parameters`, async () => {
     0.2,
     1,
     0.3,
+    'random value',
+    'planning-area-id',
     1,
     2,
     3,
     4,
     'wdpa1',
     'wdpa2',
-    'random value',
-    'planning-area-id',
   ]);
 });
 
@@ -161,6 +162,17 @@ test(`returns full query with no wdpa`, async () => {
   expect(fixPrettierQuirk(query.query)).toEqual(
     `
       with inserted_sfp as (
+        with total_amounts as (
+          select feature_id, SUM(amount) as total_amount from feature_amounts_per_planning_unit
+          where feature_id = $3
+          group by feature_id
+        ),
+        protected_amounts as (
+          select spd.scenario_id, fappu.feature_id, SUM(fappu.amount) as protected_amount
+          from scenarios_pu_data spd inner join feature_amounts_per_planning_unit fappu on fappu.project_pu_id = spd.project_pu_id
+          where spd.lockin_status = 1 and fappu.feature_id = $3 and spd.scenario_id = $4
+          group by spd.scenario_id, fappu.feature_id
+        )
         insert into scenario_features_preparation as sfp (feature_class_id,
                                                           api_feature_id,
                                                           scenario_id,
@@ -178,8 +190,8 @@ test(`returns full query with no wdpa`, async () => {
                  $6,
                  $7,
                  $8,
-                 coalesce(areas_cache.total_area, st_area(st_transform(st_intersection(pa.the_geom, fd.the_geom), 3410))),
-                 coalesce(areas_cache.current_pa, NULL),
+                 (select total_amount from total_amounts ta where ta.feature_id = $3),
+                 (select protected_amount from protected_amounts pa where pa.feature_id = $3 and pa.scenario_id = $4) ,
                  md5hash
           from features_data as fd
           inner join (
@@ -201,7 +213,6 @@ test(`returns full query with no wdpa`, async () => {
 
             ) as md5hash
 
-          left join areas_cache on areas_cache.hash = md5hash
           where feature_id = $1
           and st_intersects(st_makeenvelope(
           $11,
@@ -218,22 +229,6 @@ test(`returns full query with no wdpa`, async () => {
   );
   // and
   expect(query.parameters).toMatchInlineSnapshot(
-    [
-      'parent-feature-id',
-      'key 1',
-      'input-base-feature-id',
-      'scenario-id-1',
-      'specification-id-1',
-      0.2,
-      1,
-      0.3,
-      'random value',
-      'planning-area-id',
-      1,
-      2,
-      3,
-      4,
-    ],
     `
     Array [
       "parent-feature-id",
@@ -284,6 +279,17 @@ test(`returns full query with no planning area location`, async () => {
   expect(fixPrettierQuirk(query.query)).toEqual(
     `
       with inserted_sfp as (
+        with total_amounts as (
+          select feature_id, SUM(amount) as total_amount from feature_amounts_per_planning_unit
+          where feature_id = $3
+          group by feature_id
+        ),
+        protected_amounts as (
+          select spd.scenario_id, fappu.feature_id, SUM(fappu.amount) as protected_amount
+          from scenarios_pu_data spd inner join feature_amounts_per_planning_unit fappu on fappu.project_pu_id = spd.project_pu_id
+          where spd.lockin_status = 1 and fappu.feature_id = $3 and spd.scenario_id = $4
+          group by spd.scenario_id, fappu.feature_id
+        )
         insert into scenario_features_preparation as sfp (feature_class_id,
                                                           api_feature_id,
                                                           scenario_id,
@@ -301,17 +307,8 @@ test(`returns full query with no planning area location`, async () => {
                  $6,
                  $7,
                  $8,
-                 coalesce(areas_cache.total_area, NULL),
-                 coalesce(areas_cache.current_pa, st_area(st_transform(st_intersection(st_intersection(pa.the_geom, fd.the_geom), (
-                 select st_union(wdpa.the_geom) as area
-                 from wdpa where st_intersects(st_makeenvelope(
-                  $9,
-                  $11,
-                  $10,
-                  $12,
-                  4326
-                ), wdpa.the_geom) and wdpa.id in ($13::uuid, $14::uuid)
-            )),3410))),
+                 (select total_amount from total_amounts ta where ta.feature_id = $3),
+                 (select protected_amount from protected_amounts pa where pa.feature_id = $3 and pa.scenario_id = $4) ,
                  md5hash
           from features_data as fd
           inner join (
@@ -319,27 +316,26 @@ test(`returns full query with no planning area location`, async () => {
             FROM feature_properties_kv fpkv
             WHERE feature_id = $1
             and fpkv.key = $2
-            and trim('"' FROM fpkv.value::text) = trim('"' FROM $15::text)
+            and trim('"' FROM fpkv.value::text) = trim('"' FROM $9::text)
             ) sfpkv
             ON sfpkv.feature_data_id = fd.id
 
 
         cross join md5(
                  fd.id || '|' ||
-                $9::double precision || '|' ||
-                $11::double precision || '|' ||
                 $10::double precision || '|' ||
-                $12::double precision
-                || '|' ||$13::text ||  $14::text
+                $12::double precision || '|' ||
+                $11::double precision || '|' ||
+                $13::double precision
+                || '|' ||$14::text ||  $15::text
             ) as md5hash
 
-          left join areas_cache on areas_cache.hash = md5hash
           where feature_id = $1
           and st_intersects(st_makeenvelope(
-          $9,
-          $11,
           $10,
-          $12, 4326), fd.the_geom)
+          $12,
+          $11,
+          $13, 4326), fd.the_geom)
           returning sfp.id as id, sfp.hash as hash, sfp.total_area as total_area, sfp.current_pa as current_pa
       ), inserted_cache as (
           insert into areas_cache (hash, total_area, current_pa)
@@ -358,13 +354,13 @@ test(`returns full query with no planning area location`, async () => {
     0.2,
     1,
     0.3,
+    'random value',
     1,
     2,
     3,
     4,
     'wdpa1',
     'wdpa2',
-    'random value',
   ]);
 });
 
@@ -391,6 +387,17 @@ test(`returns full query when feature is not derived`, async () => {
   // then
   expect(fixPrettierQuirk(query.query)).toEqual(`
       with inserted_sfp as (
+        with total_amounts as (
+          select feature_id, SUM(amount) as total_amount from feature_amounts_per_planning_unit
+          where feature_id = $1
+          group by feature_id
+        ),
+        protected_amounts as (
+          select spd.scenario_id, fappu.feature_id, SUM(fappu.amount) as protected_amount
+          from scenarios_pu_data spd inner join feature_amounts_per_planning_unit fappu on fappu.project_pu_id = spd.project_pu_id
+          where spd.lockin_status = 1 and fappu.feature_id = $1 and spd.scenario_id = $2
+          group by spd.scenario_id, fappu.feature_id
+        )
         insert into scenario_features_preparation as sfp (feature_class_id,
                                                           api_feature_id,
                                                           scenario_id,
@@ -408,38 +415,28 @@ test(`returns full query when feature is not derived`, async () => {
                  $4,
                  $5,
                  $6,
-                 coalesce(areas_cache.total_area, st_area(st_transform(st_intersection(pa.the_geom, fd.the_geom), 3410))),
-                 coalesce(areas_cache.current_pa, st_area(st_transform(st_intersection(st_intersection(pa.the_geom, fd.the_geom), (
-                 select st_union(wdpa.the_geom) as area
-                 from wdpa where st_intersects(st_makeenvelope(
-                  $7,
-                  $9,
-                  $8,
-                  $10,
-                  4326
-                ), wdpa.the_geom) and wdpa.id in ($11::uuid, $12::uuid)
-            )),3410))),
+                 (select total_amount from total_amounts ta where ta.feature_id = $1),
+                 (select protected_amount from protected_amounts pa where pa.feature_id = $1 and pa.scenario_id = $2) ,
                  md5hash
           from features_data as fd
 
-          left join planning_area_table as pa on pa.id = $13
+          left join planning_area_table as pa on pa.id = $7
 
         cross join md5(
                 pa.hash || '|' || fd.id || '|' ||
-                $7::double precision || '|' ||
-                $9::double precision || '|' ||
                 $8::double precision || '|' ||
-                $10::double precision
-                || '|' ||$11::text ||  $12::text
+                $10::double precision || '|' ||
+                $9::double precision || '|' ||
+                $11::double precision
+                || '|' ||$12::text ||  $13::text
             ) as md5hash
 
-          left join areas_cache on areas_cache.hash = md5hash
           where feature_id = $1
           and st_intersects(st_makeenvelope(
-          $7,
-          $9,
           $8,
-          $10, 4326), fd.the_geom)
+          $10,
+          $9,
+          $11, 4326), fd.the_geom)
           returning sfp.id as id, sfp.hash as hash, sfp.total_area as total_area, sfp.current_pa as current_pa
       ), inserted_cache as (
           insert into areas_cache (hash, total_area, current_pa)
@@ -455,13 +452,13 @@ test(`returns full query when feature is not derived`, async () => {
     0.2,
     1,
     0.3,
+    'planning-area-id',
     1,
     2,
     3,
     4,
     'wdpa1',
     'wdpa2',
-    'planning-area-id',
   ]);
 });
 

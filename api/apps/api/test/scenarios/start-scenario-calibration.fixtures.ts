@@ -32,7 +32,7 @@ export const getFixtures = async () => {
   const projectViewerRole = ProjectRoles.project_viewer;
   const projectContributorRole = ProjectRoles.project_contributor;
 
-  const { projectId, organizationId } = await GivenProjectExists(
+  const { projectId } = await GivenProjectExists(
     app,
     ownerToken,
     {
@@ -69,17 +69,6 @@ export const getFixtures = async () => {
   );
 
   return {
-    cleanup: async () => {
-      projectChecker.clear();
-      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        ownerToken,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenScenarioWasCreated: async () => {
       const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
         name: `Test scenario`,

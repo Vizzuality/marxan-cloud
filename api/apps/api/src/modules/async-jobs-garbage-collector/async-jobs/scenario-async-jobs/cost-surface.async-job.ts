@@ -30,7 +30,7 @@ export class CostSurfaceAsyncJob extends AsyncJob {
   getFailedAsyncJobState(): CostSurfaceApiEvents {
     /*
     At the moment in the codebase, we are not using this two api events:
-    API_EVENT_KINDS.scenario__costSurface__shapeConverted__v1_alpha1 
+    API_EVENT_KINDS.scenario__costSurface__shapeConverted__v1_alpha1
     API_EVENT_KINDS.scenario__costSurface__shapeConversionFailed__v1_alpha1
     In case we start using them, we migh have to do add new state to getEndAsynJobStates()
     and check the latestApitEvent when executing getFailedAsyncJobState()

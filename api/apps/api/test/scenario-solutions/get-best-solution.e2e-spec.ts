@@ -3,21 +3,16 @@ import { getFixtures } from './solutions.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-beforeAll(async () => {
-  fixtures = await getFixtures();
-});
-
 describe(`When getting scenario best solution`, () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
+    fixtures = await getFixtures();
+
     await fixtures.GivenScenarioHasSolutionsReady();
   });
 
-  afterAll(async () => {
-    await fixtures?.cleanup();
-  });
-
   it(`should return the correct response when the given scenario id does not exists`, async () => {
-    const response = await fixtures.WhenGettingBestSolutionForAnScenarioThatDoesNotExists();
+    const response =
+      await fixtures.WhenGettingBestSolutionForAnScenarioThatDoesNotExists();
 
     fixtures.ThenScenarioNotFoundShouldBeResolved(response);
   });

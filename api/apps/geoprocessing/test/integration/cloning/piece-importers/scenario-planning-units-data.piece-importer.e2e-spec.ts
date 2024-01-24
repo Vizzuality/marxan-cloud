@@ -18,7 +18,6 @@ import {
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -31,6 +30,7 @@ import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { DeleteProjectPus, GivenProjectPus } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -51,7 +51,8 @@ describe(ScenarioPlanningUnitsDataPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoScenarioPlanningUnitsDataFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoScenarioPlanningUnitsDataFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -60,7 +61,8 @@ describe(ScenarioPlanningUnitsDataPieceImporter, () => {
 
   it('imports scenario planning units data', async () => {
     await fixtures.GivenProjectPus();
-    const archiveLocation = await fixtures.GivenValidScenarioPlanningUnitsDataFile();
+    const archiveLocation =
+      await fixtures.GivenValidScenarioPlanningUnitsDataFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -84,13 +86,12 @@ const getFixtures = async () => {
       ]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioPlanningUnitsDataPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioPlanningUnitsDataPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const scenarioId = v4();
   const projectId = v4();
   const resourceKind = ResourceKind.Project;
@@ -120,11 +121,12 @@ const getFixtures = async () => {
 
   const scenarioPlanningUnitsAmount = 4;
 
-  const validScenarioPlanningUnitsDataFileContent: ScenarioPlanningUnitsDataContent = {
-    planningUnitsData: Array(scenarioPlanningUnitsAmount)
-      .fill(0)
-      .map((_, index) => getPlanningUnitData(index + 1)),
-  };
+  const validScenarioPlanningUnitsDataFileContent: ScenarioPlanningUnitsDataContent =
+    {
+      planningUnitsData: Array(scenarioPlanningUnitsAmount)
+        .fill(0)
+        .map((_, index) => getPlanningUnitData(index + 1)),
+    };
 
   return {
     cleanUp: async () => {

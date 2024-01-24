@@ -29,15 +29,17 @@ type FolderZipData = {
 @Injectable()
 @PieceExportProvider()
 export class MarxanExecutionMetadataPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    MarxanExecutionMetadataPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(MarxanExecutionMetadataPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.MarxanExecutionMetadata;
@@ -78,16 +80,17 @@ export class MarxanExecutionMetadataPieceExporter
         }),
       ),
     };
-    const foldersZipsData: FolderZipData[] = marxanExecutionMetadataWithBuffers.flatMap(
-      ({ id, inputZip, outputZip }) => {
-        const files: FolderZipData[] = [
-          { id, buffer: inputZip, type: 'input' },
-        ];
-        if (outputZip) files.push({ id, buffer: outputZip, type: 'output' });
+    const foldersZipsData: FolderZipData[] =
+      marxanExecutionMetadataWithBuffers.flatMap(
+        ({ id, inputZip, outputZip }) => {
+          const files: FolderZipData[] = [
+            { id, buffer: inputZip, type: 'input' },
+          ];
+          if (outputZip) files.push({ id, buffer: outputZip, type: 'output' });
 
-        return files;
-      },
-    );
+          return files;
+        },
+      );
 
     const jsonFileRelativePath = ClonePieceRelativePathResolver.resolveFor(
       ClonePiece.MarxanExecutionMetadata,

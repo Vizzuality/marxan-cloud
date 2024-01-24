@@ -17,8 +17,8 @@ import {
   ArtifactType,
   CacheNotFound,
   ErrorWithSymbol,
-  ScenarioCostSurfaceRepository,
-} from '@marxan/scenario-cost-surface';
+  ArtifactCacheRepository,
+} from '@marxan/artifact-cache';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { getRedisConfig } from '@marxan-geoprocessing/utils/redisConfig.utils';
 
@@ -97,20 +97,21 @@ describe.skip(`when a job in the queue landed and failed`, () => {
 
 async function getFixtures() {
   const application = await bootstrapApplication();
-  const planningUnitsRepository: Repository<ScenariosPlanningUnitGeoEntity> = application.get(
-    getRepositoryToken(
-      ScenariosPlanningUnitGeoEntity,
-      geoprocessingConnections.default,
-    ),
-  );
+  const planningUnitsRepository: Repository<ScenariosPlanningUnitGeoEntity> =
+    application.get(
+      getRepositoryToken(
+        ScenariosPlanningUnitGeoEntity,
+        geoprocessingConnections.default,
+      ),
+    );
   const storagePath = AppConfig.get<string>(
     'storage.sharedFileStorage.localPath',
   );
   assertDefined(storagePath);
 
-  const fileRepository = application.get(ScenarioCostSurfaceRepository);
+  const fileRepository = application.get(ArtifactCacheRepository);
 
-  const queue = new Queue(`cost-surface-template-creation`, {
+  const queue = new Queue(`project-template-creation`, {
     ...getRedisConfig(),
   });
 
@@ -118,7 +119,7 @@ async function getFixtures() {
 
   return {
     async scenarioWithData() {
-      const first = await planningUnitsRepository.findOne();
+      const first = await planningUnitsRepository.findOne({});
       assertDefined(first);
       return first.scenarioId;
     },

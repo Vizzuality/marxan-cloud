@@ -9,14 +9,16 @@ import { MarkLegacyProjectImportAsFailed } from './mark-legacy-project-import-as
 
 @CommandHandler(MarkLegacyProjectImportAsFailed)
 export class MarkLegacyProjectImportAsFailedHandler
-  implements IInferredCommandHandler<MarkLegacyProjectImportAsFailed> {
+  implements IInferredCommandHandler<MarkLegacyProjectImportAsFailed>
+{
+  private readonly logger: Logger = new Logger(
+    MarkLegacyProjectImportAsFailedHandler.name,
+  );
+
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(MarkLegacyProjectImportAsFailedHandler.name);
-  }
+  ) {}
 
   async findPreviousEvent(
     kind: API_EVENT_KINDS,
@@ -41,9 +43,8 @@ export class MarkLegacyProjectImportAsFailedHandler
     projectId,
     reason,
   }: MarkLegacyProjectImportAsFailed): Promise<void> {
-    const legacyProjectImport = await this.legacyProjectImportRepository.find(
-      projectId,
-    );
+    const legacyProjectImport =
+      await this.legacyProjectImportRepository.find(projectId);
 
     let ownerId: string | undefined;
     let scenarioId: string | undefined;

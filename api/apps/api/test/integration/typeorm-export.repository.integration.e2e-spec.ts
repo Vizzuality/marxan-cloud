@@ -1,4 +1,3 @@
-import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
 import {
   Export,
@@ -18,12 +17,9 @@ import {
 } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
 import { GivenUserExists } from '../steps/given-user-exists';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 
 const millisecondsInADay = 24 * 60 * 60 * 1000;
 
@@ -33,10 +29,6 @@ describe('Typeorm export repository', () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 20000);
-
-  afterAll(async () => {
-    await fixtures.cleanup();
-  });
 
   it('should expose methods for getting an export by id and storing exports', async () => {
     await fixtures.GivenExportWasRequested();
@@ -75,10 +67,8 @@ describe('Typeorm export repository', () => {
     const projectId = fixtures.GivenProject();
     await fixtures.GivenMultipleExports(projectId);
 
-    const {
-      threeLatestExports,
-      tenLatestExports,
-    } = await fixtures.WhenRequestingLatestStandaloneExports(projectId);
+    const { threeLatestExports, tenLatestExports } =
+      await fixtures.WhenRequestingLatestStandaloneExports(projectId);
 
     fixtures.ThenFilteredExportsShouldBeReturned(
       threeLatestExports,
@@ -87,10 +77,8 @@ describe('Typeorm export repository', () => {
   });
 
   it('should delete an import when export is deleted', async () => {
-    const {
-      exportId,
-      importId,
-    } = await fixtures.GivenExportWithImportWasRequested();
+    const { exportId, importId } =
+      await fixtures.GivenExportWithImportWasRequested();
     await fixtures.WhenExportIsDeleted(exportId, importId);
     await fixtures.ThenExportAndImportDoesNotExist(exportId, importId);
   });
@@ -107,7 +95,6 @@ const getFixtures = async () => {
   const repo = app.get<ExportRepository>(ExportRepository);
   const importRepo = app.get(ImportRepository);
 
-  const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const ownerId = await GivenUserExists(app, 'aa');
 
   const amountOfExportsToFind = 5;
@@ -128,14 +115,6 @@ const getFixtures = async () => {
     });
 
   return {
-    cleanup: async () => {
-      const connection = app.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
-      await exportRepo.delete({});
-      await OrganizationsTestUtils.deleteOrganization(app, ownerToken, ownerId);
-
-      await app.close();
-    },
     GivenProject: () => {
       return v4();
     },

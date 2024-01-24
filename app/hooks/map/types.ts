@@ -1,5 +1,10 @@
-import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
+import { PUAction } from 'store/slices/scenarios/types';
+
 import { TargetSPFItemProps } from 'components/features/target-spf-item/types';
+import { CostSurface } from 'types/api/cost-surface';
+import { Feature } from 'types/api/feature';
+import { Scenario } from 'types/api/scenario';
+import { WDPA } from 'types/api/wdpa';
 
 export interface UseGeoJSONLayer {
   cache?: number;
@@ -52,16 +57,16 @@ export interface UsePUGridPreviewLayer {
     settings?: {
       opacity?: number;
       visibility?: boolean;
-    },
-  }
+    };
+  };
 }
 
 export interface UseWDPAPreviewLayer {
-  pid: string,
+  pid: string;
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
-  wdpaIucnCategories?: string[];
+  WDPACategories?: WDPA['id'][];
   options?: Record<string, unknown>;
 }
 
@@ -72,17 +77,21 @@ export interface UseFeaturePreviewLayer {
   id?: string;
 }
 
+export interface PreviewFeature extends Feature {
+  splitSelected?: string;
+  splitFeaturesSelected?: string[];
+}
+
 export interface UseFeaturePreviewLayers {
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
-  features?: SelectedItemProps[];
+  features?: PreviewFeature[];
   options?: {
-    featuresRecipe?: Record<string, any>[],
+    featuresRecipe?: Record<string, any>[];
     featureHoverId?: string;
     selectedFeatures?: Array<string>;
-    opacity?: number;
-    visibility?: boolean;
+    layerSettings?: Record<string, { opacity?: number; visibility?: boolean; color: string }>;
   };
 }
 export interface UseTargetedPreviewLayers {
@@ -91,11 +100,12 @@ export interface UseTargetedPreviewLayers {
   bbox?: number[] | unknown;
   features?: TargetSPFItemProps[];
   options?: {
-    featuresRecipe?: Record<string, any>[],
+    featuresRecipe?: Record<string, any>[];
     featureHoverId?: string;
     selectedFeatures?: Array<string>;
     opacity?: number;
     visibility?: boolean;
+    layerSettings?: Record<string, { opacity?: number; visibility?: boolean; color: string }>;
   };
 }
 
@@ -109,54 +119,67 @@ export interface UsePUGridLayer {
   options?: {
     wdpaIucnCategories?: string[];
     wdpaThreshold?: number;
-    puAction?: string;
+    puAction?: PUAction;
     puIncludedValue?: string[];
     puExcludedValue?: string[];
-    runId?: string;
-    features?: string[];
+    puAvailableValue?: string[];
+    runId?: number;
+    features?: Feature['id'][];
+    selectedFeatures?: Feature['id'][];
     preHighlightFeatures?: Array<string>;
     postHighlightFeatures?: Array<string>;
     cost?: {
       min: number;
-      max: number,
-    }
+      max: number;
+    };
     settings?: {
       pugrid?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       'wdpa-percentage'?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       features?: {
         opacity?: number;
         visibility?: boolean;
-      },
-      'features-highlight'?: {
+      };
+      'cost-surface'?: {
         opacity?: number;
         visibility?: boolean;
-      },
-      cost?: {
-        opacity?: number;
-        visibility?: boolean;
-      },
+        min: CostSurface['min'];
+        max: CostSurface['max'];
+      };
       'lock-in'?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       'lock-out'?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
+      'lock-available'?: {
+        opacity?: number;
+        visibility?: boolean;
+      };
       frequency?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       solution?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
+      [key: string]: {
+        opacity?: number;
+        visibility?: boolean;
+        amountRange?: {
+          min: number;
+          max: number;
+        };
+        color?: string;
+      };
     };
   };
 }
@@ -164,8 +187,8 @@ export interface UsePUGridLayer {
 export interface UsePUCompareLayer {
   cache?: number;
   active?: boolean;
-  sid1?: string;
-  sid2?: string;
+  sid: Scenario['id'];
+  sid2: Scenario['id'];
   options?: Record<string, unknown>;
 }
 
@@ -182,14 +205,19 @@ export interface UseLegend {
     wdpaIucnCategories?: string[];
     wdpaThreshold?: number;
     cost?: {
+      name: string;
       min: number;
-      max: number,
+      max: number;
     };
-    items?:string[];
-    puAction?: string;
+    items?: {
+      name: string;
+      id: string;
+    }[];
+    puAction?: PUAction;
     puIncludedValue?: string[];
     puExcludedValue?: string[];
-    runId?: string;
+    puAvailableValue?: string[];
+    runId?: number;
     numberOfRuns?: number;
     layerSettings?: Record<string, Record<string, unknown>>;
   };

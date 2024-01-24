@@ -8,6 +8,15 @@ export enum API_EVENT_KINDS {
   user__passwordResetTokenGenerated__v1alpha1 = 'user.passwordResetTokenGenerated/v1alpha1',
   user__passwordResetSucceeded__v1alpha1 = 'user.passwordResetSucceeded/v1alpha1',
   user__passwordResetFailed__v1alpha1 = 'user.passwordResetFailed/v1alpha1',
+  project__costSurface_shapefile_submitted__v1alpha1 = 'project.costSurface.shapefile.submitted/v1alpha1',
+  project__costSurface_shapefile_finished__v1alpha1 = 'project.costSurface.shapefile.finished/v1alpha1',
+  project__costSurface_shapeConverted__v1alpha1 = 'project.costSurface.shapeConverted/v1alpha1',
+  scenario__costSurface__link__submitted__v1_alpha1 = 'scenario.costSurface.link.submitted/v1/alpha1',
+  scenario__costSurface__link__finished__v1_alpha1 = 'scenario.costSurface.link.finished/v1/alpha1',
+  scenario__costSurface__link__failed__v1_alpha1 = 'scenario.costSurface.link.failed/v1/alpha1',
+
+  project__costSurface_shapeConversionFailed__v1alpha1 = 'project.costSurface.shapeConversionFailed/v1alpha1',
+  project__costSurface_shapefile_failed__v1alpha1 = 'project.costSurface.shapefile.failed/v1alpha1',
   scenario__costSurface__submitted__v1_alpha1 = 'scenario.costSurface.submitted/v1alpha1',
   scenario__costSurface__shapeConverted__v1_alpha1 = 'scenario.costSurface.shapeConverted/v1alpha1',
   scenario__costSurface__shapeConversionFailed__v1_alpha1 = 'scenario.costSurface.shapeConversionFailed/v1alpha1',
@@ -37,9 +46,9 @@ export enum API_EVENT_KINDS {
   scenario__featuresWithPuIntersection__submitted__v1__alpha1 = 'scenario.featuresWithPuIntersection.submitted/v1alpha',
   scenario__featuresWithPuIntersection__failed__v1__alpha1 = 'scenario.featuresWithPuIntersection.failed/v1alpha',
   scenario__featuresWithPuIntersection__finished__v1__alpha1 = 'scenario.featuresWithPuIntersection.finished/v1alpha',
-  scenario__protectedAreas__submitted__v1__alpha = 'scenario.protectedAreas.submitted/v1/alpha',
-  scenario__protectedAreas__finished__v1__alpha = 'scenario.protectedAreas.finished/v1/alpha',
-  scenario__protectedAreas__failed__v1__alpha = 'scenario.protectedAreas.failed/v1/alpha',
+  project__protectedAreas__submitted__v1__alpha = 'project.protectedAreas.submitted/v1/alpha',
+  project__protectedAreas__finished__v1__alpha = 'project.protectedAreas.finished/v1/alpha',
+  project__protectedAreas__failed__v1__alpha = 'project.protectedAreas.failed/v1/alpha',
   project__planningUnits__submitted__v1__alpha = 'project.planningUnits.submitted/v1/alpha',
   project__planningUnits__finished__v1__alpha = 'project.planningUnits.finished/v1/alpha',
   project__planningUnits__failed__v1__alpha = 'project.planningUnits.failed/v1/alpha',
@@ -49,6 +58,9 @@ export enum API_EVENT_KINDS {
   scenario__planningAreaProtectedCalculation__submitted__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.submitted/v1/alpha',
   scenario__planningAreaProtectedCalculation__finished__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.finished/v1/alpha',
   scenario__planningAreaProtectedCalculation__failed__v1__alpha1 = 'scenario.planningAreaProtectedCalculation.failed/v1/alpha',
+  scenario__protectedAreas__submitted__v1__alpha = 'scenario.protectedAreas.submitted/v1/alpha',
+  scenario__protectedAreas__finished__v1__alpha = 'scenario.protectedAreas.finished/v1/alpha',
+  scenario__protectedAreas__failed__v1__alpha = 'scenario.protectedAreas.failed/v1/alpha',
   scenario__calibration__submitted_v1_alpha1 = 'scenario.calibration.submitted/v1/alpha',
   scenario__calibration__finished_v1_alpha1 = 'scenario.calibration.finished/v1/alpha',
   scenario__calibration__failed_v1_alpha1 = 'scenario.calibration.failed/v1/alpha',
@@ -89,6 +101,9 @@ export enum API_EVENT_KINDS {
   project__legacy__import__piece__submitted__v1__alpha = 'project.legacy.import.piece.submitted/v1/alpha',
   project__legacy__import__piece__finished__v1__alpha = 'project.legacy.import.piece.finished/v1/alpha',
   project__legacy__import__piece__failed__v1__alpha = 'project.legacy.import.piece.failed/v1/alpha',
+  features__csv__import__submitted__v1__alpha = 'features.csv.import.submitted/v1/alpha',
+  features__csv__import__finished__v1__alpha = 'features.csv.import.finished/v1/alpha',
+  features__csv__import__failed__v1__alpha = 'features.csv.import.failed/v1/alpha',
 }
 
 export type ProjectEvents = Pick<
@@ -109,4 +124,5 @@ export type ScenarioGeofeatureEvents = Pick<
   typeof API_EVENT_KINDS,
   ScenarioGeoFeatureEventKeys
 >;
-export type ScenarioGeofeatureEventValues = ValuesType<ScenarioGeofeatureEvents>;
+export type ScenarioGeofeatureEventValues =
+  ValuesType<ScenarioGeofeatureEvents>;

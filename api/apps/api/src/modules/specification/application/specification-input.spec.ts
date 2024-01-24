@@ -51,7 +51,7 @@ test(`invalid values / types`, () => {
   const errors = validateSync(
     plainToClass<SpecificationInput, SpecificationInput>(SpecificationInput, {
       scenarioId: `non-uuid`,
-      draft: (`true` as unknown) as boolean,
+      draft: `true` as unknown as boolean,
       raw: {},
       features: [
         plainToClass<
@@ -60,13 +60,14 @@ test(`invalid values / types`, () => {
         >(SpecificationFeatureStratification, {
           operation: SpecificationOperation.Stratification,
           baseFeatureId: `non-uuid-as-well`,
-          againstFeatureId: (undefined as unknown) as string,
+          againstFeatureId: undefined as unknown as string,
           splitByProperty: `split-property-stratification`,
         }),
         plainToClass<SpecificationFeatureCopy, SpecificationFeatureCopy>(
           SpecificationFeatureCopy,
           {
-            operation: (`invalid operation` as unknown) as SpecificationOperation.Copy,
+            operation:
+              `invalid operation` as unknown as SpecificationOperation.Copy,
             baseFeatureId: `non-uuid-as-well`,
             selectSubSets: undefined as never,
           },

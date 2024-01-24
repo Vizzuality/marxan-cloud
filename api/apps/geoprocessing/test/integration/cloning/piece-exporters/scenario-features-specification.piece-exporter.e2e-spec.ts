@@ -3,12 +3,11 @@ import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { EntityManager, In } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteFeatures,
@@ -26,6 +25,7 @@ import { ScenarioFeaturesSpecificationContent } from '@marxan/cloning/infrastruc
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -94,13 +94,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([GeoFeatureGeometry, ScenarioFeaturesData]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioFeaturesSpecificationPieceExporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioFeaturesSpecificationPieceExporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const scenarioId = v4();
   const organizationId = v4();
@@ -248,9 +247,10 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const [firstSpecification] = await readSavedFile<
-            ScenarioFeaturesSpecificationContent[]
-          >(savedStrem);
+          const [firstSpecification] =
+            await readSavedFile<ScenarioFeaturesSpecificationContent[]>(
+              savedStrem,
+            );
           const featureName = getFeatureName(opts);
           const expectedRaw = {
             status: 'any',

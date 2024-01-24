@@ -25,8 +25,10 @@ export const PARTNER_LOGOS = [
         alt: 'Microsoft logo',
         hyperlink: 'https://www.microsoft.com',
         src: MICROSOFT_LOGO,
-      }],
-  }, {
+      },
+    ],
+  },
+  {
     // PARTNERSHIP LOGOS
     id: 'partnership',
     title: 'In partnership with:',
@@ -57,7 +59,8 @@ export const PARTNER_LOGOS = [
         src: EU_COMISSION_LOGO,
       },
     ],
-  }, {
+  },
+  {
     // ADDITIONAL SUPPORT LOGOS
     id: 'additional-support',
     title: 'With additional support from:',

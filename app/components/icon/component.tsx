@@ -1,6 +1,6 @@
 import React from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 export interface IconProps {
   icon: {
@@ -11,14 +11,10 @@ export interface IconProps {
   style?: any;
 }
 
-export const Icon: React.FC<IconProps> = ({
-  icon,
-  className = 'w-5 h-5',
-  style,
-}: IconProps) => {
+export const Icon: React.FC<IconProps> = ({ icon, className = 'w-5 h-5', style }: IconProps) => {
   return (
     <svg
-      className={cx({
+      className={cn({
         'fill-current transition-colors': true,
         [className]: className,
       })}

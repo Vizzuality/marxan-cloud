@@ -12,7 +12,8 @@ type ScenarioUnusedResourcesData = Record<string, unknown>;
 
 @Injectable()
 export class ScenarioUnusedResources
-  implements UnusedResources<ScenarioUnusedResourcesData> {
+  implements UnusedResources<ScenarioUnusedResourcesData>
+{
   constructor(
     @InjectRepository(ScenarioFeaturesData)
     private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,

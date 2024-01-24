@@ -3,7 +3,7 @@ import { isEqual } from 'lodash';
 import { PromiseType } from 'utility-types';
 import { Either, left, right } from 'fp-ts/Either';
 import { Test } from '@nestjs/testing';
-import { HttpModule } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import {
   geoprocessingUrlToken,
   CustomPlanningAreasUploader,
@@ -67,7 +67,7 @@ describe(`when underlying service failed`, () => {
   // then
   it(`should throw`, async () => {
     await expect(result).rejects.toMatchInlineSnapshot(
-      `[Error: Request failed with status code 500]`,
+      `[AxiosError: Request failed with status code 500]`,
     );
   });
 });

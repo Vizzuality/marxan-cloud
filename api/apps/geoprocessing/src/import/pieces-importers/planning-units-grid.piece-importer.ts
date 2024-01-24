@@ -22,16 +22,17 @@ type ProjectSelectResult = {
 @Injectable()
 @PieceImportProvider()
 export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    PlanningUnitsGridPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(PlanningUnitsGridPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -102,9 +103,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
     projectId: string,
     transactionalEntityManager: EntityManager,
   ) {
-    const [{ geomType }]: [
-      ProjectSelectResult,
-    ] = await this.apiEntityManager
+    const [{ geomType }]: [ProjectSelectResult] = await this.apiEntityManager
       .createQueryBuilder()
       .select('planning_unit_grid_shape', 'geomType')
       .from('projects', 'p')

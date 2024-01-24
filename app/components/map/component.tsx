@@ -1,57 +1,14 @@
-import React, {
-  useEffect, useState, useRef, useCallback,
-} from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 
-import ReactMapGL, {
-  FlyToInterpolator,
-  TRANSITION_EVENTS,
-  ViewportProps,
-} from 'react-map-gl';
-
-import isEmpty from 'lodash/isEmpty';
+import ReactMapGL, { FlyToInterpolator, TRANSITION_EVENTS, ViewportProps } from 'react-map-gl';
 
 import { fitBounds } from '@math.gl/web-mercator';
-import cx from 'classnames';
 import { easeCubic } from 'd3-ease';
-import { InteractiveMapProps } from 'react-map-gl/src/components/interactive-map';
+import isEmpty from 'lodash/isEmpty';
 import { useDebouncedCallback } from 'use-debounce';
 
-export interface MapProps extends InteractiveMapProps {
-  /** A function that returns the map instance */
-  children?: React.ReactNode;
-
-  /** Custom css class for styling */
-  className?: string;
-
-  /** An object that defines the viewport
-   * @see https://uber.github.io/react-map-gl/#/Documentation/api-reference/interactive-map?section=initialization
-   */
-  viewport?: Partial<ViewportProps>;
-
-  /** An object that defines the bounds */
-  bounds?: {
-    bbox: number[];
-    options?: {};
-    viewportOptions?: Partial<ViewportProps>;
-  };
-
-  screenshot?: boolean;
-
-  /** A function that exposes when the map is mounted.
-   * It receives and object with the `mapRef` and `mapContainerRef` reference. */
-  onMapReady?: ({ map, mapContainer }) => void;
-
-  /** A function that exposes when the map is loaded.
-   * It receives and object with the `mapRef` and `mapContainerRef` reference. */
-  onMapLoad?: ({ map, mapContainer }) => void;
-
-  /** A function that exposes the viewport */
-  onMapViewportChange?: (viewport: Partial<ViewportProps>) => void;
-
-  /** A function that exposes if current tiles on the viewport are loaded */
-  onMapTilesLoaded?: (loaded: boolean) => void;
-
-}
+import { MapProps } from 'types/map';
+import { cn } from 'utils/cn';
 
 const DEFAULT_VIEWPORT = {
   zoom: 2,
@@ -117,7 +74,7 @@ export const Map = ({
       setViewport(v);
       debouncedOnMapViewportChange(v);
     },
-    [debouncedOnMapViewportChange],
+    [debouncedOnMapViewportChange]
   );
 
   const handleResize = useCallback(
@@ -130,7 +87,7 @@ export const Map = ({
       setViewport(newViewport);
       debouncedOnMapViewportChange(newViewport);
     },
-    [mapViewport, debouncedOnMapViewportChange],
+    [mapViewport, debouncedOnMapViewportChange]
   );
 
   const handleFitBounds = useCallback(() => {
@@ -138,10 +95,7 @@ export const Map = ({
     const { bbox, options = {}, viewportOptions = {} } = bounds;
     const { transitionDuration = 0 } = viewportOptions;
 
-    if (
-      mapContainerRef.current.offsetWidth <= 0
-      || mapContainerRef.current.offsetHeight <= 0
-    ) {
+    if (mapContainerRef.current.offsetWidth <= 0 || mapContainerRef.current.offsetHeight <= 0) {
       console.error("mapContainerRef doesn't have dimensions");
       return null;
     }
@@ -192,7 +146,12 @@ export const Map = ({
   }, [onMapReady]);
 
   useEffect(() => {
-    if (ready && !isEmpty(bounds) && !!bounds.bbox && bounds.bbox.every((b) => typeof b === 'number')) {
+    if (
+      ready &&
+      !isEmpty(bounds) &&
+      !!bounds.bbox &&
+      bounds.bbox.every((b) => typeof b === 'number')
+    ) {
       handleFitBounds();
     }
   }, [ready, bounds, handleFitBounds]);
@@ -235,8 +194,8 @@ export const Map = ({
   return (
     <div
       ref={mapContainerRef}
-      className={cx({
-        'relative w-full h-full z-0': true,
+      className={cn({
+        'relative z-0 h-full w-full': true,
         [className]: !!className,
       })}
     >
@@ -269,11 +228,11 @@ export const Map = ({
         transitionEasing={easeCubic}
         // attributionControl={false}
       >
-        {ready
-          && loaded
-          && !!mapRef.current
-          && typeof children === 'function'
-          && children(mapRef.current)}
+        {ready &&
+          loaded &&
+          !!mapRef.current &&
+          typeof children === 'function' &&
+          children(mapRef.current)}
       </ReactMapGL>
     </div>
   );

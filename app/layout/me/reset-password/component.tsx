@@ -7,18 +7,15 @@ import { useRouter } from 'next/router';
 import { useResetPassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
-import PasswordStrength from 'layout/sign-up/password-strenght';
-import Wrapper from 'layout/wrapper';
-
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
-import {
-  composeValidators,
-} from 'components/forms/validations';
+import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
+import PasswordStrength from 'layout/sign-up/password-strenght';
+import Wrapper from 'layout/wrapper';
 
 import RECOVER_PASSWORD_SVG from 'svgs/users/reset-password.svg?sprite';
 
@@ -28,11 +25,13 @@ export const equalPasswordValidator = (value, allValues) => {
 
   return undefined;
 };
-export interface ResetPasswordPasswordProps {
-}
+export interface ResetPasswordPasswordProps {}
 
 export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () => {
-  const { push, query: { token: resetToken } } = useRouter();
+  const {
+    push,
+    query: { token: resetToken },
+  } = useRouter();
   const mutation = useResetPassword({ resetToken });
 
   const [submitting, setSubmitting] = useState(false);
@@ -40,113 +39,128 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
 
   const { addToast } = useToasts();
 
-  const handleSubmit = useCallback(async (values) => {
-    setSubmitting(true);
+  const handleSubmit = useCallback(
+    async (values) => {
+      setSubmitting(true);
 
-    const { passwordConfirm } = values;
-    const data = { passwordConfirm };
+      const { passwordConfirm } = values;
+      const data = { passwordConfirm };
 
-    mutation.mutate({ data }, {
-      onSuccess: () => {
-        setSubmitted(true);
-        addToast('success-reset-password', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">You have changed your password.</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        setSubmitting(false);
-      },
-      onError: () => {
-        addToast('error-reset-password', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">It has not been possible to change your password.</p>
-          </>
-        ), {
-          level: 'error',
-        });
-        setSubmitting(false);
-      },
-    });
-  }, [mutation, addToast]);
+      mutation.mutate(
+        { data },
+        {
+          onSuccess: () => {
+            setSubmitted(true);
+            addToast(
+              'success-reset-password',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">You have changed your password.</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+            setSubmitting(false);
+          },
+          onError: () => {
+            addToast(
+              'error-reset-password',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">It has not been possible to change your password.</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+            setSubmitting(false);
+          },
+        }
+      );
+    },
+    [mutation, addToast]
+  );
 
   return (
     <Wrapper>
-
       {!submitted && resetToken && (
-        <FormRFF
-          onSubmit={handleSubmit}
-        >
+        <FormRFF onSubmit={handleSubmit}>
           {(props) => (
-            <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex items-center justify-center h-full">
+            <form
+              onSubmit={props.handleSubmit}
+              autoComplete="off"
+              className="relative flex h-full items-center justify-center"
+            >
               <div className="w-full max-w-xs">
-                <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Create new password</h2>
-                <p className="mb-12 text-sm text-gray-500">Your new password must be different from previous used passwords.</p>
+                <h2 className="mb-5 text-center font-heading text-lg font-medium text-gray-700">
+                  Create new password
+                </h2>
+                <p className="mb-12 text-sm text-gray-600">
+                  Your new password must be different from previous used passwords.
+                </p>
 
                 <Loading
                   visible={submitting}
-                  className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
+                  className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-white bg-opacity-90"
                   iconClassName="w-10 h-10 text-primary-500"
                 />
 
                 <div className="flex flex-col space-y-12">
                   <div>
-                    <FieldRFF
-                      name="password"
-                      validate={composeValidators([{ presence: true }])}
-                    >
+                    <FieldRFF name="password" validate={composeValidators([{ presence: true }])}>
                       {(fprops) => (
                         <Field id="password" {...fprops}>
-                          <Label theme="light" className="mb-3 uppercase">New Password</Label>
+                          <Label theme="light" className="mb-3 uppercase">
+                            New Password
+                          </Label>
                           <Input theme="light" type="password" />
                         </Field>
                       )}
                     </FieldRFF>
 
-                    <PasswordStrength
-                      password={props.values.password}
-                    />
-
+                    <PasswordStrength password={props.values.password} />
                   </div>
                   <div>
                     <FieldRFF
                       name="passwordConfirm"
-                      validate={composeValidators([
-                        { presence: true },
-                        equalPasswordValidator,
-                      ])}
+                      validate={composeValidators([{ presence: true }, equalPasswordValidator])}
                     >
                       {(fprops) => (
                         <Field id="password-confirm" {...fprops}>
-                          <Label theme="light" className="mb-3 uppercase">Confirm Password</Label>
+                          <Label theme="light" className="mb-3 uppercase">
+                            Confirm Password
+                          </Label>
                           <Input theme="light" type="password" />
                         </Field>
                       )}
                     </FieldRFF>
                   </div>
 
-                  <Button theme="primary" size="lg" type="submit" disabled={submitting} className="w-full">
+                  <Button
+                    theme="primary"
+                    size="lg"
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full"
+                  >
                     Change password
                   </Button>
                 </div>
               </div>
-
             </form>
           )}
         </FormRFF>
       )}
 
       {submitted && resetToken && (
-        <div className="relative flex items-center justify-center h-full">
+        <div className="relative flex h-full items-center justify-center">
           <div className="w-full max-w-xs">
             <div className="pb-5">
-              <h2 className="mb-24 text-lg font-medium text-center text-gray-600 font-heading">
+              <h2 className="mb-24 text-center font-heading text-lg font-medium text-gray-700">
                 You&apos;ve changed your password
               </h2>
-              <Icon icon={RECOVER_PASSWORD_SVG} className="w-56 h-56 mx-auto mb-5 text-gray-500" />
+              <Icon icon={RECOVER_PASSWORD_SVG} className="mx-auto mb-5 h-56 w-56 text-gray-600" />
             </div>
             <div className="mt-10">
               <Button
@@ -164,15 +178,13 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
         </div>
       )}
       {!resetToken && (
-        <div className="relative flex items-center justify-center h-full">
+        <div className="relative flex h-full items-center justify-center">
           <div className="w-full max-w-xs">
-            <div className="flex flex-col items-center pb-5 space-y-20">
-              <h2 className="text-lg font-medium text-center text-gray-600 font-heading">
+            <div className="flex flex-col items-center space-y-20 pb-5">
+              <h2 className="text-center font-heading text-lg font-medium text-gray-700">
                 Sorry, you are not allowed to reset your password.
               </h2>
-              <p className="mb-12 text-sm text-gray-500">
-                Please check your email inbox.
-              </p>
+              <p className="mb-12 text-sm text-gray-600">Please check your email inbox.</p>
             </div>
           </div>
         </div>

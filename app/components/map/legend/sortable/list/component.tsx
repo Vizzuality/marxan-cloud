@@ -1,5 +1,11 @@
 import React, {
-  Children, cloneElement, isValidElement, useCallback, useMemo, useState,
+  Children,
+  cloneElement,
+  isValidElement,
+  ReactElement,
+  useCallback,
+  useMemo,
+  useState,
 } from 'react';
 
 import {
@@ -11,19 +17,18 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import {
-  restrictToVerticalAxis,
-  restrictToWindowEdges,
-} from '@dnd-kit/modifiers';
+import { restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import cx from 'classnames';
+
+import { cn } from 'utils/cn';
 
 import SortableItem from './item';
+import type { SortableItemProps } from './item/component';
 
 export interface SortableListProps {
   className?: string;
@@ -31,7 +36,7 @@ export interface SortableListProps {
   sortable: {
     enabled: boolean;
     handle: boolean;
-    handleIcon: React.ReactNode,
+    handleIcon: React.ReactNode;
   };
   onChangeOrder: (id: string[]) => void;
 }
@@ -76,7 +81,7 @@ export const SortableList: React.FC<SortableListProps> = ({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   );
 
   const handleDragStart = useCallback((event) => {
@@ -85,17 +90,20 @@ export const SortableList: React.FC<SortableListProps> = ({
     setActiveId(active.id);
   }, []);
 
-  const handleDragEnd = useCallback((event) => {
-    const { active, over } = event;
-    setActiveId(null);
+  const handleDragEnd = useCallback(
+    (event) => {
+      const { active, over } = event;
+      setActiveId(null);
 
-    if (active.id !== over.id) {
-      const oldIndex = itemsIds.indexOf(active.id);
-      const newIndex = itemsIds.indexOf(over.id);
+      if (active.id !== over.id) {
+        const oldIndex = itemsIds.indexOf(active.id);
+        const newIndex = itemsIds.indexOf(over.id);
 
-      if (onChangeOrder) onChangeOrder(arrayMove(itemsIds, oldIndex, newIndex));
-    }
-  }, [itemsIds, onChangeOrder]);
+        if (onChangeOrder) onChangeOrder(arrayMove(itemsIds, oldIndex, newIndex));
+      }
+    },
+    [itemsIds, onChangeOrder]
+  );
 
   return (
     <DndContext
@@ -106,36 +114,32 @@ export const SortableList: React.FC<SortableListProps> = ({
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-      <SortableContext
-        items={itemsIds}
-        strategy={verticalListSortingStrategy}
-      >
+      <SortableContext items={itemsIds} strategy={verticalListSortingStrategy}>
         <div
-          className={cx({
+          className={cn({
             'w-full': true,
           })}
         >
-          {Children
-            .map(children, (Child) => {
-              if (isValidElement(Child)) {
-                const { props: { id } } = Child;
+          {Children.map(children, (Child: ReactElement<SortableItemProps>) => {
+            if (isValidElement(Child)) {
+              const {
+                props: { id },
+              } = Child;
 
-                return (
-                  <SortableItem id={id} sortable={sortable}>
-                    {cloneElement(Child, {
-                      sortable,
-                    })}
-                  </SortableItem>
-                );
-              }
-              return null;
-            })}
+              return (
+                <SortableItem id={id} sortable={sortable}>
+                  {cloneElement(Child, {
+                    sortable,
+                  })}
+                </SortableItem>
+              );
+            }
+            return null;
+          })}
         </div>
       </SortableContext>
 
-      <DragOverlay>
-        {isValidElement(ActiveItem) ? cloneElement(ActiveItem) : null}
-      </DragOverlay>
+      <DragOverlay>{isValidElement(ActiveItem) ? cloneElement(ActiveItem) : null}</DragOverlay>
     </DndContext>
   );
 };

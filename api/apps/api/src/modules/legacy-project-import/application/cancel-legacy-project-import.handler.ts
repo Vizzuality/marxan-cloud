@@ -12,7 +12,8 @@ import {
 
 @CommandHandler(CancelLegacyProjectImport)
 export class CancelLegacyProjectImportHandler
-  implements IInferredCommandHandler<CancelLegacyProjectImport> {
+  implements IInferredCommandHandler<CancelLegacyProjectImport>
+{
   constructor(
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
     @InjectRepository(Project)
@@ -34,13 +35,15 @@ export class CancelLegacyProjectImportHandler
 
       const legacyProjectImportAggregate = legacyProjectImport.right;
 
-      const alreadyStarted = legacyProjectImportAggregate.importProcessAlreadyStarted();
+      const alreadyStarted =
+        legacyProjectImportAggregate.importProcessAlreadyStarted();
 
       if (!alreadyStarted) {
         await this.projectRepo.delete(projectId.value);
       }
 
-      const legacyProjectImportHalted = legacyProjectImportAggregate.haltLegacyProjectImport();
+      const legacyProjectImportHalted =
+        legacyProjectImportAggregate.haltLegacyProjectImport();
 
       if (isLeft(legacyProjectImportHalted)) return legacyProjectImportHalted;
 

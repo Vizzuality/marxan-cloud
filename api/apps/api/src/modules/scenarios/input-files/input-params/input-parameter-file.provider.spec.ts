@@ -9,7 +9,7 @@ import { ioSettingsToken } from './io-settings';
 import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 import { ProjectSourcesEnum } from '@marxan/projects';
 
-jest.useFakeTimers('modern').setSystemTime(new Date('2020-01-01').getTime());
+jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
 
 jest.mock('config', () => ({
   get: () => 'value',
@@ -167,14 +167,13 @@ async function getFixtures() {
   class FakeScenario implements Pick<Repository<Scenario>, 'findOne'> {
     db: Record<string, Scenario> = {};
 
-    async findOne(scenarioId: any, ...rest: any[]): Promise<Scenario> {
-      expect(rest).toStrictEqual([
-        {
-          relations: ['project', 'project.organization'],
-        },
-      ]);
-      if (typeof scenarioId !== 'string') fail();
-      return this.db[scenarioId];
+    async findOne(findOneOptions: any): Promise<Scenario> {
+      expect(findOneOptions).toHaveProperty('where.id');
+      expect(findOneOptions).toHaveProperty('relations.project.organization');
+      expect(typeof findOneOptions?.where?.id).toBe('string');
+      expect(findOneOptions?.relations?.project?.organization).toBe(true);
+
+      return this.db[findOneOptions?.where?.id];
     }
   }
 
@@ -223,6 +222,37 @@ async function getFixtures() {
           defaults: [],
           range: defaultBlmRange,
         },
+        costSurfaceId: '',
+        costSurface: {
+          id: '',
+          name: 'some cost surface',
+          projectId: '',
+          isDefault: false,
+          min: 0,
+          max: 0,
+          project: {
+            name: 'Project Name',
+            id: '',
+            createdByUser: {} as any,
+            createdAt: new Date(),
+            lastModifiedAt: new Date(),
+            organizationId: '',
+            createdBy: '',
+            countryId: '',
+            bbox: [0, 0, 0, 0, 0, 0],
+            projectBlm: {
+              id: '',
+              range: [0, 0],
+              values: [],
+              defaults: [],
+            },
+            setIsPublicProperty: jest.fn(),
+            sources: ProjectSourcesEnum.legacyImport,
+          },
+          createdAt: new Date(),
+          lastModifiedAt: new Date(),
+          scenarios: [],
+        },
         project: {
           name: 'Project Name',
           id: '',
@@ -247,6 +277,7 @@ async function getFixtures() {
         users: [],
         ranAtLeastOnce: false,
         solutionsAreLocked: false,
+        projectScenarioId: 1,
       };
     },
     withInputParameters() {

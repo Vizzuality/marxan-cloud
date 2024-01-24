@@ -94,12 +94,11 @@ export class ScenariosController {
     @Query() filters: ScenarioComparisonFilters,
     @Res() response: Response,
   ): Promise<void> {
-    const tile: Buffer = await this.compareTileService.getScenarioComparisonTile(
-      {
+    const tile: Buffer =
+      await this.compareTileService.getScenarioComparisonTile({
         ...tileRequest,
         bbox: filters.bbox,
-      },
-    );
+      });
 
     setTileResponseHeadersForSuccessfulRequests(response);
     response.send(tile);

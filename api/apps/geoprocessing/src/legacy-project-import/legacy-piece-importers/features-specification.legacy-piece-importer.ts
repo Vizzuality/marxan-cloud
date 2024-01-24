@@ -11,7 +11,8 @@ import {
   LegacyProjectImportJobOutput,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
-import { HttpService, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { chunk } from 'lodash';
@@ -36,6 +37,8 @@ import {
   SpecDatRow,
   TargetSpecDatRow,
 } from './file-readers/spec-dat.reader';
+import { lastValueFrom, Observable } from 'rxjs';
+import { AxiosResponse } from 'axios';
 
 type FeaturesSelectResult = {
   id: string;
@@ -52,7 +55,12 @@ export const retriesIntervalForSpecificationStatusInSeconds = 30;
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class FeaturesSpecificationLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    FeaturesSpecificationLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly specDatReader: SpecDatReader,
@@ -64,13 +72,8 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     private readonly featuresDataRepo: Repository<GeoFeatureGeometry>,
     @InjectRepository(ScenarioFeaturesData)
     private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,
-    private readonly logger: Logger,
     private readonly httpService: HttpService,
-  ) {
-    this.logger.setContext(
-      FeaturesSpecificationLegacyProjectPieceImporter.name,
-    );
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.FeaturesSpecification;
@@ -104,9 +107,8 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       LegacyProjectImportFileType.SpecDat,
     );
 
-    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      firstLineReadable,
-    );
+    const delimiterOrError =
+      await this.datFileDelimiterFinder.findDelimiter(firstLineReadable);
     if (isLeft(delimiterOrError))
       this.logAndThrow(
         `Invalid delimiter in spec.dat file. Use either comma or tabulator as your file delimiter.`,
@@ -133,9 +135,8 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       LegacyProjectImportFileType.PuvsprDat,
     );
 
-    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      firstLineReadable,
-    );
+    const delimiterOrError =
+      await this.datFileDelimiterFinder.findDelimiter(firstLineReadable);
     if (isLeft(delimiterOrError))
       this.logAndThrow(
         `Invalid delimiter in puvspr.dat file. Use either comma or tabulator as your file delimiter.`,
@@ -293,36 +294,34 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     scenarioId: string,
     retries?: number,
   ): Promise<void> {
-    const featureIdByIntegerId = await this.getFeatureIdByIntegerIdMap(
-      projectId,
+    const featureIdByIntegerId =
+      await this.getFeatureIdByIntegerIdMap(projectId);
+
+    const response: Observable<AxiosResponse<any, any>> = this.httpService.post(
+      `${AppConfig.get<string>(
+        'api.url',
+      )}/api/v1/projects/import/legacy/${projectId}/specification`,
+      {
+        features: specRows
+          .filter((row) => Boolean(featureIdByIntegerId[row.id]))
+          .map((row) => ({
+            featureId: featureIdByIntegerId[row.id],
+            kind: 'plain',
+            marxanSettings: {
+              fpf: row.spf,
+              prop: row.prop,
+            },
+          })),
+      },
+      {
+        headers: {
+          'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
+        },
+        validateStatus: () => true,
+      },
     );
 
-    const { status } = await this.httpService
-      .post(
-        `${AppConfig.get<string>(
-          'api.url',
-        )}/api/v1/projects/import/legacy/${projectId}/specification`,
-        {
-          features: specRows
-            .filter((row) => Boolean(featureIdByIntegerId[row.id]))
-            .map((row) => ({
-              featureId: featureIdByIntegerId[row.id],
-              kind: 'plain',
-              marxanSettings: {
-                fpf: row.spf,
-                prop: row.prop,
-              },
-            })),
-        },
-        {
-          headers: {
-            'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
-          },
-          validateStatus: () => true,
-        },
-      )
-      .toPromise();
-
+    const { status } = await lastValueFrom(response);
     if (status !== HttpStatus.CREATED) {
       this.logAndThrow(
         `Specification launch request failed with status: ${status}`,
@@ -344,13 +343,12 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     specRows: PropSpecDatRow[],
     scenarioId: string,
   ): Promise<void> {
-    const scenarioFeaturesData: ScenarioFeaturesData[] = await this.scenarioFeaturesDataRepo.find(
-      {
+    const scenarioFeaturesData: ScenarioFeaturesData[] =
+      await this.scenarioFeaturesDataRepo.find({
         select: ['id', 'featureData'],
         where: { scenarioId },
         relations: ['featureData'],
-      },
-    );
+      });
     const propertiesByIntegerId: Record<number, PropSpecDatRow> = {};
 
     specRows.forEach((row) => {
@@ -388,10 +386,9 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
        * size smaller than the default one, but keeping as is for the time
        * being.
        */
-      chunk(
-        updateValues,
-        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS / 4,
-      ).map((values) => this.scenarioFeaturesDataRepo.save(values)),
+      chunk(updateValues, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS / 4).map(
+        (values) => this.scenarioFeaturesDataRepo.save(values),
+      ),
     );
   }
 

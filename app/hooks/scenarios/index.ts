@@ -1,21 +1,22 @@
 import { useMemo } from 'react';
 
-import {
-  useQuery, useInfiniteQuery, useMutation, useQueryClient, useQueries,
-} from 'react-query';
-
-import flatten from 'lodash/flatten';
+import { useQuery, useMutation, useQueryClient, useQueries, UseQueryOptions } from 'react-query';
 
 import { useRouter } from 'next/router';
 
-import axios from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { formatDistanceToNow } from 'date-fns';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
+import { CostSurface } from 'types/api/cost-surface';
+import { Job } from 'types/api/job';
+import { Project } from 'types/api/project';
+import { Scenario } from 'types/api/scenario';
+import { createDownloadLink } from 'utils/download';
 
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
@@ -24,24 +25,14 @@ import UPLOADS from 'services/uploads';
 
 import {
   UseScenariosOptionsProps,
-  UseSaveScenarioProps,
-  SaveScenarioProps,
   UseDeleteScenarioProps,
   DeleteScenarioProps,
-  UseDownloadScenarioCostSurfaceProps,
-  DownloadScenarioCostSurfaceProps,
-  UseUploadScenarioCostSurfaceProps,
-  UploadScenarioCostSurfaceProps,
   UseUploadScenarioPUProps,
   UploadScenarioPUProps,
   UseSaveScenarioPUProps,
   SaveScenarioPUProps,
-  UploadPAProps,
-  UseUploadPAProps,
   UseDuplicateScenarioProps,
   DuplicateScenarioProps,
-  UseRunScenarioProps,
-  RunScenarioProps,
   UseCancelRunScenarioProps,
   CancelRunScenarioProps,
   UseSaveScenarioCalibrationRangeProps,
@@ -53,6 +44,7 @@ import {
   UseDownloadScenarioReportProps,
   DownloadScenarioReportProps,
   UseBlmImageProps,
+  ScenarioPlanningUnit,
 } from './types';
 
 function fetchScenarioBLMImage(sId, blmValue, session) {
@@ -63,7 +55,6 @@ function fetchScenarioBLMImage(sId, blmValue, session) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
-
   }).then((response) => {
     const data = {
       blmValue,
@@ -79,28 +70,33 @@ function fetchScenarioBLMImage(sId, blmValue, session) {
 ****************************************
 */
 export function useScenariosStatus(pId, requestConfig = {}, queryConfig = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const query = useQuery(['scenarios-status', pId], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pId}/scenarios/status`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    ...requestConfig,
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!pId,
-    placeholderData: {
-      data: {
-        jobs: [],
-        scenarios: [],
+  const query = useQuery(
+    ['scenarios-status', pId],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${pId}/scenarios/status`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        ...requestConfig,
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!pId,
+      placeholderData: {
+        data: {
+          jobs: [],
+          scenarios: [],
+        },
       },
-    },
-    refetchInterval: 2500,
-    ...queryConfig,
-  });
+      refetchInterval: 2500,
+      ...queryConfig,
+    }
+  );
 
   const { data } = query;
 
@@ -112,38 +108,44 @@ export function useScenariosStatus(pId, requestConfig = {}, queryConfig = {}) {
   }, [query, data?.data]);
 }
 
-export function useScenarioStatus(pId, sId) {
-  const [session] = useSession();
+export function useScenarioStatus(pId: Project['id'], sId: Scenario['id']) {
+  const { data: session } = useSession();
 
-  const query = useQuery(['scenarios-status', pId, sId], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pId}/scenarios/status`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
+  return useQuery({
+    queryKey: ['scenarios-status', pId, sId],
+    queryFn: async () =>
+      PROJECTS.request<{
+        data: {
+          id: string;
+          type: 'project-jobs';
+          jobs: Job[];
+          scenarios: { id: Scenario['id']; jobs: Job[] }[];
+        };
+        meta: unknown;
+      }>({
+        method: 'GET',
+        url: `/${pId}/scenarios/status`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then((response) => {
+        return response.data;
+      }),
     enabled: !!sId,
     placeholderData: {
       data: {
         scenarios: [],
+        jobs: [],
+        id: 'placeholder',
+        type: 'project-jobs',
       },
+      meta: {},
     },
     refetchInterval: 1000,
+    select: ({ data }) => {
+      return (data?.scenarios || []).find((s) => s.id === sId);
+    },
   });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    const scenarios = data?.data?.scenarios || [];
-    const CURRENT = scenarios.find((s) => s.id === sId);
-
-    return {
-      ...query,
-      data: CURRENT || {},
-    };
-  }, [query, data?.data, sId]);
 }
 
 export function useScenariosStatusOnce({
@@ -151,7 +153,7 @@ export function useScenariosStatusOnce({
     method: 'GET',
   },
 }: UseSaveScenarioLockProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenarioLock = ({ pId }) => {
     return PROJECTS.request({
@@ -166,7 +168,7 @@ export function useScenariosStatusOnce({
   };
 
   return useMutation(saveScenarioLock, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -183,21 +185,26 @@ export function useScenariosStatusOnce({
 */
 
 export function useProjectScenariosLocks(pid) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const query = useQuery(['project-locks', pid], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pid}/editing-locks`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!pid,
-    refetchInterval: 2500,
-  });
+  const query = useQuery(
+    ['project-locks', pid],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${pid}/editing-locks`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!pid,
+      refetchInterval: 2500,
+    }
+  );
 
   const { data } = query;
 
@@ -209,20 +216,25 @@ export function useProjectScenariosLocks(pid) {
   }, [query, data?.data]);
 }
 export function useScenarioLock(sid) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const query = useQuery(['scenario-lock', sid], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sid}/editing-locks`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!sid,
-  });
+  const query = useQuery(
+    ['scenario-lock', sid],
+    async () =>
+      SCENARIOS.request({
+        method: 'GET',
+        url: `/${sid}/editing-locks`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!sid,
+    }
+  );
 
   const { data } = query;
 
@@ -235,13 +247,11 @@ export function useScenarioLock(sid) {
 }
 
 export function useScenarioLockMe(sid) {
-  const {
-    data: scenarioLockData,
-  } = useScenarioLock(sid);
-  const { user } = useMe();
+  const { data: scenarioLockData } = useScenarioLock(sid);
+  const { data: user } = useMe();
 
   return useMemo(() => {
-    return (user.id === scenarioLockData?.userId);
+    return user.id === scenarioLockData?.userId;
   }, [user, scenarioLockData]);
 }
 
@@ -251,7 +261,7 @@ export function useSaveScenarioLock({
   },
 }: UseSaveScenarioLockProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenarioLock = ({ sid }: SaveScenarioLockProps) => {
     return SCENARIOS.request({
@@ -265,7 +275,7 @@ export function useSaveScenarioLock({
   };
 
   return useMutation(saveScenarioLock, {
-    onSuccess: (data: any, variables) => {
+    onSuccess: (data, variables) => {
       const { sid } = variables;
       queryClient.invalidateQueries('project-locks');
       queryClient.invalidateQueries(['scenario-lock', sid]);
@@ -283,7 +293,7 @@ export function useDeleteScenarioLock({
   },
 }: UseDeleteScenarioLockProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteScenarioLock = ({ sid }: DeleteScenarioLockProps) => {
     return SCENARIOS.request({
@@ -296,7 +306,7 @@ export function useDeleteScenarioLock({
   };
 
   return useMutation(deleteScenarioLock, {
-    onSuccess: (data: any, variables) => {
+    onSuccess: (data, variables) => {
       const { sid } = variables;
       queryClient.invalidateQueries('project-locks');
       queryClient.invalidateQueries(['scenario-lock', sid]);
@@ -314,59 +324,43 @@ export function useDeleteScenarioLock({
 ****************************************
 */
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { push } = useRouter();
 
-  const {
-    filters = {},
-    search,
-    sort,
-  } = options;
+  const { filters = {}, search, sort } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      // Backend isn't able to deal with this one yet; it'll always return an empty array
-      // if we set it. We'll do it manually in the frontend. Not ideal, but allows us to
-      // move forward with useable filters.
-      if (k === 'status') return acc;
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    // Backend isn't able to deal with this one yet; it'll always return an empty array
+    // if we set it. We'll do it manually in the frontend. Not ideal, but allows us to
+    // move forward with useable filters.
+    if (k === 'status') return acc;
 
-      return {
-        ...acc,
-        [`filter[${k}]`]: (filters[k] && filters[k].toString) ? filters[k].toString() : filters[k],
-      };
-    }, {});
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k] && filters[k].toString ? filters[k].toString() : filters[k],
+    };
+  }, {});
 
-  const fetchScenarios = ({ pageParam = 1 }) => SCENARIOS.request({
-    method: 'GET',
-    url: '/',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': pageParam,
-      ...parsedFilters,
-      ...search && {
-        q: search,
+  const fetchScenarios = () =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: '/',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
       },
-      ...sort && {
-        sort,
+      params: {
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+        disablePagination: true,
       },
-    },
-  });
+    }).then((response) => response.data);
 
-  const query = useInfiniteQuery(['scenarios', pId, JSON.stringify(options)], fetchScenarios, {
-    retry: false,
-    keepPreviousData: true,
-    getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
-      const { page, totalPages } = meta;
-
-      const nextPage = page + 1 > totalPages ? null : page + 1;
-      return nextPage;
-    },
-  });
-
-  const { user } = useMe();
+  const { data: user } = useMe();
 
   const { data: statusData = { scenarios: [] } } = useScenariosStatus(pId);
   const { scenarios: statusScenarios = [] } = statusData;
@@ -374,17 +368,14 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const { data: scenariosLocksData = [] } = useProjectScenariosLocks(pId);
   const { data: projectUsersData = [] } = useProjectUsers(pId);
 
-  const { data } = query;
-  const { pages } = data || {};
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
-
-      return pageData.map((d): ItemProps => {
-        const {
-          id, projectId, name, lastModifiedAt, status, ranAtLeastOnce, numberOfRuns,
-        } = d;
+  return useQuery(['scenarios', pId, JSON.stringify(options)], fetchScenarios, {
+    retry: false,
+    keepPreviousData: true,
+    refetchOnWindowFocus: true,
+    placeholderData: { data: [] },
+    select: (data) => {
+      const parsedData = data?.data.map((d): ItemProps => {
+        const { id, projectId, name, lastModifiedAt, status, ranAtLeastOnce, numberOfRuns } = d;
 
         const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
         const runStatus = status || jobs.find((job) => job.kind === 'run')?.status || 'created';
@@ -401,10 +392,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
         }
 
         const lastUpdateDistance = () => {
-          return formatDistanceToNow(
-            new Date(lastModifiedAt),
-            { addSuffix: true },
-          );
+          return formatDistanceToNow(new Date(lastModifiedAt), { addSuffix: true });
         };
 
         return {
@@ -419,87 +407,75 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           ranAtLeastOnce,
           numberOfRuns,
           onEdit: () => {
-            push(`/projects/${projectId}/scenarios/${id}/edit`);
+            push(`/projects/${projectId}/scenarios/${id}/edit?tab=protected-areas`);
           },
         };
       });
-    })) : [];
 
-    // Backend can't deal with the `status` filter just yet, so we'll just manually
-    // filter it out manually in the frontend. It'll allow us to make the feature work
-    // in the frontend for now, albeit in a non-ideal way.
-    const filteredData = parsedData.filter((parsedDataItem) => {
-      const statusFiltersArr = (filters?.status as Array<string> || []);
-      // No filters to apply, return everything
-      if (!statusFiltersArr.length) return true;
-      return statusFiltersArr.includes(parsedDataItem.runStatus);
-    });
-
-    return {
-      ...query,
-      data: filteredData,
-    };
-  }, [
-    query, pages, filters, push, user?.id, statusScenarios, scenariosLocksData, projectUsersData,
-  ]);
+      // Backend can't deal with the `status` filter just yet, so we'll just manually
+      // filter it out manually in the frontend. It'll allow us to make the feature work
+      // in the frontend for now, albeit in a non-ideal way.
+      return parsedData.filter((parsedDataItem) => {
+        const statusFiltersArr = (filters?.status as Array<string>) || [];
+        // No filters to apply, return everything
+        if (!statusFiltersArr.length) return true;
+        return statusFiltersArr.includes(parsedDataItem.runStatus);
+      });
+    },
+  });
 }
 
-export function useScenario(id) {
-  const [session] = useSession();
+export function useScenario(id: Scenario['id'], params = {}) {
+  const { data: session } = useSession();
 
-  const query = useQuery(['scenarios', id], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${id}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
+  return useQuery({
+    queryKey: ['scenario', id, params],
+    queryFn: async () =>
+      SCENARIOS.request<{ data: Scenario }>({
+        method: 'GET',
+        url: `/${id}`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        params,
+      }).then((response) => response.data),
     enabled: !!id,
+    placeholderData: {
+      // ? not a fan of this, but it's the only way to make the types work
+      data: {} as Scenario,
+    },
+    select: ({ data }) => data,
   });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
 }
 
 export function useSaveScenario({
   requestConfig = {
     method: 'POST',
   },
-}: UseSaveScenarioProps) {
+}: {
+  requestConfig?: AxiosRequestConfig<{ data: Scenario }>;
+}) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const saveScenario = ({ id, data }: SaveScenarioProps) => {
-    return SCENARIOS.request({
+  const saveScenario = ({ id, data }: { id?: Scenario['id']; data: Record<string, unknown> }) => {
+    return SCENARIOS.request<{ data: Scenario }>({
       url: id ? `/${id}` : '/',
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
-    });
+    }).then((response) => response.data);
   };
 
   return useMutation(saveScenario, {
-    onSuccess: (data: any, variables, context) => {
-      const { id, projectId } = data?.data?.data;
-      // const { isoDate, started } = data?.data?.meta;
-      queryClient.invalidateQueries(['scenarios', projectId]);
-      queryClient.setQueryData(['scenarios', id], data?.data);
+    onSuccess: async ({ data }) => {
+      const { id, projectId } = data;
 
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
+      await queryClient.invalidateQueries(['scenarios', projectId]);
+      await queryClient.invalidateQueries(['scenario', id]);
+      queryClient.setQueryData(['scenario', id], { data });
     },
   });
 }
@@ -509,7 +485,7 @@ export function useDeleteScenario({
     method: 'DELETE',
   },
 }: UseDeleteScenarioProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteScenario = ({ id }: DeleteScenarioProps) => {
     return SCENARIOS.request({
@@ -538,7 +514,7 @@ export function useUploadScenarioPU({
     method: 'POST',
   },
 }: UseUploadScenarioPUProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadScenarioPUShapefile = ({ id, data }: UploadScenarioPUProps) => {
     return UPLOADS.request({
@@ -553,139 +529,7 @@ export function useUploadScenarioPU({
   };
 
   return useMutation(uploadScenarioPUShapefile, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
-    },
-  });
-}
-
-// CUSTOM PROTECTED AREAS
-export function useUploadPA({
-  requestConfig = {
-    method: 'POST',
-  },
-}: UseUploadPAProps) {
-  const [session] = useSession();
-
-  const uploadPAShapefile = ({ id, data }: UploadPAProps) => {
-    return UPLOADS.request({
-      url: `scenarios/${id}/protected-areas/shapefile`,
-      data,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'multipart/form-data',
-      },
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(uploadPAShapefile, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      console.info('Error', error, variables, context);
-    },
-  });
-}
-
-export function useCostSurfaceRange(id) {
-  const [session] = useSession();
-
-  const query = useQuery(['scenarios-cost-surface', id], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${id}/cost-surface`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => {
-      try {
-        return JSON.parse(data);
-      } catch (error) {
-        return data;
-      }
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!id,
-  });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data,
-    };
-  }, [query, data]);
-}
-
-export function useDownloadCostSurface({
-  requestConfig = {
-    method: 'GET',
-  },
-}: UseDownloadScenarioCostSurfaceProps) {
-  const [session] = useSession();
-
-  const downloadScenarioCostSurface = ({ id }: DownloadScenarioCostSurfaceProps) => {
-    return DOWNLOADS.request({
-      url: `/scenarios/${id}/cost-surface/shapefile-template`,
-      responseType: 'arraybuffer',
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'application/zip',
-      },
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(downloadScenarioCostSurface, {
-    onSuccess: (data: any, variables, context) => {
-      const { data: blob } = data;
-      const { id } = variables;
-
-      const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `cost-surface-${id}.zip`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
-      // An error happened!
-      console.info('Error', error, variables, context);
-    },
-  });
-}
-
-export function useUploadCostSurface({
-  requestConfig = {
-    method: 'GET',
-  },
-}: UseUploadScenarioCostSurfaceProps) {
-  const [session] = useSession();
-
-  const uploadScenarioCostSurface = ({ id, data }: UploadScenarioCostSurfaceProps) => {
-    return UPLOADS.request({
-      url: `/scenarios/${id}/cost-surface/shapefile`,
-      data,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'multipart/form-data',
-      },
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(uploadScenarioCostSurface, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -696,61 +540,67 @@ export function useUploadCostSurface({
 }
 
 // PLANNING UNITS
-export function useScenarioPU(sid) {
-  const [session] = useSession();
+export function useScenarioPU(
+  sid: string,
+  queryOptions?: UseQueryOptions<
+    ScenarioPlanningUnit[],
+    AxiosError,
+    {
+      excluded: ScenarioPlanningUnit['id'][];
+      included: ScenarioPlanningUnit['id'][];
+      available: ScenarioPlanningUnit['id'][];
+      total: number;
+    }
+  >
+) {
+  const { data: session } = useSession();
 
-  const query = useQuery(['scenarios-pu', sid], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sid}/planning-units`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => {
-      try {
-        return JSON.parse(data);
-      } catch (error) {
-        return data;
-      }
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!sid,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: false,
-    placeholderData: [],
-  });
+  return useQuery(
+    ['scenarios-pu', sid],
+    async () =>
+      SCENARIOS.request<ScenarioPlanningUnit[]>({
+        method: 'GET',
+        url: `/${sid}/planning-units`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => {
+          try {
+            return JSON.parse(data);
+          } catch (error) {
+            return data;
+          }
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!sid,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      placeholderData: [],
+      select: (data) => {
+        const included = data
+          .filter((p) => p.inclusionStatus === 'locked-in' && p.setByUser)
+          .map((p) => p.id);
+        const excluded = data
+          .filter((p) => p.inclusionStatus === 'locked-out' && p.setByUser)
+          .map((p) => p.id);
+        const available = data
+          .filter((p) => p.inclusionStatus === 'available' && p.setByUser)
+          .map((p) => p.id);
+        const total = data.length;
 
-  const { data } = query;
-
-  return useMemo(() => {
-    const parsedData = data || [];
-    const included = parsedData
-      .filter((p) => p.inclusionStatus === 'locked-in')
-      .map((p) => p.id);
-
-    const includedDefault = parsedData
-      .filter((p) => p.defaultStatus === 'locked-in')
-      .map((p) => p.id);
-
-    const excluded = parsedData
-      .filter((p) => p.inclusionStatus === 'locked-out')
-      .map((p) => p.id);
-
-    const excludedDefault = parsedData
-      .filter((p) => p.defaultStatus === 'locked-out')
-      .map((p) => p.id);
-
-    return {
-      ...query,
-      data: {
-        included,
-        excluded,
-        includedDefault,
-        excludedDefault,
+        return {
+          included,
+          excluded,
+          available,
+          total,
+        };
       },
-    };
-  }, [query, data]);
+      ...queryOptions,
+    }
+  );
 }
 
 export function useSaveScenarioPU({
@@ -759,7 +609,7 @@ export function useSaveScenarioPU({
   },
 }: UseSaveScenarioPUProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenario = ({ id, data }: SaveScenarioPUProps) => {
     return SCENARIOS.request({
@@ -773,7 +623,7 @@ export function useSaveScenarioPU({
   };
 
   return useMutation(saveScenario, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
       const { id } = variables;
       queryClient.invalidateQueries(['scenarios-pu', id]);
@@ -790,7 +640,7 @@ export function useDuplicateScenario({
   },
 }: UseDuplicateScenarioProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const duplicateScenario = ({ sid }: DuplicateScenarioProps) => {
     // Pending endpoint
@@ -804,8 +654,8 @@ export function useDuplicateScenario({
   };
 
   return useMutation(duplicateScenario, {
-    onSuccess: (data: any, variables, context) => {
-      queryClient.invalidateQueries(['scenarios']);
+    onSuccess: async (data, variables, context) => {
+      await queryClient.invalidateQueries(['scenarios']);
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -819,11 +669,13 @@ export function useRunScenario({
   requestConfig = {
     method: 'POST',
   },
-}: UseRunScenarioProps) {
-  const [session] = useSession();
+}: {
+  requestConfig?: AxiosRequestConfig;
+}) {
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
 
-  const duplicateScenario = ({ id }: RunScenarioProps) => {
-    // Pending endpoint
+  const runScenario = ({ id }: { id: Scenario['id'] }) => {
     return SCENARIOS.request({
       url: `/${id}/marxan`,
       headers: {
@@ -833,12 +685,13 @@ export function useRunScenario({
     });
   };
 
-  return useMutation(duplicateScenario, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Success', data, variables, context);
+  return useMutation(runScenario, {
+    onSuccess: async (data, variables) => {
+      const { id } = variables;
+      await queryClient.invalidateQueries(['scenarios']);
+      await queryClient.invalidateQueries(['scenario', id]);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });
@@ -849,7 +702,7 @@ export function useCancelRunScenario({
     method: 'DELETE',
   },
 }: UseCancelRunScenarioProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const duplicateScenario = ({ id }: CancelRunScenarioProps) => {
     // Pending endpoint
@@ -863,7 +716,7 @@ export function useCancelRunScenario({
   };
 
   return useMutation(duplicateScenario, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -875,7 +728,7 @@ export function useCancelRunScenario({
 
 // BLM
 export function useCalibrationBLMImages({ sid, blmValues }) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const userQueries = useQueries(
     blmValues.map((blmValue) => {
@@ -883,7 +736,7 @@ export function useCalibrationBLMImages({ sid, blmValues }) {
         queryKey: ['scenario-blm-image', sid, blmValue],
         queryFn: () => fetchScenarioBLMImage(sid, blmValue, session),
       };
-    }),
+    })
   );
 
   const CALIBRATION_IMAGES = useMemo(() => {
@@ -917,52 +770,63 @@ export function useCalibrationBLMImages({ sid, blmValues }) {
 }
 
 export function useScenarioCalibrationResults(scenarioId) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const query = useQuery(['scenario-calibration', scenarioId], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${scenarioId}/calibration`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }), {
-    retry: false,
-  });
+  const query = useQuery(
+    ['scenario-calibration', scenarioId],
+    async () =>
+      SCENARIOS.request({
+        method: 'GET',
+        url: `/${scenarioId}/calibration`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }),
+    {
+      retry: false,
+    }
+  );
 
   const { data } = query;
 
   const blmValues = data?.data.map((i) => i.blmValue) || [];
+
   const { data: blmImages } = useCalibrationBLMImages({ sid: scenarioId, blmValues });
 
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data)
-      ? data?.data.sort((a, b) => (a.blmValue > b.blmValue ? 1 : -1)).map((i) => {
-        return {
-          ...i,
-          pngData: blmImages[i.blmValue],
-        };
-      }) : [];
+      ? data?.data
+          .sort((a, b) => (a.blmValue > b.blmValue ? 1 : -1))
+          .map((i) => {
+            return {
+              ...i,
+              pngData: blmImages[i.blmValue],
+            };
+          })
+      : [];
 
     return {
       ...query,
       data: parsedData,
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, data?.data, blmImages]);
 }
 
 export function useScenarioCalibrationRange(scenarioId) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const query = useQuery(['scenario-calibration-range', scenarioId], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${scenarioId}/blm/range`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }));
+  const query = useQuery(['scenario-calibration-range', scenarioId], async () =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: `/${scenarioId}/blm/range`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (data) => JSON.parse(data),
+    })
+  );
 
   const { data } = query;
 
@@ -980,7 +844,7 @@ export function useSaveScenarioCalibrationRange({
   },
 }: UseSaveScenarioCalibrationRangeProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenarioCalibrationRange = ({ sid, data }: SaveScenarioCalibrationRangeProps) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
@@ -997,7 +861,7 @@ export function useSaveScenarioCalibrationRange({
   };
 
   return useMutation(saveScenarioCalibrationRange, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       console.info('Succcess', data, variables, context);
       const { sid: scenarioId } = variables;
       queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
@@ -1011,13 +875,13 @@ export function useSaveScenarioCalibrationRange({
 
 export function useDownloadScenarioReport({
   requestConfig = {
-    method: 'POST',
+    method: 'GET',
   },
   projectName,
   scenarioName,
   runId,
 }: UseDownloadScenarioReportProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const downloadScenarioReport = ({ sid, solutionId }: DownloadScenarioReportProps) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
@@ -1034,20 +898,121 @@ export function useDownloadScenarioReport({
   };
 
   return useMutation(downloadScenarioReport, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       const { data: blob } = data;
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `project_${projectName}-scenario_${scenarioName}-run_${runId}.pdf`);
+      link.setAttribute(
+        'download',
+        `project_${projectName}-scenario_${scenarioName}-run_${runId}.pdf`
+      );
       document.body.appendChild(link);
       link.click();
       link.remove();
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeletePUScenaro() {
+  const { data: session } = useSession();
+
+  const deletePUScenario = ({
+    sid,
+    PUKind,
+  }: {
+    sid: string;
+    PUKind: 'locked-in' | 'locked-out' | 'available';
+  }) => {
+    return SCENARIOS.delete(`/${sid}/planning-units/status/${PUKind}`, {
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(deletePUScenario, {
+    onSuccess: (data, variables, context) => {
+      console.info('Success', data, variables, context);
+      // const { id } = variables;
+      // queryClient.invalidateQueries(['scenarios-pu', id]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDownloadSolutionsSummary() {
+  const { data: session } = useSession();
+
+  const downloadScenarioSolutionsSummary = ({ id }: { id: Project['id'] }) => {
+    return DOWNLOADS.request<ArrayBuffer>({
+      method: 'GET',
+      url: `/projects/${id}/output-summary`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+    });
+  };
+
+  return useMutation(downloadScenarioSolutionsSummary, {
+    onSuccess: (data, variables) => {
+      const { data: blob } = data;
+      const { id } = variables;
+
+      createDownloadLink(blob, `solutions-${id}.zip`);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useLinkScenarioToCostSurface() {
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
+
+  const linkScenario = ({ sid, csid }: { sid: Scenario['id']; csid: CostSurface['id'] }) => {
+    return SCENARIOS.request<unknown>({
+      method: 'POST',
+      url: `/${sid}/cost-surface/${csid}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(linkScenario, {
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries(['scenario', variables.sid]);
+    },
+  });
+}
+
+export function useUnlinkScenarioToCostSurface() {
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
+
+  const unlinkScenario = ({ sid }: { sid: Scenario['id'] }) => {
+    return SCENARIOS.request<unknown>({
+      method: 'DELETE',
+      url: `/${sid}/cost-surface`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(unlinkScenario, {
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries(['scenario', variables.sid]);
     },
   });
 }

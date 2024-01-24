@@ -1,8 +1,8 @@
-import { PlanningUnit } from 'types/project-model';
+import { PlanningArea } from 'types/api/project';
 
-export const DEFAULT_AREA = {
+export const DEFAULT_AREA: Omit<PlanningArea, 'country'> = {
   planningUnitAreakm2: 10,
-  planningUnitGridShape: PlanningUnit.HEXAGON,
+  planningUnitGridShape: 'hexagon',
 };
 
 export const PA_OPTIONS = [
@@ -18,4 +18,4 @@ export const PA_OPTIONS = [
     label: 'No, I don’t have a planning region or planning unit shapefile',
     value: 'regular',
   },
-];
+] as const;

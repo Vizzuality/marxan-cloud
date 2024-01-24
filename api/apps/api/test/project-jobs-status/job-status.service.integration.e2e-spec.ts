@@ -13,8 +13,6 @@ import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -22,19 +20,13 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-afterEach(async () => {
-  await fixtures.cleanup();
-});
-
 describe(`when has two projects with scenarios and events`, () => {
   let result: ProjectWithScenarios;
   let scenarioIds: string[];
   let projectId: string;
   beforeEach(async () => {
-    ({
-      scenarioIds,
-      projectId,
-    } = await fixtures.givenProjectWithTwoScenariosWithOverridingEvents());
+    ({ scenarioIds, projectId } =
+      await fixtures.givenProjectWithTwoScenariosWithOverridingEvents());
     await fixtures.givenAnotherProjectWithAScenarioWithAnEvent();
 
     result = await fixtures.getJobStatusService().getJobStatusFor(projectId);
@@ -106,8 +98,7 @@ async function getFixtures() {
 
       const eventDtos = [
         {
-          kind:
-            API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1,
+          kind: API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1,
           topic: scenario1.id,
         },
         {
@@ -115,13 +106,11 @@ async function getFixtures() {
           topic: scenario1.id,
         },
         {
-          kind:
-            API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1,
+          kind: API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1,
           topic: scenario1.id,
         },
         {
-          kind:
-            API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1,
+          kind: API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1,
           topic: scenario1.id,
         },
         {
@@ -147,31 +136,14 @@ async function getFixtures() {
       );
       await GivenScenarioExists(application, projectId, token);
       const event = await eventsRepository.create({
-        kind:
-          API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1,
+        kind: API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1,
         topic: projectId,
       });
       addedOrganizations.push(organizationId);
       addedProjects.push(projectId);
       addedEvents.push(event);
     },
-    async cleanup() {
-      await eventsRepository.repo.remove(addedEvents);
-      await Promise.all(
-        addedProjects.map((projectId) =>
-          ProjectsTestUtils.deleteProject(application, token, projectId),
-        ),
-      );
-      await Promise.all(
-        addedOrganizations.map((organizationId) =>
-          OrganizationsTestUtils.deleteOrganization(
-            application,
-            token,
-            organizationId,
-          ),
-        ),
-      );
-    },
+
     getStatusRepository() {
       return statusRepository;
     },

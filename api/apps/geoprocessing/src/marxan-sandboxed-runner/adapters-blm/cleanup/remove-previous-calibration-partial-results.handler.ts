@@ -4,7 +4,8 @@ import { RemovePreviousCalibrationPartialResults } from './remove-previous-calib
 
 @CommandHandler(RemovePreviousCalibrationPartialResults)
 export class RemovePreviousCalibrationPartialResultsHandler
-  implements IInferredCommandHandler<RemovePreviousCalibrationPartialResults> {
+  implements IInferredCommandHandler<RemovePreviousCalibrationPartialResults>
+{
   constructor(
     private readonly partialResultsRepo: BlmPartialResultsRepository,
   ) {}

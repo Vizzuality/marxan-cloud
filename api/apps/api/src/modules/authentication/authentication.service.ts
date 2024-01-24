@@ -12,12 +12,11 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { hash, compare } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 
 import { LessThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IssuedAuthnToken } from './issued-authn-token.api.entity';
-import ms = require('ms');
 import { SignUpDto } from './dto/sign-up.dto';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { v4 } from 'uuid';
@@ -27,7 +26,12 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { EventBus } from '@nestjs/cqrs';
 import { UserLoggedIn } from './user-logged-in.event';
 import { isStringEntropyHigherThan } from '@marxan-api/utils/passwordValidation.utils';
-import { isLeft } from 'fp-ts/lib/Either';
+import { Either, left, right, isLeft } from 'fp-ts/Either';
+import ms = require('ms');
+
+export const emailAlreadyInUseError = Symbol('email already in use');
+export const unknownError = Symbol('unknown error');
+type SignUpError = typeof emailAlreadyInUseError | typeof unknownError;
 
 /**
  * Access token for the app: key user data and access token
@@ -74,7 +78,8 @@ export interface JwtDataPayload {
 /**
  * Entropy threshold for password validation.
  */
-export const entropyThreshold = 80;
+// TODO: Make this env var?
+export const entropyThreshold = 10;
 @Injectable()
 export class AuthenticationService {
   private readonly logger = new Logger(AuthenticationService.name);
@@ -120,7 +125,9 @@ export class AuthenticationService {
    *
    * @todo Allow to set all of a user's data on signup, if needed.
    */
-  async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
+  async createUser(
+    signupDto: SignUpDto,
+  ): Promise<Either<SignUpError, Partial<User>>> {
     const passwordCheck = isStringEntropyHigherThan(
       entropyThreshold,
       signupDto.password,
@@ -137,12 +144,16 @@ export class AuthenticationService {
     user.background = signupDto.background;
     user.level = signupDto.level;
     user.country = signupDto.country;
+    const emailExists = await this.usersService.findByEmail(user.email);
+    if (emailExists) {
+      return left(emailAlreadyInUseError);
+    }
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
-    if (!newUser) {
-      throw new InternalServerErrorException('Error while creating a new user');
-    }
+
+    if (!newUser) return left(unknownError);
+
     await this.apiEventsService.create({
       topic: newUser.id,
       kind: API_EVENT_KINDS.user__signedUp__v1alpha1,
@@ -170,7 +181,8 @@ export class AuthenticationService {
       );
     }
     await this.mailer.sendSignUpConfirmationEmail(newUser.id, validationToken);
-    return newUser;
+
+    return right(newUser);
   }
 
   /**
@@ -281,9 +293,8 @@ export class AuthenticationService {
     const issuedTokenModel = new IssuedAuthnToken();
     issuedTokenModel.exp = new Date(tokenExpiresAt);
     issuedTokenModel.userId = user.id as string;
-    const issuedToken = await this.issuedAuthnTokensRepository.save(
-      issuedTokenModel,
-    );
+    const issuedToken =
+      await this.issuedAuthnTokensRepository.save(issuedTokenModel);
 
     /**
      * And finally we use the db-generated unique id of the token issuance log
@@ -316,8 +327,8 @@ export class AuthenticationService {
    *
    * See documentation of the IssuedAuthnToken entity for details on these ids.
    */
-  async findTokenById(tokenId: string): Promise<IssuedAuthnToken | undefined> {
-    return this.issuedAuthnTokensRepository.findOne({ id: tokenId });
+  async findTokenById(tokenId: string): Promise<IssuedAuthnToken | null> {
+    return this.issuedAuthnTokensRepository.findOne({ where: { id: tokenId } });
   }
 
   /**

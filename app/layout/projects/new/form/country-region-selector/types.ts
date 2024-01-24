@@ -1,6 +1,10 @@
+import { MouseEvent } from 'react';
+
+import { Country, Region, SubRegion } from 'types/api/location';
+
 export default interface CountryRegionSelectorProps {
-  country?: string;
-  region?: string;
-  subRegion?: string;
-  onClick?: () => void;
+  country?: Country['id'];
+  region?: Region['id'];
+  subRegion?: SubRegion['id'];
+  onClick?: (evt: MouseEvent<HTMLDivElement>) => void;
 }

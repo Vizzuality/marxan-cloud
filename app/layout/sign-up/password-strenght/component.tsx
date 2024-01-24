@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 
-import cx from 'classnames';
 import stringEntropy from 'fast-password-entropy';
+
+import { cn } from 'utils/cn';
 
 export interface PaasswordStrengthProps {
   password: string;
@@ -9,10 +10,10 @@ export interface PaasswordStrengthProps {
 
 export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
   password,
-}:PaasswordStrengthProps) => {
+}: PaasswordStrengthProps) => {
   const ENTROPY = useMemo(() => {
     const e = stringEntropy(password);
-    return (e > 100) ? 100 : stringEntropy(password);
+    return e > 100 ? 100 : stringEntropy(password);
   }, [password]);
 
   const STRENGTH = useMemo(() => {
@@ -27,14 +28,14 @@ export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
   }, [ENTROPY]);
 
   return (
-    <div className="mt-1 space-y-0.5 h-4">
-      <div className="w-full h-1 text-sm bg-gray-100 rounded-md">
+    <div className="mt-1 h-4 space-y-0.5">
+      <div className="h-1 w-full rounded-md bg-gray-200 text-sm">
         <div
-          className={cx({
+          className={cn({
             'h-full rounded-md': true,
-            'bg-green-500': STRENGTH === 'strong',
-            'bg-yellow-700': STRENGTH === 'medium',
-            'bg-red-500': STRENGTH === 'weak',
+            'bg-green-600': STRENGTH === 'strong',
+            'bg-yellow-800': STRENGTH === 'medium',
+            'bg-red-600': STRENGTH === 'weak',
           })}
           style={{
             width: `${ENTROPY}%`,
@@ -43,12 +44,8 @@ export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
       </div>
 
       {!!password && (
-        <div className="text-right text-gray-500 text-xxs">
-          Strength:
-          {' '}
-          <span>
-            {STRENGTH}
-          </span>
+        <div className="text-right text-xxs text-gray-600">
+          Strength: <span>{STRENGTH}</span>
         </div>
       )}
     </div>

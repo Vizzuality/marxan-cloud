@@ -27,7 +27,6 @@ export class UsersProjectsApiEntity {
 
   @ManyToOne(() => Project, {
     onDelete: 'CASCADE',
-    primary: true,
   })
   @JoinColumn({
     name: `project_id`,
@@ -37,7 +36,6 @@ export class UsersProjectsApiEntity {
 
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
-    primary: true,
   })
   @JoinColumn({
     name: `user_id`,
@@ -45,9 +43,7 @@ export class UsersProjectsApiEntity {
   })
   user?: User;
 
-  @ManyToOne(() => Role, {
-    primary: true,
-  })
+  @ManyToOne(() => Role)
   @JoinColumn({
     name: `role_id`,
     referencedColumnName: `name`,

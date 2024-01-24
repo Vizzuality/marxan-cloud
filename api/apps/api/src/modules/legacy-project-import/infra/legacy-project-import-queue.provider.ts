@@ -35,13 +35,14 @@ export const importLegacyProjectPieceQueueProvider: FactoryProvider<
   },
   inject: [QueueBuilder],
 };
-export const importLegacyProjectPiecenQueueEventsProvider: FactoryProvider<QueueEvents> = {
-  provide: importLegacyProjectPieceEventsToken,
-  useFactory: (eventsBuilder: QueueEventsBuilder) => {
-    return eventsBuilder.buildQueueEvents(legacyProjectImportQueueName);
-  },
-  inject: [QueueEventsBuilder],
-};
+export const importLegacyProjectPiecenQueueEventsProvider: FactoryProvider<QueueEvents> =
+  {
+    provide: importLegacyProjectPieceEventsToken,
+    useFactory: (eventsBuilder: QueueEventsBuilder) => {
+      return eventsBuilder.buildQueueEvents(legacyProjectImportQueueName);
+    },
+    inject: [QueueEventsBuilder],
+  };
 
 export const importLegacyProjectPieceEventsFactoryProvider: FactoryProvider<
   CreateWithEventFactory<

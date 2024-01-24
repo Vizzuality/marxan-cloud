@@ -24,8 +24,7 @@ import * as nock from 'nock';
 import { EntityManager, In, Repository } from 'typeorm';
 import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
-import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
-import { delay } from '../../utils';
+import { GivenScenarioAndProjectPuData } from '../../steps/given-scenario-pu-data-exists';
 import { Test } from '@nestjs/testing';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
@@ -44,21 +43,17 @@ describe(`given input data is delayed`, () => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test(`cancelling blm calibration run during fetching assets`, async (done) => {
+  test(`cancelling blm calibration run during fetching assets BLM calibration run shouldn't finish`, async () => {
     expect.assertions(1);
 
-    fixtures
-      .GivenBLMCalibrationIsRunning()
-      .then(() => {
-        throw new Error(`BLM calibration run shouldn't finish`);
-      })
-      .catch(async (error) => {
-        expect(error.signal).toEqual('SIGTERM');
-        done();
-      });
+    setTimeout(fixtures.WhenKillingMarxanRun, 1000);
 
-    await delay(1000);
-    fixtures.WhenKillingMarxanRun();
+    try {
+      await fixtures.GivenBLMCalibrationIsRunning();
+      fail();
+    } catch (e) {
+      expect(e).toHaveProperty('signal', 'SIGTERM');
+    }
   }, 30000);
 });
 
@@ -79,21 +74,17 @@ describe(`given input data is available`, () => {
     60000 * 15,
   );
 
-  test(`cancelling BLM calibration run`, async (done) => {
+  test(`cancelling BLM calibration run shouldn't finish BLM calibration run.`, async () => {
     expect.assertions(1);
 
-    fixtures
-      .GivenBLMCalibrationIsRunning()
-      .then(() => {
-        done(`Shouldn't finish BLM calibration run.`);
-      })
-      .catch((error) => {
-        expect(JSON.parse(error).signal).toEqual('SIGTERM');
-        done();
-      });
+    setTimeout(fixtures.WhenKillingMarxanRun, 1000);
 
-    await delay(1000);
-    fixtures.WhenKillingMarxanRun();
+    try {
+      await fixtures.GivenBLMCalibrationIsRunning();
+      fail();
+    } catch (e) {
+      expect(JSON.parse(e)).toHaveProperty('signal', 'SIGTERM');
+    }
   }, 30000);
 });
 
@@ -143,36 +134,27 @@ const getFixtures = async () => {
     organizationId,
   );
   const entityManager = app.get<EntityManager>(getEntityManagerToken());
-  const featuresData: Repository<GeoFeatureGeometry> = entityManager.getRepository(
-    GeoFeatureGeometry,
-  );
-  const scenarioFeatureRepo: Repository<ScenarioFeaturesData> = entityManager.getRepository(
-    ScenarioFeaturesData,
-  );
-  const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> = entityManager.getRepository(
-    PlanningUnitsGeom,
-  );
-  const puOutputRepo: Repository<OutputScenariosPuDataGeoEntity> = entityManager.getRepository(
-    OutputScenariosPuDataGeoEntity,
-  );
-  const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = entityManager.getRepository(
-    MarxanExecutionMetadataGeoEntity,
-  );
-  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = entityManager.getRepository(
-    OutputScenariosFeaturesDataGeoEntity,
-  );
-  const blmFinalResultsRepo: Repository<BlmFinalResultEntity> = entityManager.getRepository(
-    BlmFinalResultEntity,
-  );
-  const blmPartialResultsRepo: Repository<BlmPartialResultEntity> = entityManager.getRepository(
-    BlmPartialResultEntity,
-  );
+  const featuresData: Repository<GeoFeatureGeometry> =
+    entityManager.getRepository(GeoFeatureGeometry);
+  const scenarioFeatureRepo: Repository<ScenarioFeaturesData> =
+    entityManager.getRepository(ScenarioFeaturesData);
+  const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> =
+    entityManager.getRepository(PlanningUnitsGeom);
+  const puOutputRepo: Repository<OutputScenariosPuDataGeoEntity> =
+    entityManager.getRepository(OutputScenariosPuDataGeoEntity);
+  const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> =
+    entityManager.getRepository(MarxanExecutionMetadataGeoEntity);
+  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> =
+    entityManager.getRepository(OutputScenariosFeaturesDataGeoEntity);
+  const blmFinalResultsRepo: Repository<BlmFinalResultEntity> =
+    entityManager.getRepository(BlmFinalResultEntity);
+  const blmPartialResultsRepo: Repository<BlmPartialResultEntity> =
+    entityManager.getRepository(BlmPartialResultEntity);
   // note that SandboxRunner may be both single and blm-calibration one
   const runModuleContext = app.select(BlmRunAdapterModule);
 
-  const sut: MarxanSandboxBlmRunnerService = runModuleContext.get(
-    blmSandboxRunner,
-  );
+  const sut: MarxanSandboxBlmRunnerService =
+    runModuleContext.get(blmSandboxRunner);
 
   const nockScope = nock(host, {
     reqheaders: {
@@ -239,7 +221,7 @@ const getFixtures = async () => {
     GivenScenarioPuDataExists: async () => {
       outputsIds.push(
         ...(
-          await GivenScenarioPuData(
+          await GivenScenarioAndProjectPuData(
             entityManager,
             projectId,
             scenarioId,

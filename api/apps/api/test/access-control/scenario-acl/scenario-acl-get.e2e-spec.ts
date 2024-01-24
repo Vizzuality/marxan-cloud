@@ -12,9 +12,8 @@ afterEach(async () => {
 
 test(`getting scenario users when user has no role in the scenario`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated();
-  const response = await fixtures.WhenGettingScenarioUsersAsNotInScenario(
-    scenarioId,
-  );
+  const response =
+    await fixtures.WhenGettingScenarioUsersAsNotInScenario(scenarioId);
   fixtures.ThenForbiddenIsReturned(response);
 });
 
@@ -34,27 +33,24 @@ test(`getting scenario users as viewer`, async () => {
 test(`getting scenario users as contributor`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenContributorWasAddedToScenario(scenarioId);
-  const response = await fixtures.WhenGettingScenarioUsersAsContributor(
-    scenarioId,
-  );
+  const response =
+    await fixtures.WhenGettingScenarioUsersAsContributor(scenarioId);
   fixtures.ThenForbiddenIsReturned(response);
 });
 
 test(`getting scenario users as owner with a search query`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenViewerWasAddedToScenario(scenarioId);
-  const response = await fixtures.WhenGettingScenarioUsersWithSearchTerm(
-    scenarioId,
-  );
+  const response =
+    await fixtures.WhenGettingScenarioUsersWithSearchTerm(scenarioId);
   fixtures.ThenViewerUserInformationIsReturned(response);
 });
 
 test(`getting scenario users as owner with a wrong search query`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenViewerWasAddedToScenario(scenarioId);
-  const response = await fixtures.WhenGettingScenarioUsersWithWrongSearchTerm(
-    scenarioId,
-  );
+  const response =
+    await fixtures.WhenGettingScenarioUsersWithWrongSearchTerm(scenarioId);
   fixtures.ThenNoUserInformationIsReturned(response);
 });
 

@@ -28,15 +28,17 @@ type SelectResult = {
 @Injectable()
 @PieceExportProvider()
 export class ScenarioPlanningUnitsDataPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ScenarioPlanningUnitsDataPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioPlanningUnitsDataPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioPlanningUnitsData;

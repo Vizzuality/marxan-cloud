@@ -1,8 +1,8 @@
 import { INestApplication } from '@nestjs/common';
 import { PromiseType } from 'utility-types';
 
-import { TypeormCostSurface } from '../../../../src/modules/surface-cost/adapters/typeorm-cost-surface';
-import { CostSurfacePersistencePort } from '../../../../src/modules/surface-cost/ports/persistence/cost-surface-persistence.port';
+import { TypeormCostSurface } from '@marxan-geoprocessing/modules/cost-surface/adapters/typeorm-cost-surface';
+import { CostSurfacePersistencePort } from '@marxan-geoprocessing/modules/cost-surface/ports/persistence/cost-surface-persistence.port';
 
 import { bootstrapApplication } from '../../../utils';
 import { getFixtures } from '../planning-unit-fixtures';
@@ -11,21 +11,19 @@ let app: INestApplication;
 let sut: TypeormCostSurface;
 let world: PromiseType<ReturnType<typeof getFixtures>>;
 
-beforeAll(async () => {
-  app = await bootstrapApplication();
-  world = await getFixtures(app);
-  sut = app.get(CostSurfacePersistencePort);
-});
-
-afterAll(async () => {
-  await world.cleanup();
-  await app.close();
-});
-
 describe(`when updating some of the costs`, () => {
+  beforeAll(async () => {
+    app = await bootstrapApplication();
+    sut = app.get(CostSurfacePersistencePort);
+  });
   let puCostDataIds: string[];
   beforeEach(async () => {
+    world = await getFixtures(app);
     puCostDataIds = await world.GivenPuCostDataExists();
+  });
+  afterAll(async () => {
+    await world.cleanup();
+    await app.close();
   });
 
   it(`applies new costs to given PU`, async () => {

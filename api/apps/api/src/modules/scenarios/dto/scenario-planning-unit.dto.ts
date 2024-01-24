@@ -14,4 +14,7 @@ export class ScenarioPlanningUnitDto {
     enum: LockStatus,
   })
   defaultStatus!: LockStatus;
+
+  @ApiProperty()
+  setByUser!: boolean;
 }

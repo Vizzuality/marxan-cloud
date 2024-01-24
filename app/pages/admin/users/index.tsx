@@ -17,7 +17,7 @@ const AdminUsersPage: React.FC = () => {
       <Protected>
         <MetaIcons />
 
-        <main className="min-h-screen text-black bg-gray-50">
+        <main className="min-h-screen bg-gray-100 text-black">
           <Header size="base" />
 
           <AdminUsers />

@@ -82,7 +82,9 @@ export class GeoFeaturePropertySetService {
     specification: GeoFeatureSetSpecification,
     scenario: Pick<Scenario, 'projectId'>,
   ): Promise<any> {
-    const project = await this.projectRepository.findOne(scenario.projectId);
+    const project = await this.projectRepository.findOne({
+      where: { id: scenario.projectId },
+    });
     // Users can submit or request an empty specification; in this case we
     // simply return it verbatim, as we won't have any features to extend with
     // metadata.
@@ -92,14 +94,15 @@ export class GeoFeaturePropertySetService {
     const idsOfFeaturesInGeoprocessingOperations = new Set(
       flatten(
         specification.features
-          .map((feature) =>
-            feature.geoprocessingOperations
-              ?.map((op) => {
-                if (op.kind === 'stratification/v1') {
-                  return op.intersectWith.featureId;
-                }
-              })
-              .filter((id): id is string => !!id),
+          .map(
+            (feature) =>
+              feature.geoprocessingOperations
+                ?.map((op) => {
+                  if (op.kind === 'stratification/v1') {
+                    return op.intersectWith.featureId;
+                  }
+                })
+                .filter((id): id is string => !!id),
           )
           .filter((id): id is string[] => !!id),
       ),
@@ -114,17 +117,19 @@ export class GeoFeaturePropertySetService {
       ]),
     );
     const featuresInSpecification = await this.geoFeaturesRepository.find({
-      id: In(idsOfFeaturesInSpecification),
+      where: { id: In(idsOfFeaturesInSpecification) },
     });
     Logger.debug(inspect(featuresInSpecification));
-    const metadataForFeaturesInSpecification = await this.getFeaturePropertySetsForFeatures(
-      idsOfFeaturesInSpecification,
-      project?.bbox,
-    );
-    const featuresInSpecificationWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
-      featuresInSpecification,
-      metadataForFeaturesInSpecification,
-    );
+    const metadataForFeaturesInSpecification =
+      await this.getFeaturePropertySetsForFeatures(
+        idsOfFeaturesInSpecification,
+        project?.bbox,
+      );
+    const featuresInSpecificationWithPropertiesMetadata =
+      this.extendGeoFeaturesWithPropertiesFromPropertySets(
+        featuresInSpecification,
+        metadataForFeaturesInSpecification,
+      );
     return {
       status: specification.status,
       features: specification.features.map((feature) => {

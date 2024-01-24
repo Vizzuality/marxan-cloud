@@ -9,7 +9,6 @@ import { FakeQueue } from '../utils/queues';
 import { ExpectBadRequest } from './assertions/expect-bad-request';
 import { HasRelevantJobName } from './assertions/has-relevant-job-name';
 import { HasExpectedJobDetails } from './assertions/has-expected-job-details';
-import { tearDown } from '../utils/tear-down';
 import { updateQueueName } from '@marxan-jobs/planning-unit-geometry';
 
 let app: INestApplication;
@@ -18,23 +17,11 @@ let queue: FakeQueue;
 
 let world: PromiseType<ReturnType<typeof createWorld>>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   app = await bootstrapApplication();
   jwtToken = await GivenUserIsLoggedIn(app);
-  queue = FakeQueue.getByName(updateQueueName);
-});
-
-beforeEach(async () => {
   world = await createWorld(app, jwtToken);
-});
-
-afterEach(async () => {
-  await world.cleanup();
-});
-
-afterAll(async () => {
-  await app.close();
-  await tearDown();
+  queue = FakeQueue.getByName(updateQueueName);
 });
 
 describe(`when requesting to change inclusive options`, () => {
@@ -46,7 +33,8 @@ describe(`when requesting to change inclusive options`, () => {
 
   describe(`when desired PU ids are available`, () => {
     it(`triggers the job`, async () => {
-      const result = await world.WhenChangingPlanningUnitInclusivityWithExistingPu();
+      const result =
+        await world.WhenChangingPlanningUnitInclusivityWithExistingPu();
       const job = Object.values(queue.jobs)[0];
       expect(result.meta.started).toBeTruthy();
       HasExpectedJobDetails(job);

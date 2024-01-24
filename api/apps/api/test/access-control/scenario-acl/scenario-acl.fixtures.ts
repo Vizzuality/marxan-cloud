@@ -345,10 +345,12 @@ export const getFixtures = async () => {
       expect(error?.message[0]).toEqual('roleName must be a valid enum value');
     },
 
-    ThenQueryFailedIsReturned: (response: request.Response) => {
-      expect(response.status).toEqual(400);
+    ThenUserNotFoundIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(404);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual(`Error while adding record to the database.`);
+      expect(error.title).toEqual(
+        `User with ID: ${nonExistentUserId} could not be found.`,
+      );
     },
 
     ThenTransactionFailedIsReturned: (response: request.Response) => {

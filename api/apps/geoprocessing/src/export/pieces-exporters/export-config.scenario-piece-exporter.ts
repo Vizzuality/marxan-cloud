@@ -20,14 +20,15 @@ import {
 @Injectable()
 @PieceExportProvider()
 export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ExportConfigScenarioPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ExportConfigScenarioPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return piece === ClonePiece.ExportConfig && kind === ResourceKind.Scenario;

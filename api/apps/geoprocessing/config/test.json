@@ -1,6 +1,98 @@
 {
+  "logging": {
+    "muteAll": "true"
+  },
+  "network": {
+    "cors": {
+      "origins": [
+        "http://localhost:3010"
+      ]
+    }
+  },
   "redis": {
-    "host": "test-e2e-redis",
-    "port": "6379"
+    "host": "marxan-test-e2e-redis",
+    "port": 6379,
+    "password": null,
+    "useTLS": false,
+    "concurrency" : 50
+  },
+  "postgresApi": {
+    "url": null,
+    "port": 5432,
+    "host": "test-e2e-postgresql-api",
+    "username": "marxan-api",
+    "password": "marxan-api",
+    "database": "marxan-api",
+    "runMigrationsOnStartup": false,
+    "logging": "error"
+  },
+  "postgresGeoApi": {
+    "url": null,
+    "port": 5432,
+    "host": "test-e2e-postgresql-geo-api",
+    "username": "marxan-geo-api",
+    "password": "marxan-geo-api",
+    "database": "marxan-geo-api",
+    "runMigrationsOnStartup": false,
+    "logging": "error"
+  },
+  "api": {
+    "url": "http://api:3000",
+    "daemonListenPort": 3000
+  },
+  "jobOptions": {
+    "removeOnComplete": 100,
+    "removeOnFail": 1000,
+    "attempts": 3,
+    "timeout": 60000
+  },
+  "auth": {
+    "jwt": {
+      "expiresIn": "2h",
+      "secret": "jwtSecret"
+    },
+    "xApiKey": {
+      "secret": "secret"
+    }
+  },
+  "geoprocessing": {
+    "url": "http://geoprocessing:3000"
+  },
+  "storage": {
+    "sharedFileStorage": {
+      "localPath": "/tmp/storage"
+    }
+  },
+  "marxan": {
+    "inputFiles": {
+      "inputDat": {
+        "ioSettings": {
+          "INPUTDIR": "input",
+          "PUNAME": "pu.dat",
+          "SPECNAME": "spec.dat",
+          "PUVSPRNAME": "puvspr.dat",
+          "BOUNDNAME": "bound.dat",
+          "OUTPUTDIR": "output"
+        }
+      }
+    }
+  },
+  "fileUploads": {
+    "limits": {
+    }
+  },
+  "sparkpost": {
+    "apikey": "invalidSparkpostApikey",
+    "origin": "https://api.eu.sparkpost.com:443"
+  },
+  "application": {
+    "baseUrl": "http://localhost:3000"
+  },
+  "passwordReset": {
+    "tokenPrefix": "/auth/reset-password?token=",
+    "expiration": 1800000
+  },
+  "signUpConfirmation": {
+    "tokenPrefix": "/auth/sign-up-confirmation?token="
   }
 }

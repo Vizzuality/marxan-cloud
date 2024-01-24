@@ -28,6 +28,7 @@ import {
   GivenFeaturesData,
   GivenScenarioExists,
 } from '../fixtures';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 function getFeatureClassNameByIdMap(
   features: { id: string; feature_class_name: string }[],
@@ -59,7 +60,8 @@ describe(ScenarioFeaturesDataPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoScenarioFeaturesDataFileIsAvailable();
+    const archiveLocation =
+      fixtures.GivenNoScenarioFeaturesDataFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -68,7 +70,8 @@ describe(ScenarioFeaturesDataPieceImporter, () => {
 
   it('fails when a feature cannot be found', async () => {
     await fixtures.GivenScenario();
-    const archiveLocation = await fixtures.GivenScenarioFeaturesDataWithAnUnknownFeatureFile();
+    const archiveLocation =
+      await fixtures.GivenScenarioFeaturesDataWithAnUnknownFeatureFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -102,13 +105,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioFeaturesDataPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioFeaturesDataPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const resourceKind = ResourceKind.Project;
   const oldScenarioId = v4();
   const scenarioId = v4();
@@ -121,9 +123,8 @@ const getFixtures = async () => {
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
   );
   const featuresDataRepo = geoEntityManager.getRepository(GeoFeatureGeometry);
-  const scenarioFeaturesDataRepo = geoEntityManager.getRepository(
-    ScenarioFeaturesData,
-  );
+  const scenarioFeaturesDataRepo =
+    geoEntityManager.getRepository(ScenarioFeaturesData);
   const outputScenarioFeaturesDataRepo = geoEntityManager.getRepository(
     OutputScenariosFeaturesDataGeoEntity,
   );
@@ -238,9 +239,8 @@ const getFixtures = async () => {
       const platformFeaturesIds = platformFeatures.map((feature) => feature.id);
 
       const customFeatureNameById = getFeatureClassNameByIdMap(customFeatures);
-      const platformFeatureNameById = getFeatureClassNameByIdMap(
-        platformFeatures,
-      );
+      const platformFeatureNameById =
+        getFeatureClassNameByIdMap(platformFeatures);
 
       featureIds = [...customFeaturesIds, ...platformFeaturesIds];
 
@@ -331,15 +331,14 @@ const getFixtures = async () => {
             where: { scenarioId },
             relations: ['featureData'],
           });
-          const outputScenarioFeaturesData = await outputScenarioFeaturesDataRepo.find(
-            {
+          const outputScenarioFeaturesData =
+            await outputScenarioFeaturesDataRepo.find({
               where: {
                 scenarioFeaturesId: In(
                   scenarioFeaturesData.map((data) => data.id),
                 ),
               },
-            },
-          );
+            });
 
           const expectedAmountOfScenarioFeaturesDataRecords =
             (amountOfCustomFeatures + amountOfPlatformFeatures) *

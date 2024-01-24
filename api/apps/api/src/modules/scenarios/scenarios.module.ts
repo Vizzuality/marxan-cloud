@@ -1,4 +1,5 @@
-import { forwardRef, HttpModule, Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MarxanInput } from '@marxan/marxan-input/marxan-input';
@@ -11,11 +12,11 @@ import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { ScenarioFeaturesModule } from '../scenarios-features';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { AnalysisModule } from '../analysis/analysis.module';
-import { CostSurfaceModule } from './cost-surface/cost-surface.module';
+import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
-import { CostSurfaceTemplateModule } from './cost-surface-template';
+import { ProjectTemplateModule } from '../projects/shapefile-template';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
@@ -51,6 +52,7 @@ import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entit
 import { WebshotModule } from '@marxan/webshot';
 import { DeleteScenarioModule } from './delete-scenario/delete-scenario.module';
 import { LegacyProjectImportCheckerModule } from '../legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.module';
+import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 @Module({
   imports: [
@@ -65,6 +67,7 @@ import { LegacyProjectImportCheckerModule } from '../legacy-project-import/domai
       UsersScenariosApiEntity,
       ScenarioLockEntity,
       IssuedAuthnToken,
+      CostSurface,
     ]),
     TypeOrmModule.forFeature(
       [ScenariosPlanningUnitGeoEntity],
@@ -79,7 +82,7 @@ import { LegacyProjectImportCheckerModule } from '../legacy-project-import/domai
     AnalysisModule,
     CostSurfaceModule,
     HttpModule,
-    CostSurfaceTemplateModule,
+    ProjectTemplateModule,
     InputFilesModule,
     PlanningUnitsProtectionLevelModule,
     OutputFilesModule,

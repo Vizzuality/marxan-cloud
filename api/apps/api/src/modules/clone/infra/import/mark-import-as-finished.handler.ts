@@ -3,23 +3,22 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
-import { ImportRepository } from '../../import/application/import.repository.port';
 import { MarkImportAsFinished } from './mark-import-as-finished.command';
 
 @CommandHandler(MarkImportAsFinished)
 export class MarkImportAsFinishedHandler
-  implements IInferredCommandHandler<MarkImportAsFinished> {
+  implements IInferredCommandHandler<MarkImportAsFinished>
+{
+  private readonly logger: Logger = new Logger(
+    MarkImportAsFinishedHandler.name,
+  );
+
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__import__finished__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__import__finished__v1__alpha,
   };
 
-  constructor(
-    private readonly apiEvents: ApiEventsService,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(MarkImportAsFinishedHandler.name);
-  }
+  constructor(private readonly apiEvents: ApiEventsService) {}
 
   private async emitSyntheticEvents(projectId: string): Promise<void> {
     const kind = API_EVENT_KINDS.project__planningUnits__finished__v1__alpha;

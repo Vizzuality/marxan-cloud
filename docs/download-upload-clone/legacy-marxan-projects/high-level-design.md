@@ -203,7 +203,7 @@ dedicated API endpoint.
     the `target` value in `spec.dat` for the matching feature
 
 - the original `amount` is recorded in a distinct column
-  (`(geodb)scenario_features_data.amount_from_legacy_project`) as this is
+  (`(geodb)scenario_features_data.amount`) as this is
   later used when generating `puvspr.dat` files for the Marxan workspace
   when running Marxan (`PuvsprDatService.getPuvsprDatContent()`), rather
   than calculating `amount` as the intersection area between feature and
@@ -291,7 +291,7 @@ import.
 - Once `(geodb)scenario_features_data` rows have been created by processing the
   specification, the `amount` value for each feature (from the uploaded
   `puvspr.dat`) should be persisted in a new column of this same table
-  (`(geodb)scenario_features_data.amount_from_legacy_project`)).
+  (`(geodb)scenario_features_data.amount`)).
 
 - If provided, solutions should be inserted in the relevant tables, marking best
   solutions as appropriate, alongside all the relevant data.
@@ -306,7 +306,7 @@ results endpoint.
   'legacy_import']`.
 - New column: `(apidb)projects.sources project_sources not null default
   'marxan_cloud'`.
-- New column: `(geodb)scenario_features_data.amount_from_legacy_project`.
+- New column: `(geodb)scenario_features_data.amount`.
 - New column: `(apidb)scenarios.solutions_are_locked boolean not null default
   false`.
 - The main query in

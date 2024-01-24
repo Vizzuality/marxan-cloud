@@ -8,7 +8,10 @@ import { MarkExportAsFailed } from './mark-export-as-failed.command';
 
 @CommandHandler(MarkExportAsFailed)
 export class MarkExportAsFailedHandler
-  implements IInferredCommandHandler<MarkExportAsFailed> {
+  implements IInferredCommandHandler<MarkExportAsFailed>
+{
+  private readonly logger: Logger = new Logger(MarkExportAsFailedHandler.name);
+
   private exportEventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__failed__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__export__failed__v1__alpha,
@@ -21,10 +24,7 @@ export class MarkExportAsFailedHandler
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly exportRepository: ExportRepository,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(MarkExportAsFailedHandler.name);
-  }
+  ) {}
 
   async execute({ exportId, reason }: MarkExportAsFailed): Promise<void> {
     const exportInstance = await this.exportRepository.find(exportId);

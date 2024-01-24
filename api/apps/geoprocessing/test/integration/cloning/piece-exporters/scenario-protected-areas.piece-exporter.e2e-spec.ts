@@ -3,7 +3,6 @@ import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
@@ -23,6 +22,7 @@ import {
   readSavedFile,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -75,13 +75,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([ProtectedArea]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioProtectedAreasPieceExporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioProtectedAreasPieceExporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const scenarioId = v4();
   let customProtectedAreaId: string = v4();
@@ -172,9 +171,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioProtectedAreasContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioProtectedAreasContent>(savedStrem);
           expect(content).toEqual({
             wdpa: [],
             customProtectedAreas: [],
@@ -187,9 +185,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioProtectedAreasContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioProtectedAreasContent>(savedStrem);
           expect(content.threshold).toBe(1);
           expect(content.wdpa.sort()).toEqual(
             commonProtectedAreasWdpaids.sort(),

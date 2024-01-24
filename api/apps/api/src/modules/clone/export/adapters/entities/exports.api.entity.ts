@@ -24,6 +24,7 @@ export class ExportEntity {
     type: 'enum',
     name: 'resource_kind',
     enum: ResourceKind,
+    enumName: 'clone_resource_kind_enum',
   })
   resourceKind!: ResourceKind;
 
@@ -31,7 +32,7 @@ export class ExportEntity {
   ownerId!: string;
 
   /*
-    This column holds the resourceId of the new project/scenario 
+    This column holds the resourceId of the new project/scenario
     created when cloning a project/scenario
    */
   @Column({ type: 'uuid', name: 'import_resource_id', nullable: true })

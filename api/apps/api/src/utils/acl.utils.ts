@@ -21,7 +21,10 @@ import {
   exportResourceKindIsNotProject,
   projectIsMissingInfoForRegularPus,
   projectIsNotPublished,
+  projectNotEditable,
+  projectNotFound,
   projectNotFoundForExport,
+  projectNotVisible,
 } from '@marxan-api/modules/projects/projects.service';
 import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
 import {
@@ -41,17 +44,19 @@ import {
   metadataNotFound,
   outputZipNotYetAvailable,
 } from '@marxan-api/modules/scenarios/output-files/output-files.service';
-import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
+import { submissionFailed } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
 import { invalidProtectedAreaId } from '@marxan-api/modules/scenarios/protected-area/selection/selection-update.service';
 import {
   bestSolutionNotFound,
+  lockedSolutions,
   projectDoesntExist,
   projectNotReady,
-  lockedSolutions,
+  scenarioNotCreated,
+  scenarioNotEditable,
 } from '@marxan-api/modules/scenarios/scenarios.service';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
-import { jobSubmissionFailed } from '@marxan/scenario-cost-surface';
+import { jobSubmissionFailed } from '@marxan/artifact-cache';
 import {
   unknownPdfWebshotError,
   unknownPngWebshotError,
@@ -73,18 +78,63 @@ import {
   invalidProjectExport,
 } from '../modules/clone/import/application/import-project.command';
 import { saveError } from '../modules/clone/import/application/import.repository.port';
+import {
+  AclErrors,
+  userNotFound,
+} from '@marxan-api/modules/access-control/access-control.types';
+import {
+  featureDataCannotBeUploadedWithCsv,
+  featureNameAlreadyInUse,
+  featureNotEditable,
+  featureNotFound,
+  importedFeatureNameAlreadyExist,
+  missingPuidColumnInFeatureAmountCsvUpload,
+  unknownPuidsInFeatureAmountCsvUpload,
+} from '@marxan-api/modules/geo-features/geo-features.service';
+import {
+  duplicateHeadersInFeatureAmountCsvUpload,
+  duplicatePuidsInFeatureAmountCsvUpload,
+  noFeaturesFoundInInFeatureAmountCsvUpload,
+} from '@marxan-api/modules/geo-features/import/csv.parser';
+import {
+  featureNotEditableByUserWithinProject,
+  featureNotFoundWithinProject,
+  tagNotFoundForProject,
+} from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
+import { outputProjectSummaryNotFound } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
+import {
+  customProtectedAreaIsUsedInOneOrMoreScenarios,
+  customProtectedAreaNotDeletableByUser,
+  customProtectedAreaNotEditableByUser,
+  globalProtectedAreaNotDeletable,
+  globalProtectedAreaNotEditable,
+  protectedAreaNotFound,
+} from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
+import {
+  cannotDeleteDefaultCostSurface,
+  costSurfaceNameAlreadyExistsForProject,
+  costSurfaceNotFound,
+  costSurfaceNotFoundForProject,
+  costSurfaceStillInUse,
+} from '@marxan-api/modules/cost-surface/cost-surface.service';
+import { deleteCostSurfaceFailed } from '@marxan-api/modules/cost-surface/delete-cost-surface/delete-cost-surface.command';
+import { linkCostSurfaceToScenarioFailed } from '@marxan-api/modules/cost-surface/application/scenario/link-cost-surface-to-scenario.command';
 
 interface ErrorHandlerOptions {
   projectId?: string;
+  featureId?: string;
   range?: [number, number];
   resourceType?: string;
   scenarioId?: string;
   userId?: string;
   exportId?: string;
+  featureClassName?: string;
+  costSurfaceId?: string;
 }
 
 export const mapAclDomainToHttpError = (
   errorToCheck:
+    | AclErrors
     | GetScenarioFailure
     | typeof lockedSolutions
     | typeof forbiddenError
@@ -120,16 +170,53 @@ export const mapAclDomainToHttpError = (
     | typeof unknownPdfWebshotError
     | typeof unknownPngWebshotError
     | typeof unknownError
+    | typeof userNotFound
     | typeof exportNotFound
     | typeof exportResourceKindIsNotProject
     | typeof exportIsNotStandalone
     | typeof projectNotFoundForExport
     | typeof projectIsNotPublished
     | typeof deleteScenarioFailed
-    | ImportProjectError,
+    | typeof featureNameAlreadyInUse
+    | typeof featureNotFound
+    | typeof featureNotFoundWithinProject
+    | typeof featureNotEditableByUserWithinProject
+    | typeof featureNotEditable
+    | typeof projectNotFound
+    | typeof projectNotEditable
+    | typeof projectNotVisible
+    | typeof tagNotFoundForProject
+    | typeof scenarioNotCreated
+    | typeof importedFeatureNameAlreadyExist
+    | typeof unknownPuidsInFeatureAmountCsvUpload
+    | typeof missingPuidColumnInFeatureAmountCsvUpload
+    | typeof duplicatePuidsInFeatureAmountCsvUpload
+    | typeof duplicateHeadersInFeatureAmountCsvUpload
+    | typeof noFeaturesFoundInInFeatureAmountCsvUpload
+    | ImportProjectError
+    | typeof featureDataCannotBeUploadedWithCsv
+    | typeof outputProjectSummaryNotFound
+    | typeof globalProtectedAreaNotEditable
+    | typeof protectedAreaNotFound
+    | typeof customProtectedAreaNotEditableByUser
+    | typeof customProtectedAreaNotDeletableByUser
+    | typeof customProtectedAreaIsUsedInOneOrMoreScenarios
+    | typeof globalProtectedAreaNotDeletable
+    | typeof costSurfaceNotFoundForProject
+    | typeof costSurfaceNameAlreadyExistsForProject
+    | typeof costSurfaceNotFound
+    | typeof costSurfaceStillInUse
+    | typeof cannotDeleteDefaultCostSurface
+    | typeof deleteCostSurfaceFailed
+    | typeof scenarioNotEditable
+    | typeof linkCostSurfaceToScenarioFailed,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
+    case userNotFound:
+      return new NotFoundException(
+        `User with ID: ${options?.userId} could not be found.`,
+      );
     case unknownError:
       return new InternalServerErrorException(options);
     case forbiddenError:
@@ -270,6 +357,125 @@ export const mapAclDomainToHttpError = (
       return new BadRequestException(
         `Scenario ${options?.scenarioId} and associated resources could not be deleted.`,
       );
+    case featureNameAlreadyInUse:
+      throw new ForbiddenException(
+        `Feature with id ${options?.featureId} cannot be updated: name is already in use (${options?.featureClassName})`,
+      );
+    case featureNotFound:
+      throw new NotFoundException(
+        `Feature with id ${options?.featureId} not found`,
+      );
+    case featureNotFoundWithinProject:
+      throw new NotFoundException(
+        `Feature with id ${options?.featureId} is not available within Project with id ${options?.projectId}`,
+      );
+    case featureNotEditableByUserWithinProject:
+      throw new ForbiddenException(
+        `Feature with id ${options?.featureId} is not editable by user ${options?.userId} within Project with id ${options?.projectId}`,
+      );
+    case featureNotEditable:
+      throw new ForbiddenException(
+        `Feature with id ${options?.featureId} is not editable`,
+      );
+    case projectNotEditable:
+      throw new ForbiddenException(
+        `Project with id ${options?.projectId} is not editable by user ${options?.userId}`,
+      );
+    case projectNotVisible:
+      throw new ForbiddenException(
+        `Project with id ${options?.projectId} cannot be consulted by user ${options?.userId}`,
+      );
+    case projectNotFound:
+      throw new NotFoundException(
+        `Project with id ${options?.projectId} not found`,
+      );
+    case tagNotFoundForProject:
+      throw new NotFoundException(
+        `Tag for Project with id ${options?.projectId} not found`,
+      );
+    case costSurfaceNotFoundForProject:
+      throw new NotFoundException(
+        `Cost Surface for Project with id ${options?.projectId} not found`,
+      );
+    case costSurfaceNotFound:
+      throw new NotFoundException(
+        `Cost Surface ${options?.costSurfaceId} not found`,
+      );
+    case costSurfaceNameAlreadyExistsForProject:
+      throw new ForbiddenException(
+        `Cost Surface with id ${options?.costSurfaceId} cannot be updated: name is already in use in the associated Project`,
+      );
+    case costSurfaceStillInUse:
+      throw new ForbiddenException(
+        `Cost Surface with id ${options?.costSurfaceId} cannot be deleted: it's still in use by Scenarios`,
+      );
+    case cannotDeleteDefaultCostSurface:
+      throw new ForbiddenException(
+        `Cost Surface with id ${options?.costSurfaceId} cannot be deleted: it's the Project's default`,
+      );
+    case deleteCostSurfaceFailed:
+      return new BadRequestException(
+        `Cost Surface ${options?.costSurfaceId} and associated resources could not be deleted.`,
+      );
+    case scenarioNotCreated:
+      throw new NotFoundException(
+        `Scenario for Project with id ${options?.projectId} could not be created`,
+      );
+    case importedFeatureNameAlreadyExist:
+      return new BadRequestException('Imported Features already present');
+    case unknownPuidsInFeatureAmountCsvUpload:
+      return new BadRequestException('Unknown PUIDs');
+    case missingPuidColumnInFeatureAmountCsvUpload:
+      return new BadRequestException('Missing PUID column');
+    case noFeaturesFoundInInFeatureAmountCsvUpload:
+      return new BadRequestException(
+        'No features found in feature amount CSV upload',
+      );
+    case duplicateHeadersInFeatureAmountCsvUpload:
+      return new BadRequestException(
+        'Duplicate headers in feature amount CSV upload',
+      );
+    case duplicatePuidsInFeatureAmountCsvUpload:
+      return new BadRequestException(
+        'Duplicate PUIDs in feature amount CSV upload',
+      );
+    case featureDataCannotBeUploadedWithCsv:
+      throw new ForbiddenException(
+        `User with id ${options?.userId} cannot upload feature data with csv for project with id ${options?.projectId}`,
+      );
+    case outputProjectSummaryNotFound:
+      throw new NotFoundException(
+        `Output Summary for Project with id: ${options?.projectId} not found`,
+      );
+    case globalProtectedAreaNotEditable:
+      throw new ForbiddenException('Global protected areas are not editable.');
+    case globalProtectedAreaNotDeletable:
+      throw new ForbiddenException(
+        'Global protected areas can not be deleted.',
+      );
+    case protectedAreaNotFound:
+      throw new NotFoundException('Protected area not found.');
+    case customProtectedAreaNotEditableByUser:
+      throw new ForbiddenException(
+        'User not allowed to edit protected areas of the project',
+      );
+    case customProtectedAreaNotDeletableByUser:
+      throw new ForbiddenException(
+        'User not allowed to delete protected areas of the project',
+      );
+    case customProtectedAreaIsUsedInOneOrMoreScenarios:
+      throw new ForbiddenException(
+        `Custom protected area is used in one or more scenarios cannot be deleted.`,
+      );
+    case scenarioNotEditable:
+      throw new ForbiddenException(
+        `Scenario with id ${options?.scenarioId} is not editable by the given user`,
+      );
+    case linkCostSurfaceToScenarioFailed:
+      throw new BadRequestException(
+        `Linking Cost Surface to Scenario ${options?.scenarioId} failed`,
+      );
+
     default:
       const _exhaustiveCheck: never = errorToCheck;
       return _exhaustiveCheck;

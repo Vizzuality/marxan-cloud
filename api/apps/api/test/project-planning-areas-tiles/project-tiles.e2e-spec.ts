@@ -1,24 +1,19 @@
 import { PromiseType } from 'utility-types';
-import { INestApplication, Logger } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 
 import { bootstrapApplication } from '../utils/api-application';
 import { createWorld } from './world';
 
-let app: INestApplication;
-let world: PromiseType<ReturnType<typeof createWorld>>;
-
-beforeAll(async () => {
-  app = await bootstrapApplication();
-  world = await createWorld(app);
-});
-
-afterAll(async () => {
-  await world.cleanup();
-  await app.close();
-});
-
 describe('PlanningUnitsTilesModule (e2e)', () => {
-  test('When creating a regular project whe should be able to access to its planning area tiles', async () => {
+  let app: INestApplication;
+  let world: PromiseType<ReturnType<typeof createWorld>>;
+
+  beforeEach(async () => {
+    app = await bootstrapApplication();
+    world = await createWorld(app);
+  });
+
+  test.only('When creating a regular project whe should be able to access to its planning area tiles', async () => {
     const tile: Buffer = await world.WhenRequestingTileForProjectPlanningArea(
       world.regularProjectId,
     );

@@ -66,7 +66,7 @@ import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(projectResource.className)
+@ApiTags('Project - Publishing (community section)')
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class PublishProjectController {
   constructor(

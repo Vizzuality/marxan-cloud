@@ -1,12 +1,10 @@
 import React from 'react';
 
 export interface CellOwnerProps {
-  value: Record<string, string>[],
+  value: Record<string, string>[];
 }
 
-export const CellOwner: React.FC<CellOwnerProps> = ({
-  value,
-}: CellOwnerProps) => {
+export const CellOwner: React.FC<CellOwnerProps> = ({ value }: CellOwnerProps) => {
   if (!value) return null;
 
   return (
@@ -14,11 +12,12 @@ export const CellOwner: React.FC<CellOwnerProps> = ({
       {value.map((owner) => {
         const { id, displayName } = owner;
         return (
-          <div key={id} className="font-semibold">{displayName}</div>
+          <div key={id} className="font-semibold">
+            {displayName}
+          </div>
         );
       })}
     </div>
-
   );
 };
 

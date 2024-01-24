@@ -97,8 +97,9 @@ const getFixtures = async () => {
       ClonePiece.PlanningUnitsGrid,
       ClonePiece.PlanningUnitsGridGeojson,
       ClonePiece.ProjectCustomProtectedAreas,
+      ClonePiece.ProjectCostSurfaces,
       ClonePiece.ProjectCustomFeatures,
-      ClonePiece.ProjectPuvsprCalculations,
+      ClonePiece.ProjectFeatureAmountsPerPlanningUnit,
     ];
   };
 
@@ -219,8 +220,10 @@ type MockProjectOptions = Omit<ProjectMock, 'id'>;
 class FakeProjectRepo {
   projects: Record<string, ProjectMock> = {};
 
-  findOneOrFail(id: string) {
-    return this.projects[id];
+  findOneOrFail(findOneOptions: any) {
+    expect(findOneOptions).toHaveProperty('where.id');
+    expect(typeof findOneOptions?.where?.id).toBe('string');
+    return this.projects[findOneOptions?.where?.id];
   }
 
   mockProject(

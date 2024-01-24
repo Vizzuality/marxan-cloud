@@ -201,10 +201,8 @@ async function getFixtures() {
 
           const splitFeatureFound = splitFeaturesFound[0];
           const splitFeatureResult = results[0];
-          const {
-            splitByProperty,
-            subset,
-          } = splitFeatureResult.singleSplitFeature;
+          const { splitByProperty, subset } =
+            splitFeatureResult.singleSplitFeature;
           const value = subset?.value;
 
           expect(
@@ -231,10 +229,8 @@ async function getFixtures() {
               const foundFeature = splitFeaturesFound.find(
                 ({ id }) => splitFeature.id === id,
               );
-              const {
-                splitByProperty,
-                subset,
-              } = splitFeature.singleSplitFeature;
+              const { splitByProperty, subset } =
+                splitFeature.singleSplitFeature;
               const value = subset?.value;
 
               return (

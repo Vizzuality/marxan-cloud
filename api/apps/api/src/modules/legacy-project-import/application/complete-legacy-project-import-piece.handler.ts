@@ -17,15 +17,17 @@ import {
 
 @CommandHandler(CompleteLegacyProjectImportPiece)
 export class CompleteLegacyProjectImportPieceHandler
-  implements IInferredCommandHandler<CompleteLegacyProjectImportPiece> {
+  implements IInferredCommandHandler<CompleteLegacyProjectImportPiece>
+{
+  private readonly logger: Logger = new Logger(
+    CompleteLegacyProjectImportPieceHandler.name,
+  );
+
   constructor(
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
     private readonly commandBus: CommandBus,
     private readonly eventPublisher: EventPublisher,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(CompleteLegacyProjectImportPieceHandler.name);
-  }
+  ) {}
 
   private async markLegacyProjectImportAsFailed(
     projectId: ResourceId,

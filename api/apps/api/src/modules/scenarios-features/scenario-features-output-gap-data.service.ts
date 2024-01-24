@@ -22,7 +22,7 @@ import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenar
 const scenarioFeaturesOutputGapDataFilterKeyNames = ['runId'] as const;
 type ScenarioFeaturesOutputGapDataFilterKeys = keyof Pick<
   ScenarioFeaturesOutputGapData,
-  typeof scenarioFeaturesOutputGapDataFilterKeyNames[number]
+  (typeof scenarioFeaturesOutputGapDataFilterKeyNames)[number]
 >;
 type ScenarioFeaturesOutputGapDataBaseFilters = Record<
   ScenarioFeaturesOutputGapDataFilterKeys,
@@ -76,11 +76,11 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
     return right(await super.findAllPaginated(fetchSpecification, info));
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ScenarioFeaturesOutputGapData>,
     filters?: ScenarioFeaturesOutputGapDataBaseFilters,
     info?: UserSearchCriteria,
-  ): SelectQueryBuilder<ScenarioFeaturesOutputGapData> {
+  ): Promise<SelectQueryBuilder<ScenarioFeaturesOutputGapData>> {
     if (filters?.runId) {
       const runIds = filters.runId.map((i) => +i);
       const invalidRunIds = runIds.filter((i) => !(isInt(i) && isPositive(i)));
@@ -150,7 +150,8 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
      * Here we extend feature protection gap data (from geodb) with feature
      * metadata (name, etc.) from apidb.
      */
-    const scenarioFeaturesData: ScenarioFeaturesOutputGapData[] = entitiesAndCount[0] as ScenarioFeaturesOutputGapData[];
+    const scenarioFeaturesData: ScenarioFeaturesOutputGapData[] =
+      entitiesAndCount[0] as ScenarioFeaturesOutputGapData[];
     const featureIds: string[] = scenarioFeaturesData.map((i) => i.featureId);
 
     if (featureIds.length === 0) {

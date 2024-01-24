@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export API_AUTH_JWT_SECRET=$(dd if=/dev/urandom bs=1024 count=1 2>/dev/null | base64 -w0)
+export API_AUTH_X_API_KEY=$(dd if=/dev/urandom bs=64 count=1 2>/dev/null | base64 -w0)
+export CLONING_SIGNING_SECRET=$(openssl genrsa 4096 | base64 -w0)
+
+envsubst

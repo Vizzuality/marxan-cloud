@@ -11,6 +11,7 @@ import helmet from "helmet";
 import { generateSummaryReportForScenario } from "./domain/solutions-report/solutions-report";
 import { generatePngImageFromBlmData } from "./domain/blm-previews/png-image";
 import { generatePngImageFromPublishedProjectData } from "./domain/published-project-maps/published-projects-maps";
+import { generateSelectionFrequencyComparisonMapForScenarios } from "./domain/comparison-map/comparison-map";
 
 const app: Application = express();
 const daemonListenPort = config.get("port");
@@ -51,6 +52,18 @@ app.post(
       console.error(error);
       next(error);
     });
+  }
+);
+
+app.post(
+  "/projects/:projectId/scenarios/:scenarioIdA/compare/:scenarioIdB/comparison-map",
+  async (req: Request, res: Response, next: NextFunction) => {
+    await generateSelectionFrequencyComparisonMapForScenarios(req, res).catch(
+      (error) => {
+        console.error(error);
+        next(error);
+      }
+    );
   }
 );
 

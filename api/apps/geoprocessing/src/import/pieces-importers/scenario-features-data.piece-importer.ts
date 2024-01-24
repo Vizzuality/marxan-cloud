@@ -43,16 +43,17 @@ type FeatureSelectResult = {
 @Injectable()
 @PieceImportProvider()
 export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioFeaturesDataPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioFeaturesDataPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioFeaturesData;
@@ -196,7 +197,8 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     featureDataIdByFeatureIdAndHashMap: FeatureDataIdByFeatureIdAndHashMap,
     scenarioId: string,
   ) {
-    const outputScenariosFeatureData: DeepPartial<OutputScenariosFeaturesDataGeoEntity>[] = [];
+    const outputScenariosFeatureData: DeepPartial<OutputScenariosFeaturesDataGeoEntity>[] =
+      [];
     const insertValues = featureData.map(
       ({
         apiFeature,
@@ -287,25 +289,24 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
         platformFeaturesName,
       );
 
-      const featureDataIdByFeatureIdAndHashMap = await this.getFeatureDataIdByFeatureIdAndHashMap(
-        featuresData,
-        featureIdByClassNameMaps,
-      );
+      const featureDataIdByFeatureIdAndHashMap =
+        await this.getFeatureDataIdByFeatureIdAndHashMap(
+          featuresData,
+          featureIdByClassNameMaps,
+        );
 
       await this.geoEntityManager.transaction(async (em) => {
         const scenarioFeaturesDataRepo = em.getRepository(ScenarioFeaturesData);
         const outputScenariosFeatureDataRepo = em.getRepository(
           OutputScenariosFeaturesDataGeoEntity,
         );
-        const {
-          scenarioFeaturesData,
-          outputScenariosFeatureData,
-        } = this.getScenarioFeaturesDataInsertValues(
-          featuresData,
-          featureIdByClassNameMaps,
-          featureDataIdByFeatureIdAndHashMap,
-          scenarioId,
-        );
+        const { scenarioFeaturesData, outputScenariosFeatureData } =
+          this.getScenarioFeaturesDataInsertValues(
+            featuresData,
+            featureIdByClassNameMaps,
+            featureDataIdByFeatureIdAndHashMap,
+            scenarioId,
+          );
 
         await scenarioFeaturesDataRepo.save(scenarioFeaturesData, {
           chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,

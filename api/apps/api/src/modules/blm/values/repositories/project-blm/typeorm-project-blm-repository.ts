@@ -22,7 +22,9 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepo {
     super();
   }
   async get(projectId: string): Promise<Either<GetProjectFailure, ProjectBlm>> {
-    const projectBlm = await this.repository.findOne(projectId);
+    const projectBlm = await this.repository.findOne({
+      where: { id: projectId },
+    });
 
     return projectBlm ? right(projectBlm) : left(projectNotFound);
   }
@@ -31,7 +33,8 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepo {
     projectId: string,
     defaults: ProjectBlm['defaults'],
   ): Promise<Either<CreateFailure, true>> {
-    if (await this.repository.findOne(projectId)) return left(alreadyCreated);
+    if (await this.repository.findOne({ where: { id: projectId } }))
+      return left(alreadyCreated);
 
     const projectBlm = this.repository.create();
     projectBlm.id = projectId;

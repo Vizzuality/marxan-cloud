@@ -2,9 +2,7 @@ import React from 'react';
 
 import Head from 'next/head';
 
-export interface MetaIconsProps {
-
-}
+export interface MetaIconsProps {}
 
 export const MetaIcons: React.FC<MetaIconsProps> = () => {
   return (

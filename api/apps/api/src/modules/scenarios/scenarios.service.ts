@@ -1,10 +1,10 @@
 import {
   BadRequestException,
-  HttpService,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
@@ -44,17 +44,15 @@ import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { SpecificationService } from './specification';
-import { CostRange, CostRangeService } from './cost-range-service';
+import { CostRangeService } from './cost-range-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 import {
   ChangeProtectedAreasError,
   ProtectedAreaService,
   ScenarioProtectedArea,
-  submissionFailed,
 } from './protected-area';
 import { ProtectedAreasChangeDto } from './dto/protected-area-change.dto';
-import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 import {
   CalibrationRunResult,
   ScenarioCalibrationRepo,
@@ -69,7 +67,10 @@ import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenar
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { LastUpdatedSpecificationError } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import {
+  LockStatus,
+  ScenariosPlanningUnitGeoEntity,
+} from '@marxan/scenarios-planning-unit';
 import { PaginationMeta } from '@marxan-api/utils/app-base.service';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
@@ -88,12 +89,7 @@ import {
 } from '@marxan-api/modules/blm/values/blm-repos';
 
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
-import {
-  SetInitialCostSurface,
-  SetInitialCostSurfaceError,
-} from './cost-surface/application/set-initial-cost-surface.command';
-import { UpdateCostSurface } from './cost-surface/application/update-cost-surface.command';
-import { DeleteScenario } from './cost-surface/infra/delete-scenario.command';
+import { DeleteScenario } from '@marxan-api/modules/cost-surface/infra/delete-scenario.command';
 import {
   lockedByAnotherUser,
   noLockInPlace,
@@ -105,18 +101,27 @@ import { FeatureCollection } from 'geojson';
 import {
   unknownPdfWebshotError,
   WebshotConfig,
-  WebshotPdfConfig,
+  WebshotPdfReportConfig,
   WebshotService,
 } from '@marxan/webshot';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
-import { EntityManager } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { UserId } from '@marxan/domain-ids';
 import {
   DeleteScenario as DeleteScenarioUnusedResources,
   deleteScenarioFailed,
 } from './delete-scenario/delete-scenario.command';
 import { LegacyProjectImportChecker } from '../legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.service';
+import { lastValueFrom } from 'rxjs';
+import { AdjustPlanningUnitsInput } from '@marxan-api/modules/analysis/entry-points/adjust-planning-units-input';
+import { submissionFailed } from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
+import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
+import { costSurfaceNotFound } from '@marxan-api/modules/cost-surface/cost-surface.service';
+import {
+  LinkCostSurfaceToScenarioCommand,
+  linkCostSurfaceToScenarioFailed,
+} from '@marxan-api/modules/cost-surface/application/scenario/link-cost-surface-to-scenario.command';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -126,10 +131,10 @@ const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
 
 export const projectNotReady = Symbol('project not ready');
 export type ProjectNotReady = typeof projectNotReady;
-
+export const scenarioNotCreated = Symbol('scenario not created');
 export const bestSolutionNotFound = Symbol('best solution not found');
-
 export const projectDoesntExist = Symbol(`project doesn't exist`);
+export const scenarioNotEditable = Symbol(`scenario not editable`);
 export const lockedSolutions = Symbol(
   `solutions from this scenario are locked`,
 );
@@ -181,6 +186,8 @@ export class ScenariosService {
     private readonly commandBus: CommandBus,
     private readonly blmValuesRepository: ScenarioBlmRepo,
     private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
+    @InjectRepository(CostSurface)
+    private readonly costSurfaceRepository: Repository<CostSurface>,
     private readonly scenarioAclService: ScenarioAccessControl,
     private readonly webshotService: WebshotService,
     @InjectEntityManager(apiConnections.geoprocessingDB)
@@ -235,11 +242,12 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-      true,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+        true,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -258,7 +266,9 @@ export class ScenariosService {
       | typeof blmCreationFailure
       | ProjectNotReady
       | ProjectDoesntExist
-      | SetInitialCostSurfaceError,
+      | typeof scenarioNotCreated
+      | typeof costSurfaceNotFound
+      | typeof linkCostSurfaceToScenarioFailed,
       Scenario
     >
   > {
@@ -283,14 +293,34 @@ export class ScenariosService {
         return left(projectNotReady);
       }
     }
-    const isLegacyProjectCompleted = await this.legacyProjectChecker.isLegacyProjectImportCompletedFor(
-      input.projectId,
-    );
+    const isLegacyProjectCompleted =
+      await this.legacyProjectChecker.isLegacyProjectImportCompletedFor(
+        input.projectId,
+      );
 
     if (isRight(isLegacyProjectCompleted) && !isLegacyProjectCompleted.right)
       return left(projectNotReady);
 
-    const scenario = await this.crudService.create(validatedMetadata, info);
+    //When creating a scenario it will use the project's default cost surface
+    const costSurfaceDefault = await this.costSurfaceRepository.findOne({
+      where: {
+        projectId: input.projectId,
+        isDefault: true,
+      },
+    });
+    if (!costSurfaceDefault) {
+      return left(costSurfaceNotFound);
+    }
+    validatedMetadata.costSurfaceId = costSurfaceDefault.id;
+
+    let scenario;
+    try {
+      scenario = await this.crudService.create(validatedMetadata, info);
+      scenario = await this.crudService.getById(scenario.id);
+    } catch (e) {
+      return left(scenarioNotCreated);
+    }
+
     const blmCreationResult = await this.commandBus.execute(
       new CreateInitialScenarioBlm(scenario.id, scenario.projectId),
     );
@@ -303,13 +333,16 @@ export class ScenariosService {
 
     await this.planningUnitsLinkerService.link(scenario);
 
-    const costSurfaceInitializationResult = await this.commandBus.execute(
-      new SetInitialCostSurface(scenario.id),
+    const linkResult = await this.commandBus.execute(
+      new LinkCostSurfaceToScenarioCommand(
+        scenario.id,
+        costSurfaceDefault.id,
+        'creation',
+      ),
     );
-
-    if (isLeft(costSurfaceInitializationResult)) {
+    if (isLeft(linkResult)) {
       await this.commandBus.execute(new DeleteScenario(scenario.id));
-      return costSurfaceInitializationResult;
+      return linkResult;
     }
 
     await this.crudService.assignCreatorRole(
@@ -342,10 +375,11 @@ export class ScenariosService {
     if (isLeft(scenario)) {
       return left(forbiddenError);
     }
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -412,14 +446,56 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
-    await this.updatePlanningUnits.update(scenarioId, {
+
+    const updateConstraints: AdjustPlanningUnitsInput =
+      this.mapLockStatusDtoToAdjustPlanningUnitsInput(input);
+    await this.updatePlanningUnits.update(scenarioId, updateConstraints);
+    return right(void 0);
+  }
+
+  async clearLockStatuses(
+    scenarioId: string,
+    userId: string,
+    kind: LockStatus,
+  ): Promise<
+    Either<
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser
+      | typeof scenarioNotFound,
+      void
+    >
+  > {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
+    }
+
+    const updateConstraints: AdjustPlanningUnitsInput =
+      await this.mapCurrentPuStatusesAndClearRequested(scenarioId, kind);
+    await this.updatePlanningUnits.update(scenarioId, updateConstraints);
+    return right(void 0);
+  }
+
+  private mapLockStatusDtoToAdjustPlanningUnitsInput(
+    input: UpdateScenarioPlanningUnitLockStatusDto,
+  ): AdjustPlanningUnitsInput {
+    return {
       include: {
         geo: input.byGeoJson?.include,
         pu: input.byId?.include,
@@ -428,30 +504,53 @@ export class ScenariosService {
         pu: input.byId?.exclude,
         geo: input.byGeoJson?.exclude,
       },
-    });
-    return right(void 0);
+      makeAvailable: {
+        pu: input.byId?.makeAvailable,
+        geo: input.byGeoJson?.makeAvailable,
+      },
+    };
   }
 
-  async processCostSurfaceShapefile(
+  private async mapCurrentPuStatusesAndClearRequested(
     scenarioId: string,
-    userId: string,
-    file: Express.Multer.File,
-  ): Promise<
-    Either<
-      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
-      void
-    >
-  > {
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
+    kindToClear: LockStatus,
+  ): Promise<AdjustPlanningUnitsInput> {
+    const lockedInPus = await this.planningUnitsService.getByStatusSetByUser(
       scenarioId,
+      LockStatus.LockedIn,
     );
-    if (isLeft(userCanEditScenario)) {
-      return userCanEditScenario;
-    }
 
-    await this.commandBus.execute(new UpdateCostSurface(scenarioId, file));
-    return right(void 0);
+    const lockedOutPus = await this.planningUnitsService.getByStatusSetByUser(
+      scenarioId,
+      LockStatus.LockedOut,
+    );
+
+    const availablePus =
+      await this.planningUnitsService.getAvailablePUsSetByUser(scenarioId);
+
+    return {
+      ...(kindToClear !== LockStatus.LockedIn
+        ? {
+            include: {
+              pu: lockedInPus.map((pu) => pu.id),
+            },
+          }
+        : {}),
+      ...(kindToClear !== LockStatus.LockedOut
+        ? {
+            exclude: {
+              pu: lockedOutPus.map((pu) => pu.id),
+            },
+          }
+        : {}),
+      ...(kindToClear !== LockStatus.Available
+        ? {
+            makeAvailable: {
+              pu: availablePus.map((pu) => pu.id),
+            },
+          }
+        : {}),
+    };
   }
 
   async uploadLockInShapeFile(
@@ -470,10 +569,11 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -481,16 +581,16 @@ export class ScenariosService {
      * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
      * in case a shapefile is not validated and a status 4xx is sent back.
      */
-    const geoJson = await this.httpService
-      .post(
+    const geoJson = await lastValueFrom(
+      this.httpService.post(
         `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
         file,
         {
           headers: { 'Content-Type': 'application/json' },
           validateStatus: (status) => status <= 499,
         },
-      )
-      .toPromise()
+      ),
+    )
       .then((response) => response.data.data as FeatureCollection)
       .then(
         (geoJson) =>
@@ -504,12 +604,12 @@ export class ScenariosService {
                 properties: {},
               })),
             },
-          } as GeoJsonDataDTO),
+          }) as GeoJsonDataDTO,
       );
     return right(geoJson);
   }
 
-  async getCostSurfaceCsv(
+  async getPuDatCsv(
     scenarioId: string,
     userId: string,
     stream: stream.Writable,
@@ -573,10 +673,11 @@ export class ScenariosService {
       return left(lockedSolutions);
     }
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -625,10 +726,11 @@ export class ScenariosService {
     assertDefined(userInfo.authenticatedUser);
     if (isLeft(scenario)) return left(forbiddenError);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userInfo.authenticatedUser.id,
-      id,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userInfo.authenticatedUser.id,
+        id,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -681,10 +783,11 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -707,10 +810,11 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -871,7 +975,7 @@ export class ScenariosService {
    * @private
    */
   private getPayloadWithValidatedMetadata<
-    T extends CreateScenarioDTO | UpdateScenarioDTO
+    T extends CreateScenarioDTO | UpdateScenarioDTO,
   >(input: T): T {
     let marxanInput: MarxanParameters | undefined;
     if (input.metadata?.marxanInputParameterFile) {
@@ -887,7 +991,8 @@ export class ScenariosService {
       marxanInput = this.marxanInputValidator.from({});
     }
     const withValidatedMetadata: T = classToClass<T>(input);
-    (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile = marxanInput;
+    (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile =
+      marxanInput;
     return withValidatedMetadata;
   }
 
@@ -992,10 +1097,11 @@ export class ScenariosService {
     });
     if (isLeft(scenarioResult)) return scenarioResult;
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -1033,16 +1139,6 @@ export class ScenariosService {
     );
   }
 
-  async getCostRange(
-    scenarioId: string,
-    userId: string,
-  ): Promise<Either<typeof forbiddenError, CostRange>> {
-    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
-      return left(forbiddenError);
-    }
-    return right(await this.costService.getRange(scenarioId));
-  }
-
   async resetLockStatus(
     scenarioId: string,
     userId: string,
@@ -1058,10 +1154,11 @@ export class ScenariosService {
     if (await this.givenScenarioDoesNotExist(scenarioId))
       return left(scenarioNotFound);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -1069,53 +1166,7 @@ export class ScenariosService {
     return right(void 0);
   }
 
-  async addProtectedAreaFor(
-    scenarioId: string,
-    file: Express.Multer.File,
-    info: AppInfoDTO,
-    dto: UploadShapefileDto,
-  ): Promise<
-    Either<
-      | GetScenarioFailure
-      | SubmitProtectedAreaError
-      | typeof forbiddenError
-      | typeof noLockInPlace
-      | typeof lockedByAnotherUser,
-      true
-    >
-  > {
-    const scenario = await this.getById(scenarioId, info);
-    if (isLeft(scenario)) return scenario;
-
-    assertDefined(info.authenticatedUser);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      info.authenticatedUser.id,
-      scenarioId,
-    );
-    if (isLeft(userCanEditScenario)) {
-      return userCanEditScenario;
-    }
-    const projectResponse = await this.queryBus.execute(
-      new GetProjectQuery(scenario.right.projectId, info.authenticatedUser?.id),
-    );
-    if (isLeft(projectResponse)) {
-      return projectResponse;
-    }
-
-    const submission = await this.protectedArea.addShapeFor(
-      projectResponse.right.id,
-      scenarioId,
-      file,
-      dto.name,
-    );
-
-    if (isLeft(submission)) {
-      return submission;
-    }
-
-    return right(true);
-  }
-
+  // get a list of protected areas in use /selected in a scenario
   async getProtectedAreasFor(
     scenarioId: string,
     info: AppInfoDTO,
@@ -1154,6 +1205,7 @@ export class ScenariosService {
     return right(areas);
   }
 
+  // select protected areas and set them in use for a scenario
   async updateProtectedAreasFor(
     scenarioId: string,
     dto: ProtectedAreasChangeDto,
@@ -1172,10 +1224,11 @@ export class ScenariosService {
     if (isLeft(scenarioResult)) return scenarioResult;
 
     assertDefined(info.authenticatedUser);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      info.authenticatedUser?.id,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        info.authenticatedUser?.id,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -1189,7 +1242,6 @@ export class ScenariosService {
     if (isLeft(projectResponse)) {
       return projectResponse;
     }
-
     const result = await this.protectedArea.selectFor(
       {
         id: scenarioId,
@@ -1246,7 +1298,7 @@ export class ScenariosService {
   async getSummaryReportFor(
     scenarioId: string,
     userId: string,
-    configForWebshot: WebshotPdfConfig,
+    configForWebshot: WebshotPdfReportConfig,
   ): Promise<
     Either<
       | typeof forbiddenError

@@ -1,5 +1,6 @@
 import React from 'react';
-import cx from 'classnames';
+
+import { cn } from 'utils/cn';
 
 export interface ProgressBarProps {
   progress: number;
@@ -12,14 +13,14 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 }: ProgressBarProps) => {
   return (
     <div
-      className={cx({
+      className={cn({
         'relative w-full': true,
         className: !!className,
       })}
     >
-      <div className="h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 opacity-30" />
+      <div className="h-0.5 bg-gradient-to-r from-blue-500 to-purple-600 opacity-30" />
       <div
-        className="absolute bottom-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 max-w-full"
+        className="absolute bottom-0 h-0.5 max-w-full bg-gradient-to-r from-blue-500 to-purple-600"
         style={{ width: `${progress}%` }}
       />
     </div>

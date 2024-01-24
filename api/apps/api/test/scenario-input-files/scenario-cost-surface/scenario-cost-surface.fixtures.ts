@@ -1,7 +1,7 @@
 import { bootstrapApplication } from '../../utils/api-application';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import * as request from 'supertest';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import {
   LockStatus,
@@ -33,15 +33,11 @@ export const getFixtures = async () => {
   const viewerUserId = await GivenUserExists(app, 'cc');
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
-  const { cleanup: projectCleanup, projectId } = await GivenProjectExists(
-    app,
-    ownerToken,
-    {
-      countryId: 'BWA',
-      adminAreaLevel1Id: 'BWA.12_1',
-      adminAreaLevel2Id: 'BWA.12.1_1',
-    },
-  );
+  const { projectId } = await GivenProjectExists(app, ownerToken, {
+    countryId: 'BWA',
+    adminAreaLevel1Id: 'BWA.12_1',
+    adminAreaLevel2Id: 'BWA.12.1_1',
+  });
   let scenarioId: string;
   const geometries: string[] = [];
   const scenariosPuData: string[] = [];
@@ -49,18 +45,18 @@ export const getFixtures = async () => {
   const entityManager = app.get<EntityManager>(
     getEntityManagerToken(DbConnections.geoprocessingDB),
   );
-  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
-    ProjectsPuEntity,
-  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> =
+    entityManager.getRepository(ProjectsPuEntity);
   const puGeometryRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );
-  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
-    getRepositoryToken(
-      ScenariosPlanningUnitGeoEntity,
-      DbConnections.geoprocessingDB,
-    ),
-  );
+  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> =
+    app.get(
+      getRepositoryToken(
+        ScenariosPlanningUnitGeoEntity,
+        DbConnections.geoprocessingDB,
+      ),
+    );
   const scenarioPuDataCostRepo: Repository<ScenariosPuCostDataGeo> = app.get(
     getRepositoryToken(ScenariosPuCostDataGeo, DbConnections.geoprocessingDB),
   );
@@ -70,14 +66,6 @@ export const getFixtures = async () => {
   );
 
   return {
-    cleanup: async () => {
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      await projectCleanup();
-      await puGeometryRepo.delete({
-        id: In(geometries),
-      });
-      await app.close();
-    },
     GivenScenarioWasCreated: async () => {
       const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
         name: `Test scenario`,
@@ -123,7 +111,7 @@ export const getFixtures = async () => {
       );
 
       const lockStatuses: Record<number, LockStatus | null> = {
-        0: LockStatus.Unstated,
+        0: LockStatus.Available,
         1: LockStatus.LockedIn,
         2: LockStatus.LockedOut,
         3: null,
@@ -135,6 +123,7 @@ export const getFixtures = async () => {
             projectPuId: pu.id,
             scenarioId,
             lockStatus: lockStatuses[index] ?? null,
+            setByUser: [1, 2].includes(index) ? true : false,
           }),
         ),
       );

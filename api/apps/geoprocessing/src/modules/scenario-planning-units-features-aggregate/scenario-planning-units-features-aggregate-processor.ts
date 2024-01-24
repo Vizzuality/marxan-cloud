@@ -10,11 +10,14 @@ const query = `
 WITH pu AS (
 	SELECT pug.the_geom,
            spd.id,
-           spd.scenario_id
-	FROM planning_units_geom pug
-		INNER JOIN projects_pu ppu ON pug.id = ppu.geom_id
-		INNER JOIN scenarios_pu_data spd ON ppu.id = spd.project_pu_id AND spd.scenario_id = $1
-	ORDER BY ppu.puid),
+           spd.scenario_id,
+           fappu.amount
+	from feature_amounts_per_planning_unit fappu
+INNER JOIN projects_pu pp on fappu.project_pu_id = pp.id
+INNER JOIN planning_units_geom pug on pp.geom_id = pug.id
+INNER JOIN scenarios_pu_data spd ON pp.id = spd.project_pu_id
+AND scenario_id = $1
+	ORDER BY pp.puid),
 species AS (
 	SELECT sfd.scenario_id,
 		   (st_dump(fd.the_geom)).geom AS the_geom,
@@ -24,8 +27,8 @@ species AS (
 UPDATE scenarios_pu_data
 SET feature_list = sub.feature_list
 FROM (SELECT pu.scenario_id,
-             pu.id                                        AS scenario_pu_id,
-             ARRAY_AGG(DISTINCT species.feature_id::text) AS feature_list
+             pu.id AS scenario_pu_id,
+             ARRAY_AGG(DISTINCT concat_ws(':',species.feature_id::text,pu.amount)) AS feature_list
 	    FROM pu, species
       WHERE st_intersects(species.the_geom, pu.the_geom)
       GROUP BY 1, 2) AS sub
@@ -34,7 +37,8 @@ WHERE scenarios_pu_data.id = sub.scenario_pu_id;
 
 @Injectable()
 export class ScenarioPlanningUnitsFeaturesAggregateProcessor
-  implements WorkerProcessor<JobInput, true> {
+  implements WorkerProcessor<JobInput, true>
+{
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}

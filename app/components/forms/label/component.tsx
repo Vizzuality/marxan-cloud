@@ -1,10 +1,10 @@
 import React from 'react';
 
-import cx from 'classnames';
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: 'block font-heading font-medium text-xs text-white',
-  light: 'block font-heading font-medium text-xs text-gray-600',
+  light: 'block font-heading font-medium text-xs text-gray-700',
 };
 
 export interface LabelProps {
@@ -14,15 +14,10 @@ export interface LabelProps {
   className?: string;
 }
 
-const LabelComponent = (
-  {
-    id, theme = 'dark', children, className,
-  }: LabelProps,
-  ref,
-) => {
+const LabelComponent = ({ id, theme = 'dark', children, className }: LabelProps, ref) => {
   return (
     <label
-      className={cx({
+      className={cn({
         [THEME[theme]]: true,
         [className]: !!className,
       })}
@@ -34,8 +29,6 @@ const LabelComponent = (
   );
 };
 
-export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
-  LabelComponent,
-);
+export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(LabelComponent);
 
 export default Label;

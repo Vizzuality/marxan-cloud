@@ -6,7 +6,6 @@ import { ScenarioFeaturesDataContent } from '@marxan/cloning/infrastructure/clon
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
@@ -22,6 +21,7 @@ import {
   readSavedFile,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -78,13 +78,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioFeaturesDataPieceExporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioFeaturesDataPieceExporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const scenarioId = v4();
   const projectId = v4();
   const organizationId = v4();
@@ -180,9 +179,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioFeaturesDataContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioFeaturesDataContent>(savedStrem);
           expect(content.featuresData).toEqual([]);
         },
         ThenAScenarioFeaturesDataFileIsSaved: async () => {
@@ -191,9 +189,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioFeaturesDataContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioFeaturesDataContent>(savedStrem);
 
           expect(content.featuresData).toHaveLength(
             amountOfCustomFeatures * recordsOfDataForEachFeature +

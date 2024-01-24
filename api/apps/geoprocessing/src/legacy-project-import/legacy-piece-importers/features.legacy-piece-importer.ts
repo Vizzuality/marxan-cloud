@@ -30,6 +30,7 @@ import {
   PuvsprDatReader,
 } from './file-readers/puvspr-dat.reader';
 import { SpecDatReader, SpecDatRow } from './file-readers/spec-dat.reader';
+import { FeatureAmountsPerPlanningUnitEntity } from '@marxan/feature-amounts-per-planning-unit';
 
 type FeaturesData = {
   id: string;
@@ -43,7 +44,12 @@ export const specDatPuidPropertyKey = 'puid';
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class FeaturesLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    FeaturesLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly specDatReader: SpecDatReader,
@@ -53,10 +59,7 @@ export class FeaturesLegacyProjectPieceImporter
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(FeaturesLegacyProjectPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.Features;
@@ -90,9 +93,8 @@ export class FeaturesLegacyProjectPieceImporter
       LegacyProjectImportFileType.SpecDat,
     );
 
-    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      firstLineReadable,
-    );
+    const delimiterOrError =
+      await this.datFileDelimiterFinder.findDelimiter(firstLineReadable);
     if (isLeft(delimiterOrError))
       this.logAndThrow(
         `Invalid delimiter in spec.dat file. Use either comma or tabulator as your file delimiter.`,
@@ -119,9 +121,8 @@ export class FeaturesLegacyProjectPieceImporter
       LegacyProjectImportFileType.PuvsprDat,
     );
 
-    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      firstLineReadable,
-    );
+    const delimiterOrError =
+      await this.datFileDelimiterFinder.findDelimiter(firstLineReadable);
     if (isLeft(delimiterOrError))
       this.logAndThrow(
         `Invalid delimiter in puvspr.dat file. Use either comma or tabulator as your file delimiter.`,
@@ -184,7 +185,7 @@ export class FeaturesLegacyProjectPieceImporter
       theGeom: string;
       properties: Record<string, string | number>;
       source: GeometrySource;
-      amountFromLegacyProject: number;
+      amount: number;
       projectPuId: string;
     }[] = [];
     const nonExistingPus: number[] = [];
@@ -196,7 +197,7 @@ export class FeaturesLegacyProjectPieceImporter
 
       filteredPuvspr.forEach((filteredRow) => {
         const geomAndPuId = projectPusGeomsMap[filteredRow.pu];
-        const amountFromLegacyProject = filteredRow.amount;
+        const amount = filteredRow.amount;
 
         if (!geomAndPuId) {
           nonExistingPus.push(filteredRow.pu);
@@ -215,7 +216,7 @@ export class FeaturesLegacyProjectPieceImporter
             [specDatPuidPropertyKey]: filteredRow.pu,
           },
           source: GeometrySource.user_imported,
-          amountFromLegacyProject,
+          amount,
           projectPuId,
         });
       });
@@ -302,6 +303,7 @@ export class FeaturesLegacyProjectPieceImporter
           };
         });
 
+        this.logger.log(`Saving features API metadata...`);
         await Promise.all(
           featuresInsertValues.map((value) =>
             apiEm
@@ -319,15 +321,14 @@ export class FeaturesLegacyProjectPieceImporter
           feature_class_name: row.name,
         }));
 
-        const {
-          featuresDataInsertValues,
-          nonExistingPus,
-        } = this.getFeaturesDataInsertValues(
-          featuresData,
-          puvsprDatRows,
-          projectPusGeomsMap,
-        );
+        const { featuresDataInsertValues, nonExistingPus } =
+          this.getFeaturesDataInsertValues(
+            featuresData,
+            puvsprDatRows,
+            projectPusGeomsMap,
+          );
 
+        this.logger.log(`Saving Geo feature entities...`);
         await Promise.all(
           chunk(
             featuresDataInsertValues,
@@ -346,6 +347,30 @@ export class FeaturesLegacyProjectPieceImporter
           ),
         );
 
+        this.logger.log(`Saving feature amounts...`);
+        await Promise.all(
+          chunk(
+            featuresDataInsertValues,
+            CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+          ).map((values) => {
+            this.geoprocessingEntityManager
+              .createQueryBuilder()
+              .insert()
+              .into(FeatureAmountsPerPlanningUnitEntity)
+              .values(
+                values.map(({ amount, projectPuId, featureId }) => {
+                  return { amount, projectPuId, featureId, projectId };
+                }),
+              )
+              .execute();
+          }),
+        );
+
+        await this.updateAmountMinMaxForAPIFeatures(
+          apiEm,
+          featuresData.map((feature) => feature.id),
+        );
+
         return nonExistingPus;
       },
     );
@@ -356,5 +381,40 @@ export class FeaturesLegacyProjectPieceImporter
         ? [`puvspr.dat contains unknown puids: ${nonExistingPus.join(', ')}`]
         : undefined,
     };
+  }
+
+  private async updateAmountMinMaxForAPIFeatures(
+    apiEntityManager: EntityManager,
+    featureIds: string[],
+  ): Promise<void> {
+    this.logger.log(`Saving min and max amounts for new features...`);
+
+    const minAndMaxAmountsForFeatures = await this.geoprocessingEntityManager
+      .createQueryBuilder()
+      .select('feature_id', 'id')
+      .addSelect('MIN(amount)', 'amountMin')
+      .addSelect('MAX(amount)', 'amountMax')
+      .from('feature_amounts_per_planning_unit', 'fappu')
+      .where('fappu.feature_id IN (:...featureIds)', { featureIds })
+      .groupBy('fappu.feature_id')
+      .getRawMany();
+
+    const minMaxSqlValueStringForFeatures = minAndMaxAmountsForFeatures
+      .map(
+        (feature) =>
+          `(uuid('${feature.id}'), ${feature.amountMin}, ${feature.amountMax})`,
+      )
+      .join(', ');
+
+    const query = `
+        update features set
+           amount_min = minmax.min,
+           amount_max = minmax.max
+        from (
+        values
+            ${minMaxSqlValueStringForFeatures}
+        ) as minmax(feature_id, min, max)
+        where features.id = minmax.feature_id;`;
+    await apiEntityManager.query(query);
   }
 }

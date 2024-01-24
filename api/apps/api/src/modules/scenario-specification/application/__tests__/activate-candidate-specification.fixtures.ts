@@ -36,9 +36,8 @@ export const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
-  const scenarioSpecificationRepo: InMemoryScenarioSpecificationRepo = sandbox.get(
-    ScenarioSpecificationRepo,
-  );
+  const scenarioSpecificationRepo: InMemoryScenarioSpecificationRepo =
+    sandbox.get(ScenarioSpecificationRepo);
   const sut = sandbox.get(ActivateCandidateSpecificationHandler);
   const systemEvents = sandbox.get(EventBus);
 
@@ -69,9 +68,8 @@ export const getFixtures = async () => {
         ),
       ),
     ThenScenarioSpecificationIsSaved: async () => {
-      const scenarioSpecification = await scenarioSpecificationRepo.find(
-        scenarioId,
-      );
+      const scenarioSpecification =
+        await scenarioSpecificationRepo.find(scenarioId);
       expect(scenarioSpecification).toBeDefined();
       expect(scenarioSpecification!.currentActiveSpecification).toEqual(
         currentCandidateSpecificationId,
@@ -89,9 +87,8 @@ export const getFixtures = async () => {
       result: Either<ActivateError, void>,
     ) => {
       expect(isLeft(result)).toBe(true);
-      const scenarioSpecification = await scenarioSpecificationRepo.find(
-        scenarioId,
-      );
+      const scenarioSpecification =
+        await scenarioSpecificationRepo.find(scenarioId);
       expect(events).toEqual([]);
       expect(scenarioSpecification?.currentActiveSpecification).toBeUndefined();
     },

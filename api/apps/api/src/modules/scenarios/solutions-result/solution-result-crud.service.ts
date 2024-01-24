@@ -18,7 +18,7 @@ const scenariosOutputResultsFilterKeyNames = [
 ] as const;
 type ScenariosOutputResultsFilterKeys = keyof Pick<
   ScenariosOutputResultsApiEntity,
-  typeof scenariosOutputResultsFilterKeyNames[number]
+  (typeof scenariosOutputResultsFilterKeyNames)[number]
 >;
 type ScenarioOutputResultsFilters = Record<
   ScenariosOutputResultsFilterKeys,
@@ -55,11 +55,11 @@ export class SolutionResultCrudService extends AppBaseService<
     };
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ScenariosOutputResultsApiEntity>,
     filters: ScenarioOutputResultsFilters,
     _info?: AppInfoDTO,
-  ): SelectQueryBuilder<ScenariosOutputResultsApiEntity> {
+  ): Promise<SelectQueryBuilder<ScenariosOutputResultsApiEntity>> {
     if (filters?.scenarioId) {
       query.andWhere(`${this.alias}.scenarioId = :scenarioId`, {
         scenarioId: filters.scenarioId,
@@ -88,9 +88,8 @@ export class SolutionResultCrudService extends AppBaseService<
     _fetchSpecification?: FetchSpecification,
     _info?: AppInfoDTO,
   ): Promise<[ScenariosOutputResultsApiEntity[], number]> {
-    const extendedEntities: Promise<ScenariosOutputResultsApiEntity>[] = entitiesAndCount[0].map(
-      (entity) => this.extendGetByIdResult(entity),
-    );
+    const extendedEntities: Promise<ScenariosOutputResultsApiEntity>[] =
+      entitiesAndCount[0].map((entity) => this.extendGetByIdResult(entity));
     return [await Promise.all(extendedEntities), entitiesAndCount[1]];
   }
 

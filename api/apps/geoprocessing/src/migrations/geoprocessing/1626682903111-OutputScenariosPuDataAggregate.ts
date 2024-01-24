@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class OutputScenariosPuDataAggregate1626682903111
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   name = 'OutputScenariosPuDataAggregate1626682903111';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

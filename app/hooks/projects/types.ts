@@ -1,57 +1,53 @@
 import { AxiosRequestConfig } from 'axios';
-import { Response } from 'types/api-model';
 
 // useProjects
 export interface UseProjectsOptionsProps {
   search?: string;
   sort?: string;
-  filters?: Record<string, unknown>
-}
-export interface UseProjectsResponse extends Response {
-
+  filters?: Record<string, unknown>;
 }
 
 // useSaveProject
 export interface UseSaveProjectProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveProjectProps {
-  id?: string,
-  data: any
+  id?: string;
+  data: any;
 }
 
 export interface UseDeleteProjectProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DeleteProjectProps {
-  id: string
+  id: string;
 }
 
 export interface UseImportProjectProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 export interface ImportProjectProps {
-  data: any,
+  data: any;
 }
 
 // useUploadProjectPA
 export interface UseUploadProjectPAProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 export interface UploadProjectPAProps {
-  id?: string,
-  data: any,
+  id?: string;
+  data: any;
 }
 
 // useUploadProjectPAGrid
 
 export interface UseUploadProjectPAGridProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 export interface UploadProjectPAGridProps {
-  data: any,
+  data: any;
 }
 
 // useDuplicateProject
@@ -63,7 +59,7 @@ export interface DuplicateProjectProps {
   id: string | string[];
   data: {
     scenarioIds: string[];
-  }
+  };
 }
 
 // usePublishProject
@@ -103,17 +99,17 @@ export interface ExportProjectProps {
 
 // UseDownloadExportProps,
 export interface UseDownloadExportProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DownloadExportProps {
-  pid: string,
-  exportId: string
+  pid: string;
+  exportId: string;
 }
 
 // useSaveLegacyProject
 export interface UseSaveLegacyProjectProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveLegacyProjectProps {
@@ -125,48 +121,48 @@ export interface SaveLegacyProjectProps {
 
 // useCancelImportLegacyProject
 export interface UseCancelImportLegacyProjectProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface CancelImportLegacyProjectProps {
-  projectId: string,
+  projectId: string;
 }
 
 // useUploadLegacyProjectFile
 export interface UseUploadLegacyProjectFileProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface UploadLegacyProjectFileProps {
-  projectId: string,
-  data: unknown,
+  projectId: string;
+  data: unknown;
 }
 
 // useImportLegacyProject
 export interface UseImportLegacyProjectProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface ImportLegacyProjectProps {
-  projectId: string,
+  projectId: string;
   data: unknown;
 }
 
 // useCancelUploadLegacyProjectFile
 export interface UseCancelUploadLegacyProjectFileProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface CancelUploadLegacyProjectFileProps {
-  projectId: string,
-  dataFileId: string,
+  projectId: string;
+  dataFileId: string;
 }
 
 // UseLegacyProjectValidationResults
 export interface UseLegacyProjectValidationResultsProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface LegacyProjectValidationResultsProps {
-  projectId: string,
+  projectId: string;
 }

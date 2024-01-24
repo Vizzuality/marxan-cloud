@@ -4,11 +4,11 @@ export interface UseAdminUsersProps {
   page: number;
   search?: string;
   sort?: Record<string, string>;
-  filters?: Record<string, unknown>
+  filters?: Record<string, unknown>;
 }
 
 export interface UseSaveBlockUserProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveBlockUserProps {
@@ -16,7 +16,7 @@ export interface SaveBlockUserProps {
 }
 
 export interface UseDeleteBlockUserProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DeleteBlockUserProps {
@@ -24,7 +24,7 @@ export interface DeleteBlockUserProps {
 }
 
 export interface UseSaveAdminUserProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveAdminUserProps {
@@ -32,7 +32,7 @@ export interface SaveAdminUserProps {
 }
 
 export interface UseDeleteAdminUserProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DeleteAdminUserProps {
@@ -43,11 +43,11 @@ export interface UseAdminPublishedProjectsProps {
   page: number;
   search?: string;
   sort?: Record<string, string>;
-  filters?: Record<string, unknown>
+  filters?: Record<string, unknown>;
 }
 
 export interface UseSaveAdminPublishedProjectProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveAdminPublishedProjectProps {

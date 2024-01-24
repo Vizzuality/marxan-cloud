@@ -23,16 +23,18 @@ import {
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class InputLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    InputLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly inputDatReader: InputDatReader,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(InputLegacyProjectPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.Input;

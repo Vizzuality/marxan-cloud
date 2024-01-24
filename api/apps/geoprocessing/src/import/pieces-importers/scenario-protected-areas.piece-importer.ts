@@ -16,17 +16,19 @@ import {
 @Injectable()
 @PieceImportProvider()
 export class ScenarioProtectedAreasPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ScenarioProtectedAreasPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioProtectedAreasPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioProtectedAreas;

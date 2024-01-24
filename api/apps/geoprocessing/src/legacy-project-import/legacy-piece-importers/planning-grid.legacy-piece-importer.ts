@@ -31,17 +31,19 @@ type GeomIdAndPuid = {
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class PlanningGridLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    PlanningGridLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly shapefileService: ShapefileService,
     @InjectEntityManager(geoprocessingConnections.default.name)
     private readonly geoEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB.name)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(PlanningGridLegacyProjectPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.PlanningGrid;
@@ -158,7 +160,7 @@ export class PlanningGridLegacyProjectPieceImporter
       `
         INSERT INTO "planning_areas"("id", "project_id", "the_geom")
         VALUES (
-          $1, 
+          $1,
           $2,
           (SELECT ST_MULTI(ST_UNION(the_geom))
             FROM "planning_units_geom" pug

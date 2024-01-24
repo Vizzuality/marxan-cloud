@@ -3,7 +3,8 @@ import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ComponentLocation } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { HttpService, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { IncomingMessage } from 'http';
@@ -13,6 +14,7 @@ import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
+import { lastValueFrom } from 'rxjs';
 
 type SelectScenarioResult = {
   name: string;
@@ -21,24 +23,23 @@ type SelectScenarioResult = {
 @Injectable()
 @PieceExportProvider()
 export class ScenarioOutputFolderPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioOutputFolderPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
     private readonly httpService: HttpService,
-  ) {
-    this.logger.setContext(ScenarioOutputFolderPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioOutputFolder;
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const [scenario]: [
-      SelectScenarioResult,
-    ] = await this.entityManager
+    const [scenario]: [SelectScenarioResult] = await this.entityManager
       .createQueryBuilder()
       .select('name')
       .from('scenarios', 's')
@@ -51,21 +52,21 @@ export class ScenarioOutputFolderPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const { status, data } = await this.httpService
-      .get<IncomingMessage>(
-        `${AppConfig.get<string>('api.url')}/api/v1/marxan-run/scenarios/${
-          input.resourceId
-        }/marxan/output`,
-        {
-          headers: {
-            'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
-          },
-          responseType: 'stream',
-          validateStatus: (status) =>
-            status === HttpStatus.OK || status === HttpStatus.NOT_FOUND,
+    const response = this.httpService.get<IncomingMessage>(
+      `${AppConfig.get<string>('api.url')}/api/v1/marxan-run/scenarios/${
+        input.resourceId
+      }/marxan/output`,
+      {
+        headers: {
+          'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
         },
-      )
-      .toPromise();
+        responseType: 'stream',
+        validateStatus: (status) =>
+          status === HttpStatus.OK || status === HttpStatus.NOT_FOUND,
+      },
+    );
+
+    const { status, data } = await lastValueFrom(response);
 
     if (status === HttpStatus.NOT_FOUND) {
       return {

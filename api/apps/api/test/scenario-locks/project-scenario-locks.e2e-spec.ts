@@ -6,9 +6,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 beforeEach(async () => {
   fixtures = await getFixtures();
 });
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
 
 test(`getting all locks of scenarios from projects as project owner`, async () => {
   const userId = await fixtures.GivenOwnerExists();
@@ -300,15 +297,15 @@ test('A lock is deleted after user token has expired', async () => {
 
   const ownerOfLockUserToken = await fixtures.GivenUserIsLoggedIn('random');
 
-  const GivenUserAcquiredLockForScenario = await fixtures.WhenAcquiringLockForScenario(
-    scenarioId,
-    ownerOfLockUserToken,
-  );
+  const GivenUserAcquiredLockForScenario =
+    await fixtures.WhenAcquiringLockForScenario(
+      scenarioId,
+      ownerOfLockUserToken,
+    );
   await fixtures.GivenUserTokenHasExpired(ownerOfLockUserId);
 
-  const ownerOfScenarioButNotLockToken = await fixtures.GivenUserIsLoggedIn(
-    'owner',
-  );
+  const ownerOfScenarioButNotLockToken =
+    await fixtures.GivenUserIsLoggedIn('owner');
   const response = await fixtures.WhenGettingLockFromScenario(
     scenarioId,
     ownerOfScenarioButNotLockToken,

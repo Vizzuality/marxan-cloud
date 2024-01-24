@@ -13,7 +13,8 @@ import {
 
 @CommandHandler(LaunchLegacyProjectImportSpecification)
 export class LaunchLegacyProjectImportSpecificationHandler
-  implements IInferredCommandHandler<LaunchLegacyProjectImportSpecification> {
+  implements IInferredCommandHandler<LaunchLegacyProjectImportSpecification>
+{
   constructor(
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
     private readonly specificationService: SpecificationService,
@@ -25,9 +26,8 @@ export class LaunchLegacyProjectImportSpecificationHandler
   }: LaunchLegacyProjectImportSpecification): Promise<
     Either<LaunchLegacyProjectImportSpecificationHandlerErrors, boolean>
   > {
-    const legacyProjectImportOrError = await this.legacyProjectImportRepo.find(
-      projectId,
-    );
+    const legacyProjectImportOrError =
+      await this.legacyProjectImportRepo.find(projectId);
 
     if (isLeft(legacyProjectImportOrError)) return legacyProjectImportOrError;
 

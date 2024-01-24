@@ -13,7 +13,8 @@ import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 @Injectable()
 export class ProtectedAreaProcessor
-  implements WorkerProcessor<JobInput, JobOutput> {
+  implements WorkerProcessor<JobInput, JobOutput>
+{
   constructor(
     private readonly shapefileService: ShapefileExtractorService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
@@ -25,7 +26,7 @@ export class ProtectedAreaProcessor
     if (isLeft(result)) {
       throw new Error(
         `Couldn't convert ${job.data.shapefile.path} for ${
-          job.data.scenarioId
+          job.data.projectId
         }: ${String(result.left)}`,
       );
     }
@@ -64,7 +65,6 @@ export class ProtectedAreaProcessor
       return plainToClass<JobOutput, JobOutput>(JobOutput, {
         protectedAreaId: entities.map((entity) => entity.id),
         projectId: job.data.projectId,
-        scenarioId: job.data.scenarioId,
       });
     });
   }

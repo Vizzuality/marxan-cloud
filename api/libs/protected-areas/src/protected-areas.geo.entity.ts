@@ -106,4 +106,19 @@ export class ProtectedArea extends TimeUserEntityMetadata {
     name: 'project_id',
   })
   projectId?: string | null;
+
+  /**
+   * How many scenarios actively use this protected area.
+   */
+  scenarioUsageCount?: number;
+
+  /**
+   * If protected area is global or custom for project.
+   */
+  isCustom?: boolean;
+
+  /**
+   * Name used for project protected areas list (fullname for custom, iucn category for global).
+   */
+  name?: string;
 }

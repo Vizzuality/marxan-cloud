@@ -13,6 +13,7 @@ export type ScenarioMetadataContent = {
   ranAtLeastOnce: boolean;
   solutionsAreLocked: boolean;
   type: string;
+  cost_surface_id: string;
 };
 
 export const scenarioMetadataRelativePath = `scenario-metadata.json`;

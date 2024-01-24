@@ -5,6 +5,7 @@ let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
+  await fixtures.seed();
 });
 
 afterEach(async () => {

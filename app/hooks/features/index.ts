@@ -1,19 +1,25 @@
 import { useMemo } from 'react';
 
-import {
-  useQuery, useInfiniteQuery, useMutation, useQueryClient,
-} from 'react-query';
+import { useQuery, useMutation, useQueryClient, QueryObserverOptions } from 'react-query';
 
+import { useRouter } from 'next/router';
+
+import { AxiosRequestConfig } from 'axios';
+import chroma from 'chroma-js';
+import Fuse from 'fuse.js';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
 import partition from 'lodash/partition';
+import { useSession } from 'next-auth/react';
 
-import Fuse from 'fuse.js';
-import { useSession } from 'next-auth/client';
+import { COLORS } from 'hooks/map/constants';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
-import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
+import { Feature } from 'types/api/feature';
+import { GeoFeatureSet } from 'types/api/geo-feature-set';
+import { Project } from 'types/api/project';
+import { Scenario } from 'types/api/scenario';
 
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
@@ -25,69 +31,45 @@ import {
   UseFeaturesOptionsProps,
   UseSaveSelectedFeaturesProps,
   SaveSelectedFeaturesProps,
-  UseUploadFeaturesShapefileProps,
-  UploadFeaturesShapefileProps,
 } from './types';
 
-interface AllItemProps extends IntersectItemProps, RawItemProps { }
+interface AllItemProps extends IntersectItemProps, RawItemProps {}
 
-export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
-  const [session] = useSession();
+export function useAllPaginatedFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
+  const { data: session } = useSession();
 
-  const {
-    filters = {},
-    search,
-    sort,
-  } = options;
+  const { filters = {}, search, sort } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k].toString(),
-      };
-    }, {});
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k].toString(),
+    };
+  }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) => PROJECTS.request({
-    method: 'GET',
-    url: `/${projectId}/features`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': pageParam,
-      // omitFields: 'properties',
-      ...parsedFilters,
-      ...search && {
-        q: search,
+  const fetchFeatures = () =>
+    PROJECTS.request({
+      method: 'GET',
+      url: `/${projectId}/features`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
       },
-      ...sort && {
-        sort,
+      params: {
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+        disablePagination: true,
       },
-    },
-  });
+    }).then((response) => response.data);
 
-  const query = useInfiniteQuery(['all-features', projectId, JSON.stringify(options)], fetchFeatures, {
-    retry: false,
-    refetchOnWindowFocus: false,
+  return useQuery(['all-paginated-features', projectId, JSON.stringify(options)], fetchFeatures, {
     keepPreviousData: true,
-    getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
-      const { page, totalPages } = meta;
-
-      const nextPage = page + 1 > totalPages ? null : page + 1;
-      return nextPage;
-    },
-  });
-
-  const { data } = query;
-  const { pages } = data || {};
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
-
-      return pageData.map((d): AllItemProps => {
+    select: ({ data }) => {
+      const parsedData = data.map((d): AllItemProps => {
         const {
           id,
           alias,
@@ -113,17 +95,20 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
          * always undefined (from what I can see), we may need to adapt the
          * API payload or how we process it here.
          */
-        splitOptions = properties ? Object.keys(properties).map((k) => {
-          return {
-            key: k,
-            label: k,
-            values: properties[k].map((v) => ({ id: v, name: v })),
-          };
-        }) : [];
+        splitOptions = properties
+          ? Object.keys(properties).map((k) => {
+              return {
+                key: k,
+                label: k,
+                values: properties[k].map((v) => ({ id: v, name: v })),
+              };
+            })
+          : [];
 
-        splitFeaturesOptions = splitSelected ? splitOptions
-          .find((s) => s.key === splitSelected).values
-          .map((v) => ({ label: v.name, value: v.id }))
+        splitFeaturesOptions = splitSelected
+          ? splitOptions
+              .find((s) => s.key === splitSelected)
+              .values.map((v) => ({ label: v.name, value: v.id }))
           : [];
 
         return {
@@ -137,346 +122,407 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
           splitFeaturesOptions,
         };
       });
-    })) : [];
 
-    // We want to return custom features first, but preserve the overall sorting
-    const sortedByCustomFeature = flatten(partition(parsedData, (feature) => feature.isCustom));
-
-    return {
-      ...query,
-      data: sortedByCustomFeature,
-    };
-  }, [query, pages]);
+      // We want to return custom features first, but preserve the overall sorting
+      return flatten(partition(parsedData, (feature) => feature.isCustom));
+    },
+  });
 }
 
-export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, queryOptions = {}) {
-  const [session] = useSession();
+export function useAllFeatures<T = { data: Feature[] }>(
+  projectId: Project['id'],
+  options: UseFeaturesOptionsProps = {},
+  queryOptions: QueryObserverOptions<{ data: Feature[] }, Error, T> = {}
+) {
+  const { data: session } = useSession();
+
+  const { filters = {}, search, sort, disablePagination } = options;
+
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    return {
+      ...acc,
+      [k]: filters[k].toString(),
+    };
+  }, {});
+
+  const fetchFeatures = () =>
+    PROJECTS.request<{ data: Feature[] }>({
+      method: 'GET',
+      url: `/${projectId}/features`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+        disablePagination: true,
+      },
+    }).then(({ data }) => data);
+
+  return useQuery({
+    queryKey: ['all-features', projectId, JSON.stringify(options)],
+    queryFn: fetchFeatures,
+    ...queryOptions,
+  });
+}
+
+export function useSelectedFeatures(
+  sid: Scenario['id'],
+  filters: UseFeaturesFiltersProps = {},
+  queryOptions = {}
+) {
+  const { query } = useRouter();
+  const { pid } = query as { pid: string };
+  const { data: session } = useSession();
   const { search } = filters;
 
-  const fetchFeatures = () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sid}/features/specification`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      omitFields: 'properties',
-    },
-  });
+  const queryClient = useQueryClient();
 
-  const query = useQuery(['selected-features', sid], fetchFeatures, {
+  // const featureColorQueryState =
+  //   queryClient.getQueryState<{ id: Feature['id']; color: string }[]>('feature-colors');
+
+  const featureColors = useColorFeatures(pid, sid);
+
+  const fetchFeatures = () =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: `/${sid}/features/specification`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        disablePagination: true,
+      },
+    }).then(({ data }) => data);
+
+  return useQuery(['selected-features', sid], fetchFeatures, {
     ...queryOptions,
-    refetchOnWindowFocus: false,
-    retry: false,
-    enabled: !!sid,
-  });
+    enabled: (!!sid && featureColors?.length > 0) || true,
+    select: ({ data }) => {
+      const { features = [] } = data;
 
-  const { data } = query;
+      let parsedData = features.map((d) => {
+        const { featureId, geoprocessingOperations, metadata } = d;
 
-  return useMemo(() => {
-    let parsedData = data?.data?.data || {};
+        const {
+          alias,
+          featureClassName,
+          tag,
+          description,
+          amountMin,
+          amountMax,
+          properties = {},
+        } = metadata || ({} as GeoFeatureSet['features'][0]['metadata']);
 
-    const {
-      features = [],
-    } = parsedData;
+        let splitOptions = [];
+        let splitFeaturesOptions = [];
+        let splitSelected;
+        let splitFeaturesSelected = [];
 
-    parsedData = features.map((d): SelectedItemProps => {
-      const {
-        featureId,
-        geoprocessingOperations,
-        metadata = {},
-      } = d;
+        splitOptions = Object.keys(properties).map((k) => {
+          return {
+            key: k,
+            label: k,
+            values: properties[k].map((v) => ({ id: v, name: v })),
+          };
+        });
 
-      const {
-        alias,
-        featureClassName,
-        tag,
-        description,
-        properties = {},
-      } = metadata;
+        if (
+          geoprocessingOperations &&
+          !!geoprocessingOperations.find((g) => g.kind === 'split/v1')
+        ) {
+          const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
+          splitSelected = geoprocessingOperation.splitByProperty;
 
-      let splitOptions = [];
-      let splitFeaturesOptions = [];
-      let splitSelected;
-      let splitFeaturesSelected = [];
+          splitFeaturesOptions =
+            splitOptions.length && splitSelected
+              ? splitOptions
+                  .find((s) => s.key === splitSelected)
+                  .values.map((v) => ({ label: v.name, value: `${v.id}` }))
+              : [];
 
-      splitOptions = Object.keys(properties).map((k) => {
+          splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
+            return {
+              ...s,
+              id: `${s.value}`,
+              name: s.value,
+            };
+          });
+        }
+
+        let intersectFeaturesSelected = [];
+
+        if (
+          geoprocessingOperations &&
+          geoprocessingOperations.find((g) => g.kind === 'stratification/v1')
+        ) {
+          intersectFeaturesSelected = flatten(
+            geoprocessingOperations.map((ifs) => {
+              return ifs.splits.map((v) => {
+                return {
+                  ...v,
+                  label: v.value,
+                  value: v.value,
+                };
+              });
+            })
+          );
+        }
+
         return {
-          key: k,
-          label: k,
-          values: properties[k].map((v) => ({ id: v, name: v })),
+          ...d,
+          id: featureId,
+          name: alias || featureClassName,
+          type: tag,
+          description,
+          amountRange: {
+            min: amountMin,
+            max: amountMax,
+          },
+          color: featureColors.find(({ id }) => featureId === id)?.color,
+          // SPLIT
+          splitOptions,
+          splitSelected,
+          splitFeaturesSelected,
+          splitFeaturesOptions,
+
+          // INTERSECTION
+          intersectFeaturesSelected,
         };
       });
 
-      if (geoprocessingOperations && !!geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
-        const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
-        splitSelected = geoprocessingOperation.splitByProperty;
+      if (search) {
+        const fuse = new Fuse(parsedData, {
+          keys: ['name'],
+          threshold: 0.25,
+        });
 
-        splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
-          .find((s) => s.key === splitSelected).values
-          .map((v) => ({ label: v.name, value: `${v.id}` }))
-          : [];
-
-        splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
-          return {
-            ...s,
-            id: `${s.value}`,
-            name: s.value,
-          };
+        parsedData = fuse.search(search).map((f) => {
+          return f.item;
         });
       }
 
-      let intersectFeaturesSelected = [];
-
-      if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'stratification/v1')) {
-        intersectFeaturesSelected = flatten(geoprocessingOperations
-          .map((ifs) => {
-            return ifs.splits.map((v) => {
-              return {
-                ...v,
-                label: v.value,
-                value: v.value,
-              };
-            });
-          }));
-      }
-
-      return {
-        ...d,
-        id: featureId,
-        name: alias || featureClassName,
-        type: tag,
-        description,
-
-        // SPLIT
-        splitOptions,
-        splitSelected,
-        splitFeaturesSelected,
-        splitFeaturesOptions,
-
-        // INTERSECTION
-        intersectFeaturesSelected,
-      };
-    });
-
-    // Filter
-    if (search) {
-      const fuse = new Fuse(parsedData, {
-        keys: ['name'],
-        threshold: 0.25,
-      });
-      parsedData = fuse.search(search).map((f) => {
-        return f.item;
-      });
-    }
-
-    // Sort
-    parsedData = orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
-
-    return {
-      ...query,
-      data: parsedData,
-      rawData: data?.data?.data,
-    };
-  }, [query, data?.data?.data, search]);
+      return orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
+    },
+    placeholderData: { data: {} as GeoFeatureSet },
+  });
 }
 
 export function useTargetedFeatures(
-  sid,
+  sid: Scenario['id'],
   filters: UseFeaturesFiltersProps = {},
-  queryOptions = {},
+  queryOptions = {}
 ) {
-  const [session] = useSession();
-  const { search } = filters;
+  const { data: session } = useSession();
+  const { search, sort } = filters;
 
-  const fetchFeatures = () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sid}/features/specification`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  });
+  const fetchFeatures = () =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: `/${sid}/features/specification`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        disablePagination: true,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+      },
+    }).then(({ data }) => data);
 
-  const query = useQuery(['selected-features', sid], fetchFeatures, {
+  return useQuery(['targeted-features', sid, filters], fetchFeatures, {
     ...queryOptions,
-    refetchOnWindowFocus: false,
     retry: false,
     enabled: !!sid,
-  });
+    select: ({ data }) => {
+      const { features = [] } = data;
 
-  const { data } = query;
+      let parsedData = features.map((d) => {
+        const { featureId, geoprocessingOperations, metadata } = d;
 
-  return useMemo(() => {
-    let parsedData = data?.data?.data || {};
+        const {
+          alias,
+          featureClassName,
+          tag,
+          description,
+          properties = {},
+        } = metadata || ({} as GeoFeatureSet['features'][0]['metadata']);
 
-    const {
-      features = [],
-    } = parsedData;
+        let splitOptions = [];
+        let splitFeaturesOptions = [];
+        let splitSelected;
+        let splitFeaturesSelected = [];
 
-    parsedData = features.map((d) => {
-      const {
-        featureId,
-        geoprocessingOperations,
-        metadata = {},
-      } = d;
+        splitOptions = Object.keys(properties).map((k) => {
+          return {
+            key: k,
+            label: k,
+            values: properties[k].map((v) => ({ id: v, name: v })),
+          };
+        });
 
-      const {
-        alias,
-        featureClassName,
-        tag,
-        description,
-        properties = {},
-      } = metadata;
+        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
+          const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
 
-      let splitOptions = [];
-      let splitFeaturesOptions = [];
-      let splitSelected;
-      let splitFeaturesSelected = [];
+          splitSelected = geoprocessingOperation.splitByProperty;
 
-      splitOptions = Object.keys(properties).map((k) => {
+          splitFeaturesOptions =
+            splitOptions.length && splitSelected
+              ? splitOptions
+                  .find((s) => s.key === splitSelected)
+                  .values.map((v) => ({ label: v.name, value: v.id }))
+              : [];
+
+          splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
+            return {
+              ...s,
+              id: s.value,
+              name: s.value,
+            };
+          });
+        }
+
+        let intersectFeaturesSelected = [];
+
+        if (
+          geoprocessingOperations &&
+          geoprocessingOperations.find((g) => g.kind === 'stratification/v1')
+        ) {
+          intersectFeaturesSelected = flatten(
+            geoprocessingOperations.map((ifs) => {
+              return ifs.splits.map((v) => {
+                return {
+                  ...v,
+                  label: v.value,
+                  value: v.value,
+                };
+              });
+            })
+          );
+        }
+
         return {
-          key: k,
-          label: k,
-          values: properties[k].map((v) => ({ id: v, name: v })),
+          ...d,
+          id: featureId,
+          name: alias || featureClassName,
+          type: tag,
+          description,
+          // todo: missing scenarioUsageCount from API
+          scenarios: d.scenarioUsageCount,
+          // todo: missing tag from API
+          tag: d.tag,
+          isCustom: d.metadata?.isCustom,
+
+          // SPLIT
+          splitOptions,
+          splitSelected,
+          splitFeaturesSelected,
+          splitFeaturesOptions,
+
+          // INTERSECTION
+          intersectFeaturesSelected,
         };
       });
 
-      if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
-        const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
-
-        splitSelected = geoprocessingOperation.splitByProperty;
-
-        splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
-          .find((s) => s.key === splitSelected).values
-          .map((v) => ({ label: v.name, value: v.id }))
-          : [];
-
-        splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
-          return {
-            ...s,
-            id: s.value,
-            name: s.value,
-          };
+      // Filter
+      if (search) {
+        const fuse = new Fuse(parsedData, {
+          keys: ['name'],
+          threshold: 0.25,
+        });
+        parsedData = fuse.search(search).map((f) => {
+          return f.item;
         });
       }
 
-      let intersectFeaturesSelected = [];
+      // Sort
+      if (sort) {
+        parsedData.sort((a, b) => {
+          if (sort.startsWith('-')) {
+            const _sort = sort.substring(1);
+            return b[_sort].localeCompare(a[_sort]);
+          }
 
-      if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'stratification/v1')) {
-        intersectFeaturesSelected = flatten(geoprocessingOperations
-          .map((ifs) => {
-            return ifs.splits.map((v) => {
-              return {
-                ...v,
-                label: v.value,
-                value: v.value,
-              };
-            });
-          }));
+          return a[sort].localeCompare(b[sort]);
+        });
       }
 
-      return {
-        ...d,
-        id: featureId,
-        name: alias || featureClassName,
-        type: tag,
-        description,
+      parsedData = flatten(
+        parsedData.map((s) => {
+          const { id, name, splitSelected, splitFeaturesSelected, marxanSettings } = s;
+          const isSplitted = !!splitSelected;
+          // const isIntersected = !!intersectFeaturesSelected?.length;
 
-        // SPLIT
-        splitOptions,
-        splitSelected,
-        splitFeaturesSelected,
-        splitFeaturesOptions,
+          // Generate splitted features to target
+          if (isSplitted) {
+            return (
+              splitFeaturesSelected
+                // .sort((a, b) => a.name.localeCompare(b.name))
+                .map((sf) => {
+                  const { id: sfId, name: sfName, marxanSettings: sfMarxanSettings } = sf;
 
-        // INTERSECTION
-        intersectFeaturesSelected,
-      };
-    });
+                  return {
+                    ...sf,
+                    id: `${id}-${sfId}`,
+                    parentId: id,
+                    name: `${name} / ${sfName}`,
+                    splitted: true,
+                    splitSelected,
+                    splitFeaturesSelected,
+                    ...(!!sfMarxanSettings && {
+                      target: sfMarxanSettings.prop * 100,
+                      fpf: sfMarxanSettings.fpf,
+                    }),
+                  };
+                })
+            );
+          }
 
-    // Filter
-    if (search) {
-      const fuse = new Fuse(parsedData, {
-        keys: ['name'],
-        threshold: 0.25,
-      });
-      parsedData = fuse.search(search).map((f) => {
-        return f.item;
-      });
-    }
+          // if (isIntersected) {
+          //   return flatten(intersectFeaturesSelected.map((ifs) => {
+          //     const {
+          //       value: ifId,
+          //       label: ifName,
+          //       marxanSettings: ifMarxanSettings,
+          //     } = ifs;
 
-    // Sort
-    parsedData = orderBy(parsedData, ['type', 'name'], ['asc', 'asc']);
+          //     return {
+          //       ...ifs,
+          //       id: `${id}-${ifId}`,
+          //       parentId: id,
+          //       name: `${name} / ${ifName}`,
+          //       splitted: true,
+          //       ...!!ifMarxanSettings && {
+          //         target: ifMarxanSettings.prop * 100,
+          //         fpf: ifMarxanSettings.fpf,
+          //       },
+          //     };
+          //   }));
+          // }
 
-    parsedData = flatten(parsedData.map((s) => {
-      const {
-        id, name, splitSelected, splitFeaturesSelected, marxanSettings,
-      } = s;
-      const isSplitted = !!splitSelected;
-      // const isIntersected = !!intersectFeaturesSelected?.length;
+          return {
+            ...s,
+            ...(!!marxanSettings && {
+              target: marxanSettings.prop * 100,
+              fpf: marxanSettings.fpf,
+            }),
+          };
+        })
+      );
 
-      // Generate splitted features to target
-      if (isSplitted) {
-        return splitFeaturesSelected
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((sf) => {
-            const {
-              id: sfId,
-              name: sfName,
-              marxanSettings: sfMarxanSettings,
-            } = sf;
-
-            return {
-              ...sf,
-              id: `${id}-${sfId}`,
-              parentId: id,
-              name: `${name} / ${sfName}`,
-              splitted: true,
-              splitSelected,
-              splitFeaturesSelected,
-              ...!!sfMarxanSettings && {
-                target: sfMarxanSettings.prop * 100,
-                fpf: sfMarxanSettings.fpf,
-              },
-            };
-          });
-      }
-
-      // if (isIntersected) {
-      //   return flatten(intersectFeaturesSelected.map((ifs) => {
-      //     const {
-      //       value: ifId,
-      //       label: ifName,
-      //       marxanSettings: ifMarxanSettings,
-      //     } = ifs;
-
-      //     return {
-      //       ...ifs,
-      //       id: `${id}-${ifId}`,
-      //       parentId: id,
-      //       name: `${name} / ${ifName}`,
-      //       splitted: true,
-      //       ...!!ifMarxanSettings && {
-      //         target: ifMarxanSettings.prop * 100,
-      //         fpf: ifMarxanSettings.fpf,
-      //       },
-      //     };
-      //   }));
-      // }
-
-      return {
-        ...s,
-        ...!!marxanSettings && {
-          target: marxanSettings.prop * 100,
-          fpf: marxanSettings.fpf,
-        },
-      };
-    }));
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, data?.data?.data, search]);
+      return parsedData;
+    },
+    placeholderData: { data: {} as GeoFeatureSet },
+  });
 }
 
 export function useSaveSelectedFeatures({
@@ -485,7 +531,7 @@ export function useSaveSelectedFeatures({
   },
 }: UseSaveSelectedFeaturesProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveFeature = ({ id, data }: SaveSelectedFeaturesProps) => {
     return SCENARIOS.request({
@@ -495,15 +541,13 @@ export function useSaveSelectedFeatures({
         Authorization: `Bearer ${session.accessToken}`,
       },
       ...requestConfig,
-    });
+    }).then(({ data }) => data);
   };
 
   return useMutation(saveFeature, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables) => {
       const { id } = variables;
-      queryClient.setQueryData(['selected-features', id], data);
-
-      console.info('Succces', data, variables, context);
+      queryClient.setQueryData(['selected-features', id], { data: data?.data });
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -513,17 +557,22 @@ export function useSaveSelectedFeatures({
 }
 
 export function useFeature(id) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const query = useQuery(['features', id], async () => GEOFEATURES.request({
-    method: 'GET',
-    url: `/${id}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }), {
-    enabled: !!id,
-  });
+  const query = useQuery(
+    ['features', id],
+    async () =>
+      GEOFEATURES.request({
+        method: 'GET',
+        url: `/${id}`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }),
+    {
+      enabled: !!id,
+    }
+  );
 
   const { data } = query;
 
@@ -539,12 +588,14 @@ export function useUploadFeaturesShapefile({
   requestConfig = {
     method: 'POST',
   },
-}: UseUploadFeaturesShapefileProps) {
+}: {
+  requestConfig?: AxiosRequestConfig<FormData>;
+}) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const uploadFeatureShapefile = ({ id, data }: UploadFeaturesShapefileProps) => {
-    return UPLOADS.request({
+  const uploadFeatureShapefile = ({ id, data }: { id: Project['id']; data: FormData }) => {
+    return UPLOADS.request<{ success: true }>({
       url: `/projects/${id}/features/shapefile`,
       data,
       headers: {
@@ -552,17 +603,175 @@ export function useUploadFeaturesShapefile({
         'Content-Type': 'multipart/form-data',
       },
       ...requestConfig,
-    });
+    } as typeof requestConfig);
   };
 
   return useMutation(uploadFeatureShapefile, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: async (data, variables) => {
       const { id: projectId } = variables;
-      queryClient.invalidateQueries(['all-features', projectId]);
-      console.info('Succces', data, variables, context);
+      await queryClient.invalidateQueries(['all-features', projectId]);
+    },
+  });
+}
+
+export function useUploadFeaturesCSV({
+  requestConfig = {
+    method: 'POST',
+  },
+}: {
+  requestConfig?: AxiosRequestConfig<FormData>;
+}) {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const uploadFeatureCSV = ({ id, data }: { id: Project['id']; data: FormData }) => {
+    return UPLOADS.request<{ success: true }>({
+      url: `/projects/${id}/features/csv`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    } as typeof requestConfig);
+  };
+
+  return useMutation(uploadFeatureCSV, {
+    onSuccess: async (data, variables) => {
+      const { id: projectId } = variables;
+      await queryClient.invalidateQueries(['all-features', projectId]);
+    },
+  });
+}
+
+export function useEditFeature() {
+  const { data: session } = useSession();
+
+  const editFeature = ({
+    fid,
+    body = {},
+  }: {
+    fid: Feature['id'];
+    body: Record<string, unknown>;
+  }) => {
+    return GEOFEATURES.patch<Feature>(
+      `/${fid}`,
+      {
+        ...body,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }
+    );
+  };
+
+  return useMutation(editFeature);
+}
+
+export function useEditFeatureTag() {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const editFeatureTag = ({
+    featureId,
+    projectId,
+    data,
+  }: {
+    featureId: Feature['id'];
+    projectId: Project['id'];
+    data: {
+      tagName: Feature['tag'];
+    };
+  }) => {
+    return PROJECTS.request({
+      method: 'PATCH',
+      url: `/${projectId}/features/${featureId}/tags`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(editFeatureTag, {
+    onSuccess: async (data, variables) => {
+      const { featureId, projectId } = variables;
+      await queryClient.invalidateQueries(['feature', featureId]);
+      await queryClient.invalidateQueries(['project-tags', projectId]);
+      await queryClient.invalidateQueries(['all-features', projectId]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });
+}
+
+export function useDeleteFeatureTag() {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const deleteFeatureTag = ({
+    featureId,
+    projectId,
+  }: {
+    featureId: Feature['id'];
+    projectId: Project['id'];
+  }) => {
+    return PROJECTS.request({
+      method: 'DELETE',
+      url: `/${projectId}/features/${featureId}/tags`,
+
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(deleteFeatureTag, {
+    onSuccess: async (data, variables) => {
+      const { featureId, projectId } = variables;
+      await queryClient.invalidateQueries(['feature', featureId]);
+      await queryClient.invalidateQueries(['all-features', projectId]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useProjectFeatures(
+  projectId: Project['id'],
+  featureIds: Feature['id'][] | Feature['id']
+) {
+  return useAllFeatures(
+    projectId,
+    {},
+    {
+      select: (data) => data?.data.filter((f) => featureIds.includes(f.id)),
+    }
+  );
+}
+
+export function useColorFeatures(projectId: Project['id'], sid: Scenario['id']) {
+  const useAllFeaturesQuery = useAllFeatures(projectId, {});
+  const targetedFeaturesQuery = useTargetedFeatures(sid);
+
+  if (targetedFeaturesQuery.isSuccess && useAllFeaturesQuery.isSuccess) {
+    const data = [...(useAllFeaturesQuery.data?.data || []), ...targetedFeaturesQuery.data];
+    return data.map(({ id }, index) => {
+      const color =
+        data.length > COLORS['features-preview'].ramp.length
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(data.length)[index]
+          : COLORS['features-preview'].ramp[index];
+
+      return {
+        id,
+        color,
+      };
+    });
+  }
+
+  return [];
 }

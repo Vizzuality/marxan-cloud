@@ -1,14 +1,16 @@
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { getConnection, Not, QueryFailedError, Repository } from 'typeorm';
+import { DataSource, Not, QueryFailedError, Repository } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import {
+  AclErrors,
   Denied,
   Permit,
+  userNotFound,
 } from '@marxan-api/modules/access-control/access-control.types';
 import { ProjectAccessControl } from '@marxan-api/modules/access-control/projects-acl/project-access-control';
 import {
@@ -26,6 +28,7 @@ import {
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { LockService } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
+import { User } from '@marxan-api/modules/users/user.api.entity';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -54,38 +57,34 @@ export class ProjectAclService implements ProjectAccessControl {
     ProjectRoles.project_contributor,
     ProjectRoles.project_viewer,
   ];
+  private readonly canEditCostSurfaceInProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
+  private readonly canEditFeatureInProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
+  private readonly canUploadFeatureDataWithCsvInProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
+  private readonly canDeleteFeatureInProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
 
   constructor(
+    @InjectDataSource(DbConnections.default)
+    private readonly apiDataSource: DataSource,
     @InjectRepository(UsersProjectsApiEntity)
     private readonly roles: Repository<UsersProjectsApiEntity>,
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
     @InjectRepository(PublishedProject)
     private readonly publishedProjectRepo: Repository<PublishedProject>,
     private readonly lockService: LockService,
   ) {}
-
-  private async getRolesWithinProjectForUser(
-    userId: string,
-    projectId: string,
-  ): Promise<Array<ProjectRoles>> {
-    const rolesToCheck = (
-      await this.roles.find({
-        where: {
-          projectId,
-          userId,
-        },
-        select: ['roleName'],
-      })
-    ).flatMap((role) => role.roleName);
-
-    return rolesToCheck;
-  }
-
-  private async doesUserHaveRole(
-    roles: ProjectRoles[],
-    rolesToCheck: ProjectRoles[],
-  ): Promise<Permit> {
-    return intersection(roles, rolesToCheck).length > 0;
-  }
 
   // TODO: this will be changed in the following release of user requirements.
   // For now, anyone should be able to create projects, regardless of having
@@ -167,6 +166,48 @@ export class ProjectAclService implements ProjectAccessControl {
     );
 
     return userHasPermit || isPublic;
+  }
+
+  async canEditCostSurfaceInProject(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canEditCostSurfaceInProjectRoles,
+    );
+  }
+
+  async canEditFeatureInProject(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canEditFeatureInProjectRoles,
+    );
+  }
+
+  async canUploadFeatureDataWithCsvInProject(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canUploadFeatureDataWithCsvInProjectRoles,
+    );
+  }
+
+  async canDeleteFeatureInProject(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    const userhasPermit = await this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canDeleteFeatureInProjectRoles,
+    );
+
+    return userhasPermit;
   }
 
   async isOwner(userId: string, projectId: string): Promise<Permit> {
@@ -251,25 +292,16 @@ export class ProjectAclService implements ProjectAccessControl {
     projectId: string,
     userAndRoleToChange: UserRoleInProjectDto,
     loggedUserId: string,
-  ): Promise<
-    Either<
-      | typeof transactionFailed
-      | typeof forbiddenError
-      | typeof lastOwner
-      | typeof queryFailed,
-      void
-    >
-  > {
+  ): Promise<Either<AclErrors, void>> {
     const { userId, roleName } = userAndRoleToChange;
-    if (!(await this.isOwner(loggedUserId, projectId))) {
+    const userToUpdate = await this.users.findOne({ where: { id: userId } });
+    if (!(await this.isOwner(loggedUserId, projectId)))
       return left(forbiddenError);
-    }
-    if (!(await this.hasOtherOwner(userId, projectId))) {
-      return left(lastOwner);
-    }
+    if (!(await this.hasOtherOwner(userId, projectId))) return left(lastOwner);
+    if (!userToUpdate) return left(userNotFound);
+
     assertDefined(roleName);
-    const apiDbConnection = getConnection(DbConnections.default);
-    const apiQueryRunner = apiDbConnection.createQueryRunner();
+    const apiQueryRunner = this.apiDataSource.createQueryRunner();
 
     await apiQueryRunner.connect();
     await apiQueryRunner.startTransaction();
@@ -338,7 +370,33 @@ export class ProjectAclService implements ProjectAccessControl {
     return right(void 0);
   }
 
+  private async getRolesWithinProjectForUser(
+    userId: string,
+    projectId: string,
+  ): Promise<Array<ProjectRoles>> {
+    const rolesToCheck = (
+      await this.roles.find({
+        where: {
+          projectId,
+          userId,
+        },
+        select: ['roleName'],
+      })
+    ).flatMap((role) => role.roleName);
+
+    return rolesToCheck;
+  }
+
+  private async doesUserHaveRole(
+    roles: ProjectRoles[],
+    rolesToCheck: ProjectRoles[],
+  ): Promise<Permit> {
+    return intersection(roles, rolesToCheck).length > 0;
+  }
+
   private async isProjectPublic(projectId: string): Promise<boolean> {
-    return Boolean(await this.publishedProjectRepo.findOne(projectId));
+    return Boolean(
+      await this.publishedProjectRepo.findOne({ where: { id: projectId } }),
+    );
   }
 }

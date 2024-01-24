@@ -220,11 +220,10 @@ const getFixtures = async () => {
     findOne: jest.fn(),
   };
 
-  const fakeScenariosRepo: jest.Mocked<
-    Pick<Repository<Scenario>, 'findOne'>
-  > = {
-    findOne: jest.fn(),
-  };
+  const fakeScenariosRepo: jest.Mocked<Pick<Repository<Scenario>, 'findOne'>> =
+    {
+      findOne: jest.fn(),
+    };
 
   const sandbox = await Test.createTestingModule({
     providers: [
@@ -262,9 +261,8 @@ const getFixtures = async () => {
   const projectChecker = sandbox.get(ProjectChecker) as ProjectCheckerFake;
   const scenarioChecker = sandbox.get(ScenarioChecker) as ScenarioCheckerFake;
   const repo = sandbox.get(LegacyProjectImportRepository);
-  const legacyProjectImportChecker: LegacyProjectImportCheckerFake = sandbox.get(
-    LegacyProjectImportChecker,
-  );
+  const legacyProjectImportChecker: LegacyProjectImportCheckerFake =
+    sandbox.get(LegacyProjectImportChecker);
   const blockGuard = sandbox.get(BlockGuard);
 
   return {

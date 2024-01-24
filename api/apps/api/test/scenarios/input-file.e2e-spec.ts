@@ -18,15 +18,12 @@ import { E2E_CONFIG } from '../e2e.config';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-});
-
-afterEach(async () => {
-  await fixtures.cleanup();
 });
 
 describe(`when an owner updates scenario with input data`, () => {
@@ -452,7 +449,6 @@ describe(`when a viewer updates scenario with invalid input data`, () => {
 
 async function getFixtures() {
   const app = await bootstrapApplication();
-  const cleanups: (() => Promise<unknown>)[] = [() => app.close()];
   const scenarios = app.get<Repository<Scenario>>(getRepositoryToken(Scenario));
   const ownerToken: string = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken: string = await GivenUserIsLoggedIn(app, 'bb');
@@ -481,7 +477,6 @@ async function getFixtures() {
           name: 'Fresh Alaska array',
         },
       );
-      cleanups.push(cleanup);
       const scenario = await ScenariosTestUtils.createScenario(
         app,
         ownerToken,
@@ -491,7 +486,6 @@ async function getFixtures() {
           name: 'Save the world species',
         },
       );
-      cleanups.push(() => scenarios.delete(scenario.data.id));
       scenarioId = scenario.data.id;
       return scenario.data;
     },
@@ -507,11 +501,6 @@ async function getFixtures() {
         roleName: scenarioViewerRole,
         userId: viewerUserId,
       }),
-    async cleanup() {
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
-    },
     get scenarioMetadata() {
       const params: MarxanParameters = {
         BLM: 2,
@@ -588,12 +577,12 @@ async function getFixtures() {
         .send(input);
     },
     async WhenAcquiringLockForScenarioAsOwner(id: string) {
-      return await request(app.getHttpServer())
+      return request(app.getHttpServer())
         .post(`/api/v1/scenarios/${id}/lock`)
         .set('Authorization', `Bearer ${ownerToken}`);
     },
     async WhenAcquiringLockForScenarioAsContributor(id: string) {
-      return await request(app.getHttpServer())
+      return request(app.getHttpServer())
         .post(`/api/v1/scenarios/${id}/lock`)
         .set('Authorization', `Bearer ${contributorToken}`);
     },
@@ -613,10 +602,7 @@ async function getFixtures() {
     async ThenScenarioHasMetadataForMarxan(id: string) {
       return await request(app.getHttpServer())
         .get(`/api/v1/marxan-run/scenarios/${id}/marxan/dat/input.dat`)
-        .set(
-          'X-Api-Key',
-          process.env.API_AUTH_X_API_KEY ?? 'sure it is valid in envs?',
-        )
+        .set('X-Api-Key', AppConfig.get<string>('auth.xApiKey.secret'))
         .send()
         .then((response) => response.text);
     },
@@ -644,6 +630,7 @@ async function getFixtures() {
             type: 'marxan',
             wdpaThreshold: null,
             solutionsAreLocked: false,
+            projectScenarioId: 1,
             ...metadata,
           },
           id,
@@ -676,6 +663,7 @@ async function getFixtures() {
             type: 'marxan',
             wdpaThreshold: null,
             solutionsAreLocked: false,
+            projectScenarioId: 1,
             ...metadata,
           },
           id,
@@ -708,6 +696,7 @@ async function getFixtures() {
             type: 'marxan',
             wdpaThreshold: null,
             solutionsAreLocked: false,
+            projectScenarioId: 1,
             ...metadata,
           },
           id,

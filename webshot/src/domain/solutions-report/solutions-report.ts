@@ -49,6 +49,7 @@ export const generateSummaryReportForScenario = async (
 
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    headless: 'new',
   });
   const page = await browser.newPage();
   // Pass through browser console to our own service's console
@@ -74,8 +75,8 @@ export const generateSummaryReportForScenario = async (
 
   console.info(`Rendering ${pageUrl} as PDF`);
   await page.goto(pageUrl);
-  await page.waitForFunction(waitForReportReady, { timeout: 30e3 });
-  const pageAsPdf = await page.pdf({ ...pdfOptions, timeout: 30e3 });
+  await page.waitForFunction(waitForReportReady, { timeout: 60e3 });
+  const pageAsPdf = await page.pdf({ ...pdfOptions, timeout: 60e3 });
 
   await page.close();
   await browser.close();

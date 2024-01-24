@@ -71,9 +71,20 @@ Before attempting to use the following steps, be sure to:
   than secrets, the defaults in `env.default` may just work - your mileage may
   vary.
 
-The PostgreSQL credentials are used to create a database user when the
-PostgreSQL container is started for the first time. PostgreSQL data is persisted
-via a Docker volume.
+For development environments, a `.env` file can be generated with
+default/generated values suitable to run a development instance, via the
+following command:
+
+```
+make .env
+```
+
+This will only generate a file if no `.env` is present in the root of the
+repository.
+
+The PostgreSQL credentials set via environment variables are used to create a
+database user when the PostgreSQL container is started for the first time.
+PostgreSQL data is persisted via a Docker volume.
 
 ### Running the Marxan Cloud platform
 
@@ -344,21 +355,54 @@ make clean-slate
 
 ### Update seed data (GADM, WDPA) from newer upstream releases
 
-The main `Makefile` provides a set of commands to create new dbs dumps from
+The main `Makefile` provides a set of commands to create new db dumps from
 upstream data sources, upload these dumps to an Azure storage bucket, and
-populating both dbs from these dumps. Populating clean dbs this way will
-typically be faster than triggering the full geodb ETL pipelines.
+populating both dbs from these dumps.
+
+Populating clean dbs this way will be much quicker than triggering the full
+[ETL pipelines to import geographic data](#geographic-data).
+
+When uploading new dumps of seed data to an Azure storage container, or when
+downloading pre-prepared data seeds from it, the following environment variables
+must be defined in the root `.env` file:
+
+```
+DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME=
+DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME=
+```
+
+This will allow to run the `az storage blob` commands in the relevant Make
+recipes with suitable authorization.
+
+Users should have suitable access to the storage container configured.
+
+For data uploads, they will need to be logged into an Azure account that is
+allowed to write to the container:
+
+- [install the Azure CLI tool
+  (`az`)](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+- get an Azure user set up, with suitable permissions to write to the relevant
+  Azure storage account and container
+- log in to this Azure account via the `az` CLI tool
+  (https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli)
+
+For data downloads, the container itself needs to be created with "public blobs"
+settings so that individual blobs can be fetched via non-authenticated HTTP
+requests.
 
 To run the geoprocessing ETL pipelines (such as when using the *Seed data,
-option 1* above) and upload the processed data to an Azure bucket:
+option 1* above) to dump data from a previously seeded instance and upload the
+processed data to an Azure bucket:
 
 ``` bash
 make generate-content-dumps && make upload-dump-data
 ```
 
-Other developers can then benefit from the pre-prepared data seeds when
+Other developers can then benefit from these pre-prepared data seeds when
 populating new development instances after their initial setup, by running the
-following command on a clean Marxan instance:
+following command on a clean Marxan instance (that is, from empty databases, and
+after letting all the migrations run for both `api` and `geoprocessing`
+services):
 
 ``` bash
 make restore-dumps
@@ -425,7 +469,7 @@ tracker](https://github.com/Vizzuality/marxan-cloud/issues) to report bugs.
 
 ## License
 
-(C) Copyright 2020-2022 Vizzuality.
+(C) Copyright 2020-2023 Vizzuality.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the [MIT License](LICENSE) as included in this repository.

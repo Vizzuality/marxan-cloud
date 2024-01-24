@@ -14,6 +14,11 @@ export class PlanningUnitsByIdUpdateDto {
   @IsOptional()
   @IsUUID('all', { each: true })
   exclude?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID('all', { each: true })
+  makeAvailable?: string[];
 }
 
 export class PlanningUnitsByGeoJsonUpdateDto {
@@ -28,6 +33,12 @@ export class PlanningUnitsByGeoJsonUpdateDto {
   @IsArray()
   @IsFeatureCollectionOfPolygons({ each: true })
   exclude?: FeatureCollection<MultiPolygon | Polygon>[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsArray()
+  @IsFeatureCollectionOfPolygons({ each: true })
+  makeAvailable?: FeatureCollection<MultiPolygon | Polygon>[];
 }
 
 export class UpdateScenarioPlanningUnitLockStatusDto {

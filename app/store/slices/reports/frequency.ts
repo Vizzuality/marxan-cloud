@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ReportsFrequencyStateProps {
-  maps: Record<string, boolean>
+  maps: Record<string, boolean>;
 }
 
 const initialState = {

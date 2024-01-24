@@ -9,20 +9,17 @@ export interface ProjectTitleProps {
   title?: string;
 }
 
-export const ProjectTitle: React.FC<ProjectTitleProps> = ({ title }:ProjectTitleProps) => {
+export const ProjectTitle: React.FC<ProjectTitleProps> = ({ title }: ProjectTitleProps) => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
+
   const { data: projectData } = useProject(pid);
 
   return (
     <Head>
       <title>
         Projects
-        {(projectData?.name || title) && ':'}
-        {' '}
-        {title}
-        {' '}
-        {projectData?.name}
+        {(projectData?.name || title) && ':'} {title} {projectData?.name}
       </title>
     </Head>
   );

@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -19,7 +14,6 @@ import { GeoModule } from '@marxan-api/modules/geo/geo.module';
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
 import { apiConnections } from './ormconfig';
 import { OrganizationsModule } from '@marxan-api/modules/organizations/organizations.module';
-import { FetchSpecificationMiddleware } from 'nestjs-base-service';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from '@marxan-api/filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';
@@ -40,6 +34,9 @@ import { ApiCloningFilesRepositoryModule } from './modules/cloning-file-reposito
 import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-collector';
 import { ExportCleanupModule } from './modules/export-cleanup/export-cleanup.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { GeoFeatureTagsModule } from './modules/geo-feature-tags/geo-feature-tags.module';
+import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.module';
+import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
 
 @Module({
   imports: [
@@ -57,6 +54,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     CountriesModule,
     GeoModule,
     GeoFeaturesModule,
+    GeoFeatureTagsModule,
     OrganizationsModule,
     ProjectsModule,
     ProtectedAreasCrudModule,
@@ -79,6 +77,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     ThrottlerModule.forRoot(),
     ExportCleanupModule,
     ScheduleModule.forRoot(),
+    OutputProjectSummariesModule,
+    CostSurfaceModule,
   ],
   controllers: [AppController, PingController],
   providers: [
@@ -89,14 +89,4 @@ import { ScheduleModule } from '@nestjs/schedule';
     },
   ],
 })
-export class AppModule implements NestModule {
-  /**
-   * @todo Apply middleware more surgically; probably rename it to something
-   * more generic (e.g. `FetchSpecificationMiddleware`?).
-   */
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(FetchSpecificationMiddleware)
-      .forRoutes({ path: '*', method: RequestMethod.GET });
-  }
-}
+export class AppModule {}

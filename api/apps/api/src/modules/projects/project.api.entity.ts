@@ -22,6 +22,7 @@ import { ProjectBlm } from '@marxan-api/modules/blm/values/repositories/project-
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { PublishedProject } from '../published-project/entities/published-project.api.entity';
 import { ProjectSourcesEnum } from '@marxan/projects';
+import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 export const projectResource: BaseServiceResource = {
   className: 'Project',
@@ -152,6 +153,16 @@ export class Project extends TimeUserEntityMetadata {
   @ApiPropertyOptional({ type: () => Scenario })
   @OneToMany((_type) => Scenario, (scenario) => scenario.project)
   scenarios?: Scenario[];
+
+  @ApiPropertyOptional({ type: () => CostSurface })
+  @OneToMany((_type) => CostSurface, (costSurface) => costSurface.project, {
+    cascade: ['insert', 'update'],
+  })
+
+  /**
+   * @todo: Make this required when we complete the creation of a default cost surface on project creation
+   */
+  costSurfaces?: CostSurface[];
 
   @ApiProperty({
     type: () => User,

@@ -1,21 +1,27 @@
 import { ProjectSourcesEnum } from '@marxan/projects';
 import {
-  PuvsprCalculationsRepository,
-  PuvsprCalculationsService,
-} from '@marxan/puvspr-calculations';
+  FeatureAmountsPerPlanningUnitRepository,
+  FeatureAmountsPerPlanningUnitService,
+} from '@marxan/feature-amounts-per-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from '../projects/project.api.entity';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 
 @Injectable()
 export class ComputeArea {
   constructor(
-    private readonly puvsprCalculationsRepo: PuvsprCalculationsRepository,
-    private readonly puvsprCalculations: PuvsprCalculationsService,
+    private readonly featureAmountsPerPlanningUnitRepo: FeatureAmountsPerPlanningUnitRepository,
+    private readonly featureAmountsPerPlanningUnit: FeatureAmountsPerPlanningUnitService,
     @InjectRepository(Project)
     private readonly projectsRepo: Repository<Project>,
+    @InjectRepository(GeoFeature)
+    private readonly geoFeatureRepo: Repository<GeoFeature>,
+    private readonly geoFeatureService: GeoFeaturesService,
   ) {}
+
   public async computeAreaPerPlanningUnitOfFeature(
     projectId: string,
     scenarioId: string,
@@ -25,33 +31,50 @@ export class ComputeArea {
 
     if (isLegacyProject) return;
 
-    const alreadyComputed = await this.puvsprCalculationsRepo.areAmountPerPlanningUnitAndFeatureSaved(
-      projectId,
-      featureId,
-    );
+    const alreadyComputed =
+      await this.featureAmountsPerPlanningUnitRepo.areAmountPerPlanningUnitAndFeatureSaved(
+        projectId,
+        featureId,
+      );
 
-    if (alreadyComputed) return;
-
-    const amountPerPlanningUnitOfFeature = await this.puvsprCalculations.computeMarxanAmountPerPlanningUnit(
-      featureId,
-      scenarioId,
-    );
-
-    return this.puvsprCalculationsRepo.saveAmountPerPlanningUnitAndFeature(
-      projectId,
-      amountPerPlanningUnitOfFeature.map(
-        ({ featureId, projectPuId, amount }) => ({
+    if (!alreadyComputed) {
+      const amountPerPlanningUnitOfFeature =
+        await this.featureAmountsPerPlanningUnit.computeMarxanAmountPerPlanningUnit(
           featureId,
-          projectPuId,
-          amount,
-        }),
-      ),
-    );
+          projectId,
+        );
+
+      await this.featureAmountsPerPlanningUnitRepo.saveAmountPerPlanningUnitAndFeature(
+        projectId,
+        amountPerPlanningUnitOfFeature.map(
+          ({ featureId, projectPuId, amount }) => ({
+            featureId,
+            projectPuId,
+            amount,
+          }),
+        ),
+      );
+    }
+
+    const minMaxAlreadyComputed = await this.areFeatureMinMaxSaved(featureId);
+
+    if (!minMaxAlreadyComputed) {
+      await this.geoFeatureService.saveAmountRangeForFeatures([featureId]);
+    }
+  }
+
+  private async areFeatureMinMaxSaved(featureId: string): Promise<boolean> {
+    const feature = await this.geoFeatureRepo.findOneOrFail({
+      where: { id: featureId },
+    });
+    return !!(feature.amountMin && feature.amountMax);
   }
 
   private async isLegacyProject(projectId: string) {
     const [project] = await this.projectsRepo.find({
-      id: projectId,
+      where: {
+        id: projectId,
+      },
     });
 
     return project.sources === ProjectSourcesEnum.legacyImport;

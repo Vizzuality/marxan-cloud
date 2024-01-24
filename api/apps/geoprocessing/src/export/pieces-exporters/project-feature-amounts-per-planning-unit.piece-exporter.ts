@@ -1,0 +1,204 @@
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
+import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ProjectFeatureAmountsPerPlanningUnitContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-feature-amounts-per-planning-unit';
+import { SingleConfigFeatureValueStripped } from '@marxan/features-hash';
+import {
+  FeatureAmountPerProjectPlanningUnit,
+  FeatureAmountsPerPlanningUnitRepository,
+} from '@marxan/feature-amounts-per-planning-unit';
+import { SpecificationOperation } from '@marxan/specification';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
+import { EntityManager, Repository } from 'typeorm';
+import {
+  ExportPieceProcessor,
+  PieceExportProvider,
+} from '../pieces/export-piece-processor';
+
+type FeaturesSelectResult = {
+  featureName: string;
+  isCustom: boolean;
+  id: string;
+};
+
+type ProjectFeaturesSelectResult = {
+  featureName: string;
+  geoOperation: SingleConfigFeatureValueStripped;
+};
+
+type FeatureByIdMap = Record<string, Omit<FeaturesSelectResult, 'id'>>;
+
+@Injectable()
+@PieceExportProvider()
+export class ProjectFeatureAmountsPerPlanningUnitPieceExporter
+  implements ExportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ProjectFeatureAmountsPerPlanningUnitPieceExporter.name,
+  );
+
+  constructor(
+    private readonly fileRepository: CloningFilesRepository,
+    private readonly featureAmountsPerPlanningUnitRepo: FeatureAmountsPerPlanningUnitRepository,
+    @InjectRepository(ProjectsPuEntity)
+    private readonly projectPusRepo: Repository<ProjectsPuEntity>,
+    @InjectEntityManager(geoprocessingConnections.apiDB)
+    private readonly apiEntityManager: EntityManager,
+  ) {}
+
+  isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
+    return (
+      piece === ClonePiece.ProjectFeatureAmountsPerPlanningUnit &&
+      kind === ResourceKind.Project
+    );
+  }
+
+  async run(input: ExportJobInput): Promise<ExportJobOutput> {
+    const projectId = input.resourceId;
+
+    const featureAmountPerPlanningUnit =
+      await this.featureAmountsPerPlanningUnitRepo.getAmountPerPlanningUnitAndFeatureInProject(
+        projectId,
+      );
+
+    const featuresAmountPerPlanningUnitParsed =
+      await this.parseFeatureAmountPerPlanningUnit(
+        featureAmountPerPlanningUnit,
+        projectId,
+      );
+
+    const projectFeaturesGeoOperations =
+      await this.getProjectFeaturesGeoOperations(projectId);
+
+    const fileContent: ProjectFeatureAmountsPerPlanningUnitContent = {
+      featureAmountsPerPlanningUnit: featuresAmountPerPlanningUnitParsed,
+      projectFeaturesGeoOperations,
+    };
+
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.ProjectFeatureAmountsPerPlanningUnit,
+    );
+
+    const outputFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
+      Readable.from(JSON.stringify(fileContent)),
+      relativePath,
+    );
+
+    if (isLeft(outputFile)) {
+      const errorMessage = `${ProjectFeatureAmountsPerPlanningUnitPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    return {
+      ...input,
+      uris: [new ComponentLocation(outputFile.right, relativePath)],
+    };
+  }
+
+  private async parseFeatureAmountPerPlanningUnit(
+    featureAmountPerPlanningUnit: FeatureAmountPerProjectPlanningUnit[],
+    projectId: string,
+  ) {
+    const featureIds = new Set(
+      featureAmountPerPlanningUnit.map(({ featureId }) => featureId),
+    );
+    const featuresById = await this.getFeaturesById([...featureIds]);
+
+    const projectPusById = await this.getProjectPusById(projectId);
+
+    // @TODO: Because the feature_amounts_per_planning_unit table is not accounted for in the clean up task, it can happen
+    // that when exporting after having deleted a feature, in the mapping below the feature info would not be found and
+    // cause an error. Because it's not clear whether deleting the feature_amount_per_pu records of the dangling feature
+    // in the clean up task has any implications, to avoid this error, the missing features are discarded.
+    return featureAmountPerPlanningUnit
+      .filter(({ featureId }) => featuresById[featureId])
+      .map(({ featureId, amount, projectPuId }) => {
+        const feature = featuresById[featureId];
+        return {
+          amount,
+          puid: projectPusById[projectPuId],
+          featureName: feature.featureName,
+          isCustom: feature.isCustom,
+        };
+      });
+  }
+
+  private async getFeaturesById(featureIds: string[]) {
+    const result: FeatureByIdMap = {};
+
+    if (!featureIds.length) return result;
+
+    const features: FeaturesSelectResult[] = await this.apiEntityManager
+      .createQueryBuilder()
+      .select('feature_class_name', 'featureName')
+      .addSelect('id')
+      .addSelect('is_custom', 'isCustom')
+      .from('features', 'f')
+      .where('id IN (:...featureIds)', { featureIds })
+      .execute();
+
+    return features.reduce((prev, { id, ...rest }) => {
+      prev[id] = rest;
+      return prev;
+    }, result);
+  }
+
+  private async getProjectPusById(projectId: string) {
+    const projectPus = await this.projectPusRepo.find({
+      where: { projectId },
+    });
+    const projectPusById: Record<string, number> = {};
+
+    projectPus.reduce((prev, { id, puid }) => {
+      prev[id] = puid;
+      return prev;
+    }, projectPusById);
+
+    return projectPusById;
+  }
+
+  private async getProjectFeaturesGeoOperations(projectId: string) {
+    const derivedFeatures: ProjectFeaturesSelectResult[] =
+      await this.apiEntityManager
+        .createQueryBuilder()
+        .select('feature_class_name', 'featureName')
+        .addSelect('from_geoprocessing_ops', 'geoOperation')
+        .from('features', 'f')
+        .where('project_id = :projectId', { projectId })
+        .andWhere('from_geoprocessing_ops IS NOT NULL')
+        .execute();
+
+    const dataFeatureIds = derivedFeatures.map(({ geoOperation }) => {
+      if (geoOperation.operation !== SpecificationOperation.Split) {
+        const errorMessage = 'Can only proccess split features';
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      return geoOperation.baseFeatureId;
+    });
+
+    const dataFeaturesById = await this.getFeaturesById(dataFeatureIds);
+
+    return derivedFeatures.map(({ featureName, geoOperation }) => ({
+      featureName,
+      geoOperation: {
+        operation: geoOperation.operation,
+        splitByProperty: geoOperation.splitByProperty,
+        value: geoOperation.value,
+        baseFeatureName:
+          dataFeaturesById[geoOperation.baseFeatureId].featureName,
+        baseFeatureIsCustom:
+          dataFeaturesById[geoOperation.baseFeatureId].isCustom,
+      },
+    }));
+  }
+}

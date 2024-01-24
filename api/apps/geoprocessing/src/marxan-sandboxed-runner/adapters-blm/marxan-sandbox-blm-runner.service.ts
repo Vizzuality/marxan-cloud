@@ -20,9 +20,12 @@ import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
-  implements SandboxRunner<JobData, void> {
+  implements SandboxRunner<JobData, void>
+{
   readonly #controllers: Record<string, AbortController> = {};
   private readonly logger: Logger = new Logger('Marxan Sandbox Blm Runner');
+  @InjectEntityManager(geoprocessingConnections.apiDB)
+  private readonly apiEntityManager!: EntityManager;
 
   constructor(
     private readonly moduleRef: ModuleRef,
@@ -30,8 +33,6 @@ export class MarxanSandboxBlmRunnerService
     private readonly marxanRunnerFactory: MarxanRunnerFactory,
     private readonly eventBus: EventBus,
     private readonly webshotService: WebshotService,
-    @InjectEntityManager(geoprocessingConnections.apiDB)
-    private readonly apiEntityManager: EntityManager,
   ) {}
 
   kill(ofScenarioId: string): void {
@@ -93,6 +94,7 @@ export class MarxanSandboxBlmRunnerService
             projectId,
             blmValue,
             workspace,
+            this.apiEntityManager,
           );
 
           const abortEventListener = () => {
@@ -159,9 +161,8 @@ export class MarxanSandboxBlmRunnerService
     scenarioId: string,
     cancellables: Cancellable[],
   ) {
-    const controller = (this.#controllers[
-      scenarioId
-    ] ??= new AbortController());
+    const controller = (this.#controllers[scenarioId] ??=
+      new AbortController());
 
     controller.signal.addEventListener('abort', () => {
       cancellables.forEach((killMe) => killMe.cancel());

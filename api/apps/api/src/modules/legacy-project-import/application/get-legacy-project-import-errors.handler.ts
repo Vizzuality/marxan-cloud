@@ -9,7 +9,8 @@ import {
 
 @QueryHandler(GetLegacyProjectImportErrors)
 export class GetLegacyProjectImportErrorsHandler
-  implements IInferredQueryHandler<GetLegacyProjectImportErrors> {
+  implements IInferredQueryHandler<GetLegacyProjectImportErrors>
+{
   constructor(
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
   ) {}
@@ -18,9 +19,8 @@ export class GetLegacyProjectImportErrorsHandler
     projectId,
     userId,
   }: GetLegacyProjectImportErrors): Promise<GetLegacyProjectImportErrorsReturnType> {
-    const legacyProjectImport = await this.legacyProjectImportRepo.find(
-      projectId,
-    );
+    const legacyProjectImport =
+      await this.legacyProjectImportRepo.find(projectId);
 
     if (isLeft(legacyProjectImport)) return legacyProjectImport;
 
@@ -28,7 +28,8 @@ export class GetLegacyProjectImportErrorsHandler
 
     if (ownerId !== userId.value) return left(forbiddenError);
 
-    const piecesWithErrorsOrWarnings = legacyProjectImport.right.getPiecesWithErrorsOrWarnings();
+    const piecesWithErrorsOrWarnings =
+      legacyProjectImport.right.getPiecesWithErrorsOrWarnings();
 
     return right(
       piecesWithErrorsOrWarnings

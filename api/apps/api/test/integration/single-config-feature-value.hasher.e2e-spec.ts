@@ -18,7 +18,8 @@ describe(SingleConfigFeatureValueHasher, () => {
   });
 
   it('hashes a single split config feature value', async () => {
-    const singleSplitConfigFeatureValue = fixtures.GivenSingleSplitConfigFeatureValue();
+    const singleSplitConfigFeatureValue =
+      fixtures.GivenSingleSplitConfigFeatureValue();
     const result = await fixtures.WhenHashingSingleConfigFeatureValue(
       singleSplitConfigFeatureValue,
     );
@@ -26,8 +27,10 @@ describe(SingleConfigFeatureValueHasher, () => {
   });
 
   it('gives equal hashes for two single split config feature value with different fpf', async () => {
-    const singleSplitConfigFeatureValue = fixtures.GivenSingleSplitConfigFeatureValue();
-    const otherSingleSplitConfigFeatureValue = fixtures.GivenSingleSplitConfigFeatureValueWithAnotherFpf();
+    const singleSplitConfigFeatureValue =
+      fixtures.GivenSingleSplitConfigFeatureValue();
+    const otherSingleSplitConfigFeatureValue =
+      fixtures.GivenSingleSplitConfigFeatureValueWithAnotherFpf();
     const firstResult = await fixtures.WhenHashingSingleConfigFeatureValue(
       singleSplitConfigFeatureValue,
     );
@@ -41,12 +44,10 @@ describe(SingleConfigFeatureValueHasher, () => {
   });
 
   it('gives different hashes for a single split config feature with subset vs one with out subset', async () => {
-    const singleSplitConfigFeatureWithSubset = fixtures.GivenSingleSplitConfigFeatureValue(
-      { withSubset: true },
-    );
-    const singleSplitConfigFeatureWithOutSubset = fixtures.GivenSingleSplitConfigFeatureValue(
-      { withSubset: false },
-    );
+    const singleSplitConfigFeatureWithSubset =
+      fixtures.GivenSingleSplitConfigFeatureValue({ withSubset: true });
+    const singleSplitConfigFeatureWithOutSubset =
+      fixtures.GivenSingleSplitConfigFeatureValue({ withSubset: false });
     const firstResult = await fixtures.WhenHashingSingleConfigFeatureValue(
       singleSplitConfigFeatureWithSubset,
     );

@@ -20,17 +20,14 @@ export class PlanningUnitsGridProcessor {
     private readonly paGarbageCollector: PlanningAreaGarbageCollector,
   ) {}
 
-  async save(
-    shapefile: Express.Multer.File,
-  ): Promise<
+  async save(shapefile: Express.Multer.File): Promise<
     {
       id: string;
       data: GeoJSON;
     } & SaveGeoJsonResult
   > {
-    const { data: geoJson } = await this.shapefileService.transformToGeoJson(
-      shapefile,
-    );
+    const { data: geoJson } =
+      await this.shapefileService.transformToGeoJson(shapefile);
     const planningAreaId = v4();
 
     const { bbox } = await this.entityManager
@@ -50,7 +47,7 @@ export class PlanningUnitsGridProcessor {
 
         const geometryIds = geometries.map((geom) => geom.id);
         const projectsPuRepo = manager.getRepository(ProjectsPuEntity);
-        await projectsPuRepo.save(
+        const projectPus: ProjectsPuEntity[] = await projectsPuRepo.save(
           geometryIds.map((id, index) => ({
             geomId: id,
             geomType: PlanningUnitGridShape.FromShapefile,
@@ -58,6 +55,17 @@ export class PlanningUnitsGridProcessor {
             planningAreaId: planningAreaId,
           })),
           { chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS * 10 },
+        );
+
+        // TODO: Maybe add a custom method in the repo, share it in libs to be used in both sides
+        const projectPuIds = projectPus.map((p) => p.id);
+        await manager.query(
+          `INSERT INTO cost_surface_pu_data (projects_pu_id, cost, cost_surface_id)
+                    SELECT ppu.id, round(pug.area / 1000000) as area, ppu.id
+                    FROM projects_pu ppu
+                    INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
+                    WHERE ppu.id = ANY($1)`,
+          [projectPuIds],
         );
 
         const [planningArea]: [

@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
@@ -13,6 +13,8 @@ import { PublishedProject } from '@marxan-api/modules/published-project/entities
 import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios-acl/locks/entity/scenario.lock.api.entity';
 import { LockService } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
+import { User } from '@marxan-api/modules/users/user.api.entity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -85,6 +87,35 @@ const getFixtures = async () => {
     providers: [
       ProjectAclService,
       {
+        provide: getDataSourceToken(DbConnections.default),
+        useValue: {},
+      },
+      {
+        provide: getRepositoryToken(User),
+        useValue: {
+          find: jest.fn(),
+          findOne: jest.fn(),
+          createQueryBuilder: jest.fn(() => ({
+            leftJoinAndSelect: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            where: jest.fn().mockReturnThis(),
+            andWhere: jest.fn().mockReturnThis(),
+            getMany: jest.fn(() => [
+              {
+                roleName: ProjectRoles.project_owner,
+                projectId,
+                userId,
+              },
+              {
+                roleName: ProjectRoles.project_viewer,
+                projectId,
+                userId: viewerUserId,
+              },
+            ]),
+          })),
+        },
+      },
+      {
         provide: getRepositoryToken(UsersProjectsApiEntity),
         useValue: {
           find: jest.fn(),
@@ -113,7 +144,8 @@ const getFixtures = async () => {
         provide: getRepositoryToken(PublishedProject),
         useValue: {
           find: jest.fn(),
-          findOne: (id: string) => publicProjects.find((p) => p === id),
+          findOne: (findOneOptions: any) =>
+            publicProjects.find((p) => p === findOneOptions.where.id),
           createQueryBuilder: jest.fn(() => ({
             leftJoinAndSelect: jest.fn().mockReturnThis(),
             select: jest.fn().mockReturnThis(),
@@ -153,9 +185,8 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ProjectAclService);
 
-  const userProjectsRepoMock: jest.Mocked<
-    Repository<UsersProjectsApiEntity>
-  > = sandbox.get(userProjectsToken);
+  const userProjectsRepoMock: jest.Mocked<Repository<UsersProjectsApiEntity>> =
+    sandbox.get(userProjectsToken);
 
   return {
     GivenNoRoles: () =>

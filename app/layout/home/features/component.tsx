@@ -11,9 +11,7 @@ import Wrapper from 'layout/wrapper';
 
 import { FEATURES, EXAMPLE_PROJECTS } from './constants';
 
-export interface HomeFeaturesProps {
-
-}
+export interface HomeFeaturesProps {}
 
 export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
   const { ref: exploreRef, inView: exploreInView } = useInView({
@@ -23,8 +21,8 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
 
   const exampleProjectsVariants = {
     initial: (i: number) => ({
-      x: (i <= 1) ? 0 : -(i * 2),
-      y: (i === 0) ? 20 : (i * 20),
+      x: i <= 1 ? 0 : -(i * 2),
+      y: i === 0 ? 20 : i * 20,
       rotate: 0,
       originX: 1,
       originY: 1,
@@ -35,7 +33,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
     }),
     hover: (i: number) => ({
       x: -(i * 10),
-      y: (i === 0) ? 0 : i * 4,
+      y: i === 0 ? 0 : i * 4,
       rotate: -(i * 4),
       originX: 1,
       originY: 1,
@@ -50,14 +48,19 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
     <div className="bg-primary-50">
       <Wrapper>
         <div className="w-full py-10 md:py-32 ">
-          <div className="grid max-w-5xl grid-cols-1 gap-10 mx-auto md:gap-20 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-10 sm:grid-cols-2 md:gap-20 lg:grid-cols-3">
             {FEATURES.map((F, i) => {
-              const {
-                id, name, description, icon,
-              } = F;
+              const { id, name, description, icon } = F;
 
               return (
-                <Item key={`${id}`} id={id} name={name} description={description} icon={icon} index={i} />
+                <Item
+                  key={`${id}`}
+                  id={id}
+                  name={name}
+                  description={description}
+                  icon={icon}
+                  index={i}
+                />
               );
             })}
             <motion.div
@@ -74,24 +77,25 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
               }}
             >
               <motion.div
-                className="relative w-full pb-24 overflow-hidden pt-11 place-self-center rounded-3xl"
+                className="relative w-full place-self-center overflow-hidden rounded-3xl pb-24 pt-11"
                 style={{ background: 'linear-gradient(to right bottom, #4B48F5, #00BFFF)' }}
                 initial="initial"
                 whileHover="hover"
                 animate="initial"
               >
-                <Link href="/community/projects">
-                  <p className="text-2xl leading-10 cursor-pointer font-heading px-9 hover:underline">
+                <Link href="/community/projects" legacyBehavior>
+                  <p className="cursor-pointer px-9 font-heading text-2xl leading-10 hover:underline">
                     Explore and learn from planning examples around the world
                   </p>
                 </Link>
-                <div className="w-full mt-10 overflow-hidden">
-                  {EXAMPLE_PROJECTS.map(({
-                    id, image, alt,
-                  }, index) => (
-                    <div key={id} className="absolute bottom-0 w-full transform px-9 left-1/2 -translate-x-2/4">
+                <div className="mt-10 w-full overflow-hidden">
+                  {EXAMPLE_PROJECTS.map(({ id, image, alt }, index) => (
+                    <div
+                      key={id}
+                      className="absolute bottom-0 left-1/2 w-full -translate-x-2/4 transform px-9"
+                    >
                       <motion.img
-                        className="w-full cursor-pointer max-h-32 lg:max-h-full"
+                        className="max-h-32 w-full cursor-pointer lg:max-h-full"
                         alt={alt}
                         src={image}
                         custom={EXAMPLE_PROJECTS.length - index - 1}

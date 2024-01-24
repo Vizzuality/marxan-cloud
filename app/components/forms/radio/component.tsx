@@ -1,25 +1,24 @@
 import React, { InputHTMLAttributes } from 'react';
-import cx from 'classnames';
+
+import { cn } from 'utils/cn';
 
 const THEME = {
   dark: {
-    base:
-      'bg-gray-800 border rounded-full text-primary-500 focus:border-primary-500 focus:outline-none',
+    base: 'bg-gray-900 border rounded-full text-primary-500 focus:border-primary-500 focus:outline-none',
     status: {
-      none: 'border-gray-800',
-      valid: 'border-gray-800',
-      error: 'border-red-500',
-      disabled: 'border-gray-800 opacity-50',
+      none: 'border-gray-900',
+      valid: 'border-gray-900',
+      error: 'border-red-600',
+      disabled: 'border-gray-900 opacity-50',
     },
   },
   light: {
-    base:
-      'bg-white border rounded-full text-primary-500 focus:border-primary-500 focus:outline-none',
+    base: 'bg-white border rounded-full text-primary-500 focus:border-primary-500 focus:outline-none',
     status: {
-      none: 'border-gray-800',
-      valid: 'border-gray-800',
-      error: 'border-red-500 focus:border-red-500',
-      disabled: 'border-gray-800 opacity-50',
+      none: 'border-gray-900',
+      valid: 'border-gray-900',
+      error: 'border-red-600 focus:border-red-600',
+      disabled: 'border-gray-900 opacity-50',
     },
   },
 };
@@ -43,7 +42,7 @@ export const Radio: React.FC<RadioProps> = ({
       {...props}
       type="radio"
       disabled={disabled}
-      className={cx({
+      className={cn({
         'form-radio': true,
         [THEME[theme].base]: true,
         [THEME[theme].status[st]]: true,

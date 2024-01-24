@@ -4,7 +4,6 @@ import { v4 } from 'uuid';
 import { assertDefined, FieldsOf } from '@marxan/utils';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
 import { QueueNameToken } from '@marxan-api/modules/queue/queue.tokens';
-import * as config from 'config';
 import { getRedisConfig } from '@marxan-api/utils/redisConfig.utils';
 
 @Injectable({
@@ -18,7 +17,7 @@ export class FakeQueueBuilder implements FieldsOf<QueueBuilder> {
       throw new Error('queue exists');
     }
     this.queue = new FakeQueue(queueName);
-    return (this.queue as unknown) as Queue;
+    return this.queue as unknown as Queue;
   }
 
   async onModuleDestroy(): Promise<void> {
@@ -60,9 +59,8 @@ export class FakeQueue implements Partial<Queue> {
   static findByName(queueName: string): FakeQueue | undefined {
     const key = this.instanceKeys[queueName];
     if (!key) return undefined;
-    const instance = this.instances.get(key);
-    if (!instance) return undefined;
-    return instance;
+
+    return this.instances.get(key);
   }
 
   disposeFakeJobs() {

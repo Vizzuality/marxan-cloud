@@ -1,4 +1,4 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -35,7 +35,6 @@ export class FeatureService {
   constructor(
     @InjectRepository(GeoFeatureGeometry)
     private readonly featuresRepository: Repository<GeoFeatureGeometry>,
-    @Inject(TileService)
     private readonly tileService: TileService,
   ) {}
 
@@ -70,11 +69,26 @@ export class FeatureService {
    */
   public findTile(
     tileSpecification: TileSpecification,
+    forProject: boolean,
     bbox?: BBox,
   ): Promise<Buffer> {
     const { z, x, y, id } = tileSpecification;
-    const attributes = 'feature_id, properties';
-    const table = `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, 0.1) as the_geom, properties, feature_id from "${this.featuresRepository.metadata.tableName}")`;
+    const simplificationLevel = 360 / (Math.pow(2, z + 1) * 100);
+    const attributes = forProject
+      ? 'feature_id, amount'
+      : 'feature_id, properties';
+    const table = forProject
+      ? `(SELECT ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) AS the_geom,
+                 amount,
+                 feature_id
+                 FROM feature_amounts_per_planning_unit
+                 INNER JOIN projects_pu ppu on ppu.id=feature_amounts_per_planning_unit.project_pu_id
+                 INNER JOIN planning_units_geom pug on pug.id=ppu.geom_id)`
+      : `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) as the_geom,
+                 (coalesce(properties,'{}'::jsonb) || jsonb_build_object('amount', amount)) as properties,
+                 feature_id
+                 from "${this.featuresRepository.metadata.tableName}")`;
+
     const customQuery = this.buildFeaturesWhereQuery(id, bbox);
     return this.tileService.getTile({
       z,

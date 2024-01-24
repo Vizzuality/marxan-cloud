@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
-import cx from 'classnames';
 import { motion } from 'framer-motion';
 
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -11,7 +11,7 @@ export interface ScenariosSidebarAnalysisSectionProps {
   id: string;
   name: string;
   description: string;
-  disabled?: boolean,
+  disabled?: boolean;
   onChangeSection: (s: string) => void;
 }
 
@@ -34,23 +34,25 @@ export const ScenariosSidebarAnalysisSection: React.FC<ScenariosSidebarAnalysisS
       onMouseLeave={() => setAnimate('leave')}
       onClick={() => onChangeSection(id)}
     >
-      <h4 className={cx({
-        'text-xs uppercase font-heading': true,
-        'opacity-30': disabled,
-      })}
+      <h4
+        className={cn({
+          'font-heading text-xs uppercase': true,
+          'opacity-30': disabled,
+        })}
       >
         {name}
       </h4>
-      <p className={cx({
-        'mt-1 text-sm text-gray-300': true,
-        'opacity-30': disabled,
-      })}
+      <p
+        className={cn({
+          'mt-1 text-sm text-gray-400': true,
+          'opacity-30': disabled,
+        })}
       >
         {description}
       </p>
 
       <motion.div
-        className="absolute transform -translate-y-1/2 right-4 top-1/2"
+        className="absolute right-4 top-1/2 -translate-y-1/2 transform"
         initial={{
           opacity: 1,
           x: 0,
@@ -81,8 +83,8 @@ export const ScenariosSidebarAnalysisSection: React.FC<ScenariosSidebarAnalysisS
       >
         <Icon
           icon={ARROW_RIGHT_2_SVG}
-          className={cx({
-            'w-5 h-5 text-primary-500': true,
+          className={cn({
+            'h-5 w-5 text-primary-500': true,
             'opacity-75': !disabled,
             'opacity-30': disabled,
           })}

@@ -14,12 +14,16 @@ import { MarkLegacyProjectImportAsFailed } from './mark-legacy-project-import-as
 
 @CommandHandler(MarkLegacyProjectImportAsSubmitted)
 export class MarkLegacyProjectImportAsSubmittedHandler
-  implements IInferredCommandHandler<MarkLegacyProjectImportAsSubmitted> {
+  implements IInferredCommandHandler<MarkLegacyProjectImportAsSubmitted>
+{
+  private readonly logger: Logger = new Logger(
+    MarkLegacyProjectImportAsSubmittedHandler.name,
+  );
+
   constructor(
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
     private readonly apiEvents: ApiEventsService,
     private readonly commandBus: CommandBus,
-    private readonly logger: Logger,
   ) {}
 
   private async markLegacyProjectImportAsSubmitted(
@@ -35,9 +39,8 @@ export class MarkLegacyProjectImportAsSubmittedHandler
   async execute({
     projectId,
   }: MarkLegacyProjectImportAsSubmitted): Promise<void> {
-    const legacyProjectImportOrError = await this.legacyProjectImportRepository.find(
-      projectId,
-    );
+    const legacyProjectImportOrError =
+      await this.legacyProjectImportRepository.find(projectId);
 
     if (isLeft(legacyProjectImportOrError)) {
       await this.markLegacyProjectImportAsSubmitted(
@@ -47,10 +50,8 @@ export class MarkLegacyProjectImportAsSubmittedHandler
       return;
     }
 
-    const {
-      ownerId,
-      scenarioId,
-    } = legacyProjectImportOrError.right.toSnapshot();
+    const { ownerId, scenarioId } =
+      legacyProjectImportOrError.right.toSnapshot();
     const kind = API_EVENT_KINDS.project__legacy__import__submitted__v1__alpha;
     const topic = projectId.value;
 

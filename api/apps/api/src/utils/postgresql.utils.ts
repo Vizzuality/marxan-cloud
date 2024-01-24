@@ -1,4 +1,4 @@
-import { getManager } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 
 /**
  * Utility functions related to lower-level interaction with PostgreSQL servers.
@@ -9,8 +9,8 @@ export class PostgreSQLUtils {
   /**
    * Check if the PostgreSQL server we are connected to is version 13 or higher.
    */
-  static async version13Plus(): Promise<boolean> {
-    const postgresqlMajorVersion = await getManager()
+  static async version13Plus(queryRunner: QueryRunner): Promise<boolean> {
+    const postgresqlMajorVersion = await queryRunner
       .query('show server_version')
       .then((result: [{ server_version: string }]) => {
         return result[0].server_version.split('.')[0];

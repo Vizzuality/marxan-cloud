@@ -16,14 +16,15 @@ import {
 @Injectable()
 @PieceImportProvider()
 export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioMetadataPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioMetadataPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioMetadata;
@@ -78,6 +79,7 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
         status: values.status,
         created_by: ownerId,
         solutions_are_locked: values.solutionsAreLocked,
+        cost_surface_id: values.cost_surface_id,
       })
       .execute();
   }

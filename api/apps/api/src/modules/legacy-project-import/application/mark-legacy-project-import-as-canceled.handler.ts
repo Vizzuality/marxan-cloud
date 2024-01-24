@@ -6,13 +6,13 @@ import { MarkLegacyProjectImportAsCanceled } from './mark-legacy-project-import-
 
 @CommandHandler(MarkLegacyProjectImportAsCanceled)
 export class MarkLegacyProjectImportAsCanceledHandler
-  implements IInferredCommandHandler<MarkLegacyProjectImportAsCanceled> {
-  constructor(
-    private readonly apiEvents: ApiEventsService,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(MarkLegacyProjectImportAsCanceledHandler.name);
-  }
+  implements IInferredCommandHandler<MarkLegacyProjectImportAsCanceled>
+{
+  private readonly logger: Logger = new Logger(
+    MarkLegacyProjectImportAsCanceledHandler.name,
+  );
+
+  constructor(private readonly apiEvents: ApiEventsService) {}
 
   async execute({
     projectId,

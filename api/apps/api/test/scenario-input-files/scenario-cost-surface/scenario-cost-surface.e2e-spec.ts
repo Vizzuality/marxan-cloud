@@ -3,7 +3,7 @@ import { getFixtures } from './scenario-cost-surface.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   fixtures = await getFixtures();
   await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenScenarioWithPuAndLocks();
@@ -22,24 +22,28 @@ describe(`As owner, when scenario has PUs with cost and lock status`, () => {
     const results = await fixtures.WhenGettingPuInclusionStateAsOwner();
     expect(results).toEqual([
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
+        setByUser: false,
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-in',
+        setByUser: true,
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-out',
+        setByUser: true,
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
+        setByUser: false,
       },
     ]);
   });
@@ -56,27 +60,32 @@ describe(`As contributor, when scenario has PUs with cost and lock status`, () =
   });
 
   it(`returns relevant data for PU listing`, async () => {
+    await fixtures.GivenContributorWasAddedToScenario();
     const results = await fixtures.WhenGettingPuInclusionStateAsContributor();
     expect(results).toEqual([
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
+        setByUser: false,
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-in',
+        setByUser: true,
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-out',
+        setByUser: true,
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
+        setByUser: false,
       },
     ]);
   });
@@ -93,27 +102,32 @@ describe(`As viewer, when scenario has PUs with cost and lock status`, () => {
   });
 
   it(`returns relevant data for PU listing`, async () => {
+    await fixtures.GivenViewerWasAddedToScenario();
     const results = await fixtures.WhenGettingPuInclusionStateAsViewer();
     expect(results).toEqual([
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
+        setByUser: false,
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-in',
+        setByUser: true,
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-out',
+        setByUser: true,
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
+        setByUser: false,
       },
     ]);
   });
@@ -126,11 +140,8 @@ describe(`As user not in scenario, when scenario has PUs with cost and lock stat
   });
 
   it(`returns forbidden when getting planning-units`, async () => {
-    const response = await fixtures.WhenGettingPuInclusionStateAsUserNotInScenario();
+    const response =
+      await fixtures.WhenGettingPuInclusionStateAsUserNotInScenario();
     await fixtures.ThenForbiddenIsReturned(response);
   });
-});
-
-afterAll(async () => {
-  await fixtures?.cleanup();
 });

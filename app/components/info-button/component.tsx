@@ -1,19 +1,22 @@
 import React, { ReactElement } from 'react';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import INFO_SVG from 'svgs/ui/info.svg?sprite';
 
 const THEME = {
   primary: {
-    button: 'bg-blue-400',
-    icon: 'text-gray-800',
+    button: 'bg-blue-500',
+    icon: 'text-gray-900',
   },
   secondary: {
     button: 'bg-black',
+    icon: 'text-white',
+  },
+  tertiary: {
+    button: 'bg-gray-600',
     icon: 'text-white',
   },
 };
@@ -34,7 +37,7 @@ const SIZE = {
 export interface InfoButtonProps {
   children: ReactElement;
   className?: string;
-  theme?: 'primary' | 'secondary'
+  theme?: 'primary' | 'secondary' | 'tertiary';
   size?: 's' | 'base' | 'lg';
 }
 
@@ -51,21 +54,22 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
     trigger="click"
     maxWidth={350}
     interactive
-    content={(
+    content={
       <div
-        className="p-4 text-gray-500 bg-white rounded"
+        className="rounded bg-white p-4 text-gray-700"
         style={{
           boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
         }}
       >
         {children || 'Add your tooltip info'}
       </div>
-    )}
+    }
   >
     <button
       aria-label="info-button"
-      className={cx({
-        'flex flex-shrink-0 items-center justify-center transition rounded-full bg-opacity-50 focus:outline-none hover:bg-opacity-75 focus:bg-opacity-90': true,
+      className={cn({
+        'flex flex-shrink-0 items-center justify-center rounded-full bg-opacity-50 transition hover:bg-opacity-75 focus:bg-opacity-90 focus:outline-none':
+          true,
         [THEME[theme].button]: true,
         [SIZE.button[size]]: true,
         [className]: !!className,
@@ -74,7 +78,7 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
     >
       <Icon
         icon={INFO_SVG}
-        className={cx({
+        className={cn({
           [THEME[theme].icon]: true,
           [SIZE.icon[size]]: true,
         })}

@@ -1,6 +1,4 @@
-import React, {
-  useState, useEffect, useMemo, useRef, useCallback,
-} from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -24,13 +22,6 @@ import { useOrganizations } from 'hooks/organizations';
 import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
-import HelpBeacon from 'layout/help/beacon';
-import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
-import PlanningAreaGridUploader from 'layout/projects/new/form/planning-area-grid-uploader';
-import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
-import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
-import ProjectNewMap from 'layout/projects/new/map';
-
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
@@ -39,28 +30,41 @@ import Select from 'components/forms/select';
 import Textarea from 'components/forms/textarea';
 import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
+import { ScrollArea } from 'components/scroll-area';
+import HelpBeacon from 'layout/help/beacon';
+import CountryRegionSelector from 'layout/projects/new/form/country-region-selector';
+import PlanningAreaGridUploader from 'layout/projects/new/form/planning-area-grid-uploader';
+import PlanningAreaSelector from 'layout/projects/new/form/planning-area-selector';
+import PlanningAreaUploader from 'layout/projects/new/form/planning-area-uploader';
 
 import REGION_PU from 'images/info-buttons/img_planning_region_grid.png';
 
 import { DEFAULT_AREA, PA_OPTIONS } from './constants';
-import ProjectFormProps from './types';
 
-const ProjectForm: React.FC<ProjectFormProps> = () => {
+export type NewProjectFields = {
+  PAOptionSelected: (typeof PA_OPTIONS)[number]['value'];
+  countryId: string;
+  planningAreaGridId: string;
+  planningUnitAreakm2: number;
+  planningUnitGridShape: 'hexagon' | 'square' | 'from_shapefile';
+  planningAreaId: string;
+  adminAreaLevel1Id: string;
+  adminAreaLevel2Id: string;
+};
+
+export interface ProjectFormProps {
+  onFormUpdate: (formValues: NewProjectFields) => void;
+}
+
+const ProjectForm = ({ onFormUpdate }: ProjectFormProps): JSX.Element => {
   const { addToast } = useToasts();
   const { push } = useRouter();
   const plausible = usePlausible();
-
   const [PAOptionSelected, setPAOptionSelected] = useState('');
-
   const planningAreaScrollRef = useRef(null);
-
-  const { user } = useMe();
-
+  const { data: user } = useMe();
   const { data: organizationsData } = useOrganizations();
-
   const dispatch = useDispatch();
-
-  // Project mutation and submit
   const saveProjectMutation = useSaveProject({});
 
   useEffect(() => {
@@ -73,77 +77,108 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
     };
   }, [dispatch]);
 
-  const onSubmit = (values) => {
-    const { planningAreaGridId } = values;
-    delete values.PAOptionSelected;
-    delete values.planningAreaGridId;
+  const onSubmit = (values: NewProjectFields) => {
+    const v = { ...values };
+    const { planningAreaGridId, planningAreaId, adminAreaLevel1Id, adminAreaLevel2Id } = v;
+    delete v.PAOptionSelected;
+    delete v.planningAreaGridId;
+
+    if (planningAreaGridId || planningAreaId) {
+      delete v.countryId;
+      delete v.adminAreaLevel1Id;
+      delete v.adminAreaLevel2Id;
+    }
+
+    if (adminAreaLevel1Id || adminAreaLevel2Id) {
+      delete v.planningAreaId;
+    }
 
     // TEMPORARY!!
     // This should be removed once organizations IDs are handled in the user
     const data = {
-      ...values,
-      ...(planningAreaGridId && { planningAreaId: planningAreaGridId }),
-      ...(planningAreaGridId && { planningUnitGridShape: 'from_shapefile' }),
+      ...v,
+      ...(planningAreaGridId && {
+        planningAreaId: planningAreaGridId,
+        planningUnitGridShape: 'from_shapefile',
+      }),
       organizationId: organizationsData[0].id || '7f1fb7f8-1246-4509-89b9-f48b6f976e3f',
-    };
+    } satisfies NewProjectFields & { organizationId: string };
 
-    saveProjectMutation.mutate({ data }, {
-      onSuccess: ({ data: { data: p } }) => {
-        addToast('success-project-creation', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Project saved successfully</p>
-          </>
-        ), {
-          level: 'success',
-        });
+    addToast(
+      'info-project-creation',
+      <>
+        <h2 className="font-medium">Your project is being created.</h2>
+        <p className="text-sm">This might take a few seconds.</p>
+      </>,
+      {
+        level: 'info',
+      }
+    );
 
-        console.info('Project saved succesfully', p);
-        push('/projects');
-        plausible('New project', {
-          props: {
-            userId: `${user.id}`,
-            userEmail: `${user.email}`,
-          },
-        });
-        if (data.planningUnitGridShape === 'from_shapefile') {
-          plausible('Create project with planing unit shapefile', {
+    saveProjectMutation.mutate(
+      { data },
+      {
+        onSuccess: ({ data: { data: p } }) => {
+          addToast(
+            'success-project-creation',
+            <>
+              <h2 className="font-medium">Your project has been created.</h2>
+              <p className="text-sm">You will be redirected to the dashboard.</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+
+          console.info('Project saved succesfully', p);
+          push('/projects');
+          plausible('New project', {
             props: {
               userId: `${user.id}`,
               userEmail: `${user.email}`,
             },
           });
-        }
-        if (!data.countryId && data.planningUnitGridShape !== 'from_shapefile') {
-          plausible('Create project with planing region shapefile', {
-            props: {
-              userId: `${user.id}`,
-              userEmail: `${user.email}`,
-            },
-          });
-        }
-        if (data.countryId) {
-          plausible('Create project without shapefile', {
-            props: {
-              userId: `${user.id}`,
-              userEmail: `${user.email}`,
-            },
-          });
-        }
-      },
-      onError: () => {
-        addToast('error-project-creation', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Project could not be created</p>
-          </>
-        ), {
-          level: 'error',
-        });
+          if (data.planningUnitGridShape === 'from_shapefile') {
+            plausible('Create project with planing unit shapefile', {
+              props: {
+                userId: `${user.id}`,
+                userEmail: `${user.email}`,
+              },
+            });
+          }
+          if (!data.countryId && data.planningUnitGridShape !== 'from_shapefile') {
+            plausible('Create project with planing region shapefile', {
+              props: {
+                userId: `${user.id}`,
+                userEmail: `${user.email}`,
+              },
+            });
+          }
+          if (data.countryId) {
+            plausible('Create project without shapefile', {
+              props: {
+                userId: `${user.id}`,
+                userEmail: `${user.email}`,
+              },
+            });
+          }
+        },
+        onError: () => {
+          addToast(
+            'error-project-creation',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">Project could not be created</p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
 
-        console.error('Project could not be created');
-      },
-    });
+          console.error('Project could not be created');
+        },
+      }
+    );
   };
 
   const scrollDown = useCallback((ref) => {
@@ -157,7 +192,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
     const registeredFields = form.getRegisteredFields();
     registeredFields.forEach((f) => {
-      const omitFields = ['name', 'description', 'planningUnitGridShape'];
+      const omitFields = ['name', 'description', 'planningUnitGridShape', 'PAOptionSelected'];
       if (!omitFields.includes(f)) {
         form.change(f, null);
       }
@@ -170,7 +205,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
     const registeredFields = form.getRegisteredFields();
     registeredFields.forEach((f) => {
-      const omitFields = ['name', 'description'];
+      const omitFields = ['name', 'description', 'PAOptionSelected'];
       if (!omitFields.includes(f)) {
         form.change(f, null);
       }
@@ -183,79 +218,71 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   }, [PAOptionSelected]);
 
   return (
-    <FormRFF
+    <FormRFF<NewProjectFields>
       onSubmit={onSubmit}
       initialValues={{
         ...DEFAULT_AREA,
       }}
     >
-      {({ form, handleSubmit, values }) => (
-        <form
-          onSubmit={handleSubmit}
-          autoComplete="off"
-          className="flex flex-col justify-between flex-grow w-full overflow-hidden"
-        >
-          <div className="grid h-full grid-cols-1 gap-0 overflow-hidden bg-gray-700 md:grid-cols-2 rounded-3xl">
-            <HelpBeacon
-              id="project-new-overview"
-              title="Basic information"
-              subtitle="New project overview"
-              content={(
-                <div className="space-y-2">
-                  <p>
-                    To create a new project you need to add a name,
-                    a description, a planning region and
-                    a planning grid.
-                  </p>
-                  <p>
-                    You will be able to create a
-                    planning region and grid
-                    from scratch following some
-                    simple steps or you can upload
-                    your own file.
-                  </p>
-                </div>
-              )}
-              modifiers={['flip']}
-              tooltipPlacement="right"
-            >
-              <div id="project-new-form" className="flex flex-col flex-grow overflow-hidden">
-                <div className="relative flex flex-col flex-grow min-h-0">
-                  <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
+      {({ form, handleSubmit, values }) => {
+        onFormUpdate(values);
 
-                  <div className="flex flex-col flex-grow p-8 overflow-auto">
-                    <div>
-                      <h1 className="max-w-xs text-2xl text-white font-heading">
+        return (
+          <form
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            className="flex h-full w-full flex-col justify-between overflow-hidden"
+          >
+            <div className="h-full overflow-hidden">
+              <HelpBeacon
+                id="project-new-overview"
+                title="Basic information"
+                subtitle="New project overview"
+                content={
+                  <div className="space-y-2">
+                    <p>
+                      To create a new project you need to add a name, a description, a planning
+                      region and a planning grid.
+                    </p>
+                    <p>
+                      You will be able to create a planning region and grid from scratch following
+                      some simple steps or you can upload your own file.
+                    </p>
+                  </div>
+                }
+                modifiers={['flip']}
+                tooltipPlacement="right"
+              >
+                <div className="flex h-full flex-col overflow-hidden">
+                  <ScrollArea className="relative before:pointer-events-none before:absolute before:left-0 before:top-0 before:z-10 before:h-6 before:w-full before:bg-gradient-to-b before:from-black before:via-black after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:z-10 after:h-6 after:w-full after:bg-gradient-to-t after:from-black after:via-black">
+                    <div className="w-[calc(100%-25px)] py-5 pr-3">
+                      <h1 className="max-w-xs font-heading text-2xl text-white">
                         Name your project and define a planning area:
                       </h1>
 
                       {/* NAME */}
                       <div className="mt-8">
-                        <FieldRFF
-                          name="name"
-                          validate={composeValidators([{ presence: true }])}
-                        >
+                        <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
                           {(fprops) => (
                             <Field id="name" {...fprops}>
-                              <div className="flex items-center mb-3 space-x-2">
+                              <div className="mb-3 flex items-center space-x-2">
                                 <Label theme="dark" className="uppercase" id="name">
                                   Project Name
                                 </Label>
 
                                 <InfoButton>
                                   <span>
-                                    <h4 className="font-heading text-lg mb-2.5">Project Name</h4>
+                                    <h4 className="mb-2.5 font-heading text-lg">Project Name</h4>
                                     <div className="space-y-2">
                                       <p>
-                                        One project can aggregate multiple scenarios
-                                        with the same planning region and grid.
-                                        Therefore, using a generic name for the project is
-                                        recommended (eg: the name of the planning region)
-                                        as well as a generic overview for the description.
+                                        One project can aggregate multiple scenarios with the same
+                                        planning region and grid. Therefore, using a generic name
+                                        for the project is recommended (eg: the name of the planning
+                                        region) as well as a generic overview for the description.
                                       </p>
                                       <p>
-                                        In each Scenario you will be able
-                                        to provide more specific details.
+                                        In each Scenario you will be able to provide more specific
+                                        details.
                                       </p>
                                     </div>
                                   </span>
@@ -275,7 +302,9 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         >
                           {(fprops) => (
                             <Field id="description" {...fprops}>
-                              <Label theme="dark" className="mb-3 uppercase">Description</Label>
+                              <Label theme="dark" className="mb-3 uppercase">
+                                Description
+                              </Label>
                               <Textarea rows={4} placeholder="Write your project description..." />
                             </Field>
                           )}
@@ -283,32 +312,28 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                       </div>
 
                       {/* PLANNING AREA */}
-                      <div className="flex flex-col justify-between mt-10">
-                        <div className="flex items-center mb-5 space-x-3">
-                          <h2 className="text-lg font-medium font-heading">Do you have a planning region or planning unit shapefile?</h2>
+                      <div className="mt-10 flex flex-col justify-between">
+                        <div className="mb-5 flex items-center space-x-3">
+                          <h2 className="font-heading text-lg font-medium">
+                            Do you have a planning region or planning unit shapefile?
+                          </h2>
                           <InfoButton>
                             <span>
-                              <h4 className="font-heading text-lg mb-2.5">Planning Area</h4>
+                              <h4 className="mb-2.5 font-heading text-lg">Planning Area</h4>
                               <div className="space-y-2">
                                 <p>
-                                  The planning area (also named planning
-                                  region, study region
-                                  or study area) is
-                                  the outer boundary
-                                  of the region where you want to create a
-                                  plan.
+                                  The planning area (also named planning region, study region or
+                                  study area) is the outer boundary of the region where you want to
+                                  create a plan.
                                 </p>
                                 <p>
-                                  These regions
-                                  often represent administrative units
-                                  (such as countries or
-                                  smaller regions), but you can also upload your
-                                  own geometry.
+                                  These regions often represent administrative units (such as
+                                  countries or smaller regions), but you can also upload your own
+                                  geometry.
                                 </p>
                                 <p>
-                                  The planning region is converted to a
-                                  grid of planning units, that are the
-                                  central pieces that Marxan uses in its analyses.
+                                  The planning region is converted to a grid of planning units, that
+                                  are the central pieces that Marxan uses in its analyses.
                                 </p>
                                 <img src={REGION_PU} alt="Region-PU" />
                               </div>
@@ -317,32 +342,32 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         </div>
 
                         {/* PLANNING AREA TYPE SELECTOR */}
-                        <FieldRFF
-                          name="PAOptionSelected"
-                        >
+                        <FieldRFF name="PAOptionSelected">
                           {(fprops) => (
-                            <Field id="PAOptionSelected" {...fprops}>
-                              <Select
-                                theme="dark"
-                                size="base"
-                                status="none"
-                                placeholder="Select option..."
-                                initialSelected={PAOptionSelected}
-                                options={OPTIONS}
-                                onChange={(value: string) => {
-                                  setPAOptionSelected(value);
-                                  resetPlanningArea(form);
-                                  resetPlanningAreaGrid(form);
-                                }}
-                              />
-                            </Field>
+                            <div className="px-[1px]">
+                              <Field id="PAOptionSelected" {...fprops}>
+                                <Select
+                                  theme="dark"
+                                  size="base"
+                                  status="none"
+                                  placeholder="Select option..."
+                                  initialSelected={PAOptionSelected}
+                                  options={OPTIONS}
+                                  onChange={(value: NewProjectFields['PAOptionSelected']) => {
+                                    form.change('PAOptionSelected', value);
+                                    setPAOptionSelected(value);
+                                    resetPlanningArea(form);
+                                    resetPlanningAreaGrid(form);
+                                  }}
+                                />
+                              </Field>
+                            </div>
                           )}
                         </FieldRFF>
                       </div>
 
                       {PAOptionSelected === 'regular' && (
-                        <>
-
+                        <div className="px-[1px]">
                           <CountryRegionSelector
                             country={values.countryId}
                             region={values.adminAreaLevel1Id}
@@ -350,12 +375,10 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                             onClick={() => scrollDown(planningAreaScrollRef)}
                           />
                           {(!!values.countryId || !!values.planningAreaId) && (
-                            <PlanningAreaSelector
-                              values={values}
-                            />
+                            <PlanningAreaSelector values={values} />
                           )}
                           <div ref={planningAreaScrollRef} />
-                        </>
+                        </div>
                       )}
 
                       {/* CUSTOM SHAPEFILE PLANNING AREA */}
@@ -375,11 +398,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                               );
                             }}
                           </FieldRFF>
-                          {values.planningAreaId && (
-                            <PlanningAreaSelector
-                              values={values}
-                            />
-                          )}
+                          {values.planningAreaId && <PlanningAreaSelector values={values} />}
                         </div>
                       )}
 
@@ -403,76 +422,31 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                         </div>
                       )}
                     </div>
-                  </div>
-                  <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
-                </div>
+                  </ScrollArea>
 
-                {/* BUTTON BAR */}
-                <div className="flex px-8 pb-8 mt-4">
-                  <Link href="/projects" passHref>
-                    <a
-                      href="/projects"
-                    >
-                      <Button
-                        theme="secondary"
-                        size="xl"
-                      >
+                  {/* BUTTON BAR */}
+                  <div className="mt-4 flex px-8 pb-8">
+                    <Link href="/projects" passHref>
+                      <Button theme="secondary" size="xl">
                         Cancel
                       </Button>
-                    </a>
-                  </Link>
-                  <Button
-                    className="ml-6"
-                    theme="primary"
-                    size="xl"
-                    type="submit"
-                  >
-                    Save
-                  </Button>
+                    </Link>
+                    <Button
+                      className="ml-6"
+                      theme="primary"
+                      size="xl"
+                      type="submit"
+                      disabled={saveProjectMutation.isLoading}
+                    >
+                      Save
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </HelpBeacon>
-
-            <HelpBeacon
-              id="project-new-map"
-              title="MAP VIEW"
-              subtitle="New planning area and grid"
-              content={(
-                <div className="space-y-2">
-                  <p>
-                    On the map you will be able to see your selected
-                    or uploaded planning area and grid.
-                  </p>
-                  <p>
-                    If you are creating a new grid,
-                    you can change the shape and
-                    size of the planning units
-                    and look at the different results
-                    here to find
-                    the best combination for
-                    your conservation plan.
-                  </p>
-
-                </div>
-              )}
-              modifiers={['flip']}
-              tooltipPlacement="right"
-            >
-              <div className="w-full h-full">
-                <ProjectNewMap
-                  country={values.countryId}
-                  region={values.adminAreaLevel1Id}
-                  subregion={values.adminAreaLevel2Id}
-                  planningUnitGridShape={values.planningUnitGridShape}
-                  planningUnitAreakm2={values.planningUnitAreakm2}
-                  paOptionSelected={PAOptionSelected}
-                />
-              </div>
-
-            </HelpBeacon>
-          </div>
-        </form>
-      )}
+              </HelpBeacon>
+            </div>
+          </form>
+        );
+      }}
     </FormRFF>
   );
 };

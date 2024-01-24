@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ProjectListStateProps {
-  search: string
+  search: string;
 }
 
 const initialState = { search: '' } as ProjectListStateProps;

@@ -5,10 +5,11 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { getConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import * as zlib from 'zlib';
 import { TileRequest } from '@marxan/tiles';
 import { promisify } from 'util';
+import { InjectDataSource } from '@nestjs/typeorm';
 
 /**
  * @description The required input values for the tile renderer
@@ -61,6 +62,11 @@ export class TileService {
    */
   private readonly logger: Logger = new Logger(TileService.name);
 
+  constructor(
+    @InjectDataSource()
+    private readonly geoDataSource: DataSource,
+  ) {}
+
   /**
    * Simplification based in zoom level
    * @param z
@@ -94,8 +100,7 @@ export class TileService {
     inputProjection = 4326,
     attributes,
   }: TileInput<string>): Promise<Record<'mvt', Buffer>[]> {
-    const connection = getConnection();
-    const query = connection
+    const query = this.geoDataSource
       .createQueryBuilder()
       .select(`ST_AsMVT(tile.*, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
       .from((subQuery) => {

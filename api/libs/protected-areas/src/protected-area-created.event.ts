@@ -7,3 +7,10 @@ export class ProtectedAreaCreatedEvent implements IEvent {
     public readonly protectedAreaId: string[],
   ) {}
 }
+
+export class ProtectedAreaForProjectCreatedEvent implements IEvent {
+  constructor(
+    public readonly projectId: string,
+    public readonly protectedAreaId: string[],
+  ) {}
+}

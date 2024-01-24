@@ -34,7 +34,7 @@ import { isLeft } from 'fp-ts/lib/These';
 import { Subscription } from 'rxjs';
 import { Readable } from 'stream';
 import * as request from 'supertest';
-import { Connection, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
@@ -174,9 +174,9 @@ export const getFixtures = async () => {
 
   return {
     cleanup: async () => {
-      const connection = app.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
-      const importRepo = connection.getRepository(ImportEntity);
+      const dataSource = app.get<DataSource>(DataSource);
+      const exportRepo = dataSource.getRepository(ExportEntity);
+      const importRepo = dataSource.getRepository(ImportEntity);
 
       await exportRepo.delete({});
       await importRepo.delete({});
@@ -255,9 +255,8 @@ export const getFixtures = async () => {
       });
     },
     WhenImportIsReady: async () => {
-      const allPiecesImportedEvent = await eventBusTestUtils.waitUntilEventIsPublished(
-        AllPiecesImported,
-      );
+      const allPiecesImportedEvent =
+        await eventBusTestUtils.waitUntilEventIsPublished(AllPiecesImported);
       return allPiecesImportedEvent.importId;
     },
     ThenImportIsCompleted: async (importId: ImportId) => {

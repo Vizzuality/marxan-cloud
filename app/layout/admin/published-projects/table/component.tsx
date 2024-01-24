@@ -13,9 +13,7 @@ import Owner from './cells/owner';
 import Status from './cells/status';
 import Unpublish from './cells/unpublish';
 
-export interface AdminPublishedProjectsTableProps {
-
-}
+export interface AdminPublishedProjectsTableProps {}
 
 export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTableProps> = () => {
   const [page, setPage] = useState(1);
@@ -76,19 +74,21 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
         Cell: Unpublish,
         width: 50,
       },
-
     ];
   }, []);
 
-  const initialState = useMemo(() => ({
-    pageIndex: page - 1,
-    sortBy: [
-      {
-        id: sort.id,
-        desc: sort.direction === 'desc',
-      },
-    ],
-  }), [page, sort]);// eslint-disable-line react-hooks/exhaustive-deps
+  const initialState = useMemo(
+    () => ({
+      pageIndex: page - 1,
+      sortBy: [
+        {
+          id: sort.id,
+          desc: sort.direction === 'desc',
+        },
+      ],
+    }),
+    [page, sort]
+  ); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onPageChange = useCallback((p) => {
     setPage(p);

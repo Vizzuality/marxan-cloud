@@ -1,218 +1,141 @@
-import { useMemo, useRef } from 'react';
+import { useQuery } from 'react-query';
 
-import {
-  useInfiniteQuery, useQuery,
-} from 'react-query';
-
-import flatten from 'lodash/flatten';
-
-import { format } from 'd3';
-import { useSession } from 'next-auth/client';
+import { sortBy } from 'lodash';
+import { useSession } from 'next-auth/react';
 
 import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
+import { Scenario } from 'types/api/scenario';
 
 import SCENARIOS from 'services/scenarios';
 
-import {
-  UseFeaturesOptionsProps,
-} from './types';
+import { UseFeaturesOptionsProps } from './types';
 
-interface AllItemProps extends RawItemProps {}
+type AllItemProps = RawItemProps;
 
-export function useAllGapAnalysis(sId, queryOptions) {
-  const [session] = useSession();
+export function useAllGapAnalysis(sId: Scenario['id'], queryOptions) {
+  const { data: session } = useSession();
 
-  const query = useQuery('all-gap-analysis', async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sId}/features/gap-data`,
-    params: {
-      disablePagination: true,
-      fields: 'featureId',
-      omitFields: 'featureClassName,tag',
-    },
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    placeholderData: {
-      data: [],
-    },
-    ...queryOptions,
-  });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
+  return useQuery(
+    'all-gap-analysis',
+    async () =>
+      SCENARIOS.request({
+        method: 'GET',
+        url: `/${sId}/features/gap-data`,
+        params: {
+          disablePagination: true,
+          fields: 'featureId',
+        },
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then((response) => {
+        return response.data?.data;
+      }),
+    {
+      ...queryOptions,
+    }
+  );
 }
 
-export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
-  const placeholderDataRef = useRef({
-    pages: [],
-    pageParams: [],
-  });
-  const [session] = useSession();
+export function usePreGapAnalysis(sId: Scenario['id'], options: UseFeaturesOptionsProps = {}) {
+  const { data: session } = useSession();
 
-  const {
-    filters = {},
-    search,
-    sort,
-  } = options;
+  const { filters = {}, search, sort } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k],
-      };
-    }, {});
-
-  const fetchFeatures = ({ pageParam = 1 }) => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sId}/features/gap-data`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': pageParam,
-      ...parsedFilters,
-      ...search && {
-        q: search,
-      },
-      ...sort && {
-        sort,
-      },
-    },
-  });
-
-  const query = useInfiniteQuery(['pre-gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
-    placeholderData: placeholderDataRef.current,
-    getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
-      const { page, totalPages } = meta;
-
-      const nextPage = page + 1 > totalPages ? null : page + 1;
-      return nextPage;
-    },
-  });
-
-  const { data } = query;
-  const { pages } = data || {};
-
-  if (data) {
-    placeholderDataRef.current = data;
-  }
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
-
-      return pageData.map((d):AllItemProps => {
-        const {
-          id,
-          name,
-          featureClassName,
-          met,
-          metArea,
-          coverageTarget,
-          coverageTargetArea,
-          onTarget,
-        } = d;
-
-        return {
-          id,
-          name: name || featureClassName || 'Metadata name',
-          onTarget,
-          current: {
-            percent: met / 100,
-            value: format('.3s')(metArea / 1000000),
-            unit: 'km2',
-          },
-          target: {
-            percent: coverageTarget / 100,
-            value: format('.3s')(coverageTargetArea / 1000000),
-            unit: 'km2',
-          },
-        };
-      });
-    })) : [];
-
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
     return {
-      ...query,
-      data: parsedData,
+      ...acc,
+      [`filter[${k}]`]: filters[k],
     };
-  }, [query, pages]);
+  }, {});
+
+  const fetchFeatures = () =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: `/${sId}/features/gap-data`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+        disablePagination: true,
+      },
+    }).then((response) => response.data);
+
+  return useQuery(['pre-gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
+    select: ({ data }) =>
+      sortBy(
+        data.map((d): AllItemProps => {
+          const {
+            id,
+            name,
+            featureClassName,
+            met,
+            metArea,
+            coverageTarget,
+            coverageTargetArea,
+            onTarget,
+          } = d;
+
+          return {
+            id,
+            name: name || featureClassName || 'Metadata name',
+            onTarget,
+            current: {
+              percent: met / 100,
+            },
+            target: {
+              percent: coverageTarget / 100,
+            },
+          };
+        }),
+        ['name']
+      ),
+  });
 }
 
 export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
-  const placeholderDataRef = useRef({
-    pages: [],
-    pageParams: [],
-  });
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const {
-    filters = {},
-    search,
-    sort,
-  } = options;
+  const { filters = {}, search, sort } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k],
-      };
-    }, {});
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k],
+    };
+  }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sId}/marxan/solutions/gap-data`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': pageParam,
-      ...parsedFilters,
-      ...search && {
-        q: search,
+  const fetchFeatures = () =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: `/${sId}/marxan/solutions/gap-data`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
       },
-      ...sort && {
-        sort,
+      params: {
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+        disablePagination: true,
       },
-    },
-  });
+    }).then((response) => response.data);
 
-  const query = useInfiniteQuery(['post-gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
+  return useQuery(['post-gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
     enabled: !!filters.runId,
-    placeholderData: placeholderDataRef.current,
-    getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
-      const { page, totalPages } = meta;
-
-      const nextPage = page + 1 > totalPages ? null : page + 1;
-      return nextPage;
-    },
-  });
-
-  const { data } = query;
-  const { pages } = data || {};
-
-  if (data) {
-    placeholderDataRef.current = data;
-  }
-
-  return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
-
-      return pageData.map((d):AllItemProps => {
+    placeholderData: { data: [] },
+    select: ({ data }) =>
+      data.map((d): AllItemProps => {
         const {
           id,
           name,
@@ -230,21 +153,11 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
           onTarget,
           current: {
             percent: met / 100,
-            value: format('.3s')(metArea / 1000000),
-            unit: 'km2',
           },
           target: {
             percent: coverageTarget / 100,
-            value: format('.3s')(coverageTargetArea / 1000000),
-            unit: 'km2',
           },
         };
-      });
-    })) : [];
-
-    return {
-      ...query,
-      data: parsedData,
-    };
-  }, [query, pages]);
+      }),
+  });
 }

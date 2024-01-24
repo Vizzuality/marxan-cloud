@@ -4,7 +4,6 @@ import { ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { LegacyProjectImportPiece } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
@@ -19,6 +18,7 @@ import { LegacyProjectImportMemoryRepository } from './legacy-project-import-mem
 import { importLegacyProjectPieceQueueToken } from './legacy-project-import-queue.provider';
 import { ScheduleLegacyProjectImportPiece } from './schedule-legacy-project-import-piece.command';
 import { ScheduleLegacyProjectImportPieceHandler } from './schedule-legacy-project-import-piece.handler';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -27,10 +27,8 @@ beforeEach(async () => {
 });
 
 it('should add a legacy-project-import-piece job to the queue and create a legacy project import piece submitted api event', async () => {
-  const [
-    legacyProjectImportInstance,
-    component,
-  ] = await fixtures.GivenLegacyProjectImportIsCreated();
+  const [legacyProjectImportInstance, component] =
+    await fixtures.GivenLegacyProjectImportIsCreated();
   const commandToBeSend = fixtures.GivenScheduleLegacyProjectImportPieceCommand(
     legacyProjectImportInstance,
     component,
@@ -49,7 +47,8 @@ it('should add a legacy-project-import-piece job to the queue and create a legac
 });
 
 it('should send a MarkLegacyProjectImportAsFailed command if the legacy project import cannot be retrieved', async () => {
-  const commandToBeSend = fixtures.GivenScheduleLegacyProjectImportPieceCommandWithInvalidProjectId();
+  const commandToBeSend =
+    fixtures.GivenScheduleLegacyProjectImportPieceCommandWithInvalidProjectId();
 
   await fixtures.WhenScheduleLegacyProjectImportPieceHandlerIsInvoked(
     commandToBeSend,
@@ -62,13 +61,13 @@ it('should send a MarkLegacyProjectImportAsFailed command if the legacy project 
 });
 
 it('should send a MarkLegacyProjectImportAsFailed command if the legacy project import component is not found', async () => {
-  const [
-    legacyProjectImportInstance,
-  ] = await fixtures.GivenLegacyProjectImportIsCreated();
+  const [legacyProjectImportInstance] =
+    await fixtures.GivenLegacyProjectImportIsCreated();
 
-  const commandToBeSend = fixtures.GivenScheduleLegacyProjectImportPieceCommandWithInvalidComponentId(
-    legacyProjectImportInstance,
-  );
+  const commandToBeSend =
+    fixtures.GivenScheduleLegacyProjectImportPieceCommandWithInvalidComponentId(
+      legacyProjectImportInstance,
+    );
 
   await fixtures.WhenScheduleLegacyProjectImportPieceHandlerIsInvoked(
     commandToBeSend,
@@ -83,10 +82,8 @@ it('should send a MarkLegacyProjectImportAsFailed command if the legacy project 
 });
 
 it('should send a MarkImportPieceAsFailed command if the job cannot be added to the queue', async () => {
-  const [
-    legacyProjectImportInstance,
-    component,
-  ] = await fixtures.GivenLegacyProjectImportIsCreated();
+  const [legacyProjectImportInstance, component] =
+    await fixtures.GivenLegacyProjectImportIsCreated();
   const commandToBeSend = fixtures.GivenScheduleLegacyProjectImportPieceCommand(
     legacyProjectImportInstance,
     component,
@@ -124,13 +121,6 @@ const getFixtures = async () => {
         },
       },
       {
-        provide: Logger,
-        useValue: {
-          setContext: () => {},
-          error: () => {},
-        },
-      },
-      {
         provide: LegacyProjectImportRepository,
         useClass: LegacyProjectImportMemoryRepository,
       },
@@ -140,6 +130,7 @@ const getFixtures = async () => {
     ],
   }).compile();
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
 
   const ownerId = UserId.create();
   const commands: ICommand[] = [];
@@ -223,8 +214,7 @@ const getFixtures = async () => {
       const { projectId, componentId } = commandSend;
       expect(createIfNotExistsMock).toHaveBeenCalledTimes(1);
       expect(createIfNotExistsMock).toHaveBeenCalledWith({
-        kind:
-          API_EVENT_KINDS.project__legacy__import__piece__submitted__v1__alpha,
+        kind: API_EVENT_KINDS.project__legacy__import__piece__submitted__v1__alpha,
         topic: componentId.value,
         data: {
           projectId: projectId.value,

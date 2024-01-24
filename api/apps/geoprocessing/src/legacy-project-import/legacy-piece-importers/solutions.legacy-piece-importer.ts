@@ -38,7 +38,12 @@ type SolutionsFileExtension = 'dat' | 'csv' | 'txt';
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class SolutionsLegacyProjectPieceImporter
-  implements LegacyProjectImportPieceProcessor {
+  implements LegacyProjectImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    SolutionsLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly filesService: FileService,
@@ -50,10 +55,7 @@ export class SolutionsLegacyProjectPieceImporter
     private readonly geoEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB.name)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(SolutionsLegacyProjectPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.Solutions;
@@ -213,9 +215,8 @@ export class SolutionsLegacyProjectPieceImporter
       scenarioId,
       solutionsMatrixFileNameExtension,
     );
-    const planningUnitsState = await this.planningUnitsStateCalculator.consume(
-      solutionsStream,
-    );
+    const planningUnitsState =
+      await this.planningUnitsStateCalculator.consume(solutionsStream);
 
     const outputSumFileName = 'output_sum';
     const outputSumFileNameExtension = this.ensureThatOutputFileExists(

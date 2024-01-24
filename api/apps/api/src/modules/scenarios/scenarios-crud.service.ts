@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FetchSpecification } from 'nestjs-base-service';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -6,14 +6,11 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { Scenario } from './scenario.api.entity';
-import { UsersService } from '@marxan-api/modules/users/users.service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { ProtectedAreasCrudService } from '@marxan-api/modules/protected-areas/protected-areas-crud.service';
-import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
@@ -23,7 +20,7 @@ import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
   Scenario,
-  typeof scenarioFilterKeyNames[number]
+  (typeof scenarioFilterKeyNames)[number]
 >;
 type ScenarioFilters = Record<ScenarioFilterKeys, string[]>;
 
@@ -45,11 +42,6 @@ export class ScenariosCrudService extends AppBaseService<
     protected readonly repository: Repository<Scenario>,
     @InjectRepository(Project)
     protected readonly projectRepository: Repository<Project>,
-    @Inject(UsersService) protected readonly usersService: UsersService,
-    @Inject(ProtectedAreasCrudService)
-    protected readonly protectedAreasService: ProtectedAreasCrudService,
-    @Inject(forwardRef(() => ProjectsCrudService))
-    protected readonly projectsService: ProjectsCrudService,
     @InjectRepository(UsersScenariosApiEntity)
     private readonly userScenarios: Repository<UsersScenariosApiEntity>,
   ) {
@@ -79,6 +71,8 @@ export class ScenariosCrudService extends AppBaseService<
         'lastModifiedAt',
         'ranAtLeastOnce',
         'solutionsAreLocked',
+        'projectScenarioId',
+        'costSurface',
       ],
       keyForAttribute: 'camelCase',
       project: {
@@ -94,6 +88,10 @@ export class ScenariosCrudService extends AppBaseService<
           'createdAt',
           'lastModifiedAt',
         ],
+      },
+      costSurface: {
+        ref: 'id',
+        attributes: ['name', 'isDefault'],
       },
       users: {
         ref: 'id',
@@ -113,11 +111,11 @@ export class ScenariosCrudService extends AppBaseService<
   /**
    * Apply service-specific filters.
    */
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<Scenario>,
     filters: ScenarioFilters,
     _info?: ScenarioInfoDTO,
-  ): SelectQueryBuilder<Scenario> {
+  ): Promise<SelectQueryBuilder<Scenario>> {
     query = this._processBaseFilters<ScenarioFilters>(
       query,
       filters,

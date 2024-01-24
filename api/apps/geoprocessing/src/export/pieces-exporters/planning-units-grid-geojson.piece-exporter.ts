@@ -26,7 +26,8 @@ type ProjectSelectResult = {
 @Injectable()
 @PieceExportProvider()
 export class PlanningUnitsGridGeojsonPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
@@ -44,9 +45,7 @@ export class PlanningUnitsGridGeojsonPieceExporter
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const projectId = input.resourceId;
-    const [project]: [
-      ProjectSelectResult,
-    ] = await this.apiEntityManager
+    const [project]: [ProjectSelectResult] = await this.apiEntityManager
       .createQueryBuilder()
       .select(['id', 'bbox'])
       .from('projects', 'p')

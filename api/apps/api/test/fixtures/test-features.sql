@@ -1,5 +1,5 @@
 
-INSERT INTO features 
+INSERT INTO features
 (feature_class_name, alias, description, property_name, intersection, creation_status, created_by)
 VALUES
 ('demo_acinonyx_jubatus', 'Acinonyx_jubatus', null, ' name', null, 'created', (SELECT id FROM users WHERE email = 'aa@example.com')),

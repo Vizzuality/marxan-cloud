@@ -4,13 +4,13 @@ import { LockStatus } from './lock-status.enum';
 const scenariosPuDataEntityName = 'scenarios_pu_data';
 
 export const toLockEnum: Record<0 | 1 | 2, LockStatus> = Object.freeze({
-  0: LockStatus.Unstated,
+  0: LockStatus.Available,
   1: LockStatus.LockedIn,
   2: LockStatus.LockedOut,
 });
 
 const fromLockEnum: Record<LockStatus, null | 1 | 2> = Object.freeze({
-  [LockStatus.Unstated]: null,
+  [LockStatus.Available]: null,
   [LockStatus.LockedIn]: 1,
   [LockStatus.LockedOut]: 2,
 });
@@ -60,7 +60,7 @@ export class ScenariosPlanningUnitGeoEntity {
         if (value !== null && (value === 1 || value === 2)) {
           return toLockEnum[value];
         }
-        return LockStatus.Unstated;
+        return LockStatus.Available;
       },
       to(value: LockStatus): null | 1 | 2 {
         return fromLockEnum[value];
@@ -80,7 +80,7 @@ export class ScenariosPlanningUnitGeoEntity {
     default: false,
     name: `lock_status_set_by_user`,
   })
-  setByUser?: boolean;
+  setByUser!: boolean;
 
   @Column({
     type: 'float8',

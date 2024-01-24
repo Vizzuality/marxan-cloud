@@ -15,7 +15,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await Promise.all([app.close()]);
-  await tearDown();
+  await tearDown(app);
 });
 
 describe(`when user is logged in`, () => {

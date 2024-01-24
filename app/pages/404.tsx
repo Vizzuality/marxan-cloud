@@ -7,17 +7,16 @@ import MetaIcons from 'layout/meta-icons';
 const Custom404: React.FC = () => {
   return (
     <>
-
       <Head title="404 - Page Not Found" />
 
       <MetaIcons />
 
-      <main className="flex flex-col w-screen h-screen">
+      <main className="flex h-screen w-screen flex-col">
         <Header size="base" />
 
-        <div className="flex flex-col h-full md:flex-grow">
-          <div className="flex items-center justify-center h-full py-10 bg-white">
-            <h1 className="text-2xl text-gray-500 font-heading">404 - Page Not Found</h1>
+        <div className="flex h-full flex-col md:flex-grow">
+          <div className="flex h-full items-center justify-center bg-white py-10">
+            <h1 className="font-heading text-2xl text-gray-600">404 - Page Not Found</h1>
           </div>
         </div>
       </main>

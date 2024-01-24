@@ -1,21 +1,21 @@
 import React from 'react';
 
-import cx from 'classnames';
 import { motion, AnimatePresence } from 'framer-motion';
+
+import { cn } from 'utils/cn';
 
 import { LoadingMoreProps } from './types';
 
-export const LoadingMore: React.FC<LoadingMoreProps> = ({
-  visible = false,
-}: LoadingMoreProps) => {
+export const LoadingMore: React.FC<LoadingMoreProps> = ({ visible = false }: LoadingMoreProps) => {
   return (
     <AnimatePresence>
       <motion.div
         key="loading"
-        className={cx({
+        className={cn({
           'opacity-100': visible,
           'opacity-0': !visible,
-          'absolute left-0 z-20 w-full text-xs text-center uppercase bottom-0 font-heading transition pointer-events-none bg-gray-400': true,
+          'pointer-events-none absolute bottom-0 left-0 z-20 w-full bg-gray-100 text-center font-heading text-xs uppercase transition':
+            true,
         })}
         transition={{
           duration: 100,

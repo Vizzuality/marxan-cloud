@@ -21,6 +21,8 @@ import { hash } from 'bcrypt';
 import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
 
 export type TestSpecification = {
   id: string;
@@ -80,6 +82,13 @@ export function DeleteUser(em: EntityManager, userId: string) {
     .execute();
 }
 
+/**
+ * @debt A copy of this function is used in api/apps/api/test/projects/projects.fixtures.ts
+ *
+ * As `api/apps/api` code cannot rely on code from `api/apps/geoprocessing` (and vice versa),
+ * both instances of the function should be moved to a shared fixtures set in `api/libs` and
+ * imported from there.
+ */
 export function GivenOrganizationExists(
   em: EntityManager,
   organizationId: string,
@@ -95,15 +104,23 @@ export function GivenOrganizationExists(
     .execute();
 }
 
+/**
+ * @debt A copy of this function is used in api/apps/api/test/projects/projects.fixtures.ts
+ *
+ * As `api/apps/api` code cannot rely on code from `api/apps/geoprocessing` (and vice versa),
+ * both instances of the function should be moved to a shared fixtures set in `api/libs` and
+ * imported from there.
+ */
 export async function GivenProjectExists(
   em: EntityManager,
   projectId: string,
   organizationId: string,
   projectData: Record<string, any> = {},
+  costSurfaceId = v4(),
 ) {
   await GivenOrganizationExists(em, organizationId);
 
-  return em
+  const insertResult = await em
     .createQueryBuilder()
     .insert()
     .into(`projects`)
@@ -115,6 +132,41 @@ export async function GivenProjectExists(
       ...projectData,
     })
     .execute();
+
+  await GivenDefaultCostSurfaceForProject(em, projectId, costSurfaceId);
+
+  return insertResult;
+}
+
+/**
+ * @debt A copy of this function is used in api/apps/api/test/projects/projects.fixtures.ts
+ *
+ * As `api/apps/api` code cannot rely on code from `api/apps/geoprocessing` (and vice versa),
+ * both instances of the function should be moved to a shared fixtures set in `api/libs` and
+ * imported from there.
+ */
+async function GivenDefaultCostSurfaceForProject(
+  em: EntityManager,
+  projectId: string,
+  id: string,
+  name?: string,
+) {
+  const nameForCostSurface = name || projectId;
+  return em
+    .createQueryBuilder()
+    .insert()
+    .into(`cost_surfaces`)
+    .values({
+      id,
+      name: `${
+        nameForCostSurface ? nameForCostSurface + ' - ' : ''
+      }Default Cost Surface`,
+      project_id: projectId,
+      min: 0,
+      max: 0,
+      is_default: true,
+    })
+    .execute();
 }
 
 export async function GivenScenarioExists(
@@ -124,8 +176,15 @@ export async function GivenScenarioExists(
   organizationId: string,
   scenarioData: Record<string, any> = {},
   projectData: Record<string, any> = {},
+  costSurfaceId = v4(),
 ) {
-  await GivenProjectExists(em, projectId, organizationId, projectData);
+  await GivenProjectExists(
+    em,
+    projectId,
+    organizationId,
+    projectData,
+    costSurfaceId,
+  );
 
   return em
     .createQueryBuilder()
@@ -135,6 +194,7 @@ export async function GivenScenarioExists(
       id: scenarioId,
       name: `test scenario - ${scenarioId}`,
       project_id: projectId,
+      cost_surface_id: costSurfaceId,
       ...scenarioData,
     })
     .execute();
@@ -314,7 +374,7 @@ export async function DeleteScenarioOutputPuDataResults(
   scenarioId: string,
 ) {
   const deletedScenarioPu = await em.getRepository(ScenariosPuPaDataGeo).find({
-    scenarioId,
+    where: { scenarioId },
   });
   return em.getRepository(OutputScenariosPuDataGeoEntity).delete({
     scenarioPuId: In(deletedScenarioPu.map((pu) => pu.id)),
@@ -330,6 +390,7 @@ export async function DeletePlanningAreas(
     projectId: projectId,
   });
 }
+
 export async function DeleteProjectPus(em: EntityManager, projectId: string) {
   const projectsPuRepo = em.getRepository(ProjectsPuEntity);
   const planningUnitsGeomRepo = em.getRepository(PlanningUnitsGeom);
@@ -512,7 +573,7 @@ export async function GivenScenarioFeaturesData(
     .createQueryBuilder()
     .insert()
     .into(ScenarioFeaturesData)
-    .values(insertValues)
+    .values(insertValues as QueryDeepPartialEntity<ScenarioFeaturesData>[])
     .execute();
 
   return insertValues;
@@ -556,6 +617,58 @@ export async function GivenOutputScenarioFeaturesData(
     .execute();
 }
 
+export async function GivenCostSurfaces(
+  em: EntityManager,
+  min: number,
+  max: number,
+  name: string,
+  projectId: string,
+) {
+  const costSurface = Array({
+    id: v4(),
+    min,
+    max,
+    name,
+    project_id: projectId,
+  });
+
+  await Promise.all(
+    costSurface.map((values) =>
+      em
+        .createQueryBuilder()
+        .insert()
+        .into('cost_surfaces')
+        .values(values)
+        .execute(),
+    ),
+  );
+
+  return costSurface[0];
+}
+
+export async function GivenCostSurfaceData(
+  em: EntityManager,
+  projectId: string,
+  costSurfaceId: string,
+): Promise<{ id: string; hash: string; feature_id: string }[]> {
+  const projectPus = await GivenProjectPus(em, projectId, 10);
+  const insertValues = projectPus.map((pu, index) => ({
+    id: v4(),
+    costSurfaceId: costSurfaceId,
+    projectsPuId: pu.id,
+    cost: index + 1,
+  }));
+
+  const result = await em
+    .createQueryBuilder()
+    .insert()
+    .into(CostSurfacePuDataEntity)
+    .values(insertValues)
+    .returning(['id', 'cost', 'costSurfaceId'])
+    .execute();
+
+  return result.raw;
+}
 export async function GivenSpecifications(
   em: EntityManager,
   featuresIds: string[],

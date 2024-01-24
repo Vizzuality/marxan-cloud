@@ -11,6 +11,7 @@ import { validate } from 'class-validator';
 import { chunk } from 'lodash';
 import { EntityManager } from 'typeorm';
 import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
+import { ProjectCostSurfacePersistencePort } from '@marxan-geoprocessing/modules/cost-surface/ports/persistence/project-cost-surface-persistence.port';
 
 type CustomPlanningAreaJob = Required<
   Omit<
@@ -56,6 +57,7 @@ export class PlanningUnitsJobProcessor {
   private logger = new Logger('planning-units-job-processor');
 
   constructor(
+    private readonly repo: ProjectCostSurfacePersistencePort,
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) {}
@@ -220,7 +222,7 @@ grid.geom
         await Promise.all(
           chunk(geometryIds, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
             async (ids, chunkIndex) => {
-              return projectsPuRepo.insert(
+              await projectsPuRepo.insert(
                 ids.map((id, index) => ({
                   geomId: id,
                   geomType: job.data.planningUnitGridShape,
@@ -237,8 +239,34 @@ grid.geom
           ),
         );
 
+        /**
+         * @note: Await for all the previous inserts to finish to avoid race conditions
+         * @todo: Could this be a bulk update? (single query vs array of queries)
+         */
+        await Promise.all(
+          chunk(geometryIds, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
+            async (ids) => {
+              ids.map((geometryId: string) => {
+                return em.query(
+                  `
+                 INSERT INTO cost_surface_pu_data (projects_pu_id, cost, cost_surface_id)
+                 SELECT ppu.id, round(pug.area / 1000000) as area, $1
+                    FROM projects_pu ppu
+                 INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
+                 WHERE ppu.geom_id = $2 AND ppu.project_id = $3
+                `,
+                  [job.data.costSurfaceId, geometryId, job.data.projectId],
+                );
+              });
+            },
+          ),
+        );
+
         return geometries;
       });
+
+      await this.repo.updateCostSurfaceRange(job.data.costSurfaceId!);
+      this.logger.debug(`Finished planning-units processing for ${job.id}`);
     } catch (err) {
       this.logger.error(err);
       throw err;

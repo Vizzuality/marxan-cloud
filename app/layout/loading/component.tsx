@@ -1,8 +1,9 @@
 import React from 'react';
 
 import { useNProgress } from '@tanem/react-nprogress';
-import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
+
+import { cn } from 'utils/cn';
 
 export interface LoadingProps {
   loading?: boolean;
@@ -20,16 +21,17 @@ export const Loading: React.FC<LoadingProps> = ({ loading }: LoadingProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className={cx({
-            'fixed z-60 w-full h-full': true,
+          className={cn({
+            'fixed z-50 h-full w-full': true,
           })}
         >
           <div
-            className={cx({
-              'absolute top-0 left-0 h-1 transition-transform bg-gradient-to-r from-purple-500 to-blue-500 w-full': true,
+            className={cn({
+              'absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-purple-600 to-blue-600 transition-transform':
+                true,
             })}
             style={{
-              transform: `translateX(${-100 + (progress * 100)}%)`,
+              transform: `translateX(${-100 + progress * 100}%)`,
             }}
           />
         </motion.div>

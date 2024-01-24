@@ -2,7 +2,12 @@ import {
   forbiddenError,
   ProjectAccessControl,
 } from '@marxan-api/modules/access-control';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Either, isLeft, isRight, left, right } from 'fp-ts/Either';
@@ -12,7 +17,6 @@ import {
   GeoFeaturesService,
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
-
 import { ProjectsCrudService } from './projects-crud.service';
 import { JobStatusService } from './job-status';
 import { Project } from './project.api.entity';
@@ -100,10 +104,32 @@ import {
   CreateInitialScenarioBlm,
 } from '../scenarios/blm-calibration/create-initial-scenario-blm.command';
 import { LegacyProjectImportRepository } from '../legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
+import { unknownPdfWebshotError, WebshotService } from '@marxan/webshot';
+import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
+import stream from 'stream';
+import { AppConfig } from '@marxan-api/utils/config.utils';
+import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
+import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
+import {
+  OutputProjectSummariesService,
+  outputProjectSummaryNotFound,
+} from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
+import { AppInfoDTO } from '@marxan-api/dto/info.dto';
+import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
+import {
+  AddProtectedAreaService,
+  submissionFailed,
+} from '@marxan-api/modules/projects/protected-area/add-protected-area.service';
+import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
+import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
+import { GeoFeature } from '../geo-features/geo-feature.api.entity';
+import { transformMinMaxAmountsFromSquareMetresToSquareKmsForFeaturesFromShapefile } from '../geo-features/geo-feature.measurement-units';
 
 export { validationFailed } from '../planning-areas';
 
 export const projectNotFound = Symbol(`project not found`);
+export const projectNotEditable = Symbol(`project not editable`);
+export const projectNotVisible = Symbol('project not visible');
 export const projectIsMissingInfoForRegularPus = Symbol(
   `project is missing info for regular planning units`,
 );
@@ -132,6 +158,12 @@ export class ProjectsService {
     private readonly blockGuard: BlockGuard,
     private readonly exportRepository: ExportRepository,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
+    private readonly webshotService: WebshotService,
+    @Inject(forwardRef(() => ScenariosService))
+    private readonly scenariosService: ScenariosService,
+    private readonly costSurfaceService: CostSurfaceService,
+    private readonly outputProjectSummariesService: OutputProjectSummariesService,
+    private readonly protectedArea: AddProtectedAreaService,
   ) {}
 
   async findAllGeoFeatures(
@@ -146,16 +178,29 @@ export class ProjectsService {
       return project;
     }
 
-    return right(
-      await this.geoCrud.findAllPaginated(fetchSpec, {
-        ...appInfo,
-        params: {
-          ...appInfo.params,
-          projectId: project.right.id,
-          bbox: project.right.bbox,
-        },
+    const result = await this.geoCrud.findAllPaginated(fetchSpec, {
+      ...appInfo,
+      params: {
+        ...appInfo.params,
+        projectId: project.right.id,
+        bbox: project.right.bbox,
+      },
+    });
+
+    const resultWithMappedAmountRange = {
+      data: result.data.map((feature) => {
+        return {
+          ...feature,
+          amountRange:
+            transformMinMaxAmountsFromSquareMetresToSquareKmsForFeaturesFromShapefile(
+              feature,
+            ),
+        };
       }),
-    );
+      metadata: result.metadata,
+    };
+
+    return right(resultWithMappedAmountRange);
   }
 
   async findAll(fetchSpec: FetchSpecification, info: ProjectsServiceRequest) {
@@ -209,9 +254,8 @@ export class ProjectsService {
       ? { planningAreaGeometryId: project.planningAreaId }
       : this.idToGid(project.planningAreaId);
 
-    const planningAreaEntity = await this.planningAreaService.locatePlanningAreaEntity(
-      planningAreaId,
-    );
+    const planningAreaEntity =
+      await this.planningAreaService.locatePlanningAreaEntity(planningAreaId);
 
     if (!planningAreaEntity) {
       return left(projectNotFound);
@@ -250,7 +294,7 @@ export class ProjectsService {
   ): Promise<
     Either<
       GetProjectErrors | typeof forbiddenError | typeof projectNotFound,
-      { from: string; to: string; query: {} }
+      { from: string; to: string; query: Record<string, unknown> }
     >
   > {
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
@@ -318,7 +362,6 @@ export class ProjectsService {
       input.adminAreaLevel1Id ||
       input.adminAreaLevel2Id ||
       input.countryId;
-
     if (dtoHasRegularShape && !dtoHasNeededInfoForRegularShapes)
       return left(projectIsMissingInfoForRegularPus);
 
@@ -330,11 +373,19 @@ export class ProjectsService {
     ) {
       return left(forbiddenError);
     }
-    const project = await this.projectsCrud.create(input, info);
+    const defaultCostSurface =
+      this.costSurfaceService.createDefaultCostSurfaceModel();
+    const project = await this.projectsCrud.create(
+      { ...input, costSurfaces: [defaultCostSurface] } as CreateProjectDTO,
+      info,
+    );
     await this.projectsCrud.assignCreatorRole(
       project.id,
       info.authenticatedUser.id,
     );
+
+    // TODO: How to handle left for Project? How is it handled by the async jobs triggered by actionAfterCreate?
+
     return right(project);
   }
 
@@ -485,9 +536,8 @@ export class ProjectsService {
       StartLegacyProjectImportResult
     >
   > {
-    const userCanCreateProject = await this.projectAclService.canCreateProject(
-      userId,
-    );
+    const userCanCreateProject =
+      await this.projectAclService.canCreateProject(userId);
 
     if (!userCanCreateProject) {
       return left(forbiddenError);
@@ -562,9 +612,8 @@ export class ProjectsService {
       true
     >
   > {
-    const legacyProjectImportOrError = await this.legacyProjectImportRepository.find(
-      new ResourceId(projectId),
-    );
+    const legacyProjectImportOrError =
+      await this.legacyProjectImportRepository.find(new ResourceId(projectId));
 
     if (isLeft(legacyProjectImportOrError)) return legacyProjectImportOrError;
 
@@ -601,18 +650,10 @@ export class ProjectsService {
   }
 
   // TODO add ensureThatProjectIsNotBlocked guard
-  savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
-    this.planningAreaService,
-  );
-
-  private async assertProject(
-    projectId = '',
-    forUser: ProjectsRequest['authenticatedUser'],
-  ) {
-    return await this.queryBus.execute(
-      new GetProjectQuery(projectId, forUser?.id),
+  savePlanningAreaFromShapefile =
+    this.planningAreaService.savePlanningAreaFromShapefile.bind(
+      this.planningAreaService,
     );
-  }
 
   async getExportedArchive(
     projectId: string,
@@ -630,10 +671,8 @@ export class ProjectsService {
     const response = await this.assertProject(projectId, { id: userId });
     if (isLeft(response)) return left(projectNotFound);
 
-    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
-      userId,
-      projectId,
-    );
+    const canDownloadExport =
+      await this.projectAclService.canDownloadProjectExport(userId, projectId);
 
     if (!canDownloadExport) return left(notAllowed);
 
@@ -653,10 +692,8 @@ export class ProjectsService {
 
     if (isLeft(response)) return left(projectNotFound);
 
-    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
-      userId,
-      projectId,
-    );
+    const canDownloadExport =
+      await this.projectAclService.canDownloadProjectExport(userId, projectId);
 
     if (!canDownloadExport) return left(forbiddenError);
 
@@ -692,10 +729,8 @@ export class ProjectsService {
 
     if (isLeft(response)) return left(projectNotFound);
 
-    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
-      userId,
-      projectId,
-    );
+    const canDownloadExport =
+      await this.projectAclService.canDownloadProjectExport(userId, projectId);
 
     if (!canDownloadExport) return left(forbiddenError);
 
@@ -760,6 +795,94 @@ export class ProjectsService {
     return right(idsOrError.right);
   }
 
+  async getScenarioFrequencyComparisonMap(
+    scenarioIdA: string,
+    scenarioIdB: string,
+    userId: string,
+    configForWebshot: WebshotBasicPdfConfig,
+  ): Promise<
+    Either<
+      | typeof forbiddenError
+      | GetScenarioFailure
+      | typeof unknownPdfWebshotError,
+      stream.Readable
+    >
+  > {
+    const scenarioA = await this.scenariosService.getById(scenarioIdA, {
+      authenticatedUser: { id: userId },
+    });
+    const scenarioB = await this.scenariosService.getById(scenarioIdB, {
+      authenticatedUser: { id: userId },
+    });
+
+    if (isLeft(scenarioA)) {
+      return scenarioA;
+    }
+
+    if (isLeft(scenarioB)) {
+      return scenarioB;
+    }
+
+    if (scenarioA.right.projectId !== scenarioB.right.projectId) {
+      throw new BadRequestException(
+        `Scenarios ${scenarioIdA} and ${scenarioIdB} are not in the same project.`,
+      );
+    }
+    if (
+      !(await this.projectAclService.canViewProject(
+        userId,
+        scenarioA.right.projectId,
+      ))
+    ) {
+      return left(forbiddenError);
+    }
+    const webshotUrl = AppConfig.get('webshot.url') as string;
+
+    /** @debt Refactor to use @nestjs/common's StreamableFile
+     (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+     after upgrading NestJS to v8. **/
+    const pdfStream =
+      await this.webshotService.getScenarioFrequencyComparisonMap(
+        scenarioIdA,
+        scenarioIdB,
+        scenarioA.right.projectId,
+        configForWebshot,
+        webshotUrl,
+      );
+
+    return pdfStream;
+  }
+
+  async getOutputSummary(
+    userId: string,
+    projectId: string,
+  ): Promise<
+    Either<typeof outputProjectSummaryNotFound | typeof forbiddenError, Buffer>
+  > {
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+
+    const summary =
+      await this.outputProjectSummariesService.getOutputSummaryForProject(
+        projectId,
+      );
+    if (!summary) {
+      return left(outputProjectSummaryNotFound);
+    }
+
+    return right(summary?.summaryZippedData);
+  }
+
+  private async assertProject(
+    projectId = '',
+    forUser: ProjectsRequest['authenticatedUser'],
+  ) {
+    return await this.queryBus.execute(
+      new GetProjectQuery(projectId, forUser?.id),
+    );
+  }
+
   /**
    * @todo: this is a good candidate for a new static method in class
    * Gids (static planningGidsFromAreaId()
@@ -767,9 +890,52 @@ export class ProjectsService {
    **/
   private idToGid(gid: string): PlanningGids {
     const myArray = gid.split('.');
-    return myArray.reduce((acc: {}, curr: string, idx: number) => {
-      const key = idx === 0 ? 'countryId' : `adminAreaLevel${idx}Id`;
-      return { ...acc, [key]: curr };
-    }, {});
+    return myArray.reduce(
+      (acc: Record<string, unknown>, curr: string, idx: number) => {
+        const key = idx === 0 ? 'countryId' : `adminAreaLevel${idx}Id`;
+        return { ...acc, [key]: curr };
+      },
+      {},
+    );
+  }
+
+  async addProtectedAreaFor(
+    projectId: string,
+    file: Express.Multer.File,
+    info: AppInfoDTO,
+    dto: UploadShapefileDto,
+  ): Promise<
+    Either<
+      typeof submissionFailed | typeof projectNotFound | typeof forbiddenError,
+      true
+    >
+  > {
+    await ensureShapefileHasRequiredFiles(file);
+
+    const project = await this.assertProject(projectId, info.authenticatedUser);
+    if (isLeft(project)) return left(projectNotFound);
+
+    assertDefined(info.authenticatedUser);
+
+    if (
+      !(await this.projectAclService.canEditProject(
+        info.authenticatedUser.id,
+        projectId,
+      ))
+    ) {
+      return left(forbiddenError);
+    }
+
+    const submission = await this.protectedArea.addShapeFor(
+      projectId,
+      file,
+      dto.name,
+    );
+
+    if (isLeft(submission)) {
+      return left(submissionFailed);
+    }
+
+    return right(true);
   }
 }

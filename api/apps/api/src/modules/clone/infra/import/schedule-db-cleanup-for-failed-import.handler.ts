@@ -8,15 +8,17 @@ import { ScheduleDbCleanupForFailedImport } from './schedule-db-cleanup-for-fail
 
 @CommandHandler(ScheduleDbCleanupForFailedImport)
 export class ScheduleDbCleanupForFailedImportHandler
-  implements IInferredCommandHandler<ScheduleDbCleanupForFailedImport> {
+  implements IInferredCommandHandler<ScheduleDbCleanupForFailedImport>
+{
+  private readonly logger: Logger = new Logger(
+    ScheduleDbCleanupForFailedImportHandler.name,
+  );
+
   constructor(
     @Inject(failedImportDbCleanupQueueToken)
     private readonly queue: Queue<FailedImportDbCleanupJobInput>,
     private readonly importRepository: ImportRepository,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScheduleDbCleanupForFailedImportHandler.name);
-  }
+  ) {}
 
   async execute({ importId }: ScheduleDbCleanupForFailedImport): Promise<void> {
     const importInstance = await this.importRepository.find(importId);

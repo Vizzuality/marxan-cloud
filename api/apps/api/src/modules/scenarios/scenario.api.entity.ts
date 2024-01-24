@@ -15,6 +15,7 @@ import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
 import { ScenarioBlm } from '@marxan-api/modules/blm/values/repositories/scenario-blm/scenario-blm.api.entity';
+import { CostSurface } from '@marxan-api/modules/cost-surface/cost-surface.api.entity';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -93,6 +94,20 @@ export class Scenario extends TimeUserEntityMetadata {
 
   @Column('uuid', { name: 'project_id' })
   projectId!: string;
+
+  @Column('integer', { name: 'project_scenario_id' })
+  projectScenarioId!: number;
+
+  @ApiProperty({ type: () => CostSurface })
+  @ManyToOne(() => CostSurface)
+  @JoinColumn({
+    name: 'cost_surface_id',
+    referencedColumnName: 'id',
+  })
+  costSurface?: CostSurface;
+
+  @Column('uuid', { name: 'cost_surface_id' })
+  costSurfaceId!: string;
 
   /**
    * List of ids of protected areas associated to the scenario.

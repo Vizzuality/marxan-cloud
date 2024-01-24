@@ -1,11 +1,10 @@
-import React, { MutableRefObject } from 'react';
+import React, { ComponentProps, MutableRefObject } from 'react';
 
 import { useInView } from 'react-intersection-observer';
 
-import cx from 'classnames';
-
 import Button from 'components/button';
 import InfoButton from 'components/info-button';
+import { cn } from 'utils/cn';
 
 export interface ItemProps {
   id: string | number;
@@ -30,15 +29,15 @@ export const Item: React.FC<ItemProps> = ({
   const { ref, inView } = useInView({
     /* Optional options */
     threshold: 0,
-    ...scrollRoot && {
+    ...(scrollRoot && {
       root: scrollRoot.current,
-    },
+    }),
   });
 
   return (
     <div
       ref={ref}
-      className={cx({
+      className={cn({
         'bg-white px-0 py-6 text-black': true,
         [className]: !!className,
         invisible: !inView,
@@ -46,29 +45,28 @@ export const Item: React.FC<ItemProps> = ({
     >
       <header className="flex items-baseline justify-between">
         <div className="flex space-x-2">
-          <h2 className="text-sm font-medium font-heading">{name}</h2>
+          <h2 className="font-heading text-sm font-medium">{name}</h2>
 
           {description && (
-            <InfoButton
-              theme="secondary"
-            >
-              <div className="text-sm opacity-50">
-                {description}
-              </div>
+            <InfoButton theme="secondary">
+              <div className="text-sm opacity-50">{description}</div>
             </InfoButton>
           )}
 
           {!!categories && (
-            <div className="pl-2 ml-2 text-sm underline">
-              {`${categories} Categories`}
-            </div>
+            <div className="ml-2 pl-2 text-sm underline">{`${categories} Categories`}</div>
           )}
         </div>
         <div>
           <Button
-            theme={cx({
-              secondary: selected,
-              'secondary-alt': !selected,
+            theme={
+              cn({
+                secondary: selected,
+                'secondary-alt': !selected,
+              }) as ComponentProps<typeof Button>['theme']
+            }
+            className={cn({
+              'text-gray-900': !selected,
             })}
             size="xs"
             onClick={onToggleSelected}

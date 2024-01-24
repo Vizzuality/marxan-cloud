@@ -43,6 +43,24 @@ import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export
 import { LegacyProjectImportModule } from '../legacy-project-import/legacy-project-import.module';
 import { DeleteProjectModule } from './delete-project/delete-project.module';
 import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/infra/legacy-project-import.repository.module';
+import { ProjectScenarioComparisonController } from '@marxan-api/modules/projects/projects.scenario-comparison.controller';
+import { WebshotModule } from '@marxan/webshot';
+import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.module';
+import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.module';
+import { AddProtectedAreaModule } from '@marxan-api/modules/projects/protected-area/add-protected-area.module';
+import { ProjectProtectedAreasController } from './projects.protected-areas.controller';
+import { ProjectProtectedAreasService } from './project-protected-areas.service';
+import { ProjectAclModule } from '../access-control/projects-acl/project-acl.module';
+import { ProtectedAreasCrudModule } from '../protected-areas/protected-areas-crud.module';
+import { ProjectCostSurfaceController } from './project-cost-surface.controller';
+import { ProtectedAreaModule } from '@marxan-api/modules/scenarios/protected-area';
+import { CostSurfaceModule } from '@marxan-api/modules/cost-surface/cost-surface.module';
+import { LegacyProjectsController } from './projects.legacy-projects.controller';
+import { ProjectFeaturesController } from './projects.project-features.controller';
+import { ProjectCloningController } from './projects.cloning.controller';
+import { ProjectPlanningAreaAndGridController } from './projects.planning-area-and-grid.controller';
+import { ProjectBLMController } from './projects.blm.controller';
+import { ProjectSummariesController } from './projects.summaries.controller';
 
 @Module({
   imports: [
@@ -50,8 +68,10 @@ import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/in
     AdminAreasModule,
     CountriesModule,
     PlanningAreasModule,
-    GeoFeaturesModule,
+    forwardRef(() => GeoFeaturesModule),
+    GeoFeatureTagsModule,
     forwardRef(() => ScenariosModule),
+    forwardRef(() => WebshotModule),
     TypeOrmModule.forFeature([
       Project,
       ScenarioJobStatus,
@@ -72,6 +92,7 @@ import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/in
     ShapefilesModule,
     PlanningUnitGridModule,
     ProjectBlmModule,
+    ProjectAclModule,
     CloneModule,
     LegacyProjectImportModule,
     AccessControlModule,
@@ -79,8 +100,16 @@ import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/in
     ProjectCheckerModule,
     DeleteProjectModule,
     LegacyProjectImportRepositoryModule,
+    ApiEventsModule,
+    OutputProjectSummariesModule,
+    AddProtectedAreaModule,
+    ProtectedAreaModule,
+    ProtectedAreasCrudModule,
+    CostSurfaceModule,
+    ProtectedAreaModule,
   ],
   providers: [
+    ProjectProtectedAreasService,
     ProjectsCrudService,
     ProjectsService,
     GeoFeatureSerializer,
@@ -95,9 +124,18 @@ import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/in
     },
   ],
   controllers: [
-    ProjectsListingController,
-    ProjectDetailsController,
+    LegacyProjectsController,
     ProjectsController,
+    ProjectsListingController,
+    ProjectBLMController,
+    ProjectCloningController,
+    ProjectCostSurfaceController,
+    ProjectDetailsController,
+    ProjectFeaturesController,
+    ProjectPlanningAreaAndGridController,
+    ProjectProtectedAreasController,
+    ProjectScenarioComparisonController,
+    ProjectSummariesController,
   ],
   // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
   exports: [ProjectsCrudService, TypeOrmModule, ProjectsService],

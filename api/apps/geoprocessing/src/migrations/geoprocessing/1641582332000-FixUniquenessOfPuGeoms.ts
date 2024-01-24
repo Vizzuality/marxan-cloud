@@ -4,7 +4,7 @@ import { PostgreSQLUtils } from '@marxan-geoprocessing/utils/postgresql.utils';
 
 export class FixUniquenessOfPuGeoms1641582332000 implements MigrationInterface {
   async up(queryRunner: QueryRunner): Promise<void> {
-    if (await PostgreSQLUtils.version13Plus()) {
+    if (await PostgreSQLUtils.version13Plus(queryRunner)) {
       await queryRunner.query(`
           CREATE EXTENSION IF NOT EXISTS pgcrypto;
         `);
@@ -54,7 +54,7 @@ export class FixUniquenessOfPuGeoms1641582332000 implements MigrationInterface {
         on planning_units_geom(the_geom, type, coalesce(project_id, '00000000-0000-0000-0000-000000000000'));
     `);
 
-    if (await PostgreSQLUtils.version13Plus()) {
+    if (await PostgreSQLUtils.version13Plus(queryRunner)) {
       await queryRunner.query(`
           DROP EXTENSION IF EXISTS pgcrypto;
         `);

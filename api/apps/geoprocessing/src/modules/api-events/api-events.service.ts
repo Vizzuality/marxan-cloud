@@ -1,6 +1,8 @@
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { HttpService, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { AppConfig } from '../../utils/config.utils';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ApiEventsService {
@@ -10,9 +12,9 @@ export class ApiEventsService {
   constructor(private readonly http: HttpService) {
     // TODO debt: config shall be injected (nestjs/config); it isn't really unit-testable
     // will throw if not provided
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     this.#secret = AppConfig.get<string>('auth.xApiKey.secret')!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     this.#apiUrl = AppConfig.get<string>('api.url')!;
   }
 
@@ -21,8 +23,8 @@ export class ApiEventsService {
     kind: API_EVENT_KINDS,
     data?: T,
   ): Promise<void> {
-    await this.http
-      .post(
+    await lastValueFrom(
+      this.http.post(
         this.#apiUrl + `/api/v1/api-events`,
         {
           kind,
@@ -37,7 +39,7 @@ export class ApiEventsService {
           },
           validateStatus: () => true,
         },
-      )
-      .toPromise();
+      ),
+    );
   }
 }

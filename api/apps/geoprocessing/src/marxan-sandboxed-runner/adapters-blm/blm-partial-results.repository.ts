@@ -35,9 +35,8 @@ export class BlmPartialResultsRepository {
       blmValue,
     );
 
-    const puidList = await this.blmPuidsBestService.getPuidFromBestRun(
-      workspace,
-    );
+    const puidList =
+      await this.blmPuidsBestService.getPuidFromBestRun(workspace);
 
     const filteredPuidList = puidList
       .filter((puidRow) => puidRow.solution !== 0)
@@ -46,8 +45,7 @@ export class BlmPartialResultsRepository {
     const puidUuids = await Promise.all(
       filteredPuidList.map(async (puidInt) => {
         const fullPu = await this.projectPuRepository.findOneOrFail({
-          puid: puidInt,
-          projectId,
+          where: { puid: puidInt, projectId },
         });
         return fullPu.id;
       }),

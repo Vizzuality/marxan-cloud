@@ -39,17 +39,19 @@ type FeatureNames = {
 @Injectable()
 @PieceImportProvider()
 export class ScenarioFeaturesSpecificationPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ScenarioFeaturesSpecificationPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioFeaturesSpecificationPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.FeaturesSpecification;
@@ -246,10 +248,8 @@ export class ScenarioFeaturesSpecificationPieceImporter
   }> {
     const featuresNames = this.getFeaturesFromSpecifications(specifications);
 
-    const featutesIdByNameAndProjectMap = await this.getFeaturesIdByNameAndProject(
-      featuresNames,
-      projectId,
-    );
+    const featutesIdByNameAndProjectMap =
+      await this.getFeaturesIdByNameAndProject(featuresNames, projectId);
     const featureIdsBySpecificationId: FeatureIdsBySpecificationId = {};
 
     const parsedSpecifications = specifications.map(
@@ -339,22 +339,18 @@ export class ScenarioFeaturesSpecificationPieceImporter
           piece: input.piece,
         };
 
-      const scenarioFeaturesData = await this.getScenarioFeaturesData(
-        scenarioId,
-      );
+      const scenarioFeaturesData =
+        await this.getScenarioFeaturesData(scenarioId);
 
-      const scenarioFeaturesDataByFeatureId = this.getScenarioFeaturesDataByFeatureId(
-        scenarioFeaturesData,
-      );
+      const scenarioFeaturesDataByFeatureId =
+        this.getScenarioFeaturesDataByFeatureId(scenarioFeaturesData);
 
-      const {
-        parsedSpecifications,
-        featureIdsBySpecificationId,
-      } = await this.parseFileContent(
-        specifications,
-        scenarioFeaturesDataByFeatureId,
-        projectId,
-      );
+      const { parsedSpecifications, featureIdsBySpecificationId } =
+        await this.parseFileContent(
+          specifications,
+          scenarioFeaturesDataByFeatureId,
+          projectId,
+        );
 
       await this.apiEntityManager.transaction(async (apiEm) => {
         const activeSpecification = parsedSpecifications.find(

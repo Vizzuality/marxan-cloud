@@ -33,10 +33,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       [context.getHandler(), context.getClass()],
     );
 
-    const isMissingAclImplementation = this.reflector.getAllAndOverride<boolean>(
-      IS_MISSING_ACL_IMPLEMENTATION,
-      [context.getHandler(), context.getClass()],
-    );
+    const isMissingAclImplementation =
+      this.reflector.getAllAndOverride<boolean>(IS_MISSING_ACL_IMPLEMENTATION, [
+        context.getHandler(),
+        context.getClass(),
+      ]);
 
     return implementsAcl || isMissingAclImplementation;
   }

@@ -2,44 +2,42 @@ import { INestApplication } from '@nestjs/common';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { bootstrapApplication } from '../utils/api-application';
 import { createWorld } from './steps/world';
-import { tearDown } from '../utils/tear-down';
 import { v4 } from 'uuid';
 
-let app: INestApplication;
-let world: FixtureType<typeof createWorld>;
+describe('Project protected areas - Upload shapefile for scenario (e2e)', () => {
+  let app: INestApplication;
+  let world: FixtureType<typeof createWorld>;
 
-beforeAll(async () => {
-  app = await bootstrapApplication();
-  world = await createWorld(app);
-});
-
-afterAll(async () => {
-  await world?.cleanup();
-  await app.close();
-  await tearDown();
-});
-
-describe(`when scenario is not available`, () => {
-  it(`should fail`, async () => {
-    const result = await world.WhenSubmittingShapefileFor(v4());
-    expect(result.status).toEqual(404);
+  beforeEach(async () => {
+    app = await bootstrapApplication();
+    world = await createWorld(app);
   });
-});
 
-describe(`when project is available`, () => {
-  it(`submits shapefile to the system`, async () => {
-    const result = await world.WhenSubmittingShapefileFor(world.scenarioId);
+  describe(`when project is not available`, () => {
+    it(`should fail`, async () => {
+      const result = await world.WhenSubmittingProtectedAreaShapefileForProject(
+        v4(),
+      );
+      expect(result.status).toEqual(404);
+    });
+  });
 
-    expect(result.status).toEqual(201);
-    expect(result.body.meta.started).toBeTruthy();
-    const job = world.GetSubmittedJobs()[0];
-    expect(job).toMatchObject({
-      name: `add-protected-area`,
-      data: {
-        scenarioId: world.scenarioId,
-        projectId: world.projectId,
-        shapefile: expect.anything(),
-      },
+  describe(`when project is available`, () => {
+    it(`submits shapefile to the system`, async () => {
+      const result = await world.WhenSubmittingProtectedAreaShapefileForProject(
+        world.projectId,
+      );
+
+      expect(result.status).toEqual(201);
+      expect(result.body.meta.started).toBeTruthy();
+      const job = world.GetSubmittedJobs()[0];
+      expect(job).toMatchObject({
+        name: `add-protected-area`,
+        data: {
+          projectId: world.projectId,
+          shapefile: expect.anything(),
+        },
+      });
     });
   });
 });

@@ -18,7 +18,6 @@ import {
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -41,6 +40,7 @@ import {
   readSavedFile,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -101,13 +101,12 @@ const getFixtures = async () => {
       ]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioRunResultsPieceExporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioRunResultsPieceExporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const scenarioId = v4();
   const organizationId = v4();
@@ -232,9 +231,8 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioRunResultsContent>(
-            savedStrem,
-          );
+          const content =
+            await readSavedFile<ScenarioRunResultsContent>(savedStrem);
           const expectedMarxanResults = [1, 2, 3].map((value) => ({
             includedCount: 7,
             values: [false, true, false, true],

@@ -4,12 +4,9 @@ import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
 import { v4 } from 'uuid';
 import { SignUpDto } from '@marxan-api/modules/authentication/dto/sign-up.dto';
-import { User } from '@marxan-api/modules/users/user.api.entity';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
-import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
-import { tearDown } from './utils/tear-down';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as nock from 'nock';
 import { CreateTransmission, Recipient } from 'sparkpost';
@@ -18,8 +15,6 @@ import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 import { GivenUserExists } from './steps/given-user-exists';
 import { GivenUserIsCreated } from './steps/given-user-is-created';
-import { Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
@@ -37,27 +32,46 @@ nock.enableNetConnect(process.env.HOST_IP);
  * Please be mindful of this when adding new tests or updating existing ones.
  */
 
-afterAll(async () => {
-  await tearDown();
-});
-
 describe('UsersModule (e2e)', () => {
   let app: INestApplication;
   let apiEventsService: ApiEventsService;
   let usersService: UsersService;
-  let usersRepo: Repository<User>;
 
   const aNewPassword = faker.random.uuid();
 
-  const signUpDto: SignUpDto = {
-    email: `${v4()}@example.com`,
-    password: v4(),
-    displayName: `${faker.name.firstName()} ${faker.name.lastName()}`,
-  };
+  let signUpDto: SignUpDto;
+  let loginDto: LoginDto;
 
-  const loginDto: LoginDto = {
-    username: signUpDto.email,
-    password: signUpDto.password,
+  const registerAndValidateUser = async (signUpDto: SignUpDto) => {
+    await request(app.getHttpServer())
+      .post('/auth/sign-up')
+      .send(signUpDto)
+      .expect(HttpStatus.CREATED);
+    const user = await usersService.findByEmail(signUpDto.email);
+    expect(user).toBeDefined();
+
+    if (!user) {
+      throw new Error('Cannot retrieve data for newly created user.');
+    }
+
+    const validationTokenEvent = await apiEventsService.getLatestEventForTopic({
+      topic: user.id,
+      kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+    });
+
+    await request(app.getHttpServer())
+      .post(`/auth/validate`)
+      .send({
+        sub: user.id,
+        validationToken: validationTokenEvent?.data?.validationToken,
+      })
+      .expect(HttpStatus.CREATED);
+
+    return await request(app.getHttpServer())
+      .post('/auth/sign-in')
+      .send(loginDto)
+      .expect(HttpStatus.CREATED)
+      .then((response) => response.body.accessToken);
   };
 
   const mockAccountActivation = () => {
@@ -80,22 +94,24 @@ describe('UsersModule (e2e)', () => {
       .reply(200);
   };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await bootstrapApplication();
-    usersRepo = app.get(getRepositoryToken(User));
 
     apiEventsService = app.get<ApiEventsService>(ApiEventsService);
     usersService = app.get<UsersService>(UsersService);
-  });
 
-  afterAll(async () => {
-    await Promise.all([app.close()]);
+    signUpDto = {
+      email: `${v4()}@example.com`,
+      password: v4(),
+      displayName: `${faker.name.firstName()} ${faker.name.lastName()}`,
+    };
+    loginDto = {
+      username: signUpDto.email,
+      password: signUpDto.password,
+    };
   });
 
   describe('Users - sign up and validation', () => {
-    let newUser: User | undefined;
-    let validationTokenEvent: ApiEventByTopicAndKind | undefined;
-
     test('A user should be able to create an account using an email address not currently in use', async () => {
       mockAccountActivation();
 
@@ -106,24 +122,28 @@ describe('UsersModule (e2e)', () => {
     });
 
     test('A user should not be able to create an account using a weak password', async () => {
+      // TODO: The signUp dto has no validation for password strength, this is validated by the entropyCheck thing.
+      //       we should make the threshold value configurable and set different values for tests, or set a default threshold that allows
+      //       "precondition users" to be created
       await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send({
           ...signUpDto,
-          password: 'abcdef',
+          password: 'a',
         })
         .expect(HttpStatus.FORBIDDEN);
     });
 
     test('A user should not be able to create an account using an email address already in use', async () => {
-      /**
-       * We should handle this explicitly in the API - until then, this should
-       * throw a 500 error.
-       */
       await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
-        .expect(HttpStatus.INTERNAL_SERVER_ERROR);
+        .expect(HttpStatus.CREATED);
+
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send(signUpDto)
+        .expect(HttpStatus.CONFLICT);
     });
 
     test('A user should not be able to log in until their account has been validated', async () => {
@@ -140,42 +160,94 @@ describe('UsersModule (e2e)', () => {
        * token that they would normally receive via email as part of the account
        * validation/email confirmation workflow.
        */
-      newUser = await usersService.findByEmail(signUpDto.email);
-      expect(newUser).toBeDefined();
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send(signUpDto)
+        .expect(HttpStatus.CREATED);
 
-      if (!newUser) {
+      const user = await usersService.findByEmail(signUpDto.email);
+      expect(user).toBeDefined();
+
+      if (!user) {
         throw new Error('Cannot retrieve data for newly created user.');
       }
 
-      validationTokenEvent = await apiEventsService.getLatestEventForTopic({
-        topic: newUser.id,
-        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-      });
+      const validationTokenEvent =
+        await apiEventsService.getLatestEventForTopic({
+          topic: user.id,
+          kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+        });
 
       await request(app.getHttpServer())
         .post(`/auth/validate`)
         .send({
-          sub: newUser.id,
+          sub: user.id,
           validationToken: validationTokenEvent?.data?.validationToken,
         })
         .expect(HttpStatus.CREATED);
     });
 
     test('A user account validation token should not be allowed to be spent more than once', async () => {
-      if (!newUser) {
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send(signUpDto)
+        .expect(HttpStatus.CREATED);
+      const user = await usersService.findByEmail(signUpDto.email);
+      expect(user).toBeDefined();
+
+      if (!user) {
         throw new Error('Cannot retrieve data for newly created user.');
       }
+
+      const validationTokenEvent =
+        await apiEventsService.getLatestEventForTopic({
+          topic: user.id,
+          kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+        });
 
       await request(app.getHttpServer())
         .post(`/auth/validate`)
         .send({
-          sub: newUser.id,
+          sub: user.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
+        .expect(HttpStatus.CREATED);
+
+      await request(app.getHttpServer())
+        .post(`/auth/validate`)
+        .send({
+          sub: user.id,
           validationToken: validationTokenEvent?.data?.validationToken,
         })
         .expect(HttpStatus.NOT_FOUND);
     });
 
     test('A user should be able to log in once their account has been validated', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send(signUpDto)
+        .expect(HttpStatus.CREATED);
+      const user = await usersService.findByEmail(signUpDto.email);
+      expect(user).toBeDefined();
+
+      if (!user) {
+        throw new Error('Cannot retrieve data for newly created user.');
+      }
+
+      const validationTokenEvent =
+        await apiEventsService.getLatestEventForTopic({
+          topic: user.id,
+          kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+        });
+
+      await request(app.getHttpServer())
+        .post(`/auth/validate`)
+        .send({
+          sub: user.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
+        .expect(HttpStatus.CREATED);
+
       await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send(loginDto)
@@ -186,12 +258,8 @@ describe('UsersModule (e2e)', () => {
   describe('Users - metadata', () => {
     let jwtToken: string;
 
-    beforeAll(async () => {
-      jwtToken = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send(loginDto)
-        .expect(HttpStatus.CREATED)
-        .then((response) => response.body.accessToken);
+    beforeEach(async () => {
+      jwtToken = await registerAndValidateUser(signUpDto);
     });
 
     test('A user should be able to read their own metadata', async () => {
@@ -200,7 +268,22 @@ describe('UsersModule (e2e)', () => {
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(HttpStatus.OK);
 
-      expect(results);
+      expect(results.body.data).toEqual({
+        type: 'users',
+        id: expect.any(String),
+        attributes: {
+          fname: null,
+          lname: null,
+          email: expect.any(String),
+          displayName: expect.any(String),
+          avatarDataUrl: null,
+          isActive: true,
+          isAdmin: false,
+          isBlocked: false,
+          isDeleted: false,
+          metadata: null,
+        },
+      });
     });
 
     test('A user should be able to update their own metadata', async () => {
@@ -215,12 +298,8 @@ describe('UsersModule (e2e)', () => {
   describe('Users - password updates which should fail', () => {
     let jwtToken: string;
 
-    beforeAll(async () => {
-      jwtToken = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send(loginDto)
-        .expect(HttpStatus.CREATED)
-        .then((response) => response.body.accessToken);
+    beforeEach(async () => {
+      jwtToken = await registerAndValidateUser(signUpDto);
     });
 
     test('A user should not be able to change their password as part of the user update lifecycle', async () => {
@@ -249,12 +328,8 @@ describe('UsersModule (e2e)', () => {
   describe('Users - password updates which should succeed', () => {
     let jwtToken: string;
 
-    beforeAll(async () => {
-      jwtToken = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send(loginDto)
-        .expect(HttpStatus.CREATED)
-        .then((response) => response.body.accessToken);
+    beforeEach(async () => {
+      jwtToken = await registerAndValidateUser(signUpDto);
     });
 
     test('A user should be able to change their password if they provide the correct current password', async () => {
@@ -273,8 +348,8 @@ describe('UsersModule (e2e)', () => {
         .patch('/api/v1/users/me/password')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
-          currentPassword: aNewPassword,
-          newPassword: loginDto.password,
+          currentPassword: loginDto.password,
+          newPassword: aNewPassword,
         })
         .expect(HttpStatus.OK);
     });
@@ -283,12 +358,8 @@ describe('UsersModule (e2e)', () => {
   describe('Users - account deletion', () => {
     let jwtToken: string;
 
-    beforeAll(async () => {
-      jwtToken = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send(loginDto)
-        .expect(HttpStatus.CREATED)
-        .then((response) => response.body.accessToken);
+    beforeEach(async () => {
+      jwtToken = await registerAndValidateUser(signUpDto);
     });
 
     test('A user should be able to delete their own account', async () => {
@@ -300,6 +371,11 @@ describe('UsersModule (e2e)', () => {
 
     test('Once a user account is marked as deleted, the user should be logged out', async () => {
       await request(app.getHttpServer())
+        .delete('/api/v1/users/me')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
         .get('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(HttpStatus.UNAUTHORIZED);
@@ -307,50 +383,25 @@ describe('UsersModule (e2e)', () => {
 
     test('Once a user account is marked as deleted, the user should not be able to log back in', async () => {
       await request(app.getHttpServer())
+        .delete('/api/v1/users/me')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send(loginDto)
         .expect(HttpStatus.UNAUTHORIZED);
     });
-  });
-
-  describe('Users - Sign up again', () => {
-    let newUser: User | undefined;
-    let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
-      mockAccountActivation();
+      await request(app.getHttpServer())
+        .delete('/api/v1/users/me')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.OK);
 
       await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
-        .expect(HttpStatus.CREATED);
-    });
-
-    test('A user should be able to validate their account (within the validity timeframe of the validationToken)', async () => {
-      /**
-       * Here we need to dig into the actual database to retrieve both the id
-       * assigned to the user when their account is created, and the one-time
-       * token that they would normally receive via email as part of the account
-       * validation/email confirmation workflow.
-       */
-      newUser = await usersService.findByEmail(signUpDto.email);
-      expect(newUser).toBeDefined();
-
-      if (!newUser) {
-        throw new Error('Cannot retrieve data for newly created user.');
-      }
-
-      validationTokenEvent = await apiEventsService.getLatestEventForTopic({
-        topic: newUser.id,
-        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-      });
-
-      await request(app.getHttpServer())
-        .post(`/auth/validate`)
-        .send({
-          sub: newUser.id,
-          validationToken: validationTokenEvent?.data?.validationToken,
-        })
         .expect(HttpStatus.CREATED);
     });
 
@@ -361,39 +412,16 @@ describe('UsersModule (e2e)', () => {
         .expect(HttpStatus.CREATED);
     });
   });
-
   describe('Users - Platform admins', () => {
     let adminToken: string;
     let adminUserId: string;
     let nonAdminToken: string;
-    const cleanups: (() => Promise<void>)[] = [];
 
-    beforeAll(async () => {
+    beforeEach(async () => {
+      // TODO: Can we remove this? Admin users are being created in the seed, this is redundant
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
       adminUserId = await GivenUserExists(app, 'dd');
       nonAdminToken = await GivenUserIsLoggedIn(app, 'aa');
-    });
-
-    afterEach(async () => {
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
-    });
-
-    test('A platform admin should be able to identify itself as admin on /me endpoint', async () => {
-      const WhenGettingOwnInfo = await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${adminToken}`);
-
-      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(true);
-    });
-
-    test('A non platform admin should be not able to identify itself as admin on /me endpoint', async () => {
-      const WhenGettingOwnInfo = await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${nonAdminToken}`);
-
-      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(false);
     });
 
     test('A platform admin should be able to get the list of admins in the app after seed (just 1)', async () => {
@@ -406,14 +434,8 @@ describe('UsersModule (e2e)', () => {
     });
 
     test('A platform admin should be able to add a new admin', async () => {
-      const { accessToken: newAdminToken, user } = await GivenUserIsCreated(
-        app,
-      );
-
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
-        return;
-      });
+      const { accessToken: newAdminToken, user } =
+        await GivenUserIsCreated(app);
 
       const WhenAddingNewAdminResponse = await request(app.getHttpServer())
         .post(`/api/v1/users/admins/${user.id}`)
@@ -436,13 +458,24 @@ describe('UsersModule (e2e)', () => {
       expect(adminUserIds.sort()).toEqual(userIds.sort());
     });
 
+    test('A platform admin should be able to identify itself as admin on /me endpoint', async () => {
+      const WhenGettingOwnInfo = await request(app.getHttpServer())
+        .get('/api/v1/users/me')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(true);
+    });
+
+    test('A non platform admin should be not able to identify itself as admin on /me endpoint', async () => {
+      const WhenGettingOwnInfo = await request(app.getHttpServer())
+        .get('/api/v1/users/me')
+        .set('Authorization', `Bearer ${nonAdminToken}`);
+
+      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(false);
+    });
+
     test('A platform admin should be able to remove an existing admin', async () => {
       const { user } = await GivenUserIsCreated(app);
-
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
-        return;
-      });
 
       const WhenAddingNewAdminResponse = await request(app.getHttpServer())
         .post(`/api/v1/users/admins/${user.id}`)
@@ -485,15 +518,6 @@ describe('UsersModule (e2e)', () => {
         secondPassword,
       );
 
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: firstUser.id });
-        return;
-      });
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: secondUser.id });
-        return;
-      });
-
       const WhenBlockingUsersInBatch = await request(app.getHttpServer())
         .patch(`/api/v1/users/admins/block-users`)
         .set('Authorization', `Bearer ${adminToken}`)
@@ -520,10 +544,6 @@ describe('UsersModule (e2e)', () => {
       const username = `${v4()}@example.com`;
       const password = v4();
       const { user } = await GivenUserIsCreated(app, username, password);
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
-        return;
-      });
 
       const WhenBlockingAUser = await request(app.getHttpServer())
         .post(`/api/v1/users/block/${user.id}`)
@@ -543,10 +563,6 @@ describe('UsersModule (e2e)', () => {
       const username = `${v4()}@example.com`;
       const password = v4();
       const { user } = await GivenUserIsCreated(app, username, password);
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
-        return;
-      });
       const WhenBlockingAUser = await request(app.getHttpServer())
         .post(`/api/v1/users/block/${user.id}`)
         .set('Authorization', `Bearer ${adminToken}`);
@@ -603,20 +619,33 @@ describe('UsersModule (e2e)', () => {
     });
   });
 
+  describe('', () => {
+    test('The API should show a 429: Too many request error if multiple attempts at login are done in a short space of time', async () => {
+      // TODO: this should be either done by creating a user in arrangement, or reusing the precondition user (need to retrieve the user object
+      //        and that one is deep in the rabbit hole
+      await registerAndValidateUser(signUpDto);
+
+      // TODO: The Throttle value is set to 25,60 for this controller, and I've seen nothing in dev brach overriding / mocking this somehow
+      //       I don't understand how this was passing in dev given there were 5 simultaneous requests previously
+      const requestsArray = await Promise.all([
+        ...Array.from({ length: 26 }).map(() =>
+          request(app.getHttpServer())
+            .post('/auth/sign-in')
+            .send({ username: signUpDto.email, password: signUpDto.password }),
+        ),
+      ]);
+      const tooManyRequest = requestsArray.find(
+        (r) => r.status === HttpStatus.TOO_MANY_REQUESTS,
+      );
+      expect(tooManyRequest).toBeDefined();
+    });
+  });
+
   describe('Users - Find by email', () => {
     let adminToken: string;
-    let adminUserId: string;
-    const cleanups: (() => Promise<void>)[] = [];
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
-      adminUserId = await GivenUserExists(app, 'dd');
-    });
-
-    afterEach(async () => {
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
     });
 
     test('A user can be found by full email', async () => {
@@ -637,32 +666,6 @@ describe('UsersModule (e2e)', () => {
         .get('/api/v1/users/by-email/aa@example')
         .set('Authorization', `Bearer ${adminToken}`);
       expect(WhenSearchingUserByFullMail.status).toEqual(400);
-    });
-  });
-
-  describe('', () => {
-    test('The API should show a 429: Too many request error if multiple attempts at login are done in a short space of time', async () => {
-      const requestsArray = await Promise.all([
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde1' }),
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde2' }),
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde3' }),
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde4' }),
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde5' }),
-      ]);
-      const tooManyRequest = requestsArray.find(
-        (r) => r.status === HttpStatus.TOO_MANY_REQUESTS,
-      );
-      expect(tooManyRequest).toBeDefined();
     });
   });
 });

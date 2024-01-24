@@ -18,8 +18,9 @@ export class StratificationDataProvider {
   }) {
     const scenario = await this.apiEntityManager
       .getRepository(Scenario)
-      .findOne(data.scenarioId, {
-        relations: ['project'],
+      .findOne({
+        where: { id: data.scenarioId },
+        relations: { project: true },
       });
     assertDefined(scenario);
     const { project } = scenario;

@@ -1,9 +1,14 @@
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
 
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateProtectedAreaDTO } from './dto/create.protected-area.dto';
 import { UpdateProtectedAreaDTO } from './dto/update.protected-area.dto';
 import { ProtectedArea } from '@marxan/protected-areas';
@@ -24,6 +29,15 @@ import { apiConnections } from '../../ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IUCNCategory } from '@marxan/iucn';
 import { isDefined } from '@marxan/utils';
+import { Scenario } from '../scenarios/scenario.api.entity';
+import { groupBy } from 'lodash';
+import { ProjectSnapshot } from '@marxan/projects';
+import { SelectionGetService } from '@marxan-api/modules/scenarios/protected-area/getter/selection-get.service';
+import { Either, left, right } from 'fp-ts/Either';
+import { UpdateProtectedAreaNameDto } from '@marxan-api/modules/protected-areas/dto/rename.protected-area.dto';
+import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { ProtectedAreasRequestInfo } from '@marxan-api/modules/protected-areas/dto/protected-areas-request-info';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -35,7 +49,7 @@ const protectedAreaFilterKeyNames = [
 ] as const;
 type ProtectedAreaFilterKeys = keyof Pick<
   ProtectedArea,
-  typeof protectedAreaFilterKeyNames[number]
+  (typeof protectedAreaFilterKeyNames)[number]
 >;
 type ProtectedAreaBaseFilters = Record<ProtectedAreaFilterKeys, string[]>;
 
@@ -46,6 +60,27 @@ export const protectedAreaResource: BaseServiceResource = {
     plural: 'protected_areas',
   },
 };
+
+export const globalProtectedAreaNotEditable = Symbol(
+  'global protected area cannot be renamed',
+);
+
+export const globalProtectedAreaNotDeletable = Symbol(
+  'global protected area cannot be deleted',
+);
+export const protectedAreaNotFound = Symbol('protected area not found');
+
+export const customProtectedAreaNotEditableByUser = Symbol(
+  'User not allowed to edit protected areas of the project',
+);
+
+export const customProtectedAreaNotDeletableByUser = Symbol(
+  'User not allowed to delete protected areas of the project',
+);
+
+export const customProtectedAreaIsUsedInOneOrMoreScenarios = Symbol(
+  'Custom protected area is used in one or more scenarios',
+);
 
 class ProtectedAreaFilters {
   /**
@@ -76,17 +111,24 @@ export class ProtectedAreasCrudService extends AppBaseService<
   constructor(
     @InjectRepository(ProtectedArea, apiConnections.geoprocessingDB.name)
     protected readonly repository: Repository<ProtectedArea>,
+    @InjectRepository(Scenario)
+    protected readonly scenarioRepository: Repository<Scenario>,
+    @InjectRepository(Project)
+    protected readonly projectRepository: Repository<Project>,
+    @Inject(forwardRef(() => SelectionGetService))
+    private readonly selectionGetService: SelectionGetService,
+    private readonly projectAclService: ProjectAclService,
   ) {
     super(repository, 'protected_area', 'protected_areas', {
       logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ProtectedArea>,
     filters: ProtectedAreaBaseFilters & ProtectedAreaFilters,
     _info?: AppInfoDTO,
-  ): SelectQueryBuilder<ProtectedArea> {
+  ): Promise<SelectQueryBuilder<ProtectedArea>> {
     /**
      * @debt This is a bit of a hack - here we are bending a wrong abstraction
      * to avoid duplication and boilerplate. `setFilters()` should not be a land
@@ -148,6 +190,9 @@ export class ProtectedAreasCrudService extends AppBaseService<
         'countryId',
         'status',
         'designation',
+        'scenarioUsageCount',
+        'isCustom',
+        'name',
       ],
       keyForAttribute: 'camelCase',
     };
@@ -236,5 +281,210 @@ export class ProtectedAreasCrudService extends AppBaseService<
         { planningAreaId, iucnCategories },
       )
       .getMany();
+  }
+
+  async listForProject(
+    project: ProjectSnapshot,
+    fetchSpecification?: FetchSpecification,
+    info?: ProtectedAreasRequestInfo,
+  ) {
+    /**
+     * Get a list of protected areas used in project scenarios and assemble this
+     * into a map of protected area ids to lists of the scenarios where each
+     * protected area is in use.
+     */
+    const protectedAreaUsedInProjectScenarios = await this.scenarioRepository
+      .find({
+        where: {
+          projectId: project.id,
+          protectedAreaFilterByIds: Not(IsNull()),
+        },
+      })
+      .then((scenarios) =>
+        groupBy(
+          scenarios.flatMap(
+            (scenario) =>
+              scenario.protectedAreaFilterByIds
+                ?.filter(isDefined)
+                .map((protectedAreaId) => ({
+                  scenarioId: scenario.id,
+                  protectedAreaId,
+                })),
+          ),
+          'protectedAreaId',
+        ),
+      );
+
+    /**
+     * Get a list of all the protected areas that are linked to a given project,
+     * apply search, filtering and sorting if requested, and add a count of the
+     * number of scenarios where each protected area is used.
+     */
+
+    let projectProtectedAreas =
+      await this.selectionGetService.getForProject(project);
+
+    if (info?.params?.fullNameAndCategoryFilter) {
+      projectProtectedAreas = this.applySearchToProtectedAreas(
+        projectProtectedAreas,
+        info.params.fullNameAndCategoryFilter,
+      );
+    }
+
+    if (fetchSpecification?.filter?.name) {
+      projectProtectedAreas = this.applyNameFilterToProtectedAreas(
+        projectProtectedAreas,
+        fetchSpecification?.filter?.name as string[],
+      );
+    }
+
+    if (fetchSpecification?.sort) {
+      const order: 'asc' | 'desc' = fetchSpecification?.sort?.includes('-name')
+        ? 'desc'
+        : 'asc';
+      projectProtectedAreas = this.sortProtectedAreasByName(
+        projectProtectedAreas,
+        order,
+      );
+    }
+
+    const result: ProtectedArea[] = [];
+
+    projectProtectedAreas.forEach((protectedArea: any) => {
+      const scenarioUsageCount: number = protectedAreaUsedInProjectScenarios[
+        protectedArea!.id!
+      ]
+        ? protectedAreaUsedInProjectScenarios[protectedArea!.id!].length
+        : 0;
+      result.push({
+        ...protectedArea,
+        scenarioUsageCount: protectedArea.isCustom ? scenarioUsageCount : 1,
+      });
+    });
+
+    const serializer = new JSONAPISerializer.Serializer(
+      'protected_areas',
+      this.serializerConfig,
+    );
+
+    return serializer.serialize(result);
+  }
+
+  public async updateProtectedAreaName(
+    userId: string,
+    protectedAreaId: string,
+    updateProtectedAreaNameDto: UpdateProtectedAreaNameDto,
+  ): Promise<
+    Either<
+      | typeof protectedAreaNotFound
+      | typeof globalProtectedAreaNotEditable
+      | typeof customProtectedAreaNotEditableByUser,
+      ProtectedArea
+    >
+  > {
+    const protectedArea = await this.repository.findOne({
+      where: { id: protectedAreaId },
+    });
+    if (!protectedArea) {
+      return left(protectedAreaNotFound);
+    }
+    if (!protectedArea.projectId) {
+      return left(globalProtectedAreaNotEditable);
+    }
+
+    if (
+      !(await this.projectAclService.canEditProject(
+        userId,
+        protectedArea.projectId,
+      ))
+    ) {
+      return left(customProtectedAreaNotEditableByUser);
+    }
+
+    await this.repository.update(protectedAreaId, {
+      fullName: updateProtectedAreaNameDto.name,
+    });
+
+    const updatedProtectedArea = await this.repository.findOneOrFail({
+      where: { id: protectedAreaId },
+    });
+    return right(updatedProtectedArea);
+  }
+
+  public async deleteProtectedArea(
+    userId: string,
+    protectedAreaId: string,
+  ): Promise<
+    Either<
+      | typeof protectedAreaNotFound
+      | typeof globalProtectedAreaNotDeletable
+      | typeof customProtectedAreaNotDeletableByUser
+      | typeof customProtectedAreaIsUsedInOneOrMoreScenarios,
+      true
+    >
+  > {
+    const protectedArea = await this.repository.findOne({
+      where: { id: protectedAreaId },
+    });
+    if (!protectedArea) {
+      return left(protectedAreaNotFound);
+    }
+    if (!protectedArea.projectId) {
+      return left(globalProtectedAreaNotDeletable);
+    }
+
+    if (
+      !(await this.projectAclService.canEditProject(
+        userId,
+        protectedArea.projectId,
+      ))
+    ) {
+      return left(customProtectedAreaNotDeletableByUser);
+    }
+
+    const project = await this.projectRepository.findOneOrFail({
+      where: { id: protectedArea.projectId },
+    });
+
+    const projectProtectedAreas = await this.listForProject(project);
+    const protectedAreaData = projectProtectedAreas.data.find(
+      (pa: ProtectedArea) => pa.id === protectedAreaId,
+    );
+    if (protectedAreaData?.attributes.scenarioUsageCount > 0) {
+      return left(customProtectedAreaIsUsedInOneOrMoreScenarios);
+    }
+
+    await this.repository.delete(protectedAreaId);
+
+    return right(true);
+  }
+
+  private applySearchToProtectedAreas(
+    protectedAreas: Partial<ProtectedArea>[],
+    search: string,
+  ) {
+    return protectedAreas.filter((protectedArea) => {
+      return protectedArea!.name!.toLowerCase().includes(search.toLowerCase());
+    });
+  }
+
+  private applyNameFilterToProtectedAreas(
+    protectedAreas: Partial<ProtectedArea>[],
+    filterNames: string[],
+  ) {
+    return protectedAreas.filter((protectedArea) => {
+      return filterNames.includes(protectedArea!.name!);
+    });
+  }
+
+  private sortProtectedAreasByName(
+    protectedAreas: Partial<ProtectedArea>[],
+    order: 'asc' | 'desc',
+  ) {
+    if (order === 'asc') {
+      return protectedAreas.sort((a, b) => a!.name!.localeCompare(b!.name!));
+    } else {
+      return protectedAreas.sort((a, b) => b!.name!.localeCompare(a!.name!));
+    }
   }
 }

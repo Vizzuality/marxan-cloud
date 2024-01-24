@@ -23,15 +23,17 @@ type ProjectCustomProtectedAreasSelectResult = {
 @Injectable()
 @PieceExportProvider()
 export class ProjectCustomProtectedAreasPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ProjectCustomProtectedAreasPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ProjectCustomProtectedAreasPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -41,22 +43,24 @@ export class ProjectCustomProtectedAreasPieceExporter
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const customProtectedAreas: ProjectCustomProtectedAreasSelectResult[] = await this.geoprocessingEntityManager
-      .createQueryBuilder()
-      .select('ST_AsEWKB(wdpa.the_geom)', 'ewkb')
-      .addSelect('full_name', 'fullName')
-      .from(ProtectedArea, 'wdpa')
-      .where('project_id = :projectId', { projectId: input.resourceId })
-      .execute();
+    const customProtectedAreas: ProjectCustomProtectedAreasSelectResult[] =
+      await this.geoprocessingEntityManager
+        .createQueryBuilder()
+        .select('ST_AsEWKB(wdpa.the_geom)', 'ewkb')
+        .addSelect('full_name', 'fullName')
+        .from(ProtectedArea, 'wdpa')
+        .where('project_id = :projectId', { projectId: input.resourceId })
+        .execute();
 
-    const content = customProtectedAreas.map<ProjectCustomProtectedAreasContent>(
-      (protectedArea) => {
-        return {
-          fullName: protectedArea.fullName,
-          ewkb: protectedArea.ewkb.toJSON().data,
-        };
-      },
-    );
+    const content =
+      customProtectedAreas.map<ProjectCustomProtectedAreasContent>(
+        (protectedArea) => {
+          return {
+            fullName: protectedArea.fullName,
+            ewkb: protectedArea.ewkb.toJSON().data,
+          };
+        },
+      );
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
       ClonePiece.ProjectCustomProtectedAreas,

@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddClonePieceForScenarioFeatures1648642114880
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `ALTER TYPE clone_piece_enum RENAME VALUE 'user-uploaded-features' TO 'project-custom-features';`,

@@ -37,17 +37,19 @@ type SelectWdpaResult = WdpaProtectedArea | CustomProtectedArea;
 @Injectable()
 @PieceExportProvider()
 export class ScenarioProtectedAreasPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ScenarioProtectedAreasPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioProtectedAreasPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioProtectedAreas;

@@ -16,7 +16,8 @@ import { AsyncJobsGarbageCollector } from './async-jobs.garbage-collector';
 
 @Injectable()
 export class ScenarioAsyncJobsGarbageCollector
-  implements AsyncJobsGarbageCollector {
+  implements AsyncJobsGarbageCollector
+{
   constructor(
     private readonly calibrationAsyncJob: CalibrationAsyncJob,
     private readonly costSurfaceAsyncJob: CostSurfaceAsyncJob,
@@ -44,9 +45,6 @@ export class ScenarioAsyncJobsGarbageCollector
       scenarioId,
     );
     await this.planningUnitsInclusionAsyncJob.sendFailedApiEventForStuckAsyncJob(
-      scenarioId,
-    );
-    await this.protectedAreasAsyncJob.sendFailedApiEventForStuckAsyncJob(
       scenarioId,
     );
     await this.runAsyncJob.sendFailedApiEventForStuckAsyncJob(scenarioId);

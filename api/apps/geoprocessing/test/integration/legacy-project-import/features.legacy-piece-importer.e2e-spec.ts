@@ -23,7 +23,6 @@ import {
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -43,6 +42,8 @@ import {
   GivenProjectPus,
   GivenUserExists,
 } from '../cloning/fixtures';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
+import { FeatureAmountsPerPlanningUnitEntity } from '@marxan/feature-amounts-per-planning-unit';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -77,9 +78,8 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
 
   it('fails when invalid delimiter is used on spec.dat', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
-    const location = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
+    const location =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
     const job = fixtures.GivenJobInput({ specDatFileLocation: location });
     fixtures.GivenSpecDatFileWithInvalidDelimiter();
 
@@ -90,9 +90,8 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
 
   it('fails when read operation on spec.dat fails', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
-    const location = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
+    const location =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
     const job = fixtures.GivenJobInput({ specDatFileLocation: location });
     fixtures.GivenInvalidSpecDatFile();
 
@@ -105,9 +104,8 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
     const job = fixtures.GivenJobInput({ specDatFileLocation });
     fixtures.GivenValidSpecDatFile();
 
@@ -120,9 +118,8 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -139,12 +136,12 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      puvsprDatFileType,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
+    const puvsprDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        puvsprDatFileType,
+      );
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -159,12 +156,14 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
   });
 
   it('fails if spec.dat file contains duplicate feature ids', async () => {
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.SpecDat,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.PuvsprDat,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        LegacyProjectImportFileType.SpecDat,
+      );
+    const puvsprDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        LegacyProjectImportFileType.PuvsprDat,
+      );
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -179,12 +178,14 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
   });
 
   it('fails if spec.dat file contains duplicate feature names', async () => {
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.SpecDat,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.PuvsprDat,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        LegacyProjectImportFileType.SpecDat,
+      );
+    const puvsprDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        LegacyProjectImportFileType.PuvsprDat,
+      );
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -203,12 +204,12 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
     await fixtures.GivenUserExists();
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      puvsprDatFileType,
-    );
+    const specDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(specDatFileType);
+    const puvsprDatFileLocation =
+      await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        puvsprDatFileType,
+      );
 
     const job = fixtures.GivenJobInput({
       specDatFileLocation,
@@ -233,7 +234,11 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature(
-        [ProjectsPuEntity, GeoFeatureGeometry],
+        [
+          ProjectsPuEntity,
+          GeoFeatureGeometry,
+          FeatureAmountsPerPlanningUnitEntity,
+        ],
         geoprocessingConnections.default,
       ),
       TypeOrmModule.forRoot({
@@ -260,11 +265,12 @@ const getFixtures = async () => {
         provide: DatFileDelimiterFinder,
         useClass: DatFileDelimiterFinderFake,
       },
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const organizationId = v4();
   const projectId = v4();
   const scenarioId = v4();
@@ -288,6 +294,8 @@ const getFixtures = async () => {
   const featuresDataRepo = sandbox.get<Repository<GeoFeatureGeometry>>(
     getRepositoryToken(GeoFeatureGeometry),
   );
+  const featureAmountsPerPlanningUnitRepo: Repository<FeatureAmountsPerPlanningUnitEntity> =
+    sandbox.get(getRepositoryToken(FeatureAmountsPerPlanningUnitEntity));
 
   const specDatFileType = LegacyProjectImportFileType.SpecDat;
   const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
@@ -334,7 +342,7 @@ const getFixtures = async () => {
     return [firstFeature, secondFeature, thirdFeature, fourthFeature];
   };
 
-  const expectedAmountFromLegacyProject = 100;
+  const expectedAmount = 100;
   const pus = await GivenProjectPus(
     geoEntityManager,
     projectId,
@@ -441,7 +449,7 @@ const getFixtures = async () => {
       const puvsprRows = featuresWithPuids.flatMap(({ id, puids }) => {
         return puids.map((puid) => ({
           species: id,
-          amount: expectedAmountFromLegacyProject,
+          amount: expectedAmount,
           pu: puid,
         }));
       });
@@ -498,7 +506,7 @@ const getFixtures = async () => {
           expect(result).toBeDefined();
 
           expect(result.warnings).toHaveLength(1);
-          expect(result.warnings![0]).toContain(nonExistingPuid);
+          expect(result.warnings![0]).toContain(nonExistingPuid.toString());
 
           const insertedFeaturesIds = await findProjectFeaturesIds();
 
@@ -509,20 +517,56 @@ const getFixtures = async () => {
             (pu) => pu.puids,
           ).length;
           const insertedFeaturesData = await featuresDataRepo.find({
-            featureId: In(insertedFeaturesIds),
+            where: {
+              featureId: In(insertedFeaturesIds),
+            },
           });
+
+          const featureAmounts = await featureAmountsPerPlanningUnitRepo.find({
+            where: { featureId: In(insertedFeaturesIds) },
+          });
+
+          const featuresMinMax = await apiEntityManager
+            .createQueryBuilder()
+            .select('id')
+            .addSelect('amount_min', 'amountMin')
+            .addSelect('amount_max', 'amountMax')
+            .from('features', 'f')
+            .where('f.id IN (:...featureIds)', {
+              featureIds: insertedFeaturesIds,
+            })
+            .execute();
 
           expect(insertedFeaturesData).toHaveLength(
             amountOfFeaturesData - amountOfNonExistingPuids,
           );
           expect(
             insertedFeaturesData.every(
-              ({ amountFromLegacyProject, projectPuId }) =>
-                amountFromLegacyProject === expectedAmountFromLegacyProject &&
+              ({ amount, projectPuId }) =>
+                amount === expectedAmount &&
                 projectPuId &&
                 pus.map(({ id }) => id).includes(projectPuId),
             ),
           ).toEqual(true);
+
+          expect(featureAmounts).toHaveLength(
+            amountOfFeaturesData - amountOfNonExistingPuids,
+          );
+          expect(
+            featureAmounts.every(
+              ({ amount, projectPuId }) =>
+                amount === expectedAmount &&
+                projectPuId &&
+                pus.map(({ id }) => id).includes(projectPuId),
+            ),
+          ).toEqual(true);
+          expect(
+            featuresMinMax.every(
+              (featureMinMax: any) =>
+                featureMinMax.amountMin === expectedAmount &&
+                featureMinMax.amountMax === expectedAmount,
+            ),
+          ).toBeTruthy();
         },
       };
     },
@@ -530,9 +574,8 @@ const getFixtures = async () => {
 };
 
 class FakeSpecDatReader {
-  public readOperationResult: Either<string, SpecDatRow[]> = left(
-    'default error',
-  );
+  public readOperationResult: Either<string, SpecDatRow[]> =
+    left('default error');
 
   async readFile(): Promise<Either<string, SpecDatRow[]>> {
     return this.readOperationResult;
@@ -540,9 +583,8 @@ class FakeSpecDatReader {
 }
 
 class FakePuvsprDatReader {
-  public readOperationResult: Either<string, PuvrsprDatRow[]> = left(
-    'default error',
-  );
+  public readOperationResult: Either<string, PuvrsprDatRow[]> =
+    left('default error');
 
   async readFile(): Promise<Either<string, PuvrsprDatRow[]>> {
     return this.readOperationResult;

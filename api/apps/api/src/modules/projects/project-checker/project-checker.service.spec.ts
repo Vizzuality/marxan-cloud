@@ -13,8 +13,9 @@ import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { isEqual } from 'lodash';
-import { FindConditions, In, Repository } from 'typeorm';
+import { FindOneOptions, In, Repository } from 'typeorm';
 import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
+import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -296,9 +297,8 @@ it(`hasPendingBlmCalibration() should return false for a project without scenari
     { id: 'scenario-2' },
   ]);
   // and
-  const hasPendingBlmCalibration = await service.hasPendingBlmCalibration(
-    projectId,
-  );
+  const hasPendingBlmCalibration =
+    await service.hasPendingBlmCalibration(projectId);
 
   // then
   expect(hasPendingBlmCalibration).toEqual({
@@ -319,9 +319,8 @@ it(`hasPendingBlmCalibration() should return true for a project with a scenario 
   ]);
   fixtures.GivenScenarioIsRunningBlmCalibration('scenario-1');
   // and
-  const hasPendingBlmCalibration = await service.hasPendingBlmCalibration(
-    projectId,
-  );
+  const hasPendingBlmCalibration =
+    await service.hasPendingBlmCalibration(projectId);
   // then
   expect(hasPendingBlmCalibration).toEqual({
     _tag: 'Right',
@@ -335,9 +334,8 @@ it(`hasPendingBlmCalibration() should return doesntExist if the project does not
   // and
   fixtures.GivenProjectDoesntExist();
   // and
-  const hasPendingBlmCalibration = await service.hasPendingBlmCalibration(
-    `projectId`,
-  );
+  const hasPendingBlmCalibration =
+    await service.hasPendingBlmCalibration(`projectId`);
   // then
   expect(hasPendingBlmCalibration).toEqual({
     _tag: 'Left',
@@ -407,17 +405,15 @@ async function getFixtures() {
       throw new NotFoundException();
     }),
   };
-  const fakeProjectsService: jest.Mocked<
-    Pick<Repository<Project>, 'findOne'>
-  > = {
-    findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
-  };
+  const fakeProjectsService: jest.Mocked<Pick<Repository<Project>, 'findOne'>> =
+    {
+      findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
+    };
 
-  const fakeScenariosRepo: jest.Mocked<
-    Pick<Repository<Scenario>, 'findOne'>
-  > = {
-    findOne: jest.fn(() => Promise.resolve({} as Scenario)),
-  };
+  const fakeScenariosRepo: jest.Mocked<Pick<Repository<Scenario>, 'findOne'>> =
+    {
+      findOne: jest.fn((_: any) => Promise.resolve({} as Scenario)),
+    };
 
   const fakePlaningAreaFacade = {
     locatePlanningAreaEntity: jest.fn(),
@@ -425,7 +421,7 @@ async function getFixtures() {
   const testingModule = await Test.createTestingModule({
     providers: [
       {
-        provide: `ApiEventsService`,
+        provide: ApiEventsService,
         useValue: fakeApiEventsService,
       },
       {
@@ -437,7 +433,7 @@ async function getFixtures() {
         useValue: fakeScenariosRepo,
       },
       {
-        provide: `PlanningAreasService`,
+        provide: PlanningAreasService,
         useValue: fakePlaningAreaFacade,
       },
       {
@@ -569,16 +565,14 @@ async function getFixtures() {
     },
     GivenProjectDoesntExist() {
       fakeProjectsService.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<Project>) =>
-          Promise.resolve(undefined),
+        (options: FindOneOptions<Project>) => Promise.resolve(null),
       );
     },
     GivenProjectExists(projectId: string, scenarios?: { id: string }[]) {
       const fakeProject = { id: projectId, scenarios } as Project;
 
       fakeProjectsService.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<Project>) =>
-          Promise.resolve(fakeProject),
+        (options: FindOneOptions<Project>) => Promise.resolve(fakeProject),
       );
     },
     GivenScenarioIsBeingExported(scenarioId: string) {

@@ -24,15 +24,17 @@ type MetadataFolderBuffers = Record<string, Buffer>;
 @Injectable()
 @PieceImportProvider()
 export class MarxanExecutionMetadataPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    MarxanExecutionMetadataPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(MarxanExecutionMetadataPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.MarxanExecutionMetadata;
@@ -99,11 +101,8 @@ export class MarxanExecutionMetadataPieceImporter
       const buffer = await readableToBuffer(readableOrError.right);
       const stringMarxanExecutionMetadata = buffer.toString();
 
-      const {
-        marxanExecutionMetadata,
-      }: MarxanExecutionMetadataContent = JSON.parse(
-        stringMarxanExecutionMetadata,
-      );
+      const { marxanExecutionMetadata }: MarxanExecutionMetadataContent =
+        JSON.parse(stringMarxanExecutionMetadata);
 
       const foldersUris = uris.filter(
         (uri) =>

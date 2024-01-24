@@ -17,8 +17,9 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
     id: ResourceId,
     scenarioIds: string[],
   ): Promise<ExportComponent[]> {
-    const project = await this.projectRepository.findOneOrFail(id.value, {
-      relations: ['scenarios'],
+    const project = await this.projectRepository.findOneOrFail({
+      where: { id: id.value },
+      relations: { scenarios: true },
     });
     const { scenarios } = project;
 
@@ -55,8 +56,12 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       ExportComponent.newOne(id, ClonePiece.PlanningUnitsGrid),
       ExportComponent.newOne(id, ClonePiece.PlanningUnitsGridGeojson),
       ExportComponent.newOne(id, ClonePiece.ProjectCustomProtectedAreas),
+      ExportComponent.newOne(id, ClonePiece.ProjectCostSurfaces),
       ExportComponent.newOne(id, ClonePiece.ProjectCustomFeatures),
-      ExportComponent.newOne(id, ClonePiece.ProjectPuvsprCalculations),
+      ExportComponent.newOne(
+        id,
+        ClonePiece.ProjectFeatureAmountsPerPlanningUnit,
+      ),
       ...scenarioPieces,
     ];
 

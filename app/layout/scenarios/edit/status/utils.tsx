@@ -2,18 +2,28 @@ import { useMemo } from 'react';
 
 import groupBy from 'lodash/groupBy';
 
+import { Job } from 'types/api/job';
+
 import { TEXTS_FAILURE, TEXTS_RUNNING } from './constants';
 
-const getStatus = (arr) => {
-  if (arr.some(((d) => d.status === 'failure'))) return 'failure';
-  if (arr.some(((d) => d.status === 'running'))) return 'running';
+const getStatus = (arr: Job[]) => {
+  if (arr.some((d) => d.status === 'failure')) return 'failure';
+  if (arr.some((d) => d.status === 'running')) return 'running';
   return 'done';
 };
 
-export const useScenarioJobs = (jobs) => {
+export const useScenarioJobs = (jobs: Job[]): Job[] => {
   return useMemo(() => {
     const groups = groupBy(jobs, (j) => {
-      if (['specification', 'featuresWithPuIntersection', 'geofeatureCopy', 'geofeatureSplit', 'geofeatureStratification'].includes(j.kind)) {
+      if (
+        [
+          'specification',
+          'featuresWithPuIntersection',
+          'geofeatureCopy',
+          'geofeatureSplit',
+          'geofeatureStratification',
+        ].includes(j.kind)
+      ) {
         return 'features';
       }
 
@@ -22,15 +32,17 @@ export const useScenarioJobs = (jobs) => {
 
     return Object.keys(groups).map((k) => {
       const status = getStatus(groups[k]);
-      const isoDate = groups[k].reduce((a, b) => {
-        return (a.isoDate > b.isoDate) ? a.isoDate : b.isoDate;
-      }, 0);
+
+      const isoDateJob = groups[k].reduce((a, b) => {
+        if (a.isoDate > b.isoDate) return a;
+        if (a.isoDate < b.isoDate) return b;
+      });
 
       return {
         kind: k,
-        isoDate,
+        isoDate: isoDateJob?.isoDate,
         status,
-      };
+      } satisfies Job;
     });
   }, [jobs]);
 };

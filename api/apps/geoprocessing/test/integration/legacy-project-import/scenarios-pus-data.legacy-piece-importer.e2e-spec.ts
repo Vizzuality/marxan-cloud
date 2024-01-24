@@ -21,7 +21,6 @@ import {
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -33,6 +32,7 @@ import { Readable } from 'stream';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { DeleteProjectPus, GivenProjectPus } from '../cloning/fixtures';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -64,7 +64,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('fails when invalid delimiter is used on pu.dat', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     fixtures.GivenSpecDatFileWithInvalidDelimiter();
 
@@ -74,7 +75,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('fails when read operation on pu.dat fails', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     fixtures.GivenInvalidPuDatFile();
 
@@ -84,7 +86,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('fails when pu.dat file contains duplicate puids', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     fixtures.GivenPuDatFileWithDuplicatePuids();
 
@@ -94,7 +97,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('fails when pu.dat file does not contain some projects pu data', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     await fixtures.GivenValidPuDatFile();
     fixtures.GivenPuDatLacksProjectPuDataRows();
@@ -105,7 +109,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('reports warnings when pu.dat contains unknown puids', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     await fixtures.GivenValidPuDatFile();
     fixtures.GivenPuDatFileWithUnknownPlanningUnits();
@@ -118,7 +123,8 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
   });
 
   it('imports successfully scenario pus data and scenario pus cost data', async () => {
-    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const location =
+      await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
     await fixtures.GivenValidPuDatFile();
 
@@ -155,11 +161,12 @@ const getFixtures = async () => {
         provide: DatFileDelimiterFinder,
         useClass: DatFileDelimiterFinderFake,
       },
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const scenarioId = v4();
 
@@ -373,9 +380,8 @@ const getFixtures = async () => {
 };
 
 class FakePuDatReader {
-  public readOperationResult: Either<string, PuDatRow[]> = left(
-    'default error',
-  );
+  public readOperationResult: Either<string, PuDatRow[]> =
+    left('default error');
 
   async readFile(): Promise<Either<string, PuDatRow[]>> {
     return this.readOperationResult;

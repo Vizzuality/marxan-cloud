@@ -15,10 +15,11 @@ export class ScenarioPlanningUnitSerializer {
       ScenarioPlanningUnitDto,
       units.map((unit) => ({
         id: unit.id,
-        inclusionStatus: unit.lockStatus ?? LockStatus.Unstated,
+        inclusionStatus: unit.lockStatus ?? LockStatus.Available,
         defaultStatus: unit.protectedByDefault
           ? LockStatus.LockedIn
-          : LockStatus.Unstated,
+          : LockStatus.Available,
+        setByUser: unit.setByUser,
       })),
     );
   }

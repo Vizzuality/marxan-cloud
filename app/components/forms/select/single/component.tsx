@@ -3,18 +3,21 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 
-import cx from 'classnames';
 // Downshift;
 import { useSelect } from 'downshift';
 
 // Popper
 import {
-  flipModifier, hideModifier, sameWidthModifier, offsetModifier,
+  flipModifier,
+  hideModifier,
+  sameWidthModifier,
+  offsetModifier,
 } from 'components/forms/select/constants/popper-modifiers';
 import THEME from 'components/forms/select/constants/theme';
 import Menu from 'components/forms/select/menu';
 import Toggle from 'components/forms/select/toggle';
 import { SelectProps, SelectOptionProps } from 'components/forms/select/types';
+import { cn } from 'utils/cn';
 
 export const SingleSelect: React.FC<SelectProps> = ({
   theme = 'dark',
@@ -38,19 +41,17 @@ export const SingleSelect: React.FC<SelectProps> = ({
   const menuRef = useRef();
   const getOptions = useMemo(() => {
     return [
-      ...clearSelectionActive ? [
-        {
-          value: null,
-          label: clearSelectionLabel,
-        },
-      ] : [],
+      ...(clearSelectionActive
+        ? [
+            {
+              value: null,
+              label: clearSelectionLabel,
+            },
+          ]
+        : []),
       ...options,
     ];
-  }, [
-    options,
-    clearSelectionActive,
-    clearSelectionLabel,
-  ]);
+  }, [options, clearSelectionActive, clearSelectionLabel]);
 
   const getVisibleOptions = useMemo(() => {
     return getOptions.filter((o) => {
@@ -80,9 +81,8 @@ export const SingleSelect: React.FC<SelectProps> = ({
     }
   };
 
-  const isSelected = (selected: SelectOptionProps, selectedItms: SelectOptionProps[]) => (
-    selectedItms.some((i) => i.value === selected.value)
-  );
+  const isSelected = (selected: SelectOptionProps, selectedItms: SelectOptionProps[]) =>
+    selectedItms.some((i) => i.value === selected.value);
 
   // 'useSelect'
   const {
@@ -96,12 +96,12 @@ export const SingleSelect: React.FC<SelectProps> = ({
     reset,
   } = useSelect<SelectOptionProps>({
     items: getVisibleOptions,
-    ...typeof values !== 'undefined' && {
+    ...(typeof values !== 'undefined' && {
       selectedItem: getSelected,
-    },
-    ...typeof initialValues !== 'undefined' && {
+    }),
+    ...(typeof initialValues !== 'undefined' && {
       initialSelectedItem: getInitialSelected,
-    },
+    }),
     itemToString: (item) => {
       if (typeof item.label === 'string') {
         return item.label;
@@ -112,9 +112,9 @@ export const SingleSelect: React.FC<SelectProps> = ({
       const { changes, type } = actionAndChanges;
 
       if (
-        type === useSelect.stateChangeTypes.MenuKeyDownEnter
-        || type === useSelect.stateChangeTypes.MenuKeyDownSpaceButton
-        || type === useSelect.stateChangeTypes.ItemClick
+        type === useSelect.stateChangeTypes.MenuKeyDownEnter ||
+        type === useSelect.stateChangeTypes.MenuKeyDownSpaceButton ||
+        type === useSelect.stateChangeTypes.ItemClick
       ) {
         onSelect(changes.selectedItem);
       }
@@ -139,16 +139,13 @@ export const SingleSelect: React.FC<SelectProps> = ({
   const { styles, attributes, update } = usePopper(triggerRef.current, menuRef.current, {
     placement: 'bottom',
     // strategy: 'fixed',
-    modifiers: [
-      offsetModifier,
-      flipModifier,
-      hideModifier,
-      sameWidthModifier,
-    ],
+    modifiers: [offsetModifier, flipModifier, hideModifier, sameWidthModifier],
   });
 
   // Hide menu if reference is outside the boundaries
-  const referenceHidden = attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-reference-scaped'];
+  const referenceHidden =
+    attributes?.popper?.['data-popper-reference-hidden'] ||
+    attributes?.popper?.['data-popper-reference-scaped'];
   useEffect(() => {
     if (referenceHidden) {
       closeMenu();
@@ -167,19 +164,16 @@ export const SingleSelect: React.FC<SelectProps> = ({
 
   return (
     <div
-      className={cx({
+      className={cn({
         'c-select': true,
-        'w-full leading-tight overflow-hidden': true,
+        'w-full overflow-hidden leading-tight': true,
         'pointer-events-none opacity-50': disabled,
         [THEME[theme].container]: true,
         [THEME[theme].closed]: true,
         [THEME.states[status]]: true,
       })}
     >
-      <div
-        className="relative w-full"
-        ref={triggerRef}
-      >
+      <div className="relative w-full" ref={triggerRef}>
         <Toggle
           options={getOptions}
           theme={theme}
@@ -199,7 +193,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
 
       {createPortal(
         <div
-          className={cx({
+          className={cn({
             'c-select-dropdown': true,
             'z-50': true,
             // The content of `<Menu />` must always be in the DOM so that Downshift can get the ref
@@ -236,41 +230,40 @@ export const SingleSelect: React.FC<SelectProps> = ({
 
             <ul
               {...getMenuProps({ onFocus, onBlur })}
-              className={cx({
-                'py-1 focus:outline-none overflow-y-auto overflow-x-hidden': true,
+              className={cn({
+                'overflow-y-auto overflow-x-hidden py-1 focus:outline-none': true,
               })}
               style={{
                 maxHeight,
               }}
             >
-              {getVisibleOptions
-                .map((option, index) => (
-                  <li
-                    className={cx({
-                      'px-4 py-1 mt-0.5 cursor-pointer': true,
-                      [THEME[theme].item.base]: highlightedIndex !== index,
-                      [THEME[theme].item.disabled]: option.disabled,
-                      [THEME[theme].item.highlighted]: (
-                        (highlightedIndex === index && !option.disabled)
-                      || isSelected(option, selectedItems)
-                      ),
+              {getVisibleOptions.map((option, index) => (
+                <li
+                  className={cn({
+                    'mt-0.5 cursor-pointer px-4 py-1': true,
+                    [THEME[theme].item.base]: highlightedIndex !== index,
+                    [THEME[theme].item.disabled]: option.disabled,
+                    [THEME[theme].item.highlighted]:
+                      (highlightedIndex === index && !option.disabled) ||
+                      isSelected(option, selectedItems),
+                  })}
+                  key={`${option.value}`}
+                  {...getItemProps({ item: option, index, disabled: option.disabled })}
+                >
+                  <span
+                    className={cn({
+                      'ml-6': !!option.checkbox,
+                      [THEME[theme].item.clearSelectionLabel]: !option.value,
                     })}
-                    key={`${option.value}`}
-                    {...getItemProps({ item: option, index, disabled: option.disabled })}
                   >
-                    <span
-                      className={cx({
-                        'ml-6': !!option.checkbox,
-                      })}
-                    >
-                      {option.label}
-                    </span>
-                  </li>
-                ))}
+                    {option.label}
+                  </span>
+                </li>
+              ))}
             </ul>
           </Menu>
         </div>,
-        document.body,
+        document.body
       )}
     </div>
   );

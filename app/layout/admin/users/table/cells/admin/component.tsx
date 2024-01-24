@@ -9,14 +9,11 @@ import Checkbox from 'components/forms/checkbox';
 import ADMIN_WARNING_SVG from 'svgs/notifications/admin.svg?sprite';
 
 export interface CellAdminProps {
-  value: boolean,
-  row: any,
+  value: boolean;
+  row: any;
 }
 
-export const CellAdmin: React.FC<CellAdminProps> = ({
-  value,
-  row,
-}: CellAdminProps) => {
+export const CellAdmin: React.FC<CellAdminProps> = ({ value, row }: CellAdminProps) => {
   const [confirmAdmin, setConfirmAdmin] = useState<Record<string, any>>();
   const [confirmUnAdmin, setConfirmUnAdmin] = useState<Record<string, any>>();
 
@@ -26,51 +23,61 @@ export const CellAdmin: React.FC<CellAdminProps> = ({
   const { addToast } = useToasts();
 
   const onAdmin = useCallback(() => {
-    saveAdminMutation.mutate({
-      uid: confirmAdmin.id,
-    }, {
-      onSuccess: () => {
-        setConfirmAdmin(null);
+    saveAdminMutation.mutate(
+      {
+        uid: confirmAdmin.id,
       },
-      onError: () => {
-        addToast('save-admin-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Oops! Something went wrong.
-              <br />
-              Please, try again!
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+      {
+        onSuccess: () => {
+          setConfirmAdmin(null);
+        },
+        onError: () => {
+          addToast(
+            'save-admin-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">
+                Oops! Something went wrong.
+                <br />
+                Please, try again!
+              </p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [confirmAdmin, saveAdminMutation, addToast]);
 
   const onUnAdmin = useCallback(() => {
-    deleteAdminMutation.mutate({
-      uid: confirmUnAdmin.id,
-    }, {
-      onSuccess: () => {
-        setConfirmUnAdmin(null);
+    deleteAdminMutation.mutate(
+      {
+        uid: confirmUnAdmin.id,
       },
-      onError: () => {
-        addToast('delete-admin-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Oops! Something went wrong.
-              <br />
-              Please, try again!
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+      {
+        onSuccess: () => {
+          setConfirmUnAdmin(null);
+        },
+        onError: () => {
+          addToast(
+            'delete-admin-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">
+                Oops! Something went wrong.
+                <br />
+                Please, try again!
+              </p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [confirmUnAdmin, deleteAdminMutation, addToast]);
 
   return (

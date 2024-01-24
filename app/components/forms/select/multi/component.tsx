@@ -3,18 +3,21 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 
-import cx from 'classnames';
 // Downshift;
 import { useSelect, useMultipleSelection } from 'downshift';
 
 import Checkbox from 'components/forms/checkbox';
 import {
-  flipModifier, hideModifier, sameWidthModifier, offsetModifier,
+  flipModifier,
+  hideModifier,
+  sameWidthModifier,
+  offsetModifier,
 } from 'components/forms/select/constants/popper-modifiers';
 import THEME from 'components/forms/select/constants/theme';
 import Menu from 'components/forms/select/menu';
 import Toggle from 'components/forms/select/toggle';
 import { SelectProps, SelectOptionProps } from 'components/forms/select/types';
+import { cn } from 'utils/cn';
 
 export const MultiSelect: React.FC<SelectProps> = ({
   theme = 'dark',
@@ -41,18 +44,26 @@ export const MultiSelect: React.FC<SelectProps> = ({
 
   const getOptions: SelectOptionProps[] = useMemo(() => {
     return [
-      ...clearSelectionActive ? [{
-        value: 'batch-clear-selection',
-        label: clearSelectionLabel,
-        enabled: false,
-        checkbox: false,
-      }] : [],
-      ...batchSelectionActive ? [{
-        value: 'batch-selection',
-        label: batchSelectionLabel,
-        enabled: false,
-        checkbox: false,
-      }] : [],
+      ...(clearSelectionActive
+        ? [
+            {
+              value: 'batch-clear-selection',
+              label: clearSelectionLabel,
+              enabled: false,
+              checkbox: false,
+            },
+          ]
+        : []),
+      ...(batchSelectionActive
+        ? [
+            {
+              value: 'batch-selection',
+              label: batchSelectionLabel,
+              enabled: false,
+              checkbox: false,
+            },
+          ]
+        : []),
       ...options.map((o) => ({ ...o, checkbox: true, enabled: true })),
     ];
   }, [
@@ -71,9 +82,8 @@ export const MultiSelect: React.FC<SelectProps> = ({
 
   const getSelected = values ? getOptions.filter((o) => values.includes(`${o.value}`)) : null;
 
-  const isSelected = (selected: SelectOptionProps, selectedItms: SelectOptionProps[]) => (
-    selectedItms.some((i) => i.value === selected.value)
-  );
+  const isSelected = (selected: SelectOptionProps, selectedItms: SelectOptionProps[]) =>
+    selectedItms.some((i) => i.value === selected.value);
 
   const handleSelectedItem = ({
     option,
@@ -113,12 +123,12 @@ export const MultiSelect: React.FC<SelectProps> = ({
     selectedItems,
     reset,
   } = useMultipleSelection<SelectOptionProps>({
-    ...!!getSelected && {
+    ...(!!getSelected && {
       selectedItems: getSelected,
-    },
-    ...!!getInitialSelected && {
+    }),
+    ...(!!getInitialSelected && {
       initialSelectedItems: getInitialSelected,
-    },
+    }),
     itemToString: (item) => {
       if (typeof item.label === 'string') {
         return item.label;
@@ -128,10 +138,10 @@ export const MultiSelect: React.FC<SelectProps> = ({
     stateReducer: (st, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
       if (
-        type === useMultipleSelection.stateChangeTypes.FunctionAddSelectedItem
-        || type === useMultipleSelection.stateChangeTypes.FunctionRemoveSelectedItem
-        || type === useMultipleSelection.stateChangeTypes.FunctionSetSelectedItems
-        || type === useMultipleSelection.stateChangeTypes.FunctionReset
+        type === useMultipleSelection.stateChangeTypes.FunctionAddSelectedItem ||
+        type === useMultipleSelection.stateChangeTypes.FunctionRemoveSelectedItem ||
+        type === useMultipleSelection.stateChangeTypes.FunctionSetSelectedItems ||
+        type === useMultipleSelection.stateChangeTypes.FunctionReset
       ) {
         onSelect(changes.selectedItems);
       }
@@ -140,62 +150,53 @@ export const MultiSelect: React.FC<SelectProps> = ({
     },
   });
 
-  const {
-    isOpen,
-    highlightedIndex,
-    getToggleButtonProps,
-    getMenuProps,
-    getItemProps,
-    closeMenu,
-  } = useSelect<SelectOptionProps>({
-    items: getOptions,
-    itemToString: (item) => {
-      if (typeof item.label === 'string') {
-        return item.label;
-      }
-      return `${item.value}`;
-    }, // How the selected options is announced to screen readers
-    stateReducer: (st, actionAndChanges) => {
-      const { type, changes } = actionAndChanges;
-      const { selectedItem: option } = changes;
+  const { isOpen, highlightedIndex, getToggleButtonProps, getMenuProps, getItemProps, closeMenu } =
+    useSelect<SelectOptionProps>({
+      items: getOptions,
+      itemToString: (item) => {
+        if (typeof item.label === 'string') {
+          return item.label;
+        }
+        return `${item.value}`;
+      }, // How the selected options is announced to screen readers
+      stateReducer: (st, actionAndChanges) => {
+        const { type, changes } = actionAndChanges;
+        const { selectedItem: option } = changes;
 
-      switch (type) {
-        case useSelect.stateChangeTypes.MenuKeyDownEnter:
-        case useSelect.stateChangeTypes.ItemClick:
-          handleSelectedItem({
-            option,
-            selectedItems,
-            addSelectedItem,
-            removeSelectedItem,
-            setSelectedItems,
-            reset,
-          });
+        switch (type) {
+          case useSelect.stateChangeTypes.MenuKeyDownEnter:
+          case useSelect.stateChangeTypes.ItemClick:
+            handleSelectedItem({
+              option,
+              selectedItems,
+              addSelectedItem,
+              removeSelectedItem,
+              setSelectedItems,
+              reset,
+            });
 
-          return {
-            ...changes,
-            highlightedIndex: st.highlightedIndex,
-            isOpen: true,
-          };
-        default:
-          return changes;
-      }
-    },
-  });
+            return {
+              ...changes,
+              highlightedIndex: st.highlightedIndex,
+              isOpen: true,
+            };
+          default:
+            return changes;
+        }
+      },
+    });
 
   // 'usePopper'
   const { styles, attributes, update } = usePopper(triggerRef.current, menuRef.current, {
     placement: 'bottom',
     // strategy: 'fixed',
-    modifiers: [
-      offsetModifier,
-      flipModifier,
-      hideModifier,
-      sameWidthModifier,
-    ],
+    modifiers: [offsetModifier, flipModifier, hideModifier, sameWidthModifier],
   });
 
   // Hide menu if reference is outside the boundaries
-  const referenceHidden = attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-reference-scaped'];
+  const referenceHidden =
+    attributes?.popper?.['data-popper-reference-hidden'] ||
+    attributes?.popper?.['data-popper-reference-scaped'];
   useEffect(() => {
     if (referenceHidden) {
       closeMenu();
@@ -208,19 +209,16 @@ export const MultiSelect: React.FC<SelectProps> = ({
 
   return (
     <div
-      className={cx({
+      className={cn({
         'c-multi-select': true,
-        'w-full leading-tight overflow-hidden': true,
+        'w-full overflow-hidden leading-tight': true,
         'pointer-events-none opacity-50': disabled,
         [THEME[theme].container]: true,
         [THEME[theme].closed]: true,
         [THEME.states[status]]: true,
       })}
     >
-      <div
-        className="relative w-full"
-        ref={triggerRef}
-      >
+      <div className="relative w-full" ref={triggerRef}>
         <Toggle
           options={getOptionsEnabled}
           theme={theme}
@@ -240,9 +238,9 @@ export const MultiSelect: React.FC<SelectProps> = ({
       {/* Menu */}
       {createPortal(
         <div
-          className={cx({
+          className={cn({
             'c-multi-select-dropdown': true,
-            'z-50': true,
+            'z-[60]': true,
             // The content of `<Menu />` must always be in the DOM so that Downshift can get the ref
             // to the `<ul />` element through `getMenuProps`
             invisible: !isOpen,
@@ -277,8 +275,8 @@ export const MultiSelect: React.FC<SelectProps> = ({
 
             <ul
               {...getMenuProps({ onFocus, onBlur })}
-              className={cx({
-                'py-1 focus:outline-none overflow-y-auto overflow-x-hidden': true,
+              className={cn({
+                'overflow-y-auto overflow-x-hidden py-1 focus:outline-none': true,
               })}
               style={{
                 maxHeight,
@@ -286,20 +284,19 @@ export const MultiSelect: React.FC<SelectProps> = ({
             >
               {getOptions.map((option, index) => (
                 <li
-                  className={cx({
-                    'px-4 py-1 mt-0.5 cursor-pointer relative': true,
+                  className={cn({
+                    'relative mt-0.5 cursor-pointer px-4 py-1': true,
                     [THEME[theme].item.base]: highlightedIndex !== index,
                     [THEME[theme].item.disabled]: option.disabled,
-                    [THEME[theme].item.highlighted]: (
-                      (highlightedIndex === index && !option.disabled)
-                      || isSelected(option, selectedItems)
-                    ),
+                    [THEME[theme].item.highlighted]:
+                      (highlightedIndex === index && !option.disabled) ||
+                      isSelected(option, selectedItems),
                   })}
                   key={`${option.value}`}
                   {...getItemProps({ item: option, index, disabled: option.disabled })}
                 >
                   <span
-                    className={cx({
+                    className={cn({
                       'ml-6': !!option.checkbox,
                     })}
                   >
@@ -308,10 +305,10 @@ export const MultiSelect: React.FC<SelectProps> = ({
 
                   {option.checkbox && (
                     <Checkbox
-                      className="absolute bg-opacity-0 left-4 top-1.5"
+                      className="absolute left-4 top-1.5 bg-opacity-0"
                       checked={isSelected(option, selectedItems)}
                       disabled={option.disabled}
-                      onChange={() => { }}
+                      onChange={() => {}}
                     />
                   )}
                 </li>
@@ -319,7 +316,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
             </ul>
           </Menu>
         </div>,
-        document.body,
+        document.body
       )}
     </div>
   );

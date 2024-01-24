@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 
 export interface UseSaveMeProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveMeProps {
@@ -9,24 +9,24 @@ export interface SaveMeProps {
 }
 
 export interface UseSaveMePasswordProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveMePasswordProps {
   data: unknown;
 }
 export interface UseDeleteMeProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface UseRequestRecoverPasswordProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 export interface RequestRecoverPasswordProps {
   data: unknown;
 }
 export interface UseResetPasswordProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
   resetToken: string | string[];
 }
 export interface ResetPasswordProps {

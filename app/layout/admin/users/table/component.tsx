@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { format } from 'date-fns';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { useAdminUsers } from 'hooks/admin';
@@ -16,9 +16,7 @@ import DOWNLOADS from 'services/downloads';
 import CellAdmin from './cells/admin';
 import CellBlock from './cells/block';
 
-export interface AdminUsersTableProps {
-
-}
+export interface AdminUsersTableProps {}
 
 export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
   const [page, setPage] = useState(1);
@@ -70,15 +68,18 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
     ];
   }, []);
 
-  const initialState = useMemo(() => ({
-    pageIndex: page - 1,
-    sortBy: [
-      {
-        id: sort.id,
-        desc: sort.direction === 'desc',
-      },
-    ],
-  }), [page, sort]);
+  const initialState = useMemo(
+    () => ({
+      pageIndex: page - 1,
+      sortBy: [
+        {
+          id: sort.id,
+          desc: sort.direction === 'desc',
+        },
+      ],
+    }),
+    [page, sort]
+  );
 
   const onPageChange = useCallback((p) => {
     setPage(p);
@@ -95,10 +96,10 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
     setSearch(v);
   }, 250);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const onDownloadUsersData = useCallback(async () => {
-    const { data: blob, status } = await DOWNLOADS.request({
+    const { data: blob, status } = await DOWNLOADS.request<ArrayBuffer>({
       url: '/users/csv',
       responseType: 'arraybuffer',
       headers: {
@@ -117,22 +118,22 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
     link.remove();
 
     if (status !== 200) {
-      addToast('download-error', (
+      addToast(
+        'download-error',
         <>
           <h2 className="font-medium">Error!</h2>
-          <ul className="text-sm">
-            Data not downloaded
-          </ul>
-        </>
-      ), {
-        level: 'error',
-      });
+          <ul className="text-sm">Data not downloaded</ul>
+        </>,
+        {
+          level: 'error',
+        }
+      );
     }
   }, [addToast, session]);
 
   return (
     <div className="space-y-5">
-      <div className="flex justify-between w-full">
+      <div className="flex w-full justify-between">
         <div className="max-w-lg">
           <Search
             id="published-project-search"
@@ -144,14 +145,8 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
             onChange={onSearch}
           />
         </div>
-        <Button
-          theme="secondary"
-          size="base"
-          type="button"
-          onClick={onDownloadUsersData}
-        >
+        <Button theme="secondary" size="base" type="button" onClick={onDownloadUsersData}>
           Download data
-
         </Button>
       </div>
 

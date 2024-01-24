@@ -1,15 +1,19 @@
-import React, {
-  createContext, useCallback, useContext, useState,
-} from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 
 import { BeaconProps, HelpContextProps, HelpProviderProps } from './types';
 
 const HelpContext = createContext<HelpContextProps>({
   active: false,
-  onActive: (active) => { console.info(active); },
+  onActive: (active) => {
+    console.info(active);
+  },
   beacons: {},
-  addBeacon: (beacon) => { console.info(beacon); },
-  removeBeacon: (beacon) => { console.info(beacon); },
+  addBeacon: (beacon) => {
+    console.info(beacon);
+  },
+  removeBeacon: (beacon) => {
+    console.info(beacon);
+  },
 });
 
 // Hook for child components to get the toast object ...
@@ -18,9 +22,7 @@ export const useHelp = () => {
   const ctx = useContext(HelpContext);
 
   if (!ctx) {
-    throw Error(
-      'The `useHelp` hook must be called from a descendent of the `HelpProvider`.',
-    );
+    throw Error('The `useHelp` hook must be called from a descendent of the `HelpProvider`.');
   }
 
   return {
@@ -34,17 +36,18 @@ export const useHelp = () => {
 
 // Provider component that wraps your app and makes toast object ...
 // ... available to any child component that calls useHelp().
-export function HelpProvider({
-  children,
-}: HelpProviderProps) {
+export function HelpProvider({ children }: HelpProviderProps) {
   const [active, setActive] = useState(false);
   const [beacons, setBeacons] = useState<Record<string, BeaconProps>>({});
 
-  const onActive = useCallback((a: boolean) => {
-    return setActive(a);
-  }, [setActive]);
+  const onActive = useCallback(
+    (a: boolean) => {
+      return setActive(a);
+    },
+    [setActive]
+  );
 
-  const addBeacon = useCallback(({ id, state, update }) => {
+  const addBeacon = useCallback(({ id, state, update }: BeaconProps) => {
     setBeacons((prevBeacons) => {
       return {
         ...prevBeacons,
@@ -57,10 +60,13 @@ export function HelpProvider({
     });
   }, []);
 
-  const removeBeacon = useCallback((id: string) => {
-    const { [id]: omitted, ...rest } = beacons;
-    setBeacons(rest);
-  }, [beacons]);
+  const removeBeacon = useCallback(
+    (id: string) => {
+      const { [id]: omitted, ...rest } = beacons;
+      setBeacons(rest);
+    },
+    [beacons]
+  );
 
   return (
     <HelpContext.Provider

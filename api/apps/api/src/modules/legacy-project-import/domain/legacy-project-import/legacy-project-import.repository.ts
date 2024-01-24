@@ -10,8 +10,10 @@ export const legacyProjectImportSaveError = Symbol(
   'legacy project import save error',
 );
 
-export type LegacyProjectImportRepositoryFindErrors = typeof legacyProjectImportNotFound;
-export type LegacyProjectImportRepositorySaveErrors = typeof legacyProjectImportSaveError;
+export type LegacyProjectImportRepositoryFindErrors =
+  typeof legacyProjectImportNotFound;
+export type LegacyProjectImportRepositorySaveErrors =
+  typeof legacyProjectImportSaveError;
 
 export abstract class LegacyProjectImportRepository {
   abstract find(

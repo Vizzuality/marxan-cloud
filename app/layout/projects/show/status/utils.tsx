@@ -1,19 +1,29 @@
-import { useMemo } from 'react';
+import { MutableRefObject, useMemo } from 'react';
 
 import groupBy from 'lodash/groupBy';
 
+import { Job } from 'types/api/job';
+
 import { TEXTS_FAILURE, TEXTS_RUNNING } from './constants';
 
-const getStatus = (arr) => {
-  if (arr.some(((d) => d.status === 'failure'))) return 'failure';
-  if (arr.some(((d) => d.status === 'running'))) return 'running';
+const getStatus = (arr: Job[]): Job['status'] => {
+  if (arr.some((d) => d.status === 'failure')) return 'failure';
+  if (arr.some((d) => d.status === 'running')) return 'running';
   return 'done';
 };
 
-export const useProjectJobs = (jobs) => {
+export const useProjectJobs = (jobs): Job[] => {
   return useMemo(() => {
     const groups = groupBy(jobs, (j) => {
-      if (['featuresWithPuIntersection', 'specification', 'geofeatureCopy', 'geofeatureSplit', 'geofeatureStrat'].includes(j.kind)) {
+      if (
+        [
+          'featuresWithPuIntersection',
+          'specification',
+          'geofeatureCopy',
+          'geofeatureSplit',
+          'geofeatureStrat',
+        ].includes(j.kind)
+      ) {
         return 'features';
       }
 
@@ -23,7 +33,7 @@ export const useProjectJobs = (jobs) => {
     return Object.keys(groups).map((k) => {
       const status = getStatus(groups[k]);
       const isoDate = groups[k].reduce((a, b) => {
-        return (a.isoDate > b.isoDate) ? a.isoDate : b.isoDate;
+        return a.isoDate > b.isoDate ? a.isoDate : b.isoDate;
       }, 0);
 
       return {
@@ -35,7 +45,7 @@ export const useProjectJobs = (jobs) => {
   }, [jobs]);
 };
 
-export const useProjectJobFailure = (jobs, lastJobCheck) => {
+export const useProjectJobFailure = (jobs: Job[], lastJobCheck: number) => {
   return useMemo(() => {
     return jobs.find((j) => {
       const jobTimestamp = new Date(j.isoDate).getTime();
@@ -44,7 +54,7 @@ export const useProjectJobFailure = (jobs, lastJobCheck) => {
   }, [jobs, lastJobCheck]);
 };
 
-export const useProjectTextFailure = (JOB_FAILURE) => {
+export const useProjectTextFailure = (JOB_FAILURE: Job) => {
   return useMemo(() => {
     if (JOB_FAILURE && TEXTS_FAILURE[JOB_FAILURE.kind]) {
       return TEXTS_FAILURE[JOB_FAILURE.kind]();
@@ -58,7 +68,7 @@ export const useProjectTextFailure = (JOB_FAILURE) => {
   }, [JOB_FAILURE]);
 };
 
-export const useProjectJobDone = (jobs, lastJobCheck) => {
+export const useProjectJobDone = (jobs: Job[], lastJobCheck: number) => {
   return useMemo(() => {
     return jobs.find((j) => {
       const jobTimestamp = new Date(j.isoDate).getTime();
@@ -67,27 +77,13 @@ export const useProjectJobDone = (jobs, lastJobCheck) => {
   }, [jobs, lastJobCheck]);
 };
 
-export const useProjectTextDone = (JOB_DONE, JOB_DONE_REF) => {
-  return useMemo(() => {
-    if (JOB_DONE && TEXTS_RUNNING[JOB_DONE.kind]) {
-      return TEXTS_RUNNING[JOB_DONE.kind || JOB_DONE_REF?.current?.kind]();
-    }
-
-    if (JOB_DONE && !TEXTS_RUNNING[JOB_DONE.kind]) {
-      console.warn(`${JOB_DONE.kind} does not have a proper TEXT`);
-    }
-
-    return null;
-  }, [JOB_DONE, JOB_DONE_REF]);
-};
-
-export const useProjectJobRunning = (jobs, JOB_FAILURE) => {
+export const useProjectJobRunning = (jobs: Job[], JOB_FAILURE: Job) => {
   return useMemo(() => {
     return !JOB_FAILURE && jobs.find((j) => j.status === 'running');
   }, [jobs, JOB_FAILURE]);
 };
 
-export const useProjectTextRunning = (JOB_RUNNING, JOB_DONE_REF) => {
+export const useProjectTextRunning = (JOB_RUNNING: Job, JOB_DONE_REF: MutableRefObject<Job>) => {
   return useMemo(() => {
     if (JOB_RUNNING && TEXTS_RUNNING[JOB_RUNNING.kind]) {
       return TEXTS_RUNNING[JOB_RUNNING.kind || JOB_DONE_REF?.current?.kind]();

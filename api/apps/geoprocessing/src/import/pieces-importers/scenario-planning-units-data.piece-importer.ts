@@ -24,15 +24,17 @@ import {
 @Injectable()
 @PieceImportProvider()
 export class ScenarioPlanningUnitsDataPieceImporter
-  implements ImportPieceProcessor {
+  implements ImportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ScenarioPlanningUnitsDataPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioPlanningUnitsDataPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioPlanningUnitsData;
@@ -62,11 +64,8 @@ export class ScenarioPlanningUnitsDataPieceImporter
       const buffer = await readableToBuffer(readableOrError.right);
       const stringScenarioPlanningUnitsDataOrError = buffer.toString();
 
-      const {
-        planningUnitsData,
-      }: ScenarioPlanningUnitsDataContent = JSON.parse(
-        stringScenarioPlanningUnitsDataOrError,
-      );
+      const { planningUnitsData }: ScenarioPlanningUnitsDataContent =
+        JSON.parse(stringScenarioPlanningUnitsDataOrError);
       const projectPuIdByPuid: Record<number, string> = {};
 
       await this.entityManager.transaction(async (em) => {

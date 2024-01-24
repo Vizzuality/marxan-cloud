@@ -16,14 +16,15 @@ import {
 @Injectable()
 @PieceImportProvider()
 export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    PlanningAreaGadmPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(PlanningAreaGadmPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (

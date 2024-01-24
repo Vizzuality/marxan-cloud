@@ -110,7 +110,8 @@ it('returns errors and warnings of a legacy project import', async () => {
 
   await fixtures.GivenFirstBatchFailed(errors);
 
-  const result = await fixtures.WhenGettingErrorsAndWarningsOfALegacyProjectImport();
+  const result =
+    await fixtures.WhenGettingErrorsAndWarningsOfALegacyProjectImport();
 
   await fixtures.ThenLegacyProjectImportErrorsAreReported(result, errors);
 });
@@ -301,14 +302,15 @@ const getFixtures = async () => {
       const result = await runLegacyProjectImport(projectId, opts);
       expect(result.body.projectId).toBeDefined();
     },
-    WhenGettingErrorsAndWarningsOfALegacyProjectImport: async (): Promise<GetLegacyProjectImportErrorsResponseDto> => {
-      const result = await request(app.getHttpServer())
-        .get(`/api/v1/projects/import/legacy/${projectId}/validation-results`)
-        .set('Authorization', `Bearer ${token}`)
-        .expect(200);
+    WhenGettingErrorsAndWarningsOfALegacyProjectImport:
+      async (): Promise<GetLegacyProjectImportErrorsResponseDto> => {
+        const result = await request(app.getHttpServer())
+          .get(`/api/v1/projects/import/legacy/${projectId}/validation-results`)
+          .set('Authorization', `Bearer ${token}`)
+          .expect(200);
 
-      return result.body;
-    },
+        return result.body;
+      },
     ThenALegacyProjectImportIsCreated: async (
       projectName: string,
       projectDescription: string,
@@ -319,12 +321,14 @@ const getFixtures = async () => {
 
       expect(status).toBe(LegacyProjectImportStatuses.AcceptingFiles);
 
-      const project = await projectRepo.findOne(projectId);
+      const project = await projectRepo.findOne({ where: { id: projectId } });
       expect(project).toBeDefined();
       expect(project!.name).toEqual(projectName);
       expect(project!.description).toEqual(projectDescription);
 
-      const scenario = await scenarioRepo.findOne(scenarioId);
+      const scenario = await scenarioRepo.findOne({
+        where: { id: scenarioId },
+      });
       expect(scenario).toBeDefined();
       expect(scenario!.solutionsAreLocked).toEqual(false);
     },
@@ -346,7 +350,9 @@ const getFixtures = async () => {
 
       const { pieces, status, scenarioId } = legacyProjectImport.toSnapshot();
 
-      const scenario = await scenarioRepo.findOne(scenarioId);
+      const scenario = await scenarioRepo.findOne({
+        where: { id: scenarioId },
+      });
       expect(scenario).toBeDefined();
       expect(scenario!.solutionsAreLocked).toEqual(opts.solutionsAreLocked);
 

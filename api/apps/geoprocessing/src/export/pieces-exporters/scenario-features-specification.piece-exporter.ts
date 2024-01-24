@@ -62,17 +62,19 @@ type FeaturesById = Record<string, string>;
 @Injectable()
 @PieceExportProvider()
 export class ScenarioFeaturesSpecificationPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ScenarioFeaturesSpecificationPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectRepository(ScenarioFeaturesData)
     private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioFeaturesSpecificationPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.FeaturesSpecification;
@@ -136,7 +138,8 @@ export class ScenarioFeaturesSpecificationPieceExporter
     scenarioFeatureConfigs: SelectScenarioFeaturesConfigs[],
     scenarioFeaturesDataById: ScenarioFeaturesDataById,
   ): Promise<ScenarioFeaturesConfigsBySpecificationId> {
-    const scenarioFeatureConfigsBySpecificationId: ScenarioFeaturesConfigsBySpecificationId = {};
+    const scenarioFeatureConfigsBySpecificationId: ScenarioFeaturesConfigsBySpecificationId =
+      {};
     const featuresIds = new Set(
       scenarioFeatureConfigs.flatMap((config) => {
         if (!isDefined(config.againstFeatureId)) return [config.baseFeatureId];
@@ -184,14 +187,13 @@ export class ScenarioFeaturesSpecificationPieceExporter
   private async getCandidateAndActiveSpecificationsForScenario(
     scenarioId: string,
   ): Promise<{ candidate: string | null; active: string | null }> {
-    const [specificationIds]: [
-      SelectScenarioResult | undefined,
-    ] = await this.apiEntityManager
-      .createQueryBuilder()
-      .select('candidate_specification_id, active_specification_id')
-      .from('scenarios', 's')
-      .where('id = :scenarioId', { scenarioId })
-      .execute();
+    const [specificationIds]: [SelectScenarioResult | undefined] =
+      await this.apiEntityManager
+        .createQueryBuilder()
+        .select('candidate_specification_id, active_specification_id')
+        .from('scenarios', 's')
+        .where('id = :scenarioId', { scenarioId })
+        .execute();
 
     if (!specificationIds)
       throw new Error(`Scenario with id ${scenarioId} doesn't exist`);
@@ -203,18 +205,20 @@ export class ScenarioFeaturesSpecificationPieceExporter
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const scenarioSpecificationIds = await this.getCandidateAndActiveSpecificationsForScenario(
-      input.resourceId,
-    );
+    const scenarioSpecificationIds =
+      await this.getCandidateAndActiveSpecificationsForScenario(
+        input.resourceId,
+      );
 
-    const specifications: SelectSpecificationsResult[] = await this.apiEntityManager
-      .createQueryBuilder()
-      .select('id')
-      .addSelect('draft')
-      .addSelect('raw')
-      .from('specifications', 's')
-      .where('scenario_id = :scenarioId', { scenarioId: input.resourceId })
-      .execute();
+    const specifications: SelectSpecificationsResult[] =
+      await this.apiEntityManager
+        .createQueryBuilder()
+        .select('id')
+        .addSelect('draft')
+        .addSelect('raw')
+        .from('specifications', 's')
+        .where('scenario_id = :scenarioId', { scenarioId: input.resourceId })
+        .execute();
     const specificationIds = specifications.map(
       (specification) => specification.id,
     );
@@ -229,30 +233,31 @@ export class ScenarioFeaturesSpecificationPieceExporter
         relations: ['featureData'],
       });
 
-      const scenarioFeaturesDataById = this.getScenarioFeaturesDataById(
-        scenarioFeaturesData,
-      );
+      const scenarioFeaturesDataById =
+        this.getScenarioFeaturesDataById(scenarioFeaturesData);
 
-      const scenarioFeatureConfigs: SelectScenarioFeaturesConfigs[] = await this.apiEntityManager
-        .createQueryBuilder()
-        .select('specification_id', 'specificationId')
-        .addSelect('base_feature_id', 'baseFeatureId')
-        .addSelect('against_feature_id', 'againstFeatureId')
-        .addSelect('operation', 'operation')
-        .addSelect('features_determined', 'featuresDetermined')
-        .addSelect('split_by_property', 'splitByProperty')
-        .addSelect('select_sub_sets', 'selectSubSets')
-        .addSelect('features')
-        .from('specification_feature_configs', 'configs')
-        .where('specification_id IN (:...specificationIds)', {
-          specificationIds,
-        })
-        .execute();
+      const scenarioFeatureConfigs: SelectScenarioFeaturesConfigs[] =
+        await this.apiEntityManager
+          .createQueryBuilder()
+          .select('specification_id', 'specificationId')
+          .addSelect('base_feature_id', 'baseFeatureId')
+          .addSelect('against_feature_id', 'againstFeatureId')
+          .addSelect('operation', 'operation')
+          .addSelect('features_determined', 'featuresDetermined')
+          .addSelect('split_by_property', 'splitByProperty')
+          .addSelect('select_sub_sets', 'selectSubSets')
+          .addSelect('features')
+          .from('specification_feature_configs', 'configs')
+          .where('specification_id IN (:...specificationIds)', {
+            specificationIds,
+          })
+          .execute();
 
-      const scenarioFeatureConfigsBySpecificationId = await this.getScenarioFeatureConfigsBySpecificationId(
-        scenarioFeatureConfigs,
-        scenarioFeaturesDataById,
-      );
+      const scenarioFeatureConfigsBySpecificationId =
+        await this.getScenarioFeatureConfigsBySpecificationId(
+          scenarioFeatureConfigs,
+          scenarioFeaturesDataById,
+        );
 
       const featuresByIdFromRaw = await this.getFeaturesByIdFromRaw(
         specifications.map((specification) => specification.raw),

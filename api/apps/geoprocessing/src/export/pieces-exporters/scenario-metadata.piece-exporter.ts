@@ -24,6 +24,7 @@ type SelectScenarioResult = {
   solutions_are_locked: boolean;
   status: ScenarioMetadataContent['status'] | null;
   type: string;
+  cost_surface_id: string;
 };
 
 type SelectScenarioBlmResult = {
@@ -35,14 +36,15 @@ type SelectScenarioBlmResult = {
 @Injectable()
 @PieceExportProvider()
 export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioMetadataPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ScenarioMetadataPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioMetadata;
@@ -51,9 +53,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const scenarioId = input.resourceId;
 
-    const [scenario]: [
-      SelectScenarioResult,
-    ] = await this.entityManager
+    const [scenario]: [SelectScenarioResult] = await this.entityManager
       .createQueryBuilder()
       .select([
         'name',
@@ -65,6 +65,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
         'status',
         'ran_at_least_once',
         'solutions_are_locked',
+        'cost_surface_id',
       ])
       .from('scenarios', 's')
       .where('s.id = :scenarioId', { scenarioId })
@@ -76,9 +77,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const [blmRange]: [
-      SelectScenarioBlmResult,
-    ] = await this.entityManager
+    const [blmRange]: [SelectScenarioBlmResult] = await this.entityManager
       .createQueryBuilder()
       .select(['values', 'defaults', 'range'])
       .from('scenario_blms', 'pblms')
@@ -102,6 +101,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       solutionsAreLocked: scenario.solutions_are_locked,
       type: scenario.type,
       status: scenario.status ?? undefined,
+      cost_surface_id: scenario.cost_surface_id,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(

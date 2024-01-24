@@ -57,7 +57,7 @@ export class PublishedProjectService {
   ): Promise<
     Either<errors | typeof alreadyPublished | typeof exportError, true>
   > {
-    const project = await this.projectRepository.findOne(id);
+    const project = await this.projectRepository.findOne({ where: { id } });
     if (!project) {
       return left(notFound);
     }
@@ -67,7 +67,7 @@ export class PublishedProjectService {
     }
 
     const isProjectAlreadyPublished = await this.publicProjectsRepo
-      .findOne({ id })
+      .findOne({ where: { id } })
       .then((result) => (result ? true : false));
     if (isProjectAlreadyPublished) {
       return left(alreadyPublished);
@@ -99,11 +99,8 @@ export class PublishedProjectService {
     // like it does not belong here at all anyways, but right now there
     // is not a better place to deal with this.
 
-    const {
-      featuredScenarioId,
-      config,
-      ...projectWithoutScenario
-    } = projectToPublish;
+    const { featuredScenarioId, config, ...projectWithoutScenario } =
+      projectToPublish;
 
     let pngDataResult: string | undefined;
 
@@ -142,7 +139,7 @@ export class PublishedProjectService {
   ): Promise<
     Either<errors | typeof notPublished | typeof underModerationError, true>
   > {
-    const project = await this.projectRepository.findOne(id);
+    const project = await this.projectRepository.findOne({ where: { id } });
 
     if (!project) {
       return left(notFound);
@@ -154,7 +151,9 @@ export class PublishedProjectService {
       return left(accessDenied);
     }
 
-    const publicProject = await this.publicProjectsRepo.findOne({ id });
+    const publicProject = await this.publicProjectsRepo.findOne({
+      where: { id },
+    });
     if (!publicProject?.id) {
       return left(notPublished);
     }
@@ -172,7 +171,9 @@ export class PublishedProjectService {
     input: PublishProjectDto,
     userId: string,
   ): Promise<Either<typeof accessDenied | typeof notFound, PublishedProject>> {
-    const publicProject = await this.publicProjectsRepo.findOne(projectId);
+    const publicProject = await this.publicProjectsRepo.findOne({
+      where: { id: projectId },
+    });
     if (!publicProject) {
       return left(notFound);
     }
@@ -253,7 +254,7 @@ export class PublishedProjectService {
     id: string,
     info?: ProjectsRequest,
   ): Promise<Either<typeof notFound | typeof accessDenied, PublishedProject>> {
-    const result = await this.publicProjectsRepo.findOne(id);
+    const result = await this.publicProjectsRepo.findOne({ where: { id } });
     if (!result) {
       return left(notFound);
     }

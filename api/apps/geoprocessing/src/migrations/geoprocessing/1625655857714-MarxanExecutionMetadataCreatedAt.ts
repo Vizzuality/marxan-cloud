@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class MarxanExecutionMetadataCreatedAt1625655857714
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   name = 'MarxanExecutionMetadataCreatedAt1625655857714';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

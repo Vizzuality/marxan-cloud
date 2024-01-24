@@ -155,7 +155,8 @@ export class AdminAreasController {
       areaId,
       fetchSpecification,
     );
-    return await this.service.serialize(results.data, results.metadata);
+
+    return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find administrative area by id' })

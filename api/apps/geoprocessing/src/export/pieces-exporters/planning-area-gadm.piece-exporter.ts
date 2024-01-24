@@ -27,14 +27,15 @@ type QueryResult = {
 @Injectable()
 @PieceExportProvider()
 export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    PlanningAreaGadmPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(PlanningAreaGadmPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -48,9 +49,7 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
       throw new Error(`Exporting scenario is not yet supported.`);
     }
 
-    const [gadm]: [
-      QueryResult,
-    ] = await this.entityManager
+    const [gadm]: [QueryResult] = await this.entityManager
       .createQueryBuilder()
       .select('country_id')
       .addSelect('admin_area_l1_id')

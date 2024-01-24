@@ -31,11 +31,11 @@ export class ScenarioFeaturesService extends AppBaseService<
     });
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ScenarioFeaturesData>,
     filters?: FiltersSpecification['filter'],
     info?: UserSearchCriteria,
-  ): SelectQueryBuilder<ScenarioFeaturesData> {
+  ): Promise<SelectQueryBuilder<ScenarioFeaturesData>> {
     const scenarioId = info?.params?.scenarioId;
     if (scenarioId) {
       return query.andWhere(`${this.alias}.scenario_id = :scenarioId`, {
@@ -77,6 +77,15 @@ export class ScenarioFeaturesService extends AppBaseService<
         .filter((def) => def),
       scenarioFeaturesData.length,
     ];
+  }
+
+  async isFeaturePresentInAnyScenario(featureId: string): Promise<boolean> {
+    const result = await this.remoteScenarioFeatures.query(
+      `select count(*) from scenario_features_data where feature_class_id in (select id from features_data where feature_id = $1)`,
+      [featureId],
+    );
+
+    return result[0].count > 0;
   }
 
   get serializerConfig(): JSONAPISerializerConfig<ScenarioFeaturesData> {

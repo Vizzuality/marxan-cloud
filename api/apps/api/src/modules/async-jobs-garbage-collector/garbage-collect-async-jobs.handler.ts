@@ -14,7 +14,8 @@ import { ScenarioAsyncJobsGarbageCollector } from './scenario-async-jobs.garbage
 
 @CommandHandler(GarbageCollectAsyncJobs)
 export class GarbageCollectAsyncJobsHandler
-  implements IInferredCommandHandler<GarbageCollectAsyncJobs> {
+  implements IInferredCommandHandler<GarbageCollectAsyncJobs>
+{
   constructor(
     @InjectRepository(UsersProjectsApiEntity)
     private readonly usersProjectsRepo: Repository<UsersProjectsApiEntity>,

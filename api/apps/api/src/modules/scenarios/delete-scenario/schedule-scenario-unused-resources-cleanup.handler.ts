@@ -7,22 +7,22 @@ import { ScheduleCleanupForScenarioUnusedResources } from './schedule-scenario-u
 
 @CommandHandler(ScheduleCleanupForScenarioUnusedResources)
 export class ScheduleCleanupForScenarioUnusedResourcesHandler
-  implements
-    IInferredCommandHandler<ScheduleCleanupForScenarioUnusedResources> {
+  implements IInferredCommandHandler<ScheduleCleanupForScenarioUnusedResources>
+{
+  private readonly logger: Logger = new Logger(
+    ScheduleCleanupForScenarioUnusedResourcesHandler.name,
+  );
+
   constructor(
     @Inject(unusedResourcesCleanupQueueToken)
     private readonly queue: Queue<UnusedResourcesCleanupJobInput>,
-    private logger: Logger,
-  ) {
-    this.logger.setContext(
-      ScheduleCleanupForScenarioUnusedResourcesHandler.name,
-    );
-  }
+  ) {}
 
   async execute({
     scenarioId,
   }: ScheduleCleanupForScenarioUnusedResources): Promise<void> {
     const job = await this.queue.add(`scenario-unused-resources-cleanup`, {
+      type: 'Scenario',
       scenarioId,
     });
 

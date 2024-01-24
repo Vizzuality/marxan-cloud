@@ -9,7 +9,8 @@ import { unknownError } from '../../../utils/src/file-operations';
 import { LegacyProjectImportFilesRepository } from '../domain';
 
 export class LegacyProjectImportFilesMemoryRepository
-  implements LegacyProjectImportFilesRepository {
+  implements LegacyProjectImportFilesRepository
+{
   private files: Record<string, Readable> = {};
   public saveFailure = false;
 

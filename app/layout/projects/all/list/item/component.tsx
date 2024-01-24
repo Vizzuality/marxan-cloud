@@ -1,11 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-
-import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import type { Project } from 'types/project-model';
-import { ROLES } from 'utils/constants-roles';
+import isEmpty from 'lodash/isEmpty';
 
 import { useOwnsProject, useProjectRole } from 'hooks/permissions';
 import { useProjectUsers } from 'hooks/project-users';
@@ -13,6 +9,9 @@ import { useProjectUsers } from 'hooks/project-users';
 import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
+import type { Project } from 'types/api/project';
+import { cn } from 'utils/cn';
+import { ROLES } from 'utils/constants-roles';
 
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -67,33 +66,46 @@ export const Item: React.FC<ItemProps> = ({
     setAnimate('leave');
   }, [setAnimate]);
 
-  const handleClick = useCallback((e) => {
-    e.stopPropagation();
-    onClick(e);
-  }, [onClick]);
+  const handleClick = useCallback(
+    (e) => {
+      e.stopPropagation();
+      onClick(e);
+    },
+    [onClick]
+  );
 
-  const handleDownload = useCallback((e) => {
-    e.stopPropagation();
-    onDownload(e);
-  }, [onDownload]);
+  const handleDownload = useCallback(
+    (e) => {
+      e.stopPropagation();
+      onDownload(e);
+    },
+    [onDownload]
+  );
 
-  const handleDuplicate = useCallback((e) => {
-    e.stopPropagation();
-    onDuplicate(e);
-  }, [onDuplicate]);
+  const handleDuplicate = useCallback(
+    (e) => {
+      e.stopPropagation();
+      onDuplicate(e);
+    },
+    [onDuplicate]
+  );
 
-  const handleDelete = useCallback((e) => {
-    e.stopPropagation();
-    onDelete(e);
-  }, [onDelete]);
+  const handleDelete = useCallback(
+    (e) => {
+      e.stopPropagation();
+      onDelete(e);
+    },
+    [onDelete]
+  );
 
   return (
     <AnimatePresence>
       <div
         role="presentation"
         style={style}
-        className={cx({
-          'relative flex flex-col rounded-4xl bg-gray-800 px-7 py-8 text-white cursor-pointer text-left': true,
+        className={cn({
+          'relative flex cursor-pointer flex-col rounded-[40px] bg-gray-900 px-7 py-8 text-left text-white':
+            true,
           [className]: !!className,
         })}
         onMouseEnter={handleMouseEnter}
@@ -109,17 +121,18 @@ export const Item: React.FC<ItemProps> = ({
           >
             <div className="flex space-x-2">
               <div
-                className={cx({
-                  'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
+                className={cn({
+                  'rounded-3xl px-2.5 py-1 text-sm opacity-0 transition-opacity': true,
                   'opacity-100': !!ROLES[projectRole],
-                  'bg-yellow-500 bg-opacity-20': isOwner,
-                  'border border-gray-500': !isOwner,
+                  'bg-yellow-600 bg-opacity-20': isOwner,
+                  'border border-gray-600': !isOwner,
                 })}
               >
-                <p className={cx({
-                  'text-yellow-500': isOwner,
-                  'text-white': !isOwner,
-                })}
+                <p
+                  className={cn({
+                    'text-yellow-600': isOwner,
+                    'text-white': !isOwner,
+                  })}
                 >
                   {ROLES[projectRole]}
                 </p>
@@ -127,61 +140,58 @@ export const Item: React.FC<ItemProps> = ({
 
               {isPublic && (
                 <div
-                  className={cx({
-                    'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
-                    'opacity-100 bg-primary-500 bg-opacity-20': !!ROLES[projectRole],
+                  className={cn({
+                    'rounded-3xl px-2.5 py-1 text-sm opacity-0 transition-opacity': true,
+                    'bg-primary-500 bg-opacity-20 opacity-100': !!ROLES[projectRole],
                   })}
                 >
-                  <p className={cx({
-                    'text-primary-500': ROLES[projectRole],
-                  })}
+                  <p
+                    className={cn({
+                      'text-primary-500': ROLES[projectRole],
+                    })}
                   >
                     {!underModeration && 'Public'}
                     {underModeration && 'Under moderation'}
                   </p>
                 </div>
               )}
-
             </div>
 
             <div
-              className={cx({
+              className={cn({
                 'inline-flex opacity-0 transition-opacity': true,
                 'opacity-100': !isEmpty(userColors),
               })}
             >
               <div className="flex items-center text-sm">
                 <ul className="flex">
-                  {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
-                    const {
-                      user: {
-                        email, displayName, id: userId, avatarDataUrl,
-                      },
-                    } = u;
+                  {!!projectUsersVisible?.length &&
+                    projectUsersVisible.map((u, i) => {
+                      const {
+                        user: { email, displayName, id: userId, avatarDataUrl },
+                      } = u;
 
-                    return (
-                      <li
-                        key={userId}
-                        className={cx({
-                          '-ml-3': i !== 0,
-                        })}
-                      >
-                        <Avatar
-                          className="text-sm uppercase"
-                          bgColor={userColors[userId]}
-                          bgImage={avatarDataUrl}
-                          name={displayName || email}
+                      return (
+                        <li
+                          key={userId}
+                          className={cn({
+                            '-ml-3': i !== 0,
+                          })}
                         >
-                          {!avatarDataUrl && (displayName || email).slice(0, 2)}
-                        </Avatar>
-                      </li>
-                    );
-                  })}
+                          <Avatar
+                            className="text-sm uppercase"
+                            bgColor={userColors[userId]}
+                            bgImage={avatarDataUrl}
+                            name={displayName || email}
+                          >
+                            {!avatarDataUrl && (displayName || email).slice(0, 2)}
+                          </Avatar>
+                        </li>
+                      );
+                    })}
 
                   {projectUsers?.length > projectUsersVisibleSize && (
-                    <Avatar
-                      className="-ml-3 text-sm text-white uppercase bg-primary-700"
-                    >
+                    <Avatar className="-ml-3 bg-primary-700 text-sm uppercase text-white">
                       {`+${projectUsers.length - projectUsersVisibleSize}`}
                     </Avatar>
                   )}
@@ -190,13 +200,13 @@ export const Item: React.FC<ItemProps> = ({
             </div>
           </div>
 
-          <h3 className="text-xs font-medium tracking-widest uppercase font-heading pt-7">
+          <h3 className="pt-7 font-heading text-xs font-medium uppercase tracking-widest">
             {area}
           </h3>
 
           <div className="relative">
             <motion.div
-              className="absolute left-0 h-full transform -translate-y-1/2 bg-primary-500 top-1/2"
+              className="absolute left-0 top-1/2 h-full -translate-y-1/2 transform bg-primary-500"
               style={{
                 width: 3,
               }}
@@ -224,7 +234,7 @@ export const Item: React.FC<ItemProps> = ({
             />
 
             <motion.h2
-              className="mt-3 mb-10 text-lg font-medium break-words font-heading"
+              className="mb-10 mt-3 break-words font-heading text-lg font-medium"
               initial={{
                 x: 0,
               }}
@@ -253,31 +263,18 @@ export const Item: React.FC<ItemProps> = ({
 
           <div className="mb-3 text-sm">
             <span>Last update:</span>
-            <span className="ml-2 text-primary-500">
-              {lastUpdateDistance || 'no scenario'}
-            </span>
+            <span className="ml-2 text-primary-500">{lastUpdateDistance || 'no scenario'}</span>
           </div>
-          <div className="text-sm opacity-50 clamp-2">{description}</div>
+          <div className="line-clamp-2 text-sm opacity-50">{description}</div>
         </div>
 
         <footer className="mt-7">
           <div className="flex">
-
-            <Button
-              className=""
-              theme="secondary"
-              size="xs"
-              onClick={handleDownload}
-            >
+            <Button className="" theme="secondary" size="xs" onClick={handleDownload}>
               Download
             </Button>
 
-            <Button
-              className="ml-3"
-              theme="secondary"
-              size="xs"
-              onClick={handleDuplicate}
-            >
+            <Button className="ml-3" theme="secondary" size="xs" onClick={handleDuplicate}>
               Duplicate
             </Button>
 
@@ -290,12 +287,11 @@ export const Item: React.FC<ItemProps> = ({
             >
               Delete
             </Button>
-
           </div>
         </footer>
 
         <motion.div
-          className="absolute transform -translate-y-1/2 right-4 top-1/2"
+          className="absolute right-4 top-1/2 -translate-y-1/2 transform"
           initial={{
             opacity: 0,
             x: -10,
@@ -318,7 +314,7 @@ export const Item: React.FC<ItemProps> = ({
             ease: 'anticipate',
           }}
         >
-          <Icon icon={ARROW_RIGHT_2_SVG} className="w-5 h-5 text-white opacity-25" />
+          <Icon icon={ARROW_RIGHT_2_SVG} className="h-5 w-5 text-white opacity-25" />
         </motion.div>
       </div>
     </AnimatePresence>

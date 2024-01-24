@@ -18,7 +18,8 @@ import { SpecificationOperation } from '@marxan/specification';
 
 @CommandHandler(CreateFeaturesCommand)
 export class CreateFeaturesHandler
-  implements IInferredCommandHandler<CreateFeaturesCommand> {
+  implements IInferredCommandHandler<CreateFeaturesCommand>
+{
   constructor(
     private readonly eventBus: EventBus,
     private readonly copyOperation: CopyOperation,

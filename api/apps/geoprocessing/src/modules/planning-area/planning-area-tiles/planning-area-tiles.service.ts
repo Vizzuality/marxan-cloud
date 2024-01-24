@@ -19,7 +19,6 @@ export class PlanningAreaTilesService {
   constructor(
     @InjectRepository(PlanningArea)
     private readonly repository: Repository<PlanningArea>,
-    @Inject('TileService')
     private readonly tileService: TileService,
   ) {}
 

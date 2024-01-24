@@ -1,8 +1,13 @@
 import {
+  Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
+  Patch,
   Req,
   Res,
   UseGuards,
@@ -36,7 +41,22 @@ import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-categ
 import { Request, Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
-import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import {
+  ImplementsAcl,
+  IsMissingAclImplementation,
+} from '@marxan-api/decorators/acl.decorator';
+import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
+import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
+import { UpdateProtectedAreaNameDto } from '@marxan-api/modules/protected-areas/dto/rename.protected-area.dto';
+import { isLeft } from 'fp-ts/Either';
+import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
+import { projectNotFound } from '@marxan-api/modules/projects/projects.service';
+import {
+  featureIsLinkedToOneOrMoreScenarios,
+  featureNotDeletable,
+  featureNotFound,
+} from '@marxan-api/modules/geo-features/geo-features.service';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -171,5 +191,60 @@ export class ProtectedAreasController {
     return await this.service.serialize(
       await this.service.getById(id, fetchSpecification),
     );
+  }
+
+  @ApiOperation({
+    description: `Updates the name of a protected by id`,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the protected area to be renamed',
+  })
+  @ApiOkResponse({
+    type: ProtectedAreaResult,
+  })
+  @ApiTags(inlineJobTag)
+  @Patch(`:id`)
+  async updateName(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() body: UpdateProtectedAreaNameDto,
+  ): Promise<ProtectedAreaResult> {
+    const result = await this.service.updateProtectedAreaName(
+      req.user.id,
+      id,
+      body,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left);
+    } else {
+      return this.service.serialize(result.right);
+    }
+  }
+
+  @ApiOperation({
+    description: 'Deletes a custom protected area by id',
+  })
+  @ApiParam({
+    name: 'protectedAreaId',
+    description: 'ID of the Protected Area to be deleted',
+  })
+  @ApiTags(inlineJobTag)
+  @Delete(':id')
+  async deleteFeature(
+    @Param('id') protectedAreaId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.service.deleteProtectedArea(
+      req.user.id,
+      protectedAreaId,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left);
+    } else {
+      return;
+    }
   }
 }

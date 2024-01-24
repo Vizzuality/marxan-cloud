@@ -1,5 +1,5 @@
 export enum LockStatus {
-  Unstated = 'unstated',
+  Available = 'available',
 
   /**
    * is always guaranteed to be tagged as included in the planning solution

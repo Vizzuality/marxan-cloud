@@ -8,8 +8,8 @@ export interface StaticColumnProps {
   description?: string;
   caption?: string;
   image?: string;
-  href?: string,
-  external?: boolean,
+  href?: string;
+  external?: boolean;
 }
 
 export const StaticColumn: React.FC<StaticColumnProps> = ({
@@ -23,18 +23,10 @@ export const StaticColumn: React.FC<StaticColumnProps> = ({
 }: StaticColumnProps) => {
   return (
     <div>
-      <h2 className="h-56 pb-10 text-4xl leading-relaxed font-heading max-w-max">
-        {title}
-      </h2>
-      {subtitle && (
-        <h3 className="mb-6 text-lg leading-8 max-w-max font-heading">
-          {subtitle}
-        </h3>
-      )}
+      <h2 className="h-56 max-w-max pb-10 font-heading text-4xl leading-relaxed">{title}</h2>
+      {subtitle && <h3 className="mb-6 max-w-max font-heading text-lg leading-8">{subtitle}</h3>}
       {description && (
-        <p className="mb-12 text-base leading-normal text-white max-w-max">
-          {description}
-        </p>
+        <p className="mb-12 max-w-max text-base leading-normal text-white">{description}</p>
       )}
       {image && (
         <div>
@@ -49,9 +41,7 @@ export const StaticColumn: React.FC<StaticColumnProps> = ({
           />
         </div>
       )}
-      {href && (
-        <ButtonLink caption={caption} href={href} external={external} theme="light" />
-      )}
+      {href && <ButtonLink caption={caption} href={href} external={external} theme="light" />}
     </div>
   );
 };

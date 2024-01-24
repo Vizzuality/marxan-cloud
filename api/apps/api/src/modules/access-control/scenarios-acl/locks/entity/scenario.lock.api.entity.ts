@@ -40,7 +40,6 @@ export class ScenarioLockEntity {
 
   @OneToOne(() => Scenario, {
     onDelete: 'CASCADE',
-    primary: true,
   })
   @JoinColumn({
     name: `scenario_id`,
@@ -50,7 +49,6 @@ export class ScenarioLockEntity {
 
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
-    primary: true,
   })
   @JoinColumn({
     name: `user_id`,
@@ -60,7 +58,6 @@ export class ScenarioLockEntity {
 
   @ManyToOne(() => IssuedAuthnToken, {
     onDelete: 'CASCADE',
-    primary: true,
   })
   @JoinColumn({
     name: `token_id`,

@@ -1,30 +1,29 @@
-import { SurfaceCostProcessor } from '@marxan-geoprocessing/modules/surface-cost/application/surface-cost-processor';
+import { CostSurfaceProcessor } from '@marxan-geoprocessing/modules/cost-surface/application/cost-surface-processor.service';
 import { INestApplication } from '@nestjs/common';
 import { PromiseType } from 'utility-types';
 import { bootstrapApplication, delay } from '../../../utils';
-import { createWorld } from './steps/world';
+import { createWorld } from '../steps/world';
 
 let app: INestApplication;
-let sut: SurfaceCostProcessor;
+let sut: CostSurfaceProcessor;
 let world: PromiseType<ReturnType<typeof createWorld>>;
 
-beforeAll(async () => {
-  app = await bootstrapApplication();
-  world = await createWorld(app);
-  sut = app.get(SurfaceCostProcessor);
-});
-
-afterAll(async () => {
-  await world.cleanup();
-  await app?.close();
-}, 500 * 1000);
-
 describe(`given scenario has some planning units`, () => {
+  beforeAll(async () => {
+    app = await bootstrapApplication();
+    sut = app.get(CostSurfaceProcessor);
+  });
   beforeEach(async () => {
+    world = await createWorld(app);
     await world.GivenPuCostDataExists();
   });
+
+  afterAll(async () => {
+    await world.cleanup();
+    await app?.close();
+  }, 500 * 1000);
   it(`updates cost surface`, async () => {
-    await sut.process(world.getShapefileWithCost());
+    await sut.process(world.getShapefileForScenarioWithCost());
     await delay(1000);
     await world.ThenCostIsUpdated();
   }, 10000);

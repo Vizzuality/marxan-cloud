@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useRef,
-} from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -11,6 +9,7 @@ import { useScenariosStatus } from 'hooks/scenarios';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import { Job } from 'types/api/job';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import PROCESSING_SVG from 'svgs/ui/processing.svg?sprite';
@@ -22,17 +21,13 @@ import {
   useProjectJobFailure,
   useProjectTextFailure,
   useProjectJobDone,
-  useProjectTextDone,
   useProjectJobRunning,
   useProjectTextRunning,
 } from './utils';
 
-export interface ProjectStatusProps {
-}
-
-export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
+export const ProjectStatus = (): JSX.Element => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { data: projectData } = useProject(pid);
   const { data: scenarioStatusData } = useScenariosStatus(pid);
@@ -40,22 +35,19 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
   const { jobs = [] } = scenarioStatusData || {};
 
   // Jobs
+
   const JOBS = useProjectJobs(jobs);
 
   // Failure
-  const JOB_FAILURE = useProjectJobFailure(
-    JOBS,
-    new Date(projectData?.lastModifiedAt).getTime(),
-  );
+  const JOB_FAILURE = useProjectJobFailure(JOBS, projectData?.metadata?.cache);
   const TEXT_FAILURE = useProjectTextFailure(JOB_FAILURE);
 
   // Done
-  const JOB_DONE_REF = useRef(null);
+  const JOB_DONE_REF = useRef<Job>(null);
   const JOB_DONE = useProjectJobDone(
     JOBS,
-    new Date(projectData?.lastModifiedAt).getTime(),
+    new Date(projectData?.metadata?.cache as number).getTime()
   );
-  const TEXT_DONE = useProjectTextDone(JOB_DONE, JOB_DONE_REF);
 
   // Running
   const JOB_RUNNING = useProjectJobRunning(JOBS, JOB_FAILURE);
@@ -91,40 +83,35 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
   }, [ACTIONS_FAILURE, JOB_FAILURE?.kind]);
 
   return (
-    <div className="absolute top-0 left-0 z-50 flex flex-col justify-end w-full h-full pointer-events-none">
-      {(JOB_RUNNING || JOB_FAILURE || JOB_DONE) && (
+    <div className="pointer-events-none absolute left-0 top-0 z-50 flex h-full w-full flex-col justify-end">
+      {(JOB_RUNNING || JOB_FAILURE) && (
         <motion.div
-          className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-75 pointer-events-auto"
+          className="pointer-events-auto absolute left-0 top-0 z-10 h-full w-full bg-black bg-opacity-75"
           key="status-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         />
       )}
 
-      {((JOB_RUNNING || JOB_DONE) && !JOB_FAILURE) && (
+      {JOB_RUNNING && !JOB_FAILURE && (
         <motion.div
-          className="absolute z-10 pointer-events-auto top-1/2 left-1/2"
+          className="pointer-events-auto absolute left-1/2 top-1/2 z-10"
           key="status-text"
           initial={{ opacity: 0, y: '-60%', x: '-50%' }}
           animate={{ opacity: 1, y: '-50%', x: '-50%' }}
         >
-          <div className="w-full max-w-md p-10 space-y-5 text-center">
-            <h3 className="text-xs tracking-wide uppercase font-heading">{TEXT_RUNNING || TEXT_DONE}</h3>
+          <div className="w-full max-w-md space-y-5 p-10 text-center">
+            <h3 className="font-heading text-xs uppercase tracking-wide">{TEXT_RUNNING}</h3>
 
             <Icon icon={PROCESSING_SVG} className="m-auto" style={{ width: 40, height: 10 }} />
 
-            <p className="text-xs tracking-wide text-center font-heading">
+            <p className="text-center font-heading text-xs tracking-wide">
               This task may take some time.
               <br />
               Meanwhile, you can go to your dashboard and do some other stuff.
             </p>
             <div className="flex justify-center space-x-2">
-              <Button
-                theme="primary-alt"
-                size="base"
-                href="/projects"
-                className="w-1/2"
-              >
+              <Button theme="primary-alt" size="base" href="/projects" className="w-1/2">
                 Go to dashboard
               </Button>
             </div>
@@ -134,22 +121,22 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
 
       {JOB_FAILURE && (
         <motion.div
-          className="absolute z-10 pointer-events-auto top-1/2 left-1/2"
+          className="pointer-events-auto absolute left-1/2 top-1/2 z-10"
           key="status-text"
           initial={{ opacity: 0, y: '-60%', x: '-50%' }}
           animate={{ opacity: 1, y: '-50%', x: '-50%' }}
         >
-          <div className="w-full max-w-md p-10 space-y-5 text-center">
-            <Icon icon={CLOSE_SVG} className="m-auto text-red-500" style={{ width: 20, height: 20 }} />
+          <div className="w-full max-w-md space-y-5 p-10 text-center">
+            <Icon
+              icon={CLOSE_SVG}
+              className="m-auto text-red-600"
+              style={{ width: 20, height: 20 }}
+            />
 
-            <h3 className="text-xs tracking-wide uppercase font-heading">{TEXT_FAILURE}</h3>
+            <h3 className="font-heading text-xs uppercase tracking-wide">{TEXT_FAILURE}</h3>
 
             <div className="flex justify-center space-x-2">
-              <Button
-                theme="primary-alt"
-                size="base"
-                onClick={onCloseFailure}
-              >
+              <Button theme="primary-alt" size="base" onClick={onCloseFailure}>
                 Close
               </Button>
             </div>

@@ -9,7 +9,8 @@ import { CalculateFeatures } from './calculate-features.command';
 
 @CommandHandler(CalculateFeatures)
 export class CalculateFeaturesHandler
-  implements IInferredCommandHandler<CalculateFeatures> {
+  implements IInferredCommandHandler<CalculateFeatures>
+{
   constructor(
     private readonly eventPublisher: EventPublisher,
     private readonly specificationRepository: SpecificationRepository,

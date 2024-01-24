@@ -7,16 +7,16 @@ import { unusedResourcesCleanupQueueToken } from '@marxan/unused-resources-clean
 
 @CommandHandler(ScheduleCleanupForProjectUnusedResources)
 export class ScheduleCleanupForProjectUnusedResourcesHandler
-  implements IInferredCommandHandler<ScheduleCleanupForProjectUnusedResources> {
+  implements IInferredCommandHandler<ScheduleCleanupForProjectUnusedResources>
+{
+  private readonly logger: Logger = new Logger(
+    ScheduleCleanupForProjectUnusedResourcesHandler.name,
+  );
+
   constructor(
     @Inject(unusedResourcesCleanupQueueToken)
     private readonly queue: Queue<UnusedResourcesCleanupJobInput>,
-    private logger: Logger,
-  ) {
-    this.logger.setContext(
-      ScheduleCleanupForProjectUnusedResourcesHandler.name,
-    );
-  }
+  ) {}
 
   async execute({
     projectId,
@@ -24,6 +24,7 @@ export class ScheduleCleanupForProjectUnusedResourcesHandler
     scenarioIds,
   }: ScheduleCleanupForProjectUnusedResources): Promise<void> {
     const job = await this.queue.add(`project-unused-resources-cleanup`, {
+      type: 'Project',
       projectId,
       projectCustomFeaturesIds,
       scenarioIds,

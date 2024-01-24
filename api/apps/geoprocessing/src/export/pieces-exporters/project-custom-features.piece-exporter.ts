@@ -31,6 +31,9 @@ type ProjectCustomFeaturesSelectResult = {
   creation_status: CreationStatus;
   list_property_keys: string[];
   is_legacy: boolean;
+  tag: string;
+  amount_min: number | null;
+  amount_max: number | null;
 };
 
 type FeaturesDataSelectResult = {
@@ -38,24 +41,26 @@ type FeaturesDataSelectResult = {
   the_geom: string;
   properties: Record<string, string | number>;
   source: GeometrySource;
-  amount_from_legacy_project: number | null;
+  amount: number | null;
   project_pu_id: string | null;
 };
 
 @Injectable()
 @PieceExportProvider()
 export class ProjectCustomFeaturesPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
+  private readonly logger: Logger = new Logger(
+    ProjectCustomFeaturesPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(ProjectCustomFeaturesPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -65,22 +70,27 @@ export class ProjectCustomFeaturesPieceExporter
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const customFeatures: ProjectCustomFeaturesSelectResult[] = await this.apiEntityManager
-      .createQueryBuilder()
-      .select([
-        'id',
-        'feature_class_name',
-        'alias',
-        'description',
-        'property_name',
-        'intersection',
-        'creation_status',
-        'list_property_keys',
-        'is_legacy',
-      ])
-      .from('features', 'f')
-      .where('project_id = :projectId', { projectId: input.resourceId })
-      .execute();
+    const customFeatures: ProjectCustomFeaturesSelectResult[] =
+      await this.apiEntityManager
+        .createQueryBuilder()
+        .select([
+          'f.id',
+          'f.feature_class_name',
+          'f.alias',
+          'f.description',
+          'f.property_name',
+          'f.intersection',
+          'f.creation_status',
+          'f.list_property_keys',
+          'f.is_legacy',
+          'f.amount_min',
+          'f.amount_max',
+          'pft.tag',
+        ])
+        .from('features', 'f')
+        .leftJoin('project_feature_tags', 'pft', 'pft.feature_id = f.id')
+        .where('f.project_id = :projectId', { projectId: input.resourceId })
+        .execute();
 
     const customFeaturesIds = customFeatures.map((feature) => feature.id);
     let customFeaturesData: FeaturesDataSelectResult[] = [];
@@ -93,7 +103,7 @@ export class ProjectCustomFeaturesPieceExporter
           'the_geom',
           'properties',
           'source',
-          'amount_from_legacy_project',
+          'amount',
           'project_pu_id',
         ])
         .from('features_data', 'fd')

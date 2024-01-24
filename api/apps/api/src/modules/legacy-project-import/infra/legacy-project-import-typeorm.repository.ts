@@ -16,7 +16,8 @@ import { LegacyProjectImportEntity } from './entities/legacy-project-import.api.
 
 @Injectable()
 export class LegacyProjectImportTypeormRepository
-  implements LegacyProjectImportRepository {
+  implements LegacyProjectImportRepository
+{
   private inTransaction = false;
 
   constructor(
@@ -45,10 +46,12 @@ export class LegacyProjectImportTypeormRepository
     if (!legacyProjectImport) return left(legacyProjectImportNotFound);
 
     const pieces = await this.legacyProjectImportComponentRepo.find({
-      legacyProjectImportId: legacyProjectImport.id,
+      where: { legacyProjectImportId: legacyProjectImport.id },
     });
     const files = await this.legacyProjectImportFileRepo.find({
-      legacyProjectImportId: legacyProjectImport.id,
+      where: {
+        legacyProjectImportId: legacyProjectImport.id,
+      },
     });
 
     legacyProjectImport.pieces = pieces;

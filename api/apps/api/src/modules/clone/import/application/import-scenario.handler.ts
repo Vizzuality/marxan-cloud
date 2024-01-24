@@ -31,7 +31,8 @@ import { ImportRepository } from './import.repository.port';
 
 @CommandHandler(ImportScenario)
 export class ImportScenarioHandler
-  implements IInferredCommandHandler<ImportScenario> {
+  implements IInferredCommandHandler<ImportScenario>
+{
   constructor(
     private readonly exportRepo: ExportRepository,
     @InjectRepository(Scenario)
@@ -63,7 +64,9 @@ export class ImportScenarioHandler
 
     const importResourceId = exportInstance.importResourceId!;
 
-    const scenario = await this.scenarioRepo.findOne(importResourceId.value);
+    const scenario = await this.scenarioRepo.findOne({
+      where: { id: importResourceId.value },
+    });
 
     if (!scenario) {
       return left(scenarioShellNotFound);

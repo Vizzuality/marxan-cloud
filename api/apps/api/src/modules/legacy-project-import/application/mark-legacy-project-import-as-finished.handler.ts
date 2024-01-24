@@ -19,7 +19,12 @@ import { MarkLegacyProjectImportAsFinished } from './mark-legacy-project-import-
 
 @CommandHandler(MarkLegacyProjectImportAsFinished)
 export class MarkLegacyProjectImportAsFinishedHandler
-  implements IInferredCommandHandler<MarkLegacyProjectImportAsFinished> {
+  implements IInferredCommandHandler<MarkLegacyProjectImportAsFinished>
+{
+  private readonly logger: Logger = new Logger(
+    MarkLegacyProjectImportAsFinishedHandler.name,
+  );
+
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
@@ -28,10 +33,7 @@ export class MarkLegacyProjectImportAsFinishedHandler
     private readonly usersRepo: Repository<UsersProjectsApiEntity>,
     @InjectRepository(Scenario)
     private readonly scenariosRepo: Repository<Scenario>,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(MarkLegacyProjectImportAsFinishedHandler.name);
-  }
+  ) {}
 
   private async markLegacyProjectImportAsFailed(
     projectId: ResourceId,
@@ -47,7 +49,9 @@ export class MarkLegacyProjectImportAsFinishedHandler
     projectId: ResourceId,
     scenarioId: string,
   ) {
-    const [scenario] = await this.scenariosRepo.find({ id: scenarioId });
+    const [scenario] = await this.scenariosRepo.find({
+      where: { id: scenarioId },
+    });
 
     if (!scenario) {
       const reason = 'could not find scenario';
@@ -77,9 +81,8 @@ export class MarkLegacyProjectImportAsFinishedHandler
   async execute({
     projectId,
   }: MarkLegacyProjectImportAsFinished): Promise<void> {
-    const legacyProjectImport = await this.legacyProjectImportRepository.find(
-      projectId,
-    );
+    const legacyProjectImport =
+      await this.legacyProjectImportRepository.find(projectId);
 
     if (isLeft(legacyProjectImport)) {
       await this.markLegacyProjectImportAsFailed(

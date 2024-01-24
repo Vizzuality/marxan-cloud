@@ -11,7 +11,6 @@ import {
 import { MarxanParameters } from '@marxan/marxan-input';
 
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { classToPlain } from 'class-transformer';
@@ -23,6 +22,7 @@ import {
   DeleteProjectAndOrganization,
   GivenScenarioExists,
 } from '../cloning/fixtures';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -99,11 +99,12 @@ const getFixtures = async () => {
         provide: LegacyProjectImportFilesRepository,
         useClass: LegacyProjectImportFilesMemoryRepository,
       },
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const scenarioId = v4();
   const organizationId = v4();

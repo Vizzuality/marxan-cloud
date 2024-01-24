@@ -1,20 +1,20 @@
-import React, {
-  useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
 import { useProjectUsers } from 'hooks/project-users';
 import {
-  useScenarioLock, useScenarioLockMe, useSaveScenarioLock, useDeleteScenarioLock,
+  useScenarioLock,
+  useScenarioLockMe,
+  useSaveScenarioLock,
+  useDeleteScenarioLock,
 } from 'hooks/scenarios';
 
 import ConfirmationPrompt from 'components/confirmation-prompt';
 
 import LOCK_WARNING_SVG from 'svgs/notifications/lock.svg?sprite';
 
-export interface ScenarioLockProps {
-}
+export interface ScenarioLockProps {}
 
 export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   const [lockModal, setLockModal] = useState(false);
@@ -24,12 +24,10 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   const beforeunload = useRef(false);
 
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { data: projectUsersData = [] } = useProjectUsers(pid);
-  const {
-    data: scenarioLockData,
-  } = useScenarioLock(sid);
+  const { data: scenarioLockData } = useScenarioLock(sid);
   const isLockMe = useScenarioLockMe(sid);
   const prevIsLockMe = useRef(isLockMe);
 
@@ -69,9 +67,14 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   useEffect(() => {
     if (!mutatting && !scenarioLockData && !isLockMe && !beforeunload.current) {
       setMutatting(true);
-      saveScenarioLockMutation.mutate({ sid: `${sid}` }, {
-        onSettled: () => { setMutatting(false); },
-      });
+      saveScenarioLockMutation.mutate(
+        { sid: `${sid}` },
+        {
+          onSettled: () => {
+            setMutatting(false);
+          },
+        }
+      );
     }
   }, [isLockMe, scenarioLockData]); // eslint-disable-line
 
@@ -94,7 +97,9 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   return (
     <>
       <ConfirmationPrompt
-        title={`${lockUser?.displayName || lockUser?.email} is editing this scenario, and you won't be able to edit it.`}
+        title={`${
+          lockUser?.displayName || lockUser?.email
+        } is editing this scenario, and you won't be able to edit it.`}
         icon={LOCK_WARNING_SVG}
         options={{
           acceptText: 'Ok',

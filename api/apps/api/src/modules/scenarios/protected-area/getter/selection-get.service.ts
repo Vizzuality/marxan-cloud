@@ -40,7 +40,7 @@ export class SelectionGetService {
 
     return [
       ...categories.map((category) => ({
-        name: category,
+        name: 'IUCN ' + category,
         id: category,
         kind: ProtectedAreaKind.Global,
         selected:
@@ -52,6 +52,31 @@ export class SelectionGetService {
         id: area.id,
         kind: ProtectedAreaKind.Project,
         selected: scenario.protectedAreaIds.includes(area.id),
+      })),
+    ];
+  }
+
+  async getForProject(
+    project: ProjectSnapshot,
+  ): Promise<Partial<ProtectedArea>[]> {
+    const { areas, categories } = await this.getGlobalProtectedAreas(project);
+
+    const projectCustomAreas = await this.repository.find({
+      where: {
+        projectId: project.id,
+      },
+    });
+
+    return [
+      ...categories.map((category) => ({
+        name: 'IUCN ' + category,
+        id: category,
+        isCustom: false,
+      })),
+      ...projectCustomAreas.map((area) => ({
+        name: area.fullName ?? '',
+        id: area.id,
+        isCustom: true,
       })),
     ];
   }
@@ -126,11 +151,12 @@ export class SelectionGetService {
       };
     }
 
-    const wdpaAreas = await this.findAllWDPAProtectedAreasInPlanningAreaByIUCNCategory(
-      res.id,
-      res.tableName,
-      wdpaCategories,
-    );
+    const wdpaAreas =
+      await this.findAllWDPAProtectedAreasInPlanningAreaByIUCNCategory(
+        res.id,
+        res.tableName,
+        wdpaCategories,
+      );
 
     /**
      * There may be multiple WDPA Areas per single WDPA Category

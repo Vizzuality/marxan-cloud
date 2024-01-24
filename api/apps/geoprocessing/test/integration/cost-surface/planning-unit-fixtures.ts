@@ -9,22 +9,34 @@ import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
+import { ProjectCostSurfaceProcessor } from '@marxan-geoprocessing/modules/cost-surface/application/project-cost-surface.processor';
+import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
+import { ScenarioCostSurfaceProcessor } from '@marxan-geoprocessing/modules/cost-surface/application/scenario-cost-surface-processor.service';
 
 export const getFixtures = async (app: INestApplication) => {
   const projectId = v4();
   const scenarioId = v4();
   const entityManager = app.get(getEntityManagerToken());
-  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
-    ProjectsPuEntity,
-  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> =
+    entityManager.getRepository(ProjectsPuEntity);
   const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom),
   );
   const puCostDataRepo: Repository<ScenariosPuCostDataGeo> = app.get(
     getRepositoryToken(ScenariosPuCostDataGeo),
   );
+  const costSurfacePuDataRepo: Repository<CostSurfacePuDataEntity> = app.get(
+    getRepositoryToken(CostSurfacePuDataEntity),
+  );
 
-  const scenarioPuData = await GivenScenarioPuDataExists(
+  const projectCostSurfaceProcessor: ProjectCostSurfaceProcessor = app.get(
+    ProjectCostSurfaceProcessor,
+  );
+  const scenarioCostSurfaceProcessor: ScenarioCostSurfaceProcessor = app.get(
+    ScenarioCostSurfaceProcessor,
+  );
+
+  let scenarioPuData = await GivenScenarioPuDataExists(
     entityManager,
     projectId,
     scenarioId,
@@ -34,6 +46,9 @@ export const getFixtures = async (app: INestApplication) => {
   const planningUnitsPuids = scenarioPuData.map((row) => row.projectPu.puid);
 
   return {
+    projectCostSurfaceProcessor,
+    scenarioCostSurfaceProcessor,
+    costSurfacePuDataRepo,
     planningUnitDataRepo: scenarioPuData,
     planningUnitCostDataRepo: puCostDataRepo,
     scenarioId,
@@ -65,6 +80,27 @@ export const getFixtures = async (app: INestApplication) => {
         .then((scenarioPlanningUnits) =>
           scenarioPlanningUnits.map((spu) => spu?.id).filter(isDefined),
         ),
+    GivenScenarioPuDataExists: async (
+      projectId: string,
+      scenarioId: string,
+    ) => {
+      scenarioPuData = await GivenScenarioPuDataExists(
+        entityManager,
+        projectId,
+        scenarioId,
+      );
+    },
+    GivenCostSurfacePuDataExists: async (costSurfaceId: string) => {
+      await costSurfacePuDataRepo.save(
+        scenarioPuData.map((scenarioPu) =>
+          costSurfacePuDataRepo.create({
+            costSurfaceId,
+            projectsPuId: scenarioPu.projectPuId,
+            cost: 42,
+          }),
+        ),
+      );
+    },
     cleanup: async () => {
       const projectsPu = await projectsPuRepo.find({
         where: {

@@ -1,6 +1,4 @@
-import React, {
-  useEffect, useCallback, useMemo, useRef,
-} from 'react';
+import React, { useEffect, useCallback, useMemo, useRef } from 'react';
 
 import { motion, useAnimation, Transition } from 'framer-motion';
 
@@ -8,9 +6,7 @@ import { Media } from 'layout/media';
 
 import { BACKGROUND_IMAGES, MAIN_IMAGES } from './constants';
 
-export interface IntroAnimationProps {
-
-}
+export interface IntroAnimationProps {}
 
 export const IntroAnimation: React.FC<IntroAnimationProps> = () => {
   const shouldStopAnimation = useRef(false);
@@ -24,27 +20,30 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = () => {
   const bg03Controls = useAnimation();
   const bg04Controls = useAnimation();
 
-  const bgControls = useMemo(() => (
+  const bgControls = useMemo(
+    () => [bg01Controls, bg02Controls, bg03Controls, bg04Controls],
     [bg01Controls, bg02Controls, bg03Controls, bg04Controls]
-  ), [bg01Controls, bg02Controls, bg03Controls, bg04Controls]);
+  );
 
   // Main images controls
   const image01Controls = useAnimation();
   const image02Controls = useAnimation();
   const image03Controls = useAnimation();
 
-  const imageControls = useMemo(() => (
+  const imageControls = useMemo(
+    () => [image01Controls, image02Controls, image03Controls],
     [image01Controls, image02Controls, image03Controls]
-  ), [image01Controls, image02Controls, image03Controls]);
+  );
 
   // Hexagon borders controls
   const border01Controls = useAnimation();
   const border02Controls = useAnimation();
   const border03Controls = useAnimation();
 
-  const borderControls = useMemo(() => (
+  const borderControls = useMemo(
+    () => [border01Controls, border02Controls, border03Controls],
     [border01Controls, border02Controls, border03Controls]
-  ), [border01Controls, border02Controls, border03Controls]);
+  );
 
   const stopAnimation = useCallback(() => {
     shouldStopAnimation.current = true;
@@ -95,7 +94,7 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = () => {
       MAIN_IMAGES.forEach((image, index) => {
         if (!imageControls[index] || !borderControls[index]) return;
         imageControls[index].start({ ...image.slides[slideIndex], transition });
-        borderControls[index].start({ opacity: (slideIndex - 1 < index) ? 0 : 1, transition });
+        borderControls[index].start({ opacity: slideIndex - 1 < index ? 0 : 1, transition });
       });
 
       // Because we're starting multiple animations at once, we're not making use of the
@@ -130,20 +129,20 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = () => {
 
     startAnimation();
 
-    return (() => {
+    return () => {
       document.removeEventListener('visibilitychange', visibilityChangeHandler);
-    });
+    };
   }, [startAnimation, visibilityChangeHandler]);
 
   return (
-    <div className="absolute text-white top-0 bottom-0 w-full">
+    <div className="absolute bottom-0 top-0 w-full text-white">
       {BACKGROUND_IMAGES.map(({ image, backgroundColor }, index) => (
         <motion.div
           key={image}
-          className="absolute w-full h-full bg-no-repeat bg-right-bottom"
+          className="absolute h-full w-full bg-right-bottom bg-no-repeat"
           animate={bgControls[index]}
           style={{
-            opacity: (index === currBgImageRef.current) ? 1 : 0,
+            opacity: index === currBgImageRef.current ? 1 : 0,
             backgroundImage: `url(${image})`,
             backgroundColor,
           }}
@@ -151,19 +150,14 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = () => {
       ))}
 
       <Media greaterThanOrEqual="lg">
-        {MAIN_IMAGES.map(({
-          image, size, position, slides,
-        }, index) => (
+        {MAIN_IMAGES.map(({ image, size, position, slides }, index) => (
           <motion.div
             key={image}
             className="absolute"
             animate={imageControls[index]}
             style={{ ...size, ...position, ...slides[0] }}
           >
-            <div
-              className="absolute"
-              style={{ transform: 'scale(1.28)' }}
-            >
+            <div className="absolute" style={{ transform: 'scale(1.28)' }}>
               <svg
                 width="409"
                 height="368"
@@ -201,20 +195,53 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = () => {
                   />
                 </motion.g>
                 <defs>
-                  <filter id="hexagon_border_filter" x="0.950195" y="0" width="407.604" height="368" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                  <filter
+                    id="hexagon_border_filter"
+                    x="0.950195"
+                    y="0"
+                    width="407.604"
+                    height="368"
+                    filterUnits="userSpaceOnUse"
+                    colorInterpolationFilters="sRGB"
+                  >
                     <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feColorMatrix
+                      in="SourceAlpha"
+                      type="matrix"
+                      values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                      result="hardAlpha"
+                    />
                     <feOffset />
                     <feGaussianBlur stdDeviation="12" />
                     <feComposite in2="hardAlpha" operator="out" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0.74902 0 0 0 0 1 0 0 0 1 0" />
-                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_7215_10516" />
-                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_7215_10516" result="shape" />
-                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feColorMatrix
+                      type="matrix"
+                      values="0 0 0 0 0 0 0 0 0 0.74902 0 0 0 0 1 0 0 0 1 0"
+                    />
+                    <feBlend
+                      mode="normal"
+                      in2="BackgroundImageFix"
+                      result="effect1_dropShadow_7215_10516"
+                    />
+                    <feBlend
+                      mode="normal"
+                      in="SourceGraphic"
+                      in2="effect1_dropShadow_7215_10516"
+                      result="shape"
+                    />
+                    <feColorMatrix
+                      in="SourceAlpha"
+                      type="matrix"
+                      values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                      result="hardAlpha"
+                    />
                     <feOffset />
                     <feGaussianBlur stdDeviation="12" />
                     <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0.74902 0 0 0 0 1 0 0 0 1 0" />
+                    <feColorMatrix
+                      type="matrix"
+                      values="0 0 0 0 0 0 0 0 0 0.74902 0 0 0 0 1 0 0 0 1 0"
+                    />
                     <feBlend mode="normal" in2="shape" result="effect2_innerShadow_7215_10516" />
                   </filter>
                 </defs>
@@ -222,7 +249,7 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = () => {
             </div>
 
             <div
-              className="absolute bg-no-repeat bg-center bg-cover"
+              className="absolute bg-cover bg-center bg-no-repeat"
               style={{
                 width: '100%',
                 height: '100%',
@@ -233,7 +260,11 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = () => {
             >
               <svg>
                 {/* This clip path 'clips' the images to their hexagonal shape */}
-                <clipPath id="hexagon_clip_path" viewBox="0 0 362 320" clipPathUnits="objectBoundingBox">
+                <clipPath
+                  id="hexagon_clip_path"
+                  viewBox="0 0 362 320"
+                  clipPathUnits="objectBoundingBox"
+                >
                   <path d="M0.017,0.552 C0.002,0.522,0.002,0.485,0.017,0.454 L0.224,0.052 C0.239,0.022,0.268,0.003,0.299,0.003 L0.712,0.003 C0.743,0.003,0.772,0.022,0.787,0.052 L0.994,0.454 C1,0.485,1,0.522,0.994,0.552 L0.787,0.954 C0.772,0.985,0.743,1,0.712,1 H0.299 C0.268,1,0.239,0.985,0.224,0.954 L0.017,0.552" />
                 </clipPath>
               </svg>

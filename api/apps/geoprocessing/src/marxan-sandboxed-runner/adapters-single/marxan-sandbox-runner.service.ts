@@ -11,17 +11,22 @@ import { Cancellable } from '../ports/cancellable';
 import { SandboxRunnerInputFiles } from '../ports/sandbox-runner-input-files';
 import { SandboxRunner } from '../ports/sandbox-runner';
 import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handler';
+import { EntityManager } from 'typeorm';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 @Injectable()
 export class MarxanSandboxRunnerService
-  implements SandboxRunner<JobData, ExecutionResult> {
+  implements SandboxRunner<JobData, ExecutionResult>
+{
   readonly #controllers: Record<string, AbortController> = {};
   readonly #logger = new Logger(this.constructor.name);
-
   constructor(
     private readonly workspaceService: WorkspaceBuilder,
     private readonly inputFilesHandler: SandboxRunnerInputFiles,
     private readonly outputFilesHandler: SandboxRunnerOutputHandler<ExecutionResult>,
+    @InjectEntityManager(geoprocessingConnections.apiDB)
+    private readonly apiEntityManager: EntityManager,
   ) {}
 
   kill(ofScenarioId: string): void {
@@ -89,6 +94,9 @@ export class MarxanSandboxRunnerService
             marxanRun.stdError,
           );
           await workspace.cleanup();
+
+          await this.markScenarioAsRunSuccessfully(forScenarioId);
+
           resolve(output);
         } catch (error) {
           await this.outputFilesHandler
@@ -126,14 +134,20 @@ export class MarxanSandboxRunnerService
     scenarioId: string,
     cancellables: Cancellable[],
   ) {
-    const controller = (this.#controllers[
-      scenarioId
-    ] ??= new AbortController());
+    const controller = (this.#controllers[scenarioId] ??=
+      new AbortController());
 
     controller.signal.addEventListener('abort', () => {
       cancellables.forEach((killMe) => killMe.cancel());
     });
 
     return controller;
+  }
+
+  private async markScenarioAsRunSuccessfully(scenarioId: string) {
+    await this.apiEntityManager.query(
+      'update scenarios set ran_at_least_once = true where id = $1',
+      [scenarioId],
+    );
   }
 }

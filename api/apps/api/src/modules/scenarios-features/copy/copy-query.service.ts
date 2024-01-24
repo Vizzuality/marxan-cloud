@@ -58,6 +58,19 @@ export class CopyQuery {
     const isDerivedFeature = isDefined(fields.baseFeatureId);
     const query = `
       with inserted_sfp as (
+        with total_amounts as (
+          select feature_id, SUM(amount) as total_amount from feature_amounts_per_planning_unit
+          where feature_id = ${fields.featureId}
+          group by feature_id
+        ),
+        protected_amounts as (
+          select spd.scenario_id, fappu.feature_id, SUM(fappu.amount) as protected_amount
+          from scenarios_pu_data spd inner join feature_amounts_per_planning_unit fappu on fappu.project_pu_id = spd.project_pu_id
+          where spd.lockin_status = 1 and fappu.feature_id = ${
+            fields.featureId
+          } and spd.scenario_id = ${fields.scenarioId}
+          group by spd.scenario_id, fappu.feature_id
+        )
         insert into scenario_features_preparation as sfp (feature_class_id,
                                                           api_feature_id,
                                                           scenario_id,
@@ -75,14 +88,17 @@ export class CopyQuery {
                  ${fields.fpf},
                  ${fields.target},
                  ${fields.prop},
-                 coalesce(areas_cache.total_area, ${fields.totalArea}),
-                 coalesce(areas_cache.current_pa, ${fields.protectedArea}),
+                 (select total_amount from total_amounts ta where ta.feature_id = ${
+                   fields.featureId
+                 }),
+                 (select protected_amount from protected_amounts pa where pa.feature_id = ${
+                   fields.featureId
+                 } and pa.scenario_id = ${fields.scenarioId}) ,
                  md5hash
           from features_data as fd
           ${joins.featurePropertiesKvJoin}
           ${joins.planningAreaJoin}
           ${joins.md5HashJoin}
-          left join areas_cache on areas_cache.hash = md5hash
           where feature_id = ${
             isDerivedFeature ? fields.baseFeatureId : fields.featureId
           }
@@ -98,6 +114,7 @@ export class CopyQuery {
           on conflict do nothing
       )
       select id from inserted_sfp`;
+    // @TODO this query could potentially be further optimized, removing the st_intersects criteria as it shouldn't be needed anymore
     return { parameters, query };
   }
 
@@ -250,8 +267,8 @@ export class CopyQuery {
       get featurePropertiesKvJoin() {
         return (usedJoins.featurePropertiesKvJoin ??=
           isDefined(featureGeoOps) && baseFeatureAndKeyAreDefined
-            ? `inner join ( 
-            SELECT DISTINCT feature_data_id 
+            ? `inner join (
+            SELECT DISTINCT feature_data_id
             FROM feature_properties_kv fpkv
             WHERE feature_id = ${fields.baseFeatureId}
             and fpkv.key = ${fields.key}

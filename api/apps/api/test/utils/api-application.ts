@@ -1,83 +1,97 @@
-import { AppModule } from '@marxan-api/app.module';
-import { UserLoggedInSaga } from '@marxan-api/modules/async-jobs-garbage-collector';
-import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
-import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
-import {
-  CloningFilesRepository,
-  LocalCloningFilesStorage,
-} from '@marxan/cloning-files-repository';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { ModuleMetadata } from '@nestjs/common/interfaces/modules/module-metadata.interface';
-import { Test, TestingModuleBuilder } from '@nestjs/testing';
-import { ScenarioCalibrationRepo } from '../../src/modules/blm/values/scenario-calibration-repo';
-import { QueueToken } from '../../src/modules/queue/queue.tokens';
-import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
-import { ProjectCheckerFake } from './project-checker.service-fake';
-import { FakeQueue, FakeQueueBuilder } from './queues';
-import { FakeScenarioCalibrationRepo } from './scenario-calibration-repo.test.utils';
-import { ScenarioCheckerFake } from './scenario-checker.service-fake';
+import { TestClientApi } from './test-client/test-client-api';
+import { E2E_CONFIG } from '../e2e.config';
+import { PlatformAdminEntity } from '@marxan-api/modules/users/platform-admin/admin.api.entity';
+import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { User } from '@marxan-api/modules/users/user.api.entity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
-type Overridable = { provider: any; implementation: any };
-type Overrides = {
-  classes: Overridable[];
-  values: Overridable[];
-  factories: Overridable[];
-};
+async function seedUsers(api: TestClientApi) {
+  const jwt = await api.utils.createWorkingUser({
+    email: E2E_CONFIG.users.basic.aa.username,
+    password: E2E_CONFIG.users.basic.aa.password,
+    displayName: 'User A A',
+  });
+  await api.utils.createWorkingUser({
+    email: E2E_CONFIG.users.basic.bb.username,
+    password: E2E_CONFIG.users.basic.bb.password,
+    displayName: 'User B B',
+  });
+  await api.utils.createWorkingUser({
+    email: E2E_CONFIG.users.basic.cc.username,
+    password: E2E_CONFIG.users.basic.cc.password,
+    displayName: 'User C C',
+  });
+  await api.utils.createWorkingUser({
+    email: E2E_CONFIG.users.basic.dd.username,
+    password: E2E_CONFIG.users.basic.dd.password,
+    displayName: 'User D D',
+  });
 
-const defaultOverrides: Overrides = {
-  classes: [
-    { provider: QueueToken, implementation: FakeQueue },
-    { provider: QueueBuilder, implementation: FakeQueueBuilder },
-    { provider: ProjectChecker, implementation: ProjectCheckerFake },
-    { provider: ScenarioChecker, implementation: ScenarioCheckerFake },
-    {
-      provider: CloningFilesRepository,
-      implementation: LocalCloningFilesStorage,
-    },
-    {
-      provider: ScenarioCalibrationRepo,
-      implementation: FakeScenarioCalibrationRepo,
-    },
-  ],
-  values: [{ provider: UserLoggedInSaga, implementation: {} }],
-  factories: [],
-};
+  return jwt;
+}
 
+async function granAdminPrivilegesToUser(
+  api: TestClientApi,
+  user: 'aa' | 'bb' | 'cc' | 'dd',
+) {
+  const adminRepository = await api
+    .getNestInstance()
+    .get<Repository<PlatformAdminEntity>>(
+      getRepositoryToken(PlatformAdminEntity),
+    );
+
+  const userRepository = await api
+    .getNestInstance()
+    .get<Repository<User>>(getRepositoryToken(User));
+
+  const admin = await userRepository.findOneOrFail({
+    where: { email: E2E_CONFIG.users.basic[user].username },
+  });
+  await adminRepository.save({ userId: admin.id });
+}
+
+async function assignAdminRegionsToUser(
+  api: TestClientApi,
+  user: 'aa' | 'bb' | 'cc' | 'dd',
+) {
+  const userRepository = await api
+    .getNestInstance()
+    .get<Repository<User>>(getRepositoryToken(User));
+
+  const admin = await userRepository.findOneOrFail({
+    where: { email: E2E_CONFIG.users.basic[user].username },
+  });
+
+  const geoConnection = await api
+    .getNestInstance()
+    .get<DataSource>(getDataSourceToken(DbConnections.geoprocessingDB));
+  await geoConnection.query(
+    `UPDATE admin_regions SET created_by = '${admin.id}';`,
+  );
+}
+
+/**
+ *
+ * @deprecated This will be removed, please use TestClientApi instead
+ * **/
 export const bootstrapApplication = async (
   imports: ModuleMetadata['imports'] = [],
   providers: ModuleMetadata['providers'] = [],
-  overrides: Overrides = { classes: [], factories: [], values: [] },
 ): Promise<INestApplication> => {
-  const { classes, values, factories } = defaultOverrides;
-  const classOverrides = [...classes, ...overrides.classes];
-  const valueOverrides = [...values, ...overrides.values];
-  const factoryOverrides = [...factories, ...overrides.factories];
-
-  const moduleFixtureBuilder: TestingModuleBuilder = Test.createTestingModule({
-    imports: [AppModule, ...imports],
-    providers: [...providers],
-  });
-  classOverrides.forEach(({ provider, implementation }) =>
-    moduleFixtureBuilder.overrideProvider(provider).useClass(implementation),
-  );
-  valueOverrides.forEach(({ provider, implementation }) =>
-    moduleFixtureBuilder.overrideProvider(provider).useValue(implementation),
-  );
-  factoryOverrides.forEach(({ provider, implementation }) =>
-    moduleFixtureBuilder.overrideProvider(provider).useFactory(implementation),
+  const api = await TestClientApi.initialize(
+    TestClientApi.emptyOverrides,
+    imports,
   );
 
-  const moduleFixture = await moduleFixtureBuilder.compile();
+  const aaUserJwt = await seedUsers(api);
 
-  return await moduleFixture
-    .createNestApplication()
-    .enableShutdownHooks()
-    .useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    )
-    .init();
+  await granAdminPrivilegesToUser(api, 'dd');
+  await assignAdminRegionsToUser(api, 'dd');
+
+  await api.utils.createWorkingProjectWithScenario(aaUserJwt);
+
+  return api.getNestInstance();
 };

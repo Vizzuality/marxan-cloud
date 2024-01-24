@@ -6,9 +6,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 beforeEach(async () => {
   fixtures = await getFixtures();
 });
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
 
 test(`All users roles in project must be replicated in newly created scenario`, async () => {
   /*

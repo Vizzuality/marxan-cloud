@@ -1,14 +1,13 @@
 import React from 'react';
 
-import cx from 'classnames';
-
 import Icon from 'components/icon';
+import { cn } from 'utils/cn';
 
 import WARNING_SVG from 'svgs/notifications/warning.svg?sprite';
 
 const TYPE = {
-  warning: 'text-yellow-400',
-  blocked: 'text-red-500',
+  warning: 'text-yellow-500',
+  blocked: 'text-red-600',
   invalidated: 'text-white',
 };
 
@@ -19,14 +18,14 @@ export interface DisclaimerProps {
 
 export const Disclaimer: React.FC<DisclaimerProps> = ({ children, type }: DisclaimerProps) => (
   <div
-    className={cx({
-      'rounded-xl w-full bg-gray-500 flex text-sm px-4 py-3 space-x-4 items-center': true,
+    className={cn({
+      'flex w-full items-center space-x-4 rounded-xl bg-gray-600 px-4 py-3 text-sm': true,
     })}
   >
     <Icon
       icon={WARNING_SVG}
-      className={cx({
-        'z-10 w-6 h-6': true,
+      className={cn({
+        'z-10 h-6 w-6': true,
         [TYPE[type]]: true,
       })}
     />

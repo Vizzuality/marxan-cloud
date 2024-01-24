@@ -1,7 +1,8 @@
 import React from 'react';
 
-import cx from 'classnames';
 import { motion } from 'framer-motion';
+
+import { cn } from 'utils/cn';
 
 import Item from './item';
 
@@ -23,30 +24,30 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   return (
     <motion.div
       key="analysis"
-      className={cx({
+      className={cn({
         'relative ': true,
-        'flex flex-col items-start justify-start min-h-0 overflow-hidden': scrollable,
+        'flex min-h-0 flex-col items-start justify-start overflow-hidden': scrollable,
       })}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {scrollable && <div className="absolute top-0 left-0 z-10 w-full h-6 bg-gradient-to-b from-gray-700 via-gray-700" />}
+      {scrollable && (
+        <div className="absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-800 via-gray-800" />
+      )}
       <div
-        className={cx({
-          'divide-y divide-gray-600 divide-opacity-50': true,
-          'overflow-x-hidden overflow-y-auto': scrollable,
+        className={cn({
+          'divide-y divide-gray-700 divide-opacity-50': true,
+          'overflow-y-auto overflow-x-hidden': scrollable,
         })}
       >
         {sections.map((s) => (
-          <Item
-            key={s.id}
-            {...s}
-            onChangeSection={onChangeSection}
-          />
+          <Item key={s.id} {...s} onChangeSection={onChangeSection} />
         ))}
       </div>
-      {scrollable && <div className="absolute bottom-0 left-0 z-10 w-full h-6 bg-gradient-to-t from-gray-700 via-gray-700" />}
+      {scrollable && (
+        <div className="absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-800 via-gray-800" />
+      )}
     </motion.div>
   );
 };

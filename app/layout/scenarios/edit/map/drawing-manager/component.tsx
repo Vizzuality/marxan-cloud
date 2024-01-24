@@ -1,12 +1,6 @@
-import React, {
-  useEffect, useMemo, useRef,
-} from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
-import {
-  Editor,
-  EditingMode,
-  DrawPolygonMode,
-} from 'react-map-gl-draw';
+import { Editor, EditingMode, DrawPolygonMode } from 'react-map-gl-draw';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
@@ -15,8 +9,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { featureStyle, editHandleStyle } from './drawing-styles';
 
-export interface ScenariosDrawingManagerProps {
-}
+export interface ScenariosDrawingManagerProps {}
 
 export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = () => {
   const { query } = useRouter();
@@ -28,9 +21,9 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
 
   const dispatch = useDispatch();
 
-  const {
-    drawing, uploading, drawingValue, uploadingValue,
-  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { drawing, uploading, drawingValue, uploadingValue } = useSelector(
+    (state) => state[`/scenarios/${sid}/edit`]
+  );
 
   const mode = useMemo(() => {
     if (drawing === 'editing') return new EditingMode();
@@ -42,7 +35,7 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
   useEffect(() => {
     const EDITOR = editorRef?.current;
 
-    if ((!drawing) && !!EDITOR) {
+    if (!drawing && !!EDITOR) {
       EDITOR.deleteFeatures(drawingValue);
       dispatch(setDrawingValue(null));
     }
@@ -83,10 +76,12 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
         const { data, editType } = s;
         const EDITION_TYPES = ['addFeature'];
         const UPDATE_TYPES = ['addFeature', 'addPosition', 'movePosition'];
+        const EDITOR = editorRef?.current;
 
         if (EDITION_TYPES.includes(editType)) {
           dispatch(setDrawing('editing'));
           dispatch(setDrawingValue(data));
+          EDITOR.deleteFeatures(drawingValue);
         }
 
         if (UPDATE_TYPES.includes(editType)) {

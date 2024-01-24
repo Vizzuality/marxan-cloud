@@ -1,13 +1,10 @@
-import React, {
-  ReactNode, useCallback, useMemo, useState,
-} from 'react';
-
-import cx from 'classnames';
+import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import ProgressBar from 'components/progress-bar';
 import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 import LOCK_SVG from 'svgs/ui/lock.svg?sprite';
@@ -22,11 +19,11 @@ const SCENARIO_STATES = {
   },
   'run-failure': {
     text: 'Fail Running Scenario',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'run-done': {
     text: 'Run Scenario',
-    styles: 'text-green-500',
+    styles: 'text-green-600',
   },
   'calibration-running': {
     text: 'Running Calibration',
@@ -34,7 +31,7 @@ const SCENARIO_STATES = {
   },
   'calibration-failure': {
     text: 'Fail Running Calibration',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'pa-running': {
     text: 'Running PA percentage',
@@ -42,7 +39,7 @@ const SCENARIO_STATES = {
   },
   'pa-failure': {
     text: 'Fail PA percentage',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'pu-running': {
     text: 'Running PU inclusion',
@@ -50,7 +47,7 @@ const SCENARIO_STATES = {
   },
   'pu-failure': {
     text: 'Fail PU inclusion',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'features-running': {
     text: 'Running Features',
@@ -58,7 +55,7 @@ const SCENARIO_STATES = {
   },
   'features-failure': {
     text: 'Fail Features',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   'clone-running': {
     text: 'Running cloning',
@@ -66,11 +63,11 @@ const SCENARIO_STATES = {
   },
   'clone-failure': {
     text: 'Fail cloning scenario',
-    styles: 'text-red-500',
+    styles: 'text-red-600',
   },
   draft: {
     text: 'Edited',
-    styles: 'text-gray-400',
+    styles: 'text-gray-100',
   },
 };
 
@@ -81,7 +78,7 @@ export interface ItemProps {
   progress?: number;
   lastUpdate: string;
   jobs?: Record<string, any>[];
-  runStatus: 'created' | 'running' | 'done' | 'failure',
+  runStatus: 'created' | 'running' | 'done' | 'failure';
   lock?: Record<string, any>;
   lastUpdateDistance: string;
   className?: string;
@@ -113,7 +110,9 @@ export const Item: React.FC<ItemProps> = ({
   const [settings, setSettings] = useState(false);
 
   const status = useMemo(() => {
-    const planningAreaProtectedCalculation = jobs.find((j) => j.kind === 'planningAreaProtectedCalculation');
+    const planningAreaProtectedCalculation = jobs.find(
+      (j) => j.kind === 'planningAreaProtectedCalculation'
+    );
     const planningUnitsInclusion = jobs.find((j) => j.kind === 'planningUnitsInclusion');
     const geofeatureCopy = jobs.find((j) => j.kind === 'geofeatureCopy');
     const geofeatureSplit = jobs.find((j) => j.kind === 'geofeatureSplit');
@@ -124,33 +123,33 @@ export const Item: React.FC<ItemProps> = ({
     const run = jobs.find((j) => j.kind === 'run');
 
     // PROTECTED AREAS
-    if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'running') return 'pa-running';
-    if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'failure') return 'pa-failure';
+    if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'running')
+      return 'pa-running';
+    if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'failure')
+      return 'pa-failure';
 
     // PLANNING UNITS LOCK
     if (planningUnitsInclusion && planningUnitsInclusion.status === 'running') return 'pu-running';
 
     // GEO FEATURES
     if (
-      (geofeatureCopy && geofeatureCopy.status === 'running')
-      || (geofeatureSplit && geofeatureSplit.status === 'running')
-      || (geofeatureStratification && geofeatureStratification.status === 'running')
-      || (specification && specification.status === 'running')
-    ) return 'features-running';
+      (geofeatureCopy && geofeatureCopy.status === 'running') ||
+      (geofeatureSplit && geofeatureSplit.status === 'running') ||
+      (geofeatureStratification && geofeatureStratification.status === 'running') ||
+      (specification && specification.status === 'running')
+    )
+      return 'features-running';
     if (
-      (geofeatureCopy && geofeatureCopy.status === 'failure')
-      || (geofeatureSplit && geofeatureSplit.status === 'failure')
-      || (geofeatureStratification && geofeatureStratification.status === 'failure')
-      || (specification && specification.status === 'failure')
-    ) return 'features-failure';
+      (geofeatureCopy && geofeatureCopy.status === 'failure') ||
+      (geofeatureSplit && geofeatureSplit.status === 'failure') ||
+      (geofeatureStratification && geofeatureStratification.status === 'failure') ||
+      (specification && specification.status === 'failure')
+    )
+      return 'features-failure';
 
     // CALIBRATION
-    if (
-      (calibration && calibration.status === 'running')
-    ) return 'calibration-running';
-    if (
-      (calibration && calibration.status === 'failure')
-    ) return 'calibration-failure';
+    if (calibration && calibration.status === 'running') return 'calibration-running';
+    if (calibration && calibration.status === 'failure') return 'calibration-failure';
 
     // RUN
     if (run && run.status === 'running') return 'run-running';
@@ -176,30 +175,31 @@ export const Item: React.FC<ItemProps> = ({
   }, [settings]);
 
   return (
-    <div className={cx({
-      'flex flex-col space-y-0.5 bg-transparent': true,
-      [className]: className,
-    })}
+    <div
+      className={cn({
+        'flex flex-col space-y-0.5 bg-transparent': true,
+        [className]: className,
+      })}
     >
       <div
-        className={cx({
-          'flex space-x-0.5 bg-transparent h-16': true,
+        className={cn({
+          'flex h-16 space-x-0.5 bg-transparent': true,
         })}
       >
         <div
-          className={cx({
-            'flex flex-col flex-grow pl-8 bg-gray-700 rounded-l-3xl': true,
+          className={cn({
+            'flex flex-grow flex-col rounded-l-3xl bg-gray-800 pl-8': true,
             'rounded-bl-none': settings,
           })}
         >
-          <div className="flex items-center flex-grow pr-5">
-            <div className="flex items-center flex-grow max-h-full space-x-4 text-lg text-white">
+          <div className="flex flex-grow items-center pr-5">
+            <div className="flex max-h-full flex-grow items-center space-x-4 text-lg text-white">
               <section className="flex-grow">
                 <div className="flex flex-row items-center">
                   {warnings && (
-                    <div className="relative flex items-center w-10 h-10 mr-5 border border-white border-solid rounded-full">
-                      <div className="absolute w-4 h-4 bg-red-500 border-4 border-gray-700 border-solid rounded-full -top-1 -right-1" />
-                      <Icon className="w-10 h-10" icon={WARNING_SVG} />
+                    <div className="relative mr-5 flex h-10 w-10 items-center rounded-full border border-solid border-white">
+                      <div className="absolute -right-1 -top-1 h-4 w-4 rounded-full border-4 border-solid border-gray-800 bg-red-600" />
+                      <Icon className="h-10 w-10" icon={WARNING_SVG} />
                     </div>
                   )}
 
@@ -208,32 +208,27 @@ export const Item: React.FC<ItemProps> = ({
                       <Tooltip
                         arrow
                         placement="top"
-                        content={(
-                          <div
-                            className="p-2 text-xs text-center text-gray-500 bg-white rounded"
-                          >
+                        content={
+                          <div className="rounded bg-white p-2 text-center text-xs text-gray-600">
                             <div>{lock.displayName || lock.email}</div>
                             <div>is editing this scenario</div>
                           </div>
-                        )}
+                        }
                       >
-                        <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 bg-gray-500 rounded-full">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-600">
                           <Icon className="relative w-3 text-white" icon={LOCK_SVG} />
                         </div>
                       </Tooltip>
                     )}
                     <div>
-                      <h2
-                        className="text-sm font-medium font-heading clamp-1"
-                        title={name}
-                      >
+                      <h2 className="line-clamp-1 font-heading text-sm font-medium" title={name}>
                         {name}
                       </h2>
 
-                      <div className="clamp-1">
+                      <div className="line-clamp-1">
                         <span
-                          className={cx({
-                            'm-0 text-xs inline-block': true,
+                          className={cn({
+                            'm-0 inline-block text-xs': true,
                             [SCENARIO_STATES[status].styles]:
                               status !== SCENARIO_STATES[status].text,
                           })}
@@ -241,8 +236,8 @@ export const Item: React.FC<ItemProps> = ({
                           {`${SCENARIO_STATES[status].text} `}
                         </span>
                         <span
-                          className={cx({
-                            'ml-1 text-xs inline-block': true,
+                          className={cn({
+                            'ml-1 inline-block text-xs': true,
                             [SCENARIO_STATES[status].styles]:
                               status !== SCENARIO_STATES[status].text,
                           })}
@@ -270,12 +265,7 @@ export const Item: React.FC<ItemProps> = ({
               )}
 
               {status === 'run-running' && (
-                <Button
-                  className="flex-shrink-0"
-                  size="s"
-                  theme="danger-alt"
-                  onClick={onCancelRun}
-                >
+                <Button className="flex-shrink-0" size="s" theme="danger-alt" onClick={onCancelRun}>
                   Cancel run
                 </Button>
               )}
@@ -287,26 +277,23 @@ export const Item: React.FC<ItemProps> = ({
         <button
           type="button"
           onClick={onEdit}
-          className={cx({
-            'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl': true,
-            'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:outline-none focus:bg-primary-300 focus:text-black': true,
+          className={cn({
+            'flex-column flex h-full items-center rounded-r-3xl bg-gray-800 px-8': true,
+            'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:bg-primary-300 focus:text-black focus:outline-none':
+              true,
             'rounded-br-none': settings,
           })}
         >
           <span className="mr-2 text-sm">View</span>
-          <Icon className="w-3 h-3" icon={ARROW_RIGHT_SVG} />
+          <Icon className="h-3 w-3" icon={ARROW_RIGHT_SVG} />
         </button>
       </div>
 
       {settings && (
-        <Settings
-          onDelete={onDelete}
-          onDuplicate={onDuplicate}
-        >
+        <Settings onDelete={onDelete} onDuplicate={onDuplicate}>
           {SettingsC}
         </Settings>
       )}
-
     </div>
   );
 };

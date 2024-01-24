@@ -46,21 +46,17 @@ export class SplitCreateFeatures {
 
     const baseFeature = baseFeatureOrError.right;
 
-    const singleSplitFeatures = this.splitFeatureConfigMapper.toSingleSplitFeatureConfig(
-      input,
-    );
+    const singleSplitFeatures =
+      this.splitFeatureConfigMapper.toSingleSplitFeatureConfig(input);
 
-    const singleSplitFeaturesWithHashes = await this.getSplitConfigFeaturesWithHashes(
-      singleSplitFeatures,
-    );
+    const singleSplitFeaturesWithHashes =
+      await this.getSplitConfigFeaturesWithHashes(singleSplitFeatures);
 
-    const {
-      featuresAlreadyExisting,
-      featuresToBeCreated,
-    } = await this.checkIfFeaturesMatchingGivenHashesInProjectExist(
-      singleSplitFeaturesWithHashes,
-      projectId,
-    );
+    const { featuresAlreadyExisting, featuresToBeCreated } =
+      await this.checkIfFeaturesMatchingGivenHashesInProjectExist(
+        singleSplitFeaturesWithHashes,
+        projectId,
+      );
 
     const newFeaturesCreated = await this.createFeatures(
       featuresToBeCreated,
@@ -80,7 +76,9 @@ export class SplitCreateFeatures {
   }
 
   private async getBaseFeature(baseFeatureId: string) {
-    const [feature] = await this.featuresRepo.find({ id: baseFeatureId });
+    const [feature] = await this.featuresRepo.find({
+      where: { id: baseFeatureId },
+    });
 
     if (!feature) throw new Error('did not find base feature');
 
@@ -100,9 +98,10 @@ export class SplitCreateFeatures {
   private async getHashAndStripped(
     singleSplitFeature: SingleSplitConfigFeatureValue,
   ) {
-    const hashAndStrippedFeature = await this.splitConfigHasher.getHashAndStrippedConfigFeature(
-      singleSplitFeature,
-    );
+    const hashAndStrippedFeature =
+      await this.splitConfigHasher.getHashAndStrippedConfigFeature(
+        singleSplitFeature,
+      );
 
     return { singleSplitFeature, ...hashAndStrippedFeature };
   }

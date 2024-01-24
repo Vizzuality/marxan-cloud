@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useAppSelector } from 'store/hooks';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -17,34 +17,45 @@ import {
 
 import Loading from 'components/loading';
 import Map from 'components/map';
-// Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
+import type { NewProjectFields } from 'layout/projects/new/form';
+import { MapProps } from 'types/map';
+import { centerMap } from 'utils/map';
 
-import ProjectMapProps from './types';
+const minZoom = 2;
+const maxZoom = 20;
 
-export const ProjectNewMap: React.FC<ProjectMapProps> = ({
-  country,
+export const ProjectNewMap = ({
+  bbox,
+  countryId,
   region,
   subregion,
   planningUnitAreakm2,
   planningUnitGridShape,
-  paOptionSelected,
-}: ProjectMapProps) => {
-  const minZoom = 2;
-  const maxZoom = 20;
-  const {
-    bbox, uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId,
-  } = useSelector((state) => state['/projects/new']);
+  PAOptionSelected,
+}: Partial<NewProjectFields> & {
+  bbox: [number, number, number, number];
+  country: NewProjectFields['countryId'];
+  region: NewProjectFields['adminAreaLevel1Id'];
+  subregion: NewProjectFields['adminAreaLevel2Id'];
+}): JSX.Element => {
+  const { uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId } = useAppSelector(
+    (state) => state['/projects/new']
+  );
+
+  const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
 
   const BBOX = useBBOX({ bbox });
 
   const [viewport, setViewport] = useState({});
-  const [bounds, setBounds] = useState(null);
+  const [bounds, setBounds] = useState<MapProps['bounds']>(null);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+
+  const mapRef = useRef<mapboxgl.Map | null>(null);
 
   const accessToken = useAccessToken();
 
@@ -54,7 +65,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       active: !!uploadingPlanningArea,
       data: uploadingPlanningArea,
       options: {
-        customPAshapefileGrid: paOptionSelected === 'customPAshapefileGrid',
+        customPAshapefileGrid: PAOptionSelected === 'customPAshapefileGrid',
       },
     }),
     usePlanningAreaPreviewLayer({
@@ -67,12 +78,12 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
     }),
     useAdminPreviewLayer({
       active: true,
-      country,
+      country: countryId,
       region,
       subregion,
     }),
     usePUGridPreviewLayer({
-      active: paOptionSelected !== 'customPAshapefileGrid',
+      active: PAOptionSelected !== 'customPAshapefileGrid',
       bbox,
       planningUnitGridShape,
       planningUnitAreakm2,
@@ -84,7 +95,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       setBounds({
         bbox: BBOX,
         options: {
-          padding: 50,
+          padding: { top: 50, right: 50, bottom: 50, left: 575 },
         },
         viewportOptions: {
           transitionDuration: 1000,
@@ -94,6 +105,10 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       setBounds(null);
     }
   }, [BBOX]);
+
+  useEffect(() => {
+    centerMap({ ref: mapRef.current, isSidebarOpen });
+  }, [isSidebarOpen]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
@@ -107,31 +122,31 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
         transitionDuration: 500,
       });
     },
-    [viewport],
+    [viewport]
   );
 
   const handleFitBoundsChange = useCallback((b) => {
     setBounds(b);
   }, []);
 
-  const handleTransformRequest = useCallback((url) => {
-    if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
-      return {
-        url,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-    }
+  const handleTransformRequest = useCallback(
+    (url) => {
+      if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
+        return {
+          url,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+      }
 
-    return null;
-  }, [accessToken]);
+      return null;
+    },
+    [accessToken]
+  );
 
   return (
-    <div
-      id="project-new-map"
-      className="relative w-full h-full overflow-hidden rounded-r-3xl"
-    >
+    <div id="project-new-map" className="relative h-full w-full overflow-hidden rounded-r-3xl">
       <Map
         key={accessToken}
         bounds={bounds}
@@ -143,7 +158,10 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
         mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
         onMapViewportChange={handleViewportChange}
-        onMapLoad={() => setMapInteractive(true)}
+        onMapLoad={({ map }) => {
+          mapRef.current = map;
+          setMapInteractive(true);
+        }}
         onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
         transformRequest={handleTransformRequest}
       >
@@ -159,9 +177,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       </Map>
 
       <Controls>
-        <LoadingControl
-          loading={!mapTilesLoaded}
-        />
+        <LoadingControl loading={!mapTilesLoaded} />
         <ZoomControl
           viewport={{
             ...viewport,
@@ -183,7 +199,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       </Controls>
       <Loading
         visible={!mapInteractive}
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+        className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
       />
     </div>

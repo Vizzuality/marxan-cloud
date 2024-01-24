@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AlterPlanningUnitsTables1646314135070
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query('DROP VIEW scenario_pu_features_entity');
     await queryRunner.query('DROP VIEW scenario_puvspr_geo_entity');

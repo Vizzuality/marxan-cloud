@@ -20,6 +20,7 @@ import {
 } from './run-service.providers';
 import { RunHandler } from './run.handler';
 import { RunService } from './run.service';
+import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RunService } from './run.service';
     TypeOrmModule.forFeature([Scenario, ScenariosOutputResultsApiEntity]),
     InputFilesModule,
     OutputFilesModule,
+    OutputProjectSummariesModule,
   ],
   providers: [
     RunHandler,

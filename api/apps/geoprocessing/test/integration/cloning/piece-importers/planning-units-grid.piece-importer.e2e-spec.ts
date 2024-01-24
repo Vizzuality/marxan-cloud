@@ -14,7 +14,6 @@ import {
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -27,6 +26,7 @@ import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { GenerateRandomGeometries } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -92,7 +92,6 @@ const getFixtures = async () => {
     ],
     providers: [
       PlanningUnitsGridPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
       {
         provide: getEntityManagerToken(geoprocessingConnections.apiDB.name),
         useClass: FakeEntityManager,
@@ -101,6 +100,8 @@ const getFixtures = async () => {
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const userId = v4();
   const sut = sandbox.get(PlanningUnitsGridPieceImporter);
@@ -116,7 +117,7 @@ const getFixtures = async () => {
 
   return {
     cleanUp: async () => {
-      const pus = await projectsPuRepo.find({ projectId });
+      const pus = await projectsPuRepo.find({ where: { projectId } });
       await projectsPuRepo.delete({ projectId });
       await puGeomRepo.delete({
         id: In(pus.map((pu) => pu.geomId)),
@@ -246,6 +247,7 @@ class FakeEntityManager {
   select = () => this;
   from = () => this;
   where = () => this;
+
   async execute() {
     return [{ geomType: PlanningUnitGridShape.Square }];
   }
