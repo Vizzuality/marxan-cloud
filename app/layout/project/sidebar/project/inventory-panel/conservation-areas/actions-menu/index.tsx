@@ -2,8 +2,8 @@ import { ComponentProps, useCallback, useState } from 'react';
 
 import Icon from 'components/icon';
 import Modal from 'components/modal/component';
-import DeleteModal from 'layout/project/sidebar/project/inventory-panel/wdpas/modals/delete';
-import EditModal from 'layout/project/sidebar/project/inventory-panel/wdpas/modals/edit';
+import DeleteModal from 'layout/project/sidebar/project/inventory-panel/conservation-areas/modals/delete';
+import EditModal from 'layout/project/sidebar/project/inventory-panel/conservation-areas/modals/edit';
 import { cn } from 'utils/cn';
 
 import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
@@ -57,7 +57,7 @@ const ActionsMenu = ({
         </button>
         <Modal
           id="edit-wdpa-modal"
-          title="Protected area"
+          title="Conservation area"
           open={modalState.edit}
           size="narrow"
           onDismiss={() => handleModal('edit', false)}

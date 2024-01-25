@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router';
 
 import BLM_CALIBRATION_SVG from 'svgs/navigation/blm-calibration.svg?sprite';
+import CONSERVATION_AREAS_SVG from 'svgs/navigation/conservation-areas.svg?sprite';
 import COST_SURFACE_SVG from 'svgs/navigation/cost-surface.svg?sprite';
 import FEATURES_SVG from 'svgs/navigation/features.svg?sprite';
 import OVERVIEW_SVG from 'svgs/navigation/overview.svg?sprite';
 import PLANNING_UNITS_SVG from 'svgs/navigation/planning-units.svg?sprite';
-import PROTECTED_AREA_SVG from 'svgs/navigation/protected-areas.svg?sprite';
 import TARGET_SVG from 'svgs/navigation/target.svg?sprite';
 
 import { TABS } from './constants';
@@ -20,13 +20,13 @@ export const useInventoryItems = (): SubMenuItem[] => {
 
   return [
     {
-      name: 'Protected areas',
-      route: `/projects/${pid}?tab=${TABS['project-protected-areas']}`,
-      icon: PROTECTED_AREA_SVG,
-      selected: isProjectRoute && tab === TABS['project-protected-areas'],
+      name: 'Conservation Areas',
+      route: `/projects/${pid}?tab=${TABS['project-conservation-areas']}`,
+      icon: CONSERVATION_AREAS_SVG,
+      selected: isProjectRoute && tab === TABS['project-conservation-areas'],
     },
     {
-      name: 'Cost surface',
+      name: 'Cost Surface',
       route: `/projects/${pid}?tab=${TABS['project-cost-surface']}`,
       icon: COST_SURFACE_SVG,
       selected: isProjectRoute && tab === TABS['project-cost-surface'],
@@ -47,10 +47,10 @@ export const useGridSetupItems = (): SubMenuItem[] => {
 
   return [
     {
-      name: 'Protected Areas',
-      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-protected-areas']}`,
-      icon: PROTECTED_AREA_SVG,
-      selected: isScenarioRoute && tab === TABS['scenario-protected-areas'],
+      name: 'Conservation Areas',
+      route: `/projects/${pid}/scenarios/${sid}/edit?tab=${TABS['scenario-conservation-areas']}`,
+      icon: CONSERVATION_AREAS_SVG,
+      selected: isScenarioRoute && tab === TABS['scenario-conservation-areas'],
     },
     {
       name: 'Planning Unit Status',

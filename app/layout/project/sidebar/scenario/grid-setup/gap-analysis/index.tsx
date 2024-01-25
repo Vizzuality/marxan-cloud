@@ -40,8 +40,8 @@ export const GridSetupGAPAnalysis = (): JSX.Element => {
                   <p>
                     The result shows the percentage of each feature that is currently inside your
                     selected conservation network (the conservation areas you added in{' '}
-                    <b>Protected Areas</b>) and will inform you of the amount of conservation action
-                    still needed to achieve your targets.
+                    <b>Conservation Areas</b>) and will inform you of the amount of conservation
+                    action still needed to achieve your targets.
                   </p>
 
                   <p>

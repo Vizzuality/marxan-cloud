@@ -101,7 +101,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
               'save-scenario-wdpa',
               <>
                 <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Scenario protected areas saved</p>
+                <p className="text-sm">Scenario conservation areas saved</p>
               </>,
               {
                 level: 'success',
@@ -116,7 +116,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
               'error-scenario-wdpa',
               <>
                 <h2 className="font-medium">Error!</h2>
-                <p className="text-sm">Scenario protected areas not saved</p>
+                <p className="text-sm">Scenario conservation areas not saved</p>
               </>,
               {
                 level: 'error',
@@ -215,7 +215,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
       <div className="space-y-1">
         <span className="text-xs font-semibold text-blue-500">Grid Setup</span>
         <h3 className="flex items-center space-x-2">
-          <span className="text-lg font-medium">Protected Areas</span>
+          <span className="text-lg font-medium">Conservation Areas</span>
         </h3>
       </div>
       <FormRFF
@@ -272,15 +272,15 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
                           <Field id="wdpaIucnCategories" {...fprops}>
                             <div className="mb-3 flex items-center">
                               <Label theme="dark" className="mr-3 uppercase">
-                                Choose one or more protected areas categories
+                                Choose one or more conservation areas categories
                               </Label>
                               <InfoButton>
                                 <span>
                                   <h4 className="mb-2.5 font-heading text-lg">IUCN categories</h4>
                                   <div className="space-y-2">
                                     <p>
-                                      You can select to include protected areas from any or all of
-                                      the IUCN categories that exist in your planning area:
+                                      You can select to include conservation areas from any or all
+                                      of the IUCN categories that exist in your planning area:
                                     </p>
 
                                     <ul className="list-disc space-y-1 pl-6">
@@ -302,8 +302,9 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
 
                             {WDPA_CATEGORIES_OPTIONS.length < 1 && (
                               <div className="py-6 text-sm">
-                                This planning area doesn&apos;t have any protected areas categories
-                                associated with it. You can upload a new one using the button below.
+                                This planning area doesn&apos;t have any conservation areas
+                                categories associated with it. You can upload a new one using the
+                                button below.
                               </div>
                             )}
 
@@ -339,7 +340,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
                                 clearSelectionActive
                                 clearSelectionLabel="Clear selection"
                                 batchSelectionActive
-                                batchSelectionLabel="All protected areas"
+                                batchSelectionLabel="All conservation areas"
                                 disabled={!editable}
                                 selected={values.wdpaIucnCategories}
                                 options={ORDERED_WDPA_CATEGORIES_OPTIONS}
@@ -364,7 +365,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
                         <ProtectedAreasSelected
                           form={form}
                           options={WDPA_OPTIONS}
-                          title="Selected protected areas:"
+                          title="Selected conservation areas:"
                           wdpaIucnCategories={values.wdpaIucnCategories}
                         />
                       )}
@@ -373,7 +374,7 @@ export const WDPACategories = ({ onContinue }): JSX.Element => {
                         <ProtectedAreasSelected
                           form={form}
                           options={PROJECT_PA_OPTIONS}
-                          title="Uploaded protected areas:"
+                          title="Uploaded conservation areas:"
                           wdpaIucnCategories={values.wdpaIucnCategories}
                         />
                       )}

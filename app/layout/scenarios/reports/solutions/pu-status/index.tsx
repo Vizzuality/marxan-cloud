@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { useScenarioPU } from 'hooks/scenarios';
 
 import PUStatusReportMap from 'layout/scenarios/reports/solutions/pu-status/map';
-import { cn } from 'utils/cn';
 
 export const PUStatusReport = (): JSX.Element => {
   const { query } = useRouter();
@@ -21,7 +20,7 @@ export const PUStatusReport = (): JSX.Element => {
         <p className="font-semibold">Locked in/out areas</p>
         <div className={PU_LEGEND_CONTAINER_CLASSES}>
           <div className={`${PU_LEGEND_BOX_CLASSES} border-blue-900 bg-blue-900`} />
-          <p>Protected areas </p>
+          <p>Conservation areas </p>
         </div>
         <div className={PU_LEGEND_CONTAINER_CLASSES}>
           <div className={`${PU_LEGEND_BOX_CLASSES} border-primary-500`} />

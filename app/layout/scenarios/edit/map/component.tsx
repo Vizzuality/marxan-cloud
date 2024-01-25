@@ -275,7 +275,7 @@ export const ScenariosEditMap = (): JSX.Element => {
     options: {
       wdpaIucnCategories: protectedAreas,
       wdpaThreshold:
-        tab === TABS['scenario-protected-areas']
+        tab === TABS['scenario-conservation-areas']
           ? wdpaThreshold * 100
           : scenarioData?.wdpaThreshold,
       puAction,

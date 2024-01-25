@@ -66,7 +66,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
     const clone = jobs.find((j) => j.kind === 'clone');
     const run = jobs.find((j) => j.kind === 'run');
 
-    // PROTECTED AREAS
+    // Conversation areas
     if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'running')
       return 'pa-running';
     if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'failure')
