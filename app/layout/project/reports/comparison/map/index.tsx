@@ -14,6 +14,7 @@ import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 
 import Map from 'components/map';
+import MapScale from 'components/map/scale';
 
 export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element => {
   const [cache] = useState<number>(Date.now());
@@ -145,11 +146,15 @@ export const ScreenshotComparisionMap = ({ id }: { id: string }): JSX.Element =>
         >
           {(map) => {
             return (
-              <LayerManager map={map} plugin={PluginMapboxGl}>
-                {LAYERS.map((l) => (
-                  <Layer key={l.id} {...l} />
-                ))}
-              </LayerManager>
+              <>
+                <LayerManager map={map} plugin={PluginMapboxGl}>
+                  {LAYERS.map((l) => (
+                    <Layer key={l.id} {...l} />
+                  ))}
+                </LayerManager>
+
+                <MapScale />
+              </>
             );
           }}
         </Map>

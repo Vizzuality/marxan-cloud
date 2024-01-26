@@ -16,6 +16,7 @@ import { useScenario } from 'hooks/scenarios';
 import { useBestSolution, useSolution } from 'hooks/solutions';
 
 import Map from 'components/map';
+import MapScale from 'components/map/scale';
 
 export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
   const accessToken = useAccessToken();
@@ -124,9 +125,12 @@ export const ScenariosReportMap = ({ id }: { id: string }): JSX.Element => {
         >
           {(map) => {
             return (
-              <LayerManager map={map} plugin={PluginMapboxGl}>
-                <Layer key={PUGridLayer.id} {...PUGridLayer} />
-              </LayerManager>
+              <>
+                <LayerManager map={map} plugin={PluginMapboxGl}>
+                  <Layer key={PUGridLayer.id} {...PUGridLayer} />
+                </LayerManager>
+                <MapScale />
+              </>
             );
           }}
         </Map>

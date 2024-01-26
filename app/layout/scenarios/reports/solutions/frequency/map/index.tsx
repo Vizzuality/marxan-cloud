@@ -14,6 +14,7 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 
 import Map from 'components/map';
+import MapScale from 'components/map/scale';
 
 export const ReportMap = ({ id }: { id: string }): JSX.Element => {
   const [cache] = useState<number>(Date.now());
@@ -112,9 +113,12 @@ export const ReportMap = ({ id }: { id: string }): JSX.Element => {
         >
           {(map) => {
             return (
-              <LayerManager map={map} plugin={PluginMapboxGl}>
-                <Layer key={PUGridLayer.id} {...PUGridLayer} />
-              </LayerManager>
+              <>
+                <LayerManager map={map} plugin={PluginMapboxGl}>
+                  <Layer key={PUGridLayer.id} {...PUGridLayer} />
+                </LayerManager>
+                <MapScale />
+              </>
             );
           }}
         </Map>

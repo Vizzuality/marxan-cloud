@@ -13,6 +13,7 @@ import { useBBOX, usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
 import Map from 'components/map';
+import MapScale from 'components/map/scale';
 
 export const ReportMap = ({ id, runId }: { id: string; runId: number }): JSX.Element => {
   const accessToken = useAccessToken();
@@ -108,9 +109,12 @@ export const ReportMap = ({ id, runId }: { id: string; runId: number }): JSX.Ele
         >
           {(map) => {
             return (
-              <LayerManager map={map} plugin={PluginMapboxGl}>
-                <Layer key={PUGridLayer.id} {...PUGridLayer} />
-              </LayerManager>
+              <>
+                <LayerManager map={map} plugin={PluginMapboxGl}>
+                  <Layer key={PUGridLayer.id} {...PUGridLayer} />
+                </LayerManager>
+                <MapScale />
+              </>
             );
           }}
         </Map>
