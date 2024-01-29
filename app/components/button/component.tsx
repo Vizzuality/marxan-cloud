@@ -13,7 +13,7 @@ const THEME = {
   secondary:
     'text-white bg-gray-700 hover:bg-gray-600 active:bg-gray-400 border border-gray-700 hover:border-gray-600 active:border-gray-400 active:outline active:outline-offset-2 active:outline-gray-700',
   'secondary-alt':
-    'text-black bg-transparent hover:bg-transparent active:bg-transparent border border-gray-600 hover:border-gray-400 active:border-gray-300',
+    'text-white bg-transparent hover:bg-transparent active:bg-transparent border border-gray-600 hover:border-gray-400 active:border-gray-300',
 
   tertiary: 'text-black bg-gray-200 hover:bg-gray-100 hover:border-gray-100 hover:text-white',
 

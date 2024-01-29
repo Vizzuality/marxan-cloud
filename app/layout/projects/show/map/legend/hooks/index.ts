@@ -1,5 +1,3 @@
-import { useQueryClient } from 'react-query';
-
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -123,8 +121,6 @@ export const useFeaturesLegend = () => {
   );
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
-
-  // const queryClient = useQueryClient();
 
   const featureColors = useColorFeatures(pid, sid);
 

@@ -32,12 +32,16 @@ export const GapAnalysisPage = (): JSX.Element => {
                 <tr key={feature.id}>
                   <td>{feature.name}</td>
                   <td>
-                    {(feature.current.percent * 100).toFixed(0)}% ({feature.current.value}
-                    {feature.current.unit})
+                    <span>{(feature.current.percent * 100).toFixed(0)}%</span>
+                    {feature.current.value && (
+                      <span>{`${feature.current.value} ${feature.current.unit}`}</span>
+                    )}
                   </td>
                   <td>
-                    {(feature.target.percent * 100).toFixed(0)}% ({feature.target.value}
-                    {feature.target.unit})
+                    <span>{(feature.target.percent * 100).toFixed(0)}% </span>
+                    {feature.current.value && (
+                      <span>{`${feature.current.value} ${feature.current.unit}`}</span>
+                    )}
                   </td>
                   <td>
                     <div

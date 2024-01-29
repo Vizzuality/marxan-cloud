@@ -44,7 +44,7 @@ export const ReportHeader = (): JSX.Element => {
             <div className="h-5 w-[2px] bg-gray-200" />
             <div className="flex space-x-2">
               <p className="font-medium uppercase">Marxan platform version:</p>
-              <p> V.0.0.1</p>
+              <p>V.2.0.35</p>
             </div>
             <div className="h-5 w-[2px] bg-gray-200" />
             <div className="flex space-x-2">

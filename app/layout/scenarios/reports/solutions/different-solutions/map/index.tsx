@@ -113,7 +113,7 @@ export const ReportMap = ({ id, runId }: { id: string; runId: number }): JSX.Ele
                 <LayerManager map={map} plugin={PluginMapboxGl}>
                   <Layer key={PUGridLayer.id} {...PUGridLayer} />
                 </LayerManager>
-                <MapScale />
+                <MapScale className="right-3" />
               </>
             );
           }}
