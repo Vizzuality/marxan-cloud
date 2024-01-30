@@ -61,7 +61,6 @@ export const useScenarioActionsFailure = () => {
     );
   }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, addToast]);
 
-  // Protected Areas
   const onUploadedProtectedAreaFailure = useCallback(() => {
     scenarioMutation.mutate(
       {

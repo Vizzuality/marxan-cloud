@@ -138,7 +138,7 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
               'save-scenario-wdpa',
               <>
                 <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Scenario protected areas threshold saved</p>
+                <p className="text-sm">Conservation areas threshold saved</p>
               </>,
               {
                 level: 'success',
@@ -150,7 +150,7 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
               'error-scenario-wdpa',
               <>
                 <h2 className="font-medium">Error!</h2>
-                <p className="text-sm">Scenario protected areas threshold not saved</p>
+                <p className="text-sm">Conservation areas threshold not saved</p>
               </>,
               {
                 level: 'error',
@@ -200,7 +200,7 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
       <div className="space-y-1">
         <span className="text-xs font-semibold text-blue-500">Grid Setup</span>
         <h3 className="flex items-center space-x-2">
-          <span className="text-lg font-medium">Protected Areas Treshold</span>
+          <span className="text-lg font-medium">Conservation Areas Threshold</span>
         </h3>
       </div>
       <FormRFF onSubmit={handleSubmit} initialValues={INITIAL_VALUES}>
@@ -230,12 +230,12 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
                           <Field id="scenario-wdpaThreshold" {...flprops}>
                             <div className="mb-3 flex items-center">
                               <Label ref={labelRef} theme="dark" className="mr-3 uppercase">
-                                Set the threshold for protected areas
+                                Set the threshold for conservation areas
                               </Label>
                               <InfoButton>
                                 <div>
                                   <h4 className="mb-2.5 font-heading text-lg">
-                                    Threshold for Protected Areas
+                                    Threshold for conservation areas
                                   </h4>
                                   <div className="space-y-2">
                                     <p>
@@ -256,7 +256,7 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
 
                             <p className="mb-3 text-sm text-gray-400">
                               Refers to what percentage of a planning unit must be covered by a
-                              protected area to be considered “protected”.
+                              conservation area to be considered “protected”.
                             </p>
 
                             <Slider
@@ -283,7 +283,7 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
                     {areGlobalPAreasSelected && (
                       <ProtectedAreasSelected
                         options={GLOBAL_PA_OPTIONS}
-                        title="Selected protected areas:"
+                        title="Selected conservation areas:"
                         isView
                         wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
                       />
@@ -292,7 +292,7 @@ export const WDPAThreshold = ({ onGoBack }: { onGoBack: () => void }): JSX.Eleme
                     {areProjectPAreasSelected && (
                       <ProtectedAreasSelected
                         options={PROJECT_PA_OPTIONS}
-                        title="Uploaded protected areas:"
+                        title="Uploaded conservation areas:"
                         isView
                         wdpaIucnCategories={wdpaCategories.wdpaIucnCategories}
                       />

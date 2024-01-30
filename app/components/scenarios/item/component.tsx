@@ -122,7 +122,7 @@ export const Item: React.FC<ItemProps> = ({
     const clone = jobs.find((j) => j.kind === 'clone');
     const run = jobs.find((j) => j.kind === 'run');
 
-    // PROTECTED AREAS
+    // Conservation areas
     if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'running')
       return 'pa-running';
     if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'failure')

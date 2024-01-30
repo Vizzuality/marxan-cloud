@@ -1,6 +1,6 @@
 {
-  "name": "app",
-  "version": "0.4.0",
+  "name": "marxan-app",
+  "version": "2.0.35",
   "private": true,
   "scripts": {
     "dev": "next dev",

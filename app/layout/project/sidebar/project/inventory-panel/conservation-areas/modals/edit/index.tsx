@@ -51,7 +51,7 @@ const EditModal = ({
               'success-edit-wdpa',
               <>
                 <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Protected area edited</p>
+                <p className="text-sm">Conservation area edited</p>
               </>,
               {
                 level: 'success',
@@ -63,7 +63,7 @@ const EditModal = ({
               'error-edit-wdpa',
               <>
                 <h2 className="font-medium">Error!</h2>
-                <p className="text-sm">It is not possible to edit this protected area</p>
+                <p className="text-sm">It is not possible to edit this conservation area</p>
               </>,
               {
                 level: 'error',
@@ -89,7 +89,7 @@ const EditModal = ({
         return (
           <form onSubmit={handleSubmit} className="relative">
             <div className="flex flex-col space-y-5 px-8 py-1">
-              <h2 className="font-heading font-bold text-black">Edit protected area</h2>
+              <h2 className="font-heading font-bold text-black">Edit conservation area</h2>
 
               <div>
                 <FieldRFF<string> name="name" validate={composeValidators([{ presence: true }])}>

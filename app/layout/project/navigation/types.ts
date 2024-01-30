@@ -5,4 +5,4 @@ export type NavigationTreeCategories =
   | 'solutions'
   | 'marxanSettings';
 
-export type NavigationInventoryTabs = 'protected-areas' | 'cost-surface' | 'features';
+export type NavigationInventoryTabs = 'conservation-areas' | 'cost-surface' | 'features';

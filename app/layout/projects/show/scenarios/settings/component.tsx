@@ -52,7 +52,7 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
   return (
     <dl className="flex flex-col space-y-2">
       <div className="flex space-x-2 text-sm">
-        <dt>Protected areas:</dt>
+        <dt>Conservation areas:</dt>
         <dd className="rounded bg-blue-500 bg-opacity-30 px-1.5 text-blue-500">
           {protectedAreas?.length || '-'}
         </dd>

@@ -70,7 +70,7 @@ export const ScenariosSidebarName = (): JSX.Element => {
               }
             );
 
-            push(`/projects/${pid}/scenarios/${data.id}/edit?tab=protected-areas`);
+            push(`/projects/${pid}/scenarios/${data.id}/edit?tab=conservation-areas`);
             plausible('New scenario', {
               props: {
                 userId: `${user.id}`,

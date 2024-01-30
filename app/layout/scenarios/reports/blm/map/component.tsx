@@ -14,6 +14,7 @@ import { useBBOX, useScenarioBlmLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
 import Map from 'components/map';
+import MapScale from 'components/map/scale';
 
 export interface ScreenshotBLMMapProps {
   id: string;
@@ -117,9 +118,12 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
         >
           {(map) => {
             return (
-              <LayerManager map={map} plugin={PluginMapboxGl}>
-                <Layer key={BLMLayer.id} {...BLMLayer} />
-              </LayerManager>
+              <>
+                <LayerManager map={map} plugin={PluginMapboxGl}>
+                  <Layer key={BLMLayer.id} {...BLMLayer} />
+                </LayerManager>
+                <MapScale />
+              </>
             );
           }}
         </Map>

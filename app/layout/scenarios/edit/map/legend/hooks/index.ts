@@ -529,8 +529,8 @@ export const useScenarioLegend = () => {
         useLockOutLegend(),
         useLockAvailableLegend(),
         useWDPAPreviewLegend(),
-        useFrequencyLegend(),
         useSolutionsLegend(),
+        useFrequencyLegend(),
       ],
       subgroups: [
         {

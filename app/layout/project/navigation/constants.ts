@@ -1,10 +1,10 @@
 import { NavigationTreeCategories } from './types';
 
 export const TABS = {
-  'project-protected-areas': 'protected-areas',
+  'project-conservation-areas': 'conservation-areas',
   'project-cost-surface': 'cost-surface',
   'project-features': 'features',
-  'scenario-protected-areas': 'protected-areas',
+  'scenario-conservation-areas': 'conservation-areas',
   'scenario-cost-surface': 'cost-surface',
   'scenario-planning-unit-status': 'planning-unit-status',
   'scenario-features': 'features',
@@ -19,12 +19,12 @@ export const TABS = {
 export const NAVIGATION_TREE = {
   user: [],
   inventory: [
-    TABS['project-protected-areas'],
+    TABS['project-conservation-areas'],
     TABS['project-cost-surface'],
     TABS['project-features'],
   ],
   gridSetup: [
-    TABS['scenario-protected-areas'],
+    TABS['scenario-conservation-areas'],
     TABS['scenario-cost-surface'],
     TABS['scenario-planning-unit-status'],
     TABS['scenario-features'],

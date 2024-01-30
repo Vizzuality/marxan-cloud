@@ -14,6 +14,7 @@ import { useProject } from 'hooks/projects';
 import { useBestSolution } from 'hooks/solutions';
 
 import Map from 'components/map';
+import MapScale from 'components/map/scale';
 
 export const ReportMap = ({ id }: { id: string }): JSX.Element => {
   const accessToken = useAccessToken();
@@ -111,9 +112,12 @@ export const ReportMap = ({ id }: { id: string }): JSX.Element => {
         >
           {(map) => {
             return (
-              <LayerManager map={map} plugin={PluginMapboxGl}>
-                <Layer key={PUGridLayer.id} {...PUGridLayer} />
-              </LayerManager>
+              <>
+                <LayerManager map={map} plugin={PluginMapboxGl}>
+                  <Layer key={PUGridLayer.id} {...PUGridLayer} />
+                </LayerManager>
+                <MapScale className="right-3" />
+              </>
             );
           }}
         </Map>

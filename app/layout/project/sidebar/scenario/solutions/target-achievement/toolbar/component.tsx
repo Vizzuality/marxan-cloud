@@ -30,7 +30,7 @@ export const ScenarioGapAnalysis: React.FC<ScenarioPostGapAnalysisToolbarProps> 
         theme="dark"
         size="sm"
         defaultValue={search}
-        placeholder="Search by feature name..."
+        placeholder="Search target"
         aria-label="Search"
         onChange={onChangeDebounced}
       />

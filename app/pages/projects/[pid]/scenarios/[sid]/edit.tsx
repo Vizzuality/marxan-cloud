@@ -18,11 +18,11 @@ import { TABS } from 'layout/project/navigation/constants';
 import Sidebar from 'layout/project/sidebar';
 import AdvancedSettingsBLMCalibration from 'layout/project/sidebar/scenario/advanced-settings/blm-calibration';
 import AdvancedSettingsOverview from 'layout/project/sidebar/scenario/advanced-settings/overview';
+import GridSetupProtectedAreas from 'layout/project/sidebar/scenario/grid-setup/conservation-areas';
 import GridSetupCostSurface from 'layout/project/sidebar/scenario/grid-setup/cost-surface';
 import GridSetupFeatures from 'layout/project/sidebar/scenario/grid-setup/features';
 import GridSetupGAPAnalysis from 'layout/project/sidebar/scenario/grid-setup/gap-analysis';
 import GridSetupPlanningUnits from 'layout/project/sidebar/scenario/grid-setup/planning-unit-status';
-import GridSetupProtectedAreas from 'layout/project/sidebar/scenario/grid-setup/protected-areas';
 import SolutionsOverview from 'layout/project/sidebar/scenario/solutions/overview';
 import SolutionsTargetAchievements from 'layout/project/sidebar/scenario/solutions/target-achievement';
 import ProjectStatus from 'layout/projects/show/status/component';
@@ -91,7 +91,7 @@ const EditScenarioPage = (): JSX.Element => {
             {!tab && <NewScenario />}
 
             {/* // ? grid setup */}
-            {tab === TABS['scenario-protected-areas'] && <GridSetupProtectedAreas />}
+            {tab === TABS['scenario-conservation-areas'] && <GridSetupProtectedAreas />}
             {tab === TABS['scenario-cost-surface'] && <GridSetupCostSurface />}
             {tab === TABS['scenario-planning-unit-status'] && <GridSetupPlanningUnits />}
             {[TABS['scenario-features'], TABS['scenario-features-targets-spf']].includes(tab) && (
