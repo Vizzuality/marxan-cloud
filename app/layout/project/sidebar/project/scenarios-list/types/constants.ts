@@ -26,7 +26,7 @@ export const SCENARIO_TYPES = [
       height: 20,
     },
     subtitle:
-      'Prioritizes for multiple actions simultaneously (e.g. protected areas, community-use, and sustainable use zones).',
+      'Prioritizes for multiple actions simultaneously (e.g. conservation areas, community-use, and sustainable use zones).',
     disclaimer: 'This approach is more data and process intensive.',
     disabled: true,
   },

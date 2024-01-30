@@ -1,9 +1,10 @@
 import { QueryClient } from 'react-query';
 
-import { NAVIGATION_TREE } from 'layout/project/navigation/constants';
 import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import { dehydrate } from 'react-query/hydration';
+
+import { NAVIGATION_TREE } from 'layout/project/navigation/constants';
 import { Project } from 'types/api/project';
 import { Scenario } from 'types/api/scenario';
 
@@ -276,7 +277,7 @@ export function withSolutions(getServerSidePropsFunc?: Function) {
       return {
         props: {},
         redirect: {
-          destination: `/projects/${pid}/scenarios/${sid}/edit?tab=protected-areas`,
+          destination: `/projects/${pid}/scenarios/${sid}/edit?tab=conservation-areas`,
           permanent: false,
         },
       };

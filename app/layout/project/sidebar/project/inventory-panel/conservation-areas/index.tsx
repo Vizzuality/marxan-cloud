@@ -21,11 +21,7 @@ const WDPA_TABLE_COLUMNS = [
   },
 ];
 
-const InventoryPanelProtectedAreas = ({
-  noData: noDataMessage,
-}: {
-  noData: string;
-}): JSX.Element => {
+const ConservationAreasTable = ({ noData: noDataMessage }: { noData: string }): JSX.Element => {
   const dispatch = useAppDispatch();
 
   const {
@@ -146,4 +142,4 @@ const InventoryPanelProtectedAreas = ({
   );
 };
 
-export default InventoryPanelProtectedAreas;
+export default ConservationAreasTable;

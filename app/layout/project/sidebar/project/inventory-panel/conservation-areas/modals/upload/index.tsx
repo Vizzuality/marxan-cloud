@@ -188,7 +188,7 @@ export const WDPAUploadModal = ({
             <form onSubmit={handleSubmit}>
               <div className="space-y-5 p-9">
                 <div className="mb-5 flex items-center space-x-3">
-                  <h4 className="font-heading text-lg text-black">Upload protected area</h4>
+                  <h4 className="font-heading text-lg text-black">Upload conservation area</h4>
                   <InfoButton size="base" theme="primary">
                     <UploadWDPAsInfoButtonContent />
                   </InfoButton>

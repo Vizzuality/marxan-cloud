@@ -78,7 +78,7 @@ export const ResumePage = (): JSX.Element => {
         </div>
         <div>
           <div className={SECTION_CLASSES}>
-            <h3 className={TITLE_CLASSES}>Protected Areas:</h3>
+            <h3 className={TITLE_CLASSES}>Conservation Areas:</h3>
             <p className={TEXT_CLASSES}>
               {protectedAreaQuery.data?.map(({ name }) => name).join(', ')}
             </p>

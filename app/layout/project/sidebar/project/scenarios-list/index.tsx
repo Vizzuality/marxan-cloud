@@ -28,6 +28,7 @@ import Loading from 'components/loading';
 import Modal from 'components/modal';
 import { ScrollArea } from 'components/scroll-area';
 import HelpBeacon from 'layout/help/beacon';
+import { TABS } from 'layout/project/navigation/constants';
 import NoResults from 'layout/project/sidebar/project/inventory-panel/components/no-results';
 import ScenarioToolbar from 'layout/project/sidebar/project/scenarios-list/toolbar';
 import Section from 'layout/section';
@@ -324,19 +325,19 @@ export const ScenariosList: React.FC = () => {
                     <p className="mt-1 text-center font-sans text-xs font-medium text-gray-400">
                       Before we can show you any results, we&lsquo;ll need you to{' '}
                       <span className="text-white">
-                        upload some features, protected areas or cost surface
+                        upload some features, conservation areas or cost surface
                       </span>{' '}
                       that are essential to the analysis.
                     </p>
                   </div>
                   <div className="mx-10 flex flex-wrap justify-center gap-2">
-                    <Link href={`/projects/${pid}/?tab=protected-areas`}>
-                      <div className={LINK_CLASSES}>Upload Protected Areas</div>
+                    <Link href={`/projects/${pid}/?tab=${TABS['scenario-conservation-areas']}`}>
+                      <div className={LINK_CLASSES}>Upload Conservation Areas</div>
                     </Link>
-                    <Link href={`/projects/${pid}/?tab=cost-surface`}>
+                    <Link href={`/projects/${pid}/?tab=${TABS['scenario-cost-surface']}`}>
                       <div className={LINK_CLASSES}>Upload Cost Surface</div>
                     </Link>
-                    <Link href={`/projects/${pid}/?tab=features`}>
+                    <Link href={`/projects/${pid}/?tab=${TABS['scenario-features']}`}>
                       <div className={LINK_CLASSES}>Upload Features</div>
                     </Link>
                   </div>

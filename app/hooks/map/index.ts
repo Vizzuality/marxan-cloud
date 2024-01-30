@@ -858,7 +858,7 @@ export function usePUGridLayer({
               ]
             : []),
 
-          // PROTECTED AREAS
+          // Conservation Areas
           ...(sublayers.includes('wdpa-percentage') &&
           wdpaThreshold !== null &&
           !!wdpaIucnCategories.length

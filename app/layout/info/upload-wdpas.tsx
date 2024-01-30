@@ -2,7 +2,7 @@ export const UploadWDPAsInfoButtonContent = (): JSX.Element => {
   return (
     <div className="space-y-2.5 text-xs">
       <h4 className="mb-2.5 font-heading">
-        When uploading shapefiles of protected areas, please make sure that:
+        When uploading shapefiles of conservation areas, please make sure that:
       </h4>
       <ul className="list-disc space-y-1 pl-6">
         <li>this is a single zip file that includes all the components of a single shapefile;</li>

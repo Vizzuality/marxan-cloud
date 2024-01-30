@@ -80,4 +80,8 @@ export const SCENARIO_PARAMETERS = [
     description: 'Clumping rule',
     value: 'CLUMPTYPE',
   },
+  {
+    description: 'BLM',
+    value: 'BLM',
+  },
 ];

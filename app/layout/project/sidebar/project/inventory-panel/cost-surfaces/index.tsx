@@ -50,12 +50,10 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
     },
     {
       select: (data) =>
-        data
-          .filter(({ isDefault }) => !isDefault)
-          .map((cs) => ({
-            ...cs,
-            isCustom: !cs.isDefault,
-          })),
+        data.map((cs) => ({
+          ...cs,
+          isCustom: !cs.isDefault,
+        })),
       keepPreviousData: true,
       placeholderData: [],
     }

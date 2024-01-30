@@ -49,6 +49,7 @@ import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
+import MapScale from 'components/map/scale';
 import { TABS } from 'layout/project/navigation/constants';
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 import { MapProps } from 'types/map';
@@ -69,7 +70,6 @@ export const ScenariosEditMap = (): JSX.Element => {
   const { isSidebarOpen } = useAppSelector((state) => state['/projects/[id]']);
 
   const accessToken = useAccessToken();
-  // const queryClient = useQueryClient();
 
   const { query } = useRouter();
 
@@ -275,7 +275,7 @@ export const ScenariosEditMap = (): JSX.Element => {
     options: {
       wdpaIucnCategories: protectedAreas,
       wdpaThreshold:
-        tab === TABS['scenario-protected-areas']
+        tab === TABS['scenario-conservation-areas']
           ? wdpaThreshold * 100
           : scenarioData?.wdpaThreshold,
       puAction,
@@ -581,6 +581,7 @@ export const ScenariosEditMap = (): JSX.Element => {
 
               {/* Drawing editor */}
               <ScenariosDrawingManager />
+              <MapScale />
             </>
           );
         }}

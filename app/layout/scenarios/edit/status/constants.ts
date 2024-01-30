@@ -1,5 +1,5 @@
 export const TEXTS_RUNNING = {
-  planningAreaProtectedCalculation: () => 'Calculating the protected areas percentages...',
+  planningAreaProtectedCalculation: () => 'Calculating the conservation areas percentages...',
   features: () => 'Processing the features...',
   planningUnitsInclusion: () => 'Processing inclusion/exclusion of planning units...',
   costSurface: () => 'Processing cost surface...',
@@ -10,7 +10,7 @@ export const TEXTS_RUNNING = {
 };
 
 export const TEXTS_FAILURE = {
-  planningAreaProtectedCalculation: () => 'Fail Calculating the protected areas percentages',
+  planningAreaProtectedCalculation: () => 'Fail Calculating the conservation areas percentages',
   features: () => 'Fail Processing the features',
   planningUnitsInclusion: () => 'Fail Processing inclusion/exclusion of planning units',
   costSurface: () => 'Fail Processing cost surface',

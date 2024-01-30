@@ -91,7 +91,6 @@ export const useScenarioActionsDone = () => {
     ]
   );
 
-  // Protected Areas
   const onUploadedProtectedAreaDone = useCallback(
     (JOB_REF) => {
       scenarioMutation.mutate(
@@ -173,7 +172,17 @@ export const useScenarioActionsDone = () => {
         }
       );
     },
-    [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, setCache, addToast, setSubTab]
+    [
+      sid,
+      scenarioMutation,
+      scenarioData?.metadata,
+      dispatch,
+      setJob,
+      setCache,
+      addToast,
+      setSubTab,
+      queryClient,
+    ]
   );
 
   // Cost surface

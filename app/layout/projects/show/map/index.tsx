@@ -1,6 +1,6 @@
 import { ComponentProps, useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
-import { useQueryClient } from 'react-query';
+import { ScaleControl } from 'react-map-gl';
 
 import { useRouter } from 'next/router';
 
@@ -50,6 +50,7 @@ import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
+import MapScale from 'components/map/scale';
 import HelpBeacon from 'layout/help/beacon';
 import { Scenario } from 'types/api/scenario';
 import { MapProps } from 'types/map';
@@ -525,11 +526,14 @@ export const ProjectMap = (): JSX.Element => {
               >
                 {(map) => {
                   return (
-                    <LayerManager map={map} plugin={PluginMapboxGl}>
-                      {LAYERS.map((l) => (
-                        <Layer key={l.id} {...l} />
-                      ))}
-                    </LayerManager>
+                    <>
+                      <LayerManager map={map} plugin={PluginMapboxGl}>
+                        {LAYERS.map((l) => (
+                          <Layer key={l.id} {...l} />
+                        ))}
+                      </LayerManager>
+                      <MapScale />
+                    </>
                   );
                 }}
               </Map>
@@ -638,6 +642,8 @@ export const ProjectMap = (): JSX.Element => {
               })}
             </Legend>
           </div>
+
+          <ScaleControl className="absolute right-0 z-30" />
 
           {!!SCENARIOS_RUNNED.sid1Options.length && !tab && (
             <div

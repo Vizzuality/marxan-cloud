@@ -115,10 +115,10 @@ export const ProtectedAreaUploader = ({ input }): JSX.Element => {
           await queryClient.invalidateQueries(['protected-areas']);
 
           addToast(
-            'success-upload-protected-area',
+            'success-upload-conservation-area',
             <>
               <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Protected area uploaded</p>
+              <p className="text-sm">Conservation area uploaded</p>
             </>,
             {
               level: 'success',
@@ -134,7 +134,7 @@ export const ProtectedAreaUploader = ({ input }): JSX.Element => {
           setSuccessFile(null);
 
           addToast(
-            'error-upload-protected-area',
+            'error-upload-conservation-area',
             <>
               <h2 className="font-medium">Error!</h2>
               <ul className="text-sm">
@@ -164,7 +164,7 @@ export const ProtectedAreaUploader = ({ input }): JSX.Element => {
 
   return (
     <Uploader
-      caption="Upload your protected area network"
+      caption="Upload your conservation area network"
       open={opened}
       disabled={!editable}
       onOpen={() => {
@@ -191,7 +191,7 @@ export const ProtectedAreaUploader = ({ input }): JSX.Element => {
                     <span className="text-xs">
                       {' '}
                       <h4 className="mb-2.5 font-heading">
-                        When uploading shapefiles of protected areas, please make sure that:
+                        When uploading shapefiles of conservation areas, please make sure that:
                       </h4>
                       <ul className="list-disc space-y-1 pl-6">
                         <li>

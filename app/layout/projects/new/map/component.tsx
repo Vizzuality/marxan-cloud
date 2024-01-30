@@ -21,6 +21,7 @@ import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
+import MapScale from 'components/map/scale';
 import type { NewProjectFields } from 'layout/projects/new/form';
 import { MapProps } from 'types/map';
 import { centerMap } from 'utils/map';
@@ -167,11 +168,14 @@ export const ProjectNewMap = ({
       >
         {(map) => {
           return (
-            <LayerManager map={map} plugin={PluginMapboxGl}>
-              {LAYERS.map((l) => (
-                <Layer key={l.id} {...l} />
-              ))}
-            </LayerManager>
+            <>
+              <LayerManager map={map} plugin={PluginMapboxGl}>
+                {LAYERS.map((l) => (
+                  <Layer key={l.id} {...l} />
+                ))}
+              </LayerManager>
+              <MapScale />
+            </>
           );
         }}
       </Map>

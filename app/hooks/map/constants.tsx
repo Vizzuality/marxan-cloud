@@ -190,7 +190,7 @@ export const LEGEND_LAYERS = {
 
     return {
       id: 'wdpa-preview',
-      name: 'Protected areas preview',
+      name: 'Conservation areas preview',
       icon: (
         <Icon
           icon={SQUARE_SVG}
@@ -210,7 +210,7 @@ export const LEGEND_LAYERS = {
 
     return {
       id: 'wdpa-percentage',
-      name: 'Protected areas',
+      name: 'Conservation areas',
       icon: (
         <Icon
           icon={HEXAGON_SVG}

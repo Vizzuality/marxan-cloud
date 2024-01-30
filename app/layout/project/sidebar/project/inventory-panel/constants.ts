@@ -1,5 +1,8 @@
 import { NavigationInventoryTabs } from 'layout/project/navigation/types';
 
+import ConservationAreasTable from './conservation-areas';
+import ConservationAreasFooter from './conservation-areas/footer';
+import WDPAUploadModal from './conservation-areas/modals/upload';
 import CostSurfaceTable from './cost-surfaces';
 import CostSurfaceInfo from './cost-surfaces/info';
 import CostSurfaceUploadModal from './cost-surfaces/modals/upload';
@@ -7,17 +10,14 @@ import FeaturesTable from './features';
 import FeaturesInfo from './features/info';
 import FeatureUploadModal from './features/modals/upload';
 import { InventoryPanel } from './types';
-import ProtectedAreasTable from './wdpas';
-import ProtectedAreasFooter from './wdpas/footer';
-import WDPAUploadModal from './wdpas/modals/upload';
 
 export const INVENTORY_TABS = {
-  'protected-areas': {
-    title: 'Protected Areas',
-    search: 'Search protected areas',
-    noData: 'No protected areas found.',
-    TableComponent: ProtectedAreasTable,
-    FooterComponent: ProtectedAreasFooter,
+  'conservation-areas': {
+    title: 'Conservation Areas',
+    search: 'Search conservation areas',
+    noData: 'No conservation areas found.',
+    TableComponent: ConservationAreasTable,
+    FooterComponent: ConservationAreasFooter,
     UploadModalComponent: WDPAUploadModal,
   },
   'cost-surface': {

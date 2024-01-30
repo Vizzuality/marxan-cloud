@@ -1,4 +1,4 @@
-const ProtectedAreasFooter = (): JSX.Element => {
+const ConservationAreasFooter = (): JSX.Element => {
   return (
     <div className="mt-8 text-xs">
       <p className="text-gray-400">
@@ -21,4 +21,4 @@ const ProtectedAreasFooter = (): JSX.Element => {
   );
 };
 
-export default ProtectedAreasFooter;
+export default ConservationAreasFooter;

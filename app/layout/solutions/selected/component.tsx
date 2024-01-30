@@ -51,7 +51,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
           )}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-x-5 gap-y-6 pr-32 pt-5 text-sm text-white">
+      <div className="grid grid-cols-2 gap-x-5 gap-y-6 pt-5 text-sm text-white">
         <div className="flex space-x-2 border-l-2 border-blue-800 pl-2.5 text-white">
           <p>Score:</p>
           <p className="text-left font-semibold">{scoreValue}</p>
@@ -65,7 +65,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
           <p className="text-left font-semibold">{missingValues}</p>
         </div>
         <div className="flex space-x-2 border-l-2 border-blue-800 pl-2.5 text-white">
-          <p>Planning:</p>
+          <p>Planning Units:</p>
           <p className="text-left font-semibold">{planningUnits}</p>
         </div>
       </div>

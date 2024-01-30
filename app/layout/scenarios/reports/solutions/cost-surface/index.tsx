@@ -17,14 +17,13 @@ export const CostSurfaceReport = (): JSX.Element => {
     pid,
     {},
     {
-      select: (data) =>
-        data.filter((cs) => cs.scenarios.filter((s) => s.id === sid).length > 0)?.[0],
+      select: (data) => data.filter((cs) => cs.scenarios.find((s) => s.id === sid))?.[0],
     }
   );
 
   const LEGEND = useMemo(() => {
     return {
-      name: 'Cost layer',
+      name: costSurfaceQuery.data?.name,
       settingsManager: null,
       items: [
         {

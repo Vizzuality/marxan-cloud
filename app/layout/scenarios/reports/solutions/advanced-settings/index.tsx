@@ -1,9 +1,6 @@
-import React from 'react';
-
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 
-import { useScenario, useScenarioCalibrationResults } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 
 import {
   SCENARIO_PARAMETERS,
@@ -13,8 +10,6 @@ import {
 export const AdvancedSettingsPage = (): JSX.Element => {
   const { query } = useRouter();
   const { sid } = query as { sid: string };
-
-  const calibrationResultsQuery = useScenarioCalibrationResults(sid);
 
   const { data: scenarioData } = useScenario(sid);
 
@@ -72,26 +67,6 @@ export const AdvancedSettingsPage = (): JSX.Element => {
               <p className="text-left font-semibold">
                 {description}: <span className="font-normal"> {PARAMETERS[value]}</span>
               </p>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="flex w-5/12 flex-col space-y-2">
-        {calibrationResultsQuery.data?.map((cr) => {
-          return (
-            <div key={`${cr.scenarioId}-${cr.blmValue}`} className="flex space-x-3 bg-gray-600">
-              {cr.pngData && <Image src={cr.pngData} alt="Blm Image" width={115} height={115} />}
-              <div className="flex flex-col space-y-2 py-2 text-sm">
-                <div>
-                  <p className="font-medium uppercase text-white">BLM:</p>
-                  <p className="text-primary-500">{cr.blmValue}</p>
-                </div>
-                <div>
-                  <p className="font-medium uppercase text-white">COST:</p>
-                  <p className="text-primary-500">{cr.cost}</p>
-                </div>
-              </div>
             </div>
           );
         })}
