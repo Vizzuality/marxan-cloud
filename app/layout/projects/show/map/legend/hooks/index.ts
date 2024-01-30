@@ -12,7 +12,7 @@ import {
 import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useAllFeatures, useColorFeatures } from 'hooks/features';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
-import { useScenario } from 'hooks/scenarios';
+import { useScenario, useScenarios } from 'hooks/scenarios';
 import { useProjectWDPAs } from 'hooks/wdpa';
 
 import { CostSurface } from 'types/api/cost-surface';
@@ -271,10 +271,23 @@ export const useInventoryLegend = ({
     comparisonSettings,
   });
 
+  const { query } = useRouter();
+  const { pid } = query as {
+    pid: string;
+  };
+
+  const scenariosQuery = useScenarios(pid, {
+    filters: {
+      projectId: pid,
+    },
+  });
+
+  const planningGridLegend = usePlanningGridLegend();
+
   return [
     {
       name: 'Planning Grid',
-      layers: [usePlanningGridLegend()],
+      layers: scenariosQuery.data?.length > 0 ? [planningGridLegend] : [],
       subgroups: [
         ...(isComparisonEnabled
           ? [
