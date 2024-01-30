@@ -6,6 +6,7 @@ import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
 import AdvancedSettingsPage from 'layout/scenarios/reports/solutions/advanced-settings';
 import BestSolutionPage from 'layout/scenarios/reports/solutions/best-solution';
+import CalibrationResultsReport from 'layout/scenarios/reports/solutions/calibration-results';
 import CostSurfaceReport from 'layout/scenarios/reports/solutions/cost-surface';
 import DifferentSolutionsFirstPage from 'layout/scenarios/reports/solutions/different-solutions/first';
 // import DifferentSolutionsSecondPage from 'layout/scenarios/reports/solutions/different-solutions/second';
@@ -66,29 +67,34 @@ const MainReport: React.FC = () => {
       {/* PAGE 7 */}
       <div className={PAGE_CLASSES}>
         <ReportHeader />
-        <FeaturesPage />
+        <CalibrationResultsReport />
       </div>
       {/* PAGE 8 */}
       <div className={PAGE_CLASSES}>
         <ReportHeader />
-        <SolutionsTablePage />
+        <FeaturesPage />
       </div>
       {/* PAGE 9 */}
       <div className={PAGE_CLASSES}>
         <ReportHeader />
-        <DifferentSolutionsFirstPage />
+        <SolutionsTablePage />
       </div>
       {/* PAGE 10 */}
+      <div className={PAGE_CLASSES}>
+        <ReportHeader />
+        <DifferentSolutionsFirstPage />
+      </div>
+      {/* PAGE 11 */}
       {/* <div className={PAGE_CLASSES}>
         <ReportHeader />
         <DifferentSolutionsSecondPage />
       </div> */}
-      {/* PAGE 11 */}
+      {/* PAGE 12 */}
       <div className={PAGE_CLASSES}>
         <ReportHeader />
         <GapAnalysisPage />
       </div>
-      {/* PAGE 12 */}
+      {/* PAGE 13 */}
       <div className={PAGE_CLASSES}>
         <ReportHeader />
         <TargetAchievementPage />
