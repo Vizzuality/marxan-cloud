@@ -34,12 +34,14 @@ const CalibrationResultsReport = (): JSX.Element => {
           );
         })}
       </div>
-      {chartData?.length > 0 && (
-        <div className="h-72 w-full space-y-4 bg-gray-600 p-4">
-          <h3 className="text-sm font-bold text-white">Calibration results</h3>
-          <BlmChart data={chartData} selected={null} onChange={() => {}} />
+      <div className="bg-gray-600 p-4 pb-12">
+        <h3 className="text-sm font-bold text-white">Calibration results</h3>
+        <div className="h-64 w-full">
+          {chartData?.length > 0 && (
+            <BlmChart data={chartData} selected={null} onChange={() => {}} />
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
