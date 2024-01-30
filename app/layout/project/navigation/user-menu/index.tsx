@@ -18,6 +18,7 @@ import { Switch } from 'components/forms/switch';
 import Icon from 'components/icon';
 import { cn } from 'utils/cn';
 
+import USERS_SVG from 'svgs/admin/users.svg?sprite';
 import COMMUNITY_SVG from 'svgs/navigation/community.svg?sprite';
 import DOCUMENTATION_SVG from 'svgs/navigation/documentation.svg?sprite';
 import HELP_GUIDE_SVG from 'svgs/navigation/help-guide.svg?sprite';
@@ -128,6 +129,29 @@ export const UserMenu = (): JSX.Element => {
               </div>
             </Link>
           </li>
+          {user.isAdmin && (
+            <li>
+              <Link
+                href="/admin"
+                className={cn({
+                  [ITEM_COMMON_CLASSES]: true,
+                  'group items-start space-x-5 bg-transparent': true,
+                })}
+              >
+                <div className="rounded-xl bg-gray-100 p-2 group-hover:bg-blue-500">
+                  <Icon icon={USERS_SVG} className="h-5 w-5 transition-none" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className={ITEM_TITLE_COMMON_CLASSES}>
+                    <span>Admin panel</span>
+                  </h4>
+                  <span className={ITEM_DESCRIPTION_COMMON_CLASSES}>
+                    Manage users and published projects.
+                  </span>
+                </div>
+              </Link>
+            </li>
+          )}
           <li className={ITEM_COMMON_CLASSES}>
             <div className="flex w-full items-center justify-between">
               <div className="flex space-x-2">
