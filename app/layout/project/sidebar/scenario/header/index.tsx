@@ -20,11 +20,11 @@ export const ScenarioHeader = (): JSX.Element => {
   const { name, description } = scenarioQuery.data;
 
   const onEditScenarioName = useCallback(
-    (newName: Parameters<ComponentProps<typeof Title>['onEditTitle']>[0]) => {
+    (data: Parameters<ComponentProps<typeof Title>['onEditTitle']>[0]) => {
       saveScenarioMutation.mutate({
         id: sid,
         data: {
-          name: newName,
+          name: data.name,
         },
       });
     },

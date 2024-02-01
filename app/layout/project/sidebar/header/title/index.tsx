@@ -26,7 +26,9 @@ const EditableTitle = ({
   title: string;
   description?: string;
   className?: HTMLAttributes<HTMLDivElement>['className'];
-  onEditTitle: (newName: string) => void;
+  onEditTitle: (
+    newName: Parameters<ComponentProps<typeof FormRFF<FormFields>>['onSubmit']>[0]
+  ) => void;
 }): JSX.Element => {
   const { query } = useRouter();
   const { pid } = query as { pid: string };
@@ -40,7 +42,7 @@ const EditableTitle = ({
   const handleSubmit = useCallback(
     (data: Parameters<ComponentProps<typeof FormRFF<FormFields>>['onSubmit']>[0]) => {
       titleInputRef.current?.blur();
-      onEditTitle(data.name);
+      onEditTitle(data);
       setEditting(false);
     },
     [onEditTitle, titleInputRef]
