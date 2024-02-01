@@ -25,14 +25,12 @@ const InventoryProjectHeader = (): JSX.Element => {
     },
   });
 
-  const onEditProjectName = useCallback(
-    (newName: Parameters<ComponentProps<typeof Title>['onEditTitle']>[0]) => {
+  const onEditInfo = useCallback(
+    (data: Parameters<ComponentProps<typeof Title>['onEditTitle']>[0]) => {
       saveProjectMutation.mutate(
         {
           id: pid,
-          data: {
-            name: newName,
-          },
+          data,
         },
         {
           onSuccess: async () => {
@@ -47,7 +45,7 @@ const InventoryProjectHeader = (): JSX.Element => {
   return (
     <div className="flex items-start justify-between">
       <UnderModeration />
-      <Title title={name} description={description} onEditTitle={onEditProjectName} />
+      <Title title={name} description={description} onEditTitle={onEditInfo} />
       <div className="mt-4 flex items-center space-x-5">
         <Contributors />
         <ProjectButton />
