@@ -164,6 +164,10 @@
   .preserve-3d {
     transform-style: preserve-3d;
   }
+
+  .break-anywhere {
+    overflow-wrap: anywhere;
+  }
 }
 
 /* PRINT */
