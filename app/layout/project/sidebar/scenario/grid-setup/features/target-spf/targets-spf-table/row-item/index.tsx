@@ -75,7 +75,7 @@ const RowItem = ({
       </td>
       <td
         className={cn({
-          'flex flex-col px-1 pb-2': true,
+          'break-anywhere flex max-w-[300px] flex-col px-1 pb-2': true,
           'w-52': type,
         })}
       >
