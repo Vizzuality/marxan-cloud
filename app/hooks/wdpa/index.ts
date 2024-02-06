@@ -43,7 +43,7 @@ export function useWDPACategories({
         },
       }).then(({ data }) => data),
     {
-      enabled: !!adminAreaId || !!customAreaId,
+      // enabled: !!adminAreaId || !!customAreaId,
     }
   );
 }
