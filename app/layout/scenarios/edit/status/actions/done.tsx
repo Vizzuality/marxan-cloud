@@ -153,6 +153,7 @@ export const useScenarioActionsDone = () => {
             dispatch(setJob(null));
             dispatch(setCache(Date.now()));
             dispatch(setSubTab(null));
+            await queryClient.invalidateQueries(['all-features', pid]);
             await queryClient.invalidateQueries(['selected-features', sid]);
             await queryClient.invalidateQueries(['targeted-features', sid]);
             await queryClient.invalidateQueries(['pre-gap-analysis', sid]);

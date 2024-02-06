@@ -1,6 +1,5 @@
 import { useQuery } from 'react-query';
 
-import { sortBy } from 'lodash';
 import { useSession } from 'next-auth/react';
 
 import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
@@ -70,18 +69,9 @@ export function usePreGapAnalysis(sId: Scenario['id'], options: UseFeaturesOptio
 
   return useQuery(['pre-gap-analysis', sId, JSON.stringify(options)], fetchFeatures, {
     select: ({ data }) =>
-      sortBy(
-        data.map((d): AllItemProps => {
-          const {
-            id,
-            name,
-            featureClassName,
-            met,
-            metArea,
-            coverageTarget,
-            coverageTargetArea,
-            onTarget,
-          } = d;
+      data
+        .map((d): AllItemProps => {
+          const { id, name, featureClassName, met, metArea, coverageTarget, onTarget } = d;
 
           return {
             id,
@@ -94,9 +84,8 @@ export function usePreGapAnalysis(sId: Scenario['id'], options: UseFeaturesOptio
               percent: coverageTarget / 100,
             },
           };
-        }),
-        ['name']
-      ),
+        })
+        .sort((a, b) => a['name']?.localeCompare(b['name'])),
   });
 }
 

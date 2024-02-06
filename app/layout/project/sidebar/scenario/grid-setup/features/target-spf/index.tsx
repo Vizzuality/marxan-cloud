@@ -27,7 +27,7 @@ import { Feature } from 'types/api/feature';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-import AllTargetsSelector from './all-targets';
+// import AllTargetsSelector from './all-targets';
 import FeaturesBulkActionMenu from './bulk-action-menu';
 
 const TARGET_SPF_TABLE_COLUMNS = [
@@ -191,19 +191,19 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     }));
   }, []);
 
-  const handleChangeAllTargets = useCallback(
-    (target: Parameters<ComponentProps<typeof AllTargetsSelector>['onChangeAllTargets']>[0]) => {
-      setConfirmationTarget(target);
-    },
-    []
-  );
+  // const handleChangeAllTargets = useCallback(
+  //   (target: Parameters<ComponentProps<typeof AllTargetsSelector>['onChangeAllTargets']>[0]) => {
+  //     setConfirmationTarget(target);
+  //   },
+  //   []
+  // );
 
-  const handleChangeAllSPF = useCallback(
-    (spf: Parameters<ComponentProps<typeof AllTargetsSelector>['onChangeAllSPF']>[0]) => {
-      setConfirmationFPF(spf);
-    },
-    []
-  );
+  // const handleChangeAllSPF = useCallback(
+  //   (spf: Parameters<ComponentProps<typeof AllTargetsSelector>['onChangeAllSPF']>[0]) => {
+  //     setConfirmationFPF(spf);
+  //   },
+  //   []
+  // );
 
   const toggleSeeOnMap = useCallback(
     (id: Feature['id']) => {
@@ -407,6 +407,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           onSuccess: async () => {
             await queryClient.invalidateQueries(['selected-features', sid]);
             await queryClient.invalidateQueries(['targeted-features', sid]);
+            await queryClient.invalidateQueries(['pre-gap-analysis', sid]);
           },
         }
       );
@@ -466,10 +467,10 @@ const TargetAndSPFFeatures = (): JSX.Element => {
         )}
 
         {/* set target/spf all features */}
-        <AllTargetsSelector
+        {/* <AllTargetsSelector
           onChangeAllTargets={handleChangeAllTargets}
           onChangeAllSPF={handleChangeAllSPF}
-        />
+        /> */}
 
         <div className="flex h-full flex-col overflow-hidden">
           <TargetsSPFTable
