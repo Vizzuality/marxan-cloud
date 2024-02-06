@@ -312,8 +312,8 @@ export function useWDPAPreviewLayer({
             // wdpaIucnCategories are filtered in two steps as they are custom and WDPA.
             filter: [
               'any',
-              ['all', ['in', ['get', 'iucn_cat'], ['literal', id]]],
-              ['all', ['in', ['get', 'id'], ['literal', id]]],
+              ['all', ['in', ['get', 'iucn_cat'], ['literal', [id]]]],
+              ['all', ['in', ['get', 'id'], ['literal', [id]]]],
             ],
             paint: {
               'fill-color': COLORS['wdpa-preview'],
