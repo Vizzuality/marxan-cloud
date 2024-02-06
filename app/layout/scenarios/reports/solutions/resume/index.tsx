@@ -6,13 +6,16 @@ import { useProjectCostSurfaces } from 'hooks/cost-surface';
 import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import { useScenario, useScenarioPU } from 'hooks/scenarios';
-import { useProjectWDPAs } from 'hooks/wdpa';
+import { useWDPACategories } from 'hooks/wdpa';
 
 export const ResumePage = (): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
   const projectQuery = useProject(pid);
   const scenarioQuery = useScenario(sid);
+  const ScenarioWPDACategoriesQuery = useWDPACategories({
+    scenarioId: sid,
+  });
 
   const costSurfaceQuery = useProjectCostSurfaces(
     pid,
@@ -23,16 +26,12 @@ export const ResumePage = (): JSX.Element => {
     }
   );
 
-  const protectedAreaQuery = useProjectWDPAs(
-    pid,
-    { sort: 'name' },
-    {
-      select: (data) => data.map(({ id, name }) => ({ id, name })),
-    }
-  );
-
   const projectUsersQuery = useProjectUsers(pid);
   const PUDataQuery = useScenarioPU(sid);
+
+  const selectedScenarioWDPACategories = ScenarioWPDACategoriesQuery.data
+    ?.filter(({ selected }) => selected)
+    .map(({ name }) => name);
 
   const SECTION_CLASSES = 'pb-6';
   const TITLE_CLASSES = 'pb-3 text-sm font-semibold';
@@ -79,9 +78,7 @@ export const ResumePage = (): JSX.Element => {
         <div>
           <div className={SECTION_CLASSES}>
             <h3 className={TITLE_CLASSES}>Conservation Areas:</h3>
-            <p className={TEXT_CLASSES}>
-              {protectedAreaQuery.data?.map(({ name }) => name).join(', ')}
-            </p>
+            <p className={TEXT_CLASSES}>{selectedScenarioWDPACategories?.join(', ')}</p>
           </div>
 
           <div className={SECTION_CLASSES}>
