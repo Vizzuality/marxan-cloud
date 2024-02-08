@@ -384,6 +384,12 @@ export class GeoFeaturesService extends AppBaseService<
     data: UploadShapefileDTO,
     features: Record<string, any>[],
   ): Promise<Either<Error, GeoFeature>> {
+    /**
+     * @debt Avoid duplicating transaction scaffolding in multiple sites
+     * within this class: this should be wrapped in a utility method, and the
+     * code to be executed within transactions, as well as error handling
+     * (`catch`) and cleanup (`finally`) should be passed to the utility method.
+     */
     const apiQueryRunner = this.apiDataSource.createQueryRunner();
     const geoQueryRunner = this.geoDataSource.createQueryRunner();
 
@@ -476,6 +482,16 @@ export class GeoFeaturesService extends AppBaseService<
       })),
       { chunk: CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS },
     );
+  }
+
+  private async deleteFeatureAmountsPerPlanningUnit(
+    geoEntityManager: EntityManager,
+    featureId: string,
+  ): Promise<void> {
+    const repo = geoEntityManager.getRepository(
+      FeatureAmountsPerPlanningUnitEntity,
+    );
+    await repo.delete({ featureId });
   }
 
   public async updateFeatureForProject(
@@ -573,11 +589,56 @@ export class GeoFeaturesService extends AppBaseService<
       return left(featureNotDeletable);
     }
 
-    // NOTE
-    // This deletes the feature on the API DB but not on the GEO DB. That task is left up to the CleanupTasks
-    // cronjob; the cronjob is not activated manually because it may take a non trivial amount of time because
-    // of other data to be garbage collected
-    await this.repository.delete(featureId);
+    /**
+     * @debt Avoid duplicating transaction scaffolding in multiple sites within
+     * this class: this should be wrapped in a utility method, and the code to
+     * be executed within transactions, as well as error handling (`catch`) and
+     * cleanup (`finally`) should be passed to the utility method.
+     */
+    const apiQueryRunner = this.apiDataSource.createQueryRunner();
+    const geoQueryRunner = this.geoDataSource.createQueryRunner();
+
+    await apiQueryRunner.connect();
+    await geoQueryRunner.connect();
+
+    await apiQueryRunner.startTransaction();
+    await geoQueryRunner.startTransaction();
+
+    try {
+      /**
+       * Delete the feature, as well as its associated amount per planning unit
+       * data.
+       *
+       * This is fast, and leaving amount per planning unit data behind until it
+       * is eventually garbage-collected by a scheduled cleanup task may cause
+       * issues with piece exporters/importers, so it is ok to delete this
+       * associated data straight away.
+       *
+       * Other feature data (such as spatial data) can be left to the cleanup
+       * tasks to delete when suitable, as doing so synchronously at this stage
+       * would be a potentially expensive operation.
+       */
+      await apiQueryRunner.manager.delete(GeoFeature, { id: featureId });
+      await this.deleteFeatureAmountsPerPlanningUnit(
+        geoQueryRunner.manager,
+        featureId,
+      );
+      await apiQueryRunner.commitTransaction();
+      await geoQueryRunner.commitTransaction();
+    } catch (err) {
+      await apiQueryRunner.rollbackTransaction();
+      await geoQueryRunner.rollbackTransaction();
+
+      this.logger.error(
+        `An error occurred while deleting feature with id ${featureId} or any of its related data (changes have been rolled back)`,
+        String(err),
+      );
+      throw err;
+    } finally {
+      // you need to release a queryRunner which was manually instantiated
+      await apiQueryRunner.release();
+      await geoQueryRunner.release();
+    }
 
     return right(true);
   }
