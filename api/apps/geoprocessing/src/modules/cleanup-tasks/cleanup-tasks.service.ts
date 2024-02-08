@@ -473,6 +473,13 @@ export class CleanupTasksService implements CleanupTasks {
         SELECT df.feature_id FROM dangling_features df
       );`,
     );
+
+    await this.geoEntityManager.query(
+      `DELETE FROM feature_amounts_per_planning_unit fappu
+      WHERE fappu.feature_id IN (
+        SELECT df.feature_id FROM dangling_features df
+      );`,
+    );
   }
 
   async deleteDanglingCostSurfacesIdsInGeoDb() {
