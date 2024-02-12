@@ -136,7 +136,7 @@ export function useAllFeatures<T = { data: Feature[] }>(
 ) {
   const { data: session } = useSession();
 
-  const { filters = {}, search, sort, disablePagination } = options;
+  const { filters = {}, search, sort, includeInProgress = false } = options;
 
   const parsedFilters = Object.keys(filters).reduce((acc, k) => {
     return {
@@ -160,6 +160,7 @@ export function useAllFeatures<T = { data: Feature[] }>(
         ...(sort && {
           sort,
         }),
+        includeInProgress,
         disablePagination: true,
       },
     }).then(({ data }) => data);

@@ -28,4 +28,5 @@ export interface UseFeaturesOptionsProps {
   sort?: string;
   filters?: Record<string, unknown>;
   disablePagination?: boolean;
+  includeInProgress?: boolean;
 }

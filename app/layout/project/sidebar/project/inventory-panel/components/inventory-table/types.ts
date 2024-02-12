@@ -1,5 +1,6 @@
 import { ChangeEvent } from 'react';
 
+import { Feature } from 'types/api/feature';
 import { WDPA } from 'types/api/wdpa';
 
 export type DataItem = {
@@ -10,6 +11,8 @@ export type DataItem = {
   tag?: string;
   isVisibleOnMap: boolean;
   isCustom?: boolean;
+  creationStatus?: Feature['creationStatus'];
+  isFeature?: boolean;
 };
 
 export type InventoryTable = {

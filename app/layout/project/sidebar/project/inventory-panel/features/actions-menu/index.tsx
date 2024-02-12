@@ -23,12 +23,14 @@ const ActionsMenu = ({
   item,
   onDismissMenu,
 }: Parameters<ComponentProps<typeof RowItem>['ActionsComponent']>[0]): JSX.Element => {
-  const isDeletable = item.isCustom && !item.scenarios;
+  const isDeletable = (item.isCustom && !item.scenarios) || item.creationStatus === 'failure';
 
   const [modalState, setModalState] = useState<{ edit: boolean; delete: boolean }>({
     edit: false,
     delete: false,
   });
+
+  const isEditable = item.creationStatus === 'created';
 
   const handleModal = useCallback(
     (modalKey: keyof typeof modalState, isVisible: boolean) => {
@@ -51,9 +53,17 @@ const ActionsMenu = ({
           className={cn({
             [BUTTON_CLASSES]: true,
             'rounded-t-2xl': true,
+            [BUTTON_DISABLED_CLASSES]: !isEditable,
           })}
+          disabled={!isEditable}
         >
-          <Icon icon={TAG_SVG} className={ICON_CLASSES} />
+          <Icon
+            icon={TAG_SVG}
+            className={cn({
+              [ICON_CLASSES]: true,
+              [ICON_DISABLED_CLASSES]: !isEditable,
+            })}
+          />
           <span>Edit</span>
         </button>
         <Modal

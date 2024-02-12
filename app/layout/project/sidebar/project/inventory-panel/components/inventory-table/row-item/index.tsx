@@ -20,13 +20,26 @@ const RowItem = ({
   onSelectTag,
   ActionsComponent,
 }: RowItem) => {
-  const { id, name, scenarios, tag, isVisibleOnMap, isCustom } = item;
+  const { id, name, scenarios, tag, isVisibleOnMap, isCustom, isFeature, creationStatus } = item;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const onDismissMenu = useCallback(() => {
     setIsMenuOpen(false);
   }, []);
+
+  const renderScenarioUsage = useCallback((scenarios: (typeof item)['scenarios']) => {
+    return (
+      <div className="mt-1.5 text-xs text-gray-400">
+        Currently in use in{' '}
+        <span className="rounded bg-blue-600 bg-opacity-10 px-1 text-blue-600">{scenarios}</span>{' '}
+        scenarios.
+      </div>
+    );
+  }, []);
+
+  const isFeatureRunning = isFeature && creationStatus === 'running';
+  const isFeatureFailed = isFeature && creationStatus === 'failure';
 
   return (
     <tr key={id} className="flex w-full align-top">
@@ -38,7 +51,7 @@ const RowItem = ({
           onChange={onSelectRow}
           value={id}
           checked={isCustom && selectedIds.includes(id)}
-          disabled={!isCustom}
+          disabled={!isCustom || isFeatureRunning}
         />
       </td>
       <td
@@ -48,15 +61,21 @@ const RowItem = ({
         })}
       >
         <span className="inline-flex break-all">{name}</span>
-        {isCustom && (
-          <div className="mt-1.5 text-xs text-gray-400">
-            Currently in use in{' '}
-            <span className="rounded bg-blue-600 bg-opacity-10 px-1 text-blue-600">
-              {scenarios}
-            </span>{' '}
-            scenarios.
-          </div>
+
+        {isFeature && (
+          <>
+            {isCustom && creationStatus === 'created' && renderScenarioUsage(scenarios)}
+
+            {creationStatus === 'failure' && (
+              <div className="mt-1.5 text-xs text-red-600">Feature could not be processed</div>
+            )}
+
+            {creationStatus === 'running' && (
+              <div className="mt-1.5 text-xs text-gray-400">Feature is being processed...</div>
+            )}
+          </>
         )}
+        {isCustom && !isFeature && renderScenarioUsage(scenarios)}
       </td>
       {tag && (
         <td className="w-28 px-6 pb-2 pt-5 text-xs">
@@ -76,11 +95,16 @@ const RowItem = ({
       )}
       <td className="w-22 ml-auto pb-2 pl-1 pr-2 pt-5">
         <div className="flex gap-6">
-          <button type="button" onClick={() => onToggleSeeOnMap(id)}>
+          <button
+            type="button"
+            onClick={() => onToggleSeeOnMap(id)}
+            disabled={isFeatureRunning || isFeatureFailed}
+          >
             <Icon
               className={cn({
                 'h-5 w-5 text-gray-600': true,
                 'text-blue-500': isVisibleOnMap,
+                'text-gray-700': isFeatureRunning || isFeatureFailed,
               })}
               icon={isVisibleOnMap ? SHOW_SVG : HIDE_SVG}
             />
@@ -98,8 +122,13 @@ const RowItem = ({
                 onClick={() => {
                   setIsMenuOpen((prevState) => !prevState);
                 }}
+                disabled={isFeatureRunning}
               >
-                <HiDotsHorizontal className="pointer-events-none h-4 w-4 text-white" />
+                <HiDotsHorizontal
+                  className={cn('pointer-events-none h-4 w-4 text-white', {
+                    'text-gray-700': isFeatureRunning,
+                  })}
+                />
               </button>
             </PopoverTrigger>
             <PopoverContent

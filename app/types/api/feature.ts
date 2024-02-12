@@ -13,4 +13,5 @@ export interface Feature {
     min: number;
     max: number;
   };
+  creationStatus: 'created' | 'failure' | 'running';
 }
