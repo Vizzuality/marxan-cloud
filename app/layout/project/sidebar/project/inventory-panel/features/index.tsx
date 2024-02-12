@@ -59,6 +59,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     {
       ...{
         ...filters,
+        includeInProgress: true,
         // ? if tag sorting is chosen, sort by tag and then by name
         ...(['tag', '-tag'].includes(filters.sort) && {
           sort: `${filters.sort},featureClassName`,
@@ -79,6 +80,12 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
             isCustom: feature.isCustom,
             color,
             amountRange: feature.amountRange,
+            isFeature: true,
+            creationStatus: feature.creationStatus,
+            // ! keep for testing. Remove once done.
+            // creationStatus: 'created',
+            // creationStatus: 'running',
+            // creationStatus: 'failure',
           };
         });
       },
@@ -195,13 +202,15 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     return d;
   }, [allFeaturesQuery.data, layerSettings, selectedTag]);
 
-  const featureIds = data?.filter(({ isCustom }) => isCustom).map((feature) => feature.id);
-
   const handleSelectAll = useCallback(
     (evt: ChangeEvent<HTMLInputElement>) => {
-      setSelectedFeaturesIds(evt.target.checked ? featureIds : []);
+      const allSelectableFeatues = allFeaturesQuery.data
+        ?.filter(({ isCustom, creationStatus }) => isCustom && creationStatus !== 'running')
+        .map(({ id }) => id);
+
+      setSelectedFeaturesIds(evt.target.checked ? allSelectableFeatues : []);
     },
-    [featureIds]
+    [allFeaturesQuery.data]
   );
 
   useEffect(() => {

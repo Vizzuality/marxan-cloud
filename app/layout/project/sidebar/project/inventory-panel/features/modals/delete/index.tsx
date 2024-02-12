@@ -46,6 +46,10 @@ const DeleteModal = ({
     Boolean(scenarioUsageCount)
   );
 
+  const haveFeaturesRunning = selectedFeatures.some(
+    ({ creationStatus }) => creationStatus === 'running'
+  );
+
   const handleBulkDelete = useCallback(() => {
     const deletableFeatureIds = selectedFeatures.map(({ id }) => id);
 
@@ -109,7 +113,8 @@ const DeleteModal = ({
       <div className="flex items-center space-x-1.5 rounded border-l-[5px] border-red-700 bg-red-100/50 px-1.5 py-4">
         <Icon className="h-10 w-10 text-red-700" icon={ALERT_SVG} />
         <p className="font-sans text-xs font-medium text-black">
-          A feature can be deleted ONLY if it&apos;s not being used by any scenario
+          A feature can be deleted ONLY if it&apos;s not being used by any scenario and it is not
+          being processed at the moment of deletion.
         </p>
       </div>
       <div className="flex w-full justify-between space-x-3 px-10 py-2">
@@ -120,7 +125,7 @@ const DeleteModal = ({
           theme="danger-alt"
           size="lg"
           className="w-full"
-          disabled={haveScenarioAssociated}
+          disabled={haveScenarioAssociated || haveFeaturesRunning}
           onClick={handleBulkDelete}
         >
           Delete
