@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { Button } from 'components/button/component';
 import Table from 'components/table';
+import { cn } from 'utils/cn';
 
 import BestCell from './cells/best';
 import { SolutionsTableProps } from './types';
@@ -28,7 +29,9 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
       <Button
         theme={isSelected ? 'secondary' : 'secondary-alt'}
         size="s"
-        className="flex w-full justify-center"
+        className={cn('flex w-full justify-center', {
+          'text-gray-900': !isSelected,
+        })}
         onClick={() => {
           setSelectedRowId(row.id);
           onSelectSolution(row);
