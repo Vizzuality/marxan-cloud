@@ -125,11 +125,11 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
           await this.updateScenario(em, scenarioId, metadata, input.ownerId);
         } else {
           /**
-            * Aggressive locking on the table is used here in order to ensure that by the time
-            * the trigger function that is executed on insert will not get stale data from
-            * concurrent transactions. Inserting in serializable mode seems not to be enough,
-            * from checks done when this lock was added.
-            */
+           * Aggressive locking on the table is used here in order to ensure that by the time
+           * the trigger function that is executed on insert will not get stale data from
+           * concurrent transactions. Inserting in serializable mode seems not to be enough,
+           * from checks done when this lock was added.
+           */
           await em.query('lock table scenarios');
           await this.createScenario(
             em,
