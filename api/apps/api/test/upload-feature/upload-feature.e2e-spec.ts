@@ -124,3 +124,29 @@ test(`if there is already an existing feature with a tag that has equivalent cap
   await fixtures.ThenGeoFeatureTagIsCreated(name, equivalentTag);
   // TODO Check for update of last_modified_at for all affected tag rows for project when implemented
 });
+
+test(`custom feature upload`, async () => {
+  const name = 'someFeature';
+  const description = 'someDescrip';
+  await fixtures.GivenProjectPusWithGeometryForProject();
+
+  const result = await fixtures.WhenUploadingCustomFeature(name, description);
+
+  await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
+  await fixtures.ThenFeatureAmountsFromShapefileAreCreated(name);
+});
+
+test('should delete feature_amounts_per_planning_unit data related to a feature when this is deleted', async () => {
+  const name = 'someFeature';
+  const description = 'someDescrip';
+  await fixtures.GivenProjectPusWithGeometryForProject();
+
+  const result = await fixtures.WhenUploadingCustomFeature(name, description);
+
+  await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
+  await fixtures.ThenFeatureAmountsFromShapefileAreCreated(name);
+  await fixtures.WhenDeletingFeatureForProject(name);
+  await fixtures.ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId(
+    name,
+  );
+});

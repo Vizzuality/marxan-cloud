@@ -135,18 +135,6 @@ describe('Project - Delete Feature', () => {
     );
     await fixtures.ThenGeoFeaturesIsDeleted(result, featureId);
   });
-
-  test('should delete feature_amounts_per_planning_unit data related to a feature when this is deleted', async () => {
-    const projectId = fixtures.projectId;
-    const featureId = await fixtures.GivenBaseFeature(
-      'deletedFeature',
-      projectId,
-    );
-    await fixtures.WhenDeletingFeatureForProject(projectId, featureId);
-    await fixtures.ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId(
-      featureId,
-    );
-  });
 });
 
 // NOTE:
@@ -323,18 +311,6 @@ const getFixtures = async () => {
         where: { id: featureId },
       });
       expect(feature).toBeNull();
-    },
-
-    ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId: async (
-      featureId: string,
-    ) => {
-      const featureAmountsPerPlanningUnitForFeature =
-        await featureAmountsPerPlanningUnitRepo.find({
-          where: {
-            featureId,
-          },
-        });
-      expect(featureAmountsPerPlanningUnitForFeature).toBeUndefined();
     },
   };
 };
