@@ -19,6 +19,7 @@ import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { GivenScenarioExists } from '../../steps/given-scenario-exists';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { FeatureAmountsPerPlanningUnitEntity } from '@marxan/feature-amounts-per-planning-unit';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -134,6 +135,18 @@ describe('Project - Delete Feature', () => {
     );
     await fixtures.ThenGeoFeaturesIsDeleted(result, featureId);
   });
+
+  test('should delete feature_amounts_per_planning_unit data related to a feature when this is deleted', async () => {
+    const projectId = fixtures.projectId;
+    const featureId = await fixtures.GivenBaseFeature(
+      'deletedFeature',
+      projectId,
+    );
+    await fixtures.WhenDeletingFeatureForProject(projectId, featureId);
+    await fixtures.ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId(
+      featureId,
+    );
+  });
 });
 
 // NOTE:
@@ -156,6 +169,8 @@ const getFixtures = async () => {
   const featuresDataRepo: Repository<GeoFeatureGeometry> = app.get(
     getRepositoryToken(GeoFeatureGeometry, DbConnections.geoprocessingDB),
   );
+  const featureAmountsPerPlanningUnitRepo: Repository<FeatureAmountsPerPlanningUnitEntity> =
+    app.get(getRepositoryToken(FeatureAmountsPerPlanningUnitEntity));
   const scenarioRepo: Repository<Scenario> = app.get(
     getRepositoryToken(Scenario),
   );
@@ -308,6 +323,18 @@ const getFixtures = async () => {
         where: { id: featureId },
       });
       expect(feature).toBeNull();
+    },
+
+    ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId: async (
+      featureId: string,
+    ) => {
+      const featureAmountsPerPlanningUnitForFeature =
+        await featureAmountsPerPlanningUnitRepo.find({
+          where: {
+            featureId,
+          },
+        });
+      expect(featureAmountsPerPlanningUnitForFeature).toBeUndefined();
     },
   };
 };
