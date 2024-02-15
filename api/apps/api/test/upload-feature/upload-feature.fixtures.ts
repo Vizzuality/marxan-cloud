@@ -228,7 +228,6 @@ export const getFixtures = async () => {
           description: customFeatureDesc,
         });
     },
-
     WhenUploadingCsvWithPuidsNotPresentITheProject: async () => {
       await GivenProjectsPuExists(geoEntityManager, projectId);
       return request(app.getHttpServer())
@@ -243,7 +242,15 @@ export const getFixtures = async () => {
           description: customFeatureDesc,
         });
     },
-
+    WhenDeletingFeatureForProject: async (featureClassName: string) => {
+      const feature = await featuresRepository.findOneOrFail({
+        where: { featureClassName },
+      });
+      await request(app.getHttpServer())
+        .delete(`/api/v1/projects/${projectId}/features/${feature?.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send();
+    },
     // ASSERT
     ThenMaxLengthErrorWasReturned: (response: request.Response) => {
       const error: any =
@@ -426,6 +433,22 @@ export const getFixtures = async () => {
       expect(feature2Amounts[0].amount).toBe(0);
       expect(feature2Amounts[1].amount).toBe(0);
       expect(feature2Amounts[2].amount).toBe(0);
+    },
+    ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId: async (
+      featureClassName: string,
+    ) => {
+      const featureId = await featuresRepository
+        .findOneOrFail({
+          where: { featureClassName },
+        })
+        .then((result) => result.id);
+      const featureAmountsPerPlanningUnitForFeature =
+        await featureAmountsPerPlanningUnitRepo.find({
+          where: {
+            featureId,
+          },
+        });
+      expect(featureAmountsPerPlanningUnitForFeature.length).toBe(0);
     },
     ThenFeatureUploadRegistryIsCleared: async () => {
       const featureImportRegistryRecord = await featureImportRegistry.findOne({
