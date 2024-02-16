@@ -20,6 +20,7 @@ import {
 } from '@marxan-jobs/planning-unit-geometry';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { GivenPuSquareGridGeometryExists } from '../../../geoprocessing/test/steps/given-pu-geometries-exists';
+import { waitForFeatureToBeReady } from '../utils/wait-for-feature-to-be-ready.utils';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -145,6 +146,9 @@ export const getFixtures = async () => {
       name: string,
       description: string,
       tagName?: string,
+      options?: {
+        skipWaitingForFeatureToBeReady?: boolean;
+      },
     ) => {
       const dto: any = {
         name,
@@ -153,11 +157,19 @@ export const getFixtures = async () => {
       if (tagName) {
         dto.tagName = tagName;
       }
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/features/shapefile`)
         .set('Authorization', `Bearer ${token}`)
         .attach(`file`, __dirname + `/import-files/wetlands.zip`)
         .field(dto);
+      if (!options?.skipWaitingForFeatureToBeReady) {
+        expect(response.body.data.id).toBeDefined();
+        await waitForFeatureToBeReady(
+          geoFeaturesApiRepo,
+          response.body.data.id,
+        );
+      }
+      return response;
     },
     WhenUploadingCustomFeatureFromCSV: async () => {
       await GivenProjectsPuExists(geoEntityManager, projectId);
@@ -321,7 +333,7 @@ export const getFixtures = async () => {
           amountMin: 820348505.9774874,
           propertyName: null,
           intersection: null,
-          creationStatus: `done`,
+          creationStatus: 'created',
           projectId,
           isCustom: true,
           isLegacy: false,
@@ -435,13 +447,8 @@ export const getFixtures = async () => {
       expect(feature2Amounts[2].amount).toBe(0);
     },
     ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId: async (
-      featureClassName: string,
+      featureId: string,
     ) => {
-      const featureId = await featuresRepository
-        .findOneOrFail({
-          where: { featureClassName },
-        })
-        .then((result) => result.id);
       const featureAmountsPerPlanningUnitForFeature =
         await featureAmountsPerPlanningUnitRepo.find({
           where: {
