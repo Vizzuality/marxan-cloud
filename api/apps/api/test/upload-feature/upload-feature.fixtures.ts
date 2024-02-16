@@ -159,8 +159,8 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${token}`)
         .attach(`file`, __dirname + `/import-files/wetlands.zip`)
         .field(dto);
-      expect(response.body.id).toBeDefined();
-      await waitForFeatureToBeReady(geoFeaturesApiRepo, response.body.id);
+      expect(response.body.data.id).toBeDefined();
+      await waitForFeatureToBeReady(geoFeaturesApiRepo, response.body.data.id);
       return response;
     },
     WhenUploadingCustomFeatureFromCSV: async () => {
@@ -439,13 +439,8 @@ export const getFixtures = async () => {
       expect(feature2Amounts[2].amount).toBe(0);
     },
     ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId: async (
-      featureClassName: string,
+      featureId: string,
     ) => {
-      const featureId = await featuresRepository
-        .findOneOrFail({
-          where: { featureClassName },
-        })
-        .then((result) => result.id);
       const featureAmountsPerPlanningUnitForFeature =
         await featureAmountsPerPlanningUnitRepo.find({
           where: {
