@@ -20,6 +20,7 @@ import {
 } from '@marxan-jobs/planning-unit-geometry';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { GivenPuSquareGridGeometryExists } from '../../../geoprocessing/test/steps/given-pu-geometries-exists';
+import { waitForFeatureToBeReady } from '../utils/wait-for-feature-to-be-ready.utils';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -153,11 +154,14 @@ export const getFixtures = async () => {
       if (tagName) {
         dto.tagName = tagName;
       }
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/features/shapefile`)
         .set('Authorization', `Bearer ${token}`)
         .attach(`file`, __dirname + `/import-files/wetlands.zip`)
         .field(dto);
+      expect(response.body.id).toBeDefined();
+      await waitForFeatureToBeReady(geoFeaturesApiRepo, response.body.id);
+      return response;
     },
     WhenUploadingCustomFeatureFromCSV: async () => {
       await GivenProjectsPuExists(geoEntityManager, projectId);
