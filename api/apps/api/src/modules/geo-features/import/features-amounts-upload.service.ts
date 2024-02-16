@@ -232,7 +232,7 @@ export class FeatureAmountUploadService {
       return {
         featureClassName: feature.feature_name,
         projectId: projectId,
-        creationStatus: JobStatus.done,
+        creationStatus: JobStatus.created,
         isLegacy: true,
       };
     });

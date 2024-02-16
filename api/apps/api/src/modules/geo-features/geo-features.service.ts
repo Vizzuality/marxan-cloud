@@ -741,7 +741,7 @@ export class GeoFeaturesService extends AppBaseService<
         featureClassName: data.name,
         description: data.description,
         projectId,
-        creationStatus: JobStatus.done,
+        creationStatus: JobStatus.created,
       }),
     );
   }
