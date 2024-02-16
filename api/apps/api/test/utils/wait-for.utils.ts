@@ -1,5 +1,4 @@
 import { Logger } from '@nestjs/common';
-import ms from 'ms';
 
 type msTime = number;
 
@@ -23,14 +22,14 @@ export const waitFor = async (
   Logger.debug(`Polling for ${retryOp.description} until complete...`);
 
   if (retryOptions?.delayMs) {
-    const delay = ms(retryOptions.delayMs ?? '0') as number;
+    const delay = retryOptions.delayMs ?? '0';
     Logger.debug(
       `Waiting for ${delay / 1e3}s before starting to poll status...`,
     );
     await sleep(delay / 1e3);
   }
 
-  const interval = ms(retryOptions.intervalMs) as number;
+  const interval = retryOptions.intervalMs;
 
   for (const i of [...Array(retryOptions.maxTries).keys()]) {
     Logger.debug(`Retry ${i} of ${retryOptions.maxTries}...`);
