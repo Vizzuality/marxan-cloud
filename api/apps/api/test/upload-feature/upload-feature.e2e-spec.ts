@@ -37,6 +37,7 @@ test(`if tagging info is included in DTO but invalid, then error is returned and
     name,
     description,
     invalidTag1,
+    { skipWaitingForFeatureToBeReady: true }, // needed as this feature will never be actually created
   );
   expect(result1.status).toBe(HttpStatus.BAD_REQUEST);
   fixtures.ThenInvalidTagErrorWasReturned(result1);
@@ -46,6 +47,7 @@ test(`if tagging info is included in DTO but invalid, then error is returned and
     name,
     description,
     invalidTag2,
+    { skipWaitingForFeatureToBeReady: true }, // needed as this feature will never be actually created
   );
   expect(result2.status).toBe(HttpStatus.BAD_REQUEST);
   fixtures.ThenMaxLengthErrorWasReturned(result2);
@@ -132,10 +134,9 @@ test('should delete feature_amounts_per_planning_unit data related to a feature 
 
   const result = await fixtures.WhenUploadingCustomFeature(name, description);
 
-  await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
   await fixtures.ThenFeatureAmountsFromShapefileAreCreated(name);
   await fixtures.WhenDeletingFeatureForProject(name);
   await fixtures.ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId(
-    name,
+    result.body.id,
   );
 });
