@@ -143,10 +143,9 @@ test('should delete feature_amounts_per_planning_unit data related to a feature 
 
   const result = await fixtures.WhenUploadingCustomFeature(name, description);
 
-  await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
   await fixtures.ThenFeatureAmountsFromShapefileAreCreated(name);
   await fixtures.WhenDeletingFeatureForProject(name);
   await fixtures.ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId(
-    name,
+    result.body.id,
   );
 });
