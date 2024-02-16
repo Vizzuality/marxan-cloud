@@ -272,7 +272,7 @@ async function getFixtures() {
           setIsPublicProperty: jest.fn(),
           sources: ProjectSourcesEnum.legacyImport,
         },
-        status: JobStatus.done,
+        status: JobStatus.created,
         type: ScenarioType.marxanWithZones,
         users: [],
         ranAtLeastOnce: false,
