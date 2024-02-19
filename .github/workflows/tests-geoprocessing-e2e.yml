@@ -32,6 +32,6 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run CI tests via make task
         run: TEST_SUITE_PATH="${{ matrix.test-suite }}" make test-e2e-geoprocessing environment=ci
