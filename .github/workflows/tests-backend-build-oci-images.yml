@@ -45,17 +45,17 @@ jobs:
       REPOSITORY: marxan-api
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Prepare ids
         shell: bash
@@ -66,7 +66,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
           REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
@@ -84,17 +84,17 @@ jobs:
       REPOSITORY: marxan-geoprocessing
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Prepare ids
         shell: bash
@@ -105,7 +105,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
           REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
@@ -123,17 +123,17 @@ jobs:
       REPOSITORY: marxan-postgresql-api
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Prepare ids
         shell: bash
@@ -144,7 +144,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
           REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
@@ -162,17 +162,17 @@ jobs:
       REPOSITORY: marxan-postgresql-geo-api
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Prepare ids
         shell: bash
@@ -183,7 +183,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
           REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
@@ -201,17 +201,17 @@ jobs:
       REPOSITORY: marxan-redis
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Prepare ids
         shell: bash
@@ -222,7 +222,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
           REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
@@ -239,17 +239,17 @@ jobs:
       REPOSITORY: marxan-webshot
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Prepare ids
         shell: bash
@@ -260,7 +260,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
           REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
