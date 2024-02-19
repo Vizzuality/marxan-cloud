@@ -89,9 +89,13 @@ const InventoryPanelCostSurface = ({ noData: noDataMessage }: { noData: string }
 
   const handleSelectAll = useCallback(
     (evt: ChangeEvent<HTMLInputElement>) => {
-      setSelectedCostSurfaceIds(evt.target.checked ? costSurfaceIds : []);
+      setSelectedCostSurfaceIds(
+        evt.target.checked
+          ? filteredData?.filter(({ isCustom }) => isCustom).map((cs) => cs.id)
+          : []
+      );
     },
-    [costSurfaceIds]
+    [filteredData]
   );
 
   const handleSelectCostSurface = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
