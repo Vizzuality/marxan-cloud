@@ -34,8 +34,9 @@ const DeleteModal = ({
 
   const selectedCostSurfaces = useMemo(() => {
     return (
-      allProjectCostSurfacesQuery.data?.filter(({ id }) => selectedCostSurfacesIds.includes(id)) ||
-      []
+      allProjectCostSurfacesQuery.data?.filter(
+        ({ id, isDefault }) => selectedCostSurfacesIds.includes(id) && !isDefault
+      ) || []
     );
   }, [allProjectCostSurfacesQuery.data, selectedCostSurfacesIds]);
 
