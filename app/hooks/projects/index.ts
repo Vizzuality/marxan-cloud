@@ -189,8 +189,8 @@ export function useSaveProject({
   };
 
   return useMutation(saveProject, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('projects');
+    onSuccess: async () => {
+      await queryClient.invalidateQueries('projects');
     },
     onError: (error, variables, context) => {
       // An error happened!

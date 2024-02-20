@@ -1,4 +1,4 @@
-import { useQuery, QueryObserverOptions, useMutation } from 'react-query';
+import { useQuery, QueryObserverOptions, useMutation, useQueryClient } from 'react-query';
 
 import { useSession } from 'next-auth/react';
 
@@ -86,6 +86,7 @@ export function useEditProjectCostSurface() {
 
 export function useUploadProjectCostSurface() {
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
 
   const uploadProjectCostSurface = ({ id, data }: { id: CostSurface['id']; data: FormData }) => {
     return UPLOADS.request({
@@ -99,5 +100,14 @@ export function useUploadProjectCostSurface() {
     });
   };
 
-  return useMutation(uploadProjectCostSurface);
+  return useMutation(uploadProjectCostSurface, {
+    onSuccess: (data, variables) => {
+      // ? delaying the invalidation of the query to avoid falling in a "limbo" window where
+      // ? the application is not aware if it should refetch the list as the API processing was not fast enough to resolve before the upload callback
+      // ? but it is fast enough to resolve before the first polling after upload. This window time is known as "limbo".
+      setTimeout(() => {
+        queryClient.invalidateQueries(['cost-surfaces', variables.id]);
+      }, 1000);
+    },
+  });
 }
