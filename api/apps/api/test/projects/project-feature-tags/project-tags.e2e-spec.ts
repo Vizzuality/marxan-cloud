@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { HttpStatus } from '@nestjs/common';
 import { getProjectTagsFixtures } from './project-tags.fixtures';
 import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 let fixtures: FixtureType<typeof getProjectTagsFixtures>;
 
@@ -109,7 +110,7 @@ describe('Projects Tag GET (e2e)', () => {
     expect(response2.body.data).toEqual(['AnotherTag', 'another-repeated-tag']);
   });
 
-  test('should return all available distinct tags for the given project if no tag query param is provided', async () => {
+  test('should return all available distinct tags for  the features of given project that have creationStatus created, if no tag query param is provided', async () => {
     const projectId1 = await fixtures.GivenProject('someProject');
     const featureId11 = await fixtures.GivenFeatureOnProject(
       projectId1,
@@ -123,9 +124,30 @@ describe('Projects Tag GET (e2e)', () => {
       projectId1,
       'name13',
     );
+    const featureIdRunning = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'running',
+      JobStatus.running,
+    );
+    const featureIdFailure = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'failure',
+      JobStatus.failure,
+    );
+
     await fixtures.GivenTagOnFeature(projectId1, featureId11, 'OneRepeatedTag');
     await fixtures.GivenTagOnFeature(projectId1, featureId12, 'OneRepeatedTag');
     await fixtures.GivenTagOnFeature(projectId1, featureId13, 'AnotherTag');
+    await fixtures.GivenTagOnFeature(
+      projectId1,
+      featureIdRunning,
+      'Irrelevant',
+    );
+    await fixtures.GivenTagOnFeature(
+      projectId1,
+      featureIdFailure,
+      'Irrelevant',
+    );
 
     // ACT
     const response = await fixtures.WhenGettingProjectTags(
@@ -210,7 +232,7 @@ describe('Projects Tag PATCH (e2e)', () => {
     fixtures.ThenTagNotFoundErrorWasReturned(response, projectId);
   });
 
-  test('should update all feature tag rows that match exactly with the tag to be updated, for the given Project', async () => {
+  test('should update all feature tag rows that match exactly with the tag to be updated, for the features in the given Project, that have a creationStatus of created only ', async () => {
     // ARRANGE
     const projectId1 = await fixtures.GivenProject('someProject');
     const projectId2 = await fixtures.GivenProject('someProject2');
@@ -219,12 +241,32 @@ describe('Projects Tag PATCH (e2e)', () => {
     const featureId13 = await fixtures.GivenFeatureOnProject(projectId1, 'f13');
     const featureId14 = await fixtures.GivenFeatureOnProject(projectId1, 'f14');
     const featureId21 = await fixtures.GivenFeatureOnProject(projectId2, 'f21');
+    const featureIdRunning = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'running',
+      JobStatus.running,
+    );
+    const featureIdFailure = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'failure',
+      JobStatus.failure,
+    );
 
     await fixtures.GivenTagOnFeature(projectId1, featureId11, 'toBeUpdated');
     await fixtures.GivenTagOnFeature(projectId1, featureId12, 'notupdated');
     await fixtures.GivenTagOnFeature(projectId1, featureId13, 'NOTupdated');
     await fixtures.GivenTagOnFeature(projectId1, featureId14, 'TOBEUPDATED');
     await fixtures.GivenTagOnFeature(projectId2, featureId21, 'toBeUpdated');
+    await fixtures.GivenTagOnFeature(
+      projectId1,
+      featureIdRunning,
+      'toBeUpdated',
+    );
+    await fixtures.GivenTagOnFeature(
+      projectId1,
+      featureIdFailure,
+      'toBeUpdated',
+    );
 
     //ACT
     const response = await fixtures.WhenPatchingAProjectTag(
@@ -237,7 +279,16 @@ describe('Projects Tag PATCH (e2e)', () => {
     expect(response.status).toBe(HttpStatus.OK);
     await fixtures.ThenFeatureHasTag(projectId1, featureId12, 'notupdated');
     await fixtures.ThenFeatureHasTag(projectId1, featureId13, 'notupdated');
-    await fixtures.ThenFeatureHasTag(projectId2, featureId21, 'toBeUpdated');
+    await fixtures.ThenFeatureHasTag(
+      projectId1,
+      featureIdRunning,
+      'updatedTAG',
+    );
+    await fixtures.ThenFeatureHasTag(
+      projectId1,
+      featureIdFailure,
+      'updatedTAG',
+    );
 
     await fixtures.ThenFeatureHasTag(projectId1, featureId11, 'updatedTAG');
     await fixtures.ThenFeatureHasTag(projectId1, featureId14, 'updatedTAG');
@@ -347,6 +398,16 @@ describe('Projects Tag GET Features (e2e)', () => {
     const featureId13 = await fixtures.GivenFeatureOnProject(projectId1, 'f13');
     const featureId14 = await fixtures.GivenFeatureOnProject(projectId1, 'f14');
     const featureId21 = await fixtures.GivenFeatureOnProject(projectId2, 'f21');
+    const featureIdRunning = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'running',
+      JobStatus.running,
+    );
+    const featureIdFailure = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'failure',
+      JobStatus.failure,
+    );
 
     const mockedIntersectingProjectFeature =
       fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock([
@@ -361,6 +422,9 @@ describe('Projects Tag GET Features (e2e)', () => {
 
     await fixtures.GivenTagOnFeature(projectId1, featureId14, 'wind');
     await fixtures.GivenTagOnFeature(projectId2, featureId21, 'fire');
+
+    await fixtures.GivenTagOnFeature(projectId1, featureIdRunning, 'fire');
+    await fixtures.GivenTagOnFeature(projectId1, featureIdFailure, 'EARTH');
 
     // ACT
     const response1 = await fixtures.WhenGettingFeaturesFromProject(

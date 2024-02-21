@@ -10,7 +10,7 @@ import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
 import { GivenProjectsPuExists } from '../../../geoprocessing/test/steps/given-projects-pu-exists';
-import { HttpStatus } from '@nestjs/common';
+import { BadRequestException, HttpStatus } from '@nestjs/common';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
 import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { FeatureAmountsPerPlanningUnitEntity } from '@marxan/feature-amounts-per-planning-unit';
@@ -20,11 +20,21 @@ import {
 } from '@marxan-jobs/planning-unit-geometry';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { GivenPuSquareGridGeometryExists } from '../../../geoprocessing/test/steps/given-pu-geometries-exists';
-import { waitForFeatureToBeReady } from '../utils/wait-for-feature-to-be-ready.utils';
+import { EventBusTestUtils } from '../utils/event-bus.test.utils';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ApiEventsService } from '@marxan-api/modules/api-events';
+import { GivenUserExists } from '../steps/given-user-exists';
+import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { waitForEvent } from '../utils/wait-for-feature-to-be-ready.utils';
 
 export const getFixtures = async () => {
-  const app = await bootstrapApplication();
+  const app = await bootstrapApplication([], [EventBusTestUtils]);
+  const eventBusUtils = app.get(EventBusTestUtils);
+  eventBusUtils.startInspectingEvents();
+  const apiEventService = app.get(ApiEventsService);
   const token = await GivenUserIsLoggedIn(app);
+  const userId = await GivenUserExists(app);
   const { projectId, cleanup } = await GivenProjectExists(
     app,
     token,
@@ -77,6 +87,8 @@ export const getFixtures = async () => {
     );
 
   return {
+    userId,
+    projectId,
     cleanup: async () => {
       const feature = await geoFeaturesApiRepo.findOne({
         where: {
@@ -93,7 +105,9 @@ export const getFixtures = async () => {
       });
       await planningUnitsRepo.delete({});
       await projectsPuRepo.delete({});
+      await apiEventService.purgeAll();
       await cleanup();
+      eventBusUtils.stopInspectingEvents();
       await app.close();
     },
 
@@ -146,9 +160,6 @@ export const getFixtures = async () => {
       name: string,
       description: string,
       tagName?: string,
-      options?: {
-        skipWaitingForFeatureToBeReady?: boolean;
-      },
     ) => {
       const dto: any = {
         name,
@@ -162,13 +173,6 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${token}`)
         .attach(`file`, __dirname + `/import-files/wetlands.zip`)
         .field(dto);
-      if (!options?.skipWaitingForFeatureToBeReady) {
-        expect(response.body.data.id).toBeDefined();
-        await waitForFeatureToBeReady(
-          geoFeaturesApiRepo,
-          response.body.data.id,
-        );
-      }
       return response;
     },
     WhenUploadingCustomFeatureFromCSV: async () => {
@@ -264,6 +268,72 @@ export const getFixtures = async () => {
         .send();
     },
     // ASSERT
+    ThenWaitForApiEvent: (topic: string, kind: API_EVENT_KINDS) => {
+      return new Promise<ApiEventByTopicAndKind>((resolve, reject) => {
+        const findApiEvent = setInterval(async () => {
+          try {
+            const event = await apiEventService.getLatestEventForTopic({
+              topic,
+              kind,
+            });
+            clearInterval(findApiEvent);
+
+            resolve(event);
+          } catch (e) {
+            console.error(e);
+          }
+        }, 150);
+
+        setTimeout(async () => {
+          clearInterval(findApiEvent);
+          reject();
+        }, 6000);
+      });
+    },
+    ThenCSVImportSubmitEventWasSubmitted: async (topic: string) => {
+      await waitForEvent(
+        apiEventService,
+        topic,
+        API_EVENT_KINDS.features__csv__import__submitted__v1__alpha,
+      );
+    },
+    ThenCSVImportFinishedEventWasSubmitted: async (topic: string) => {
+      await waitForEvent(
+        apiEventService,
+        topic,
+        API_EVENT_KINDS.features__csv__import__finished__v1__alpha,
+      );
+    },
+    ThenCSVImportFailedEventWasSubmitted: async (topic: string) => {
+      await waitForEvent(
+        apiEventService,
+        topic,
+        API_EVENT_KINDS.features__csv__import__failed__v1__alpha,
+      );
+    },
+
+    ThenShapefileImportSubmittedEventWasSubmitted: async (topic: string) => {
+      await waitForEvent(
+        apiEventService,
+        topic,
+        API_EVENT_KINDS.features__shapefile__import__submitted__v1__alpha,
+      );
+    },
+    ThenShapefileImportFinishedEventWasSubmitted: async (topic: string) => {
+      await waitForEvent(
+        apiEventService,
+        topic,
+        API_EVENT_KINDS.features__shapefile__import__finished__v1__alpha,
+      );
+    },
+    ThenShapefileImportFailedEventWasSubmitted: async (topic: string) => {
+      await waitForEvent(
+        apiEventService,
+        topic,
+        API_EVENT_KINDS.features__shapefile__import__failed__v1__alpha,
+      );
+    },
+
     ThenMaxLengthErrorWasReturned: (response: request.Response) => {
       const error: any =
         response.body.errors[0].meta.rawError.response.message[0];
@@ -309,13 +379,9 @@ export const getFixtures = async () => {
       result: request.Response,
       name: string,
       description: string,
-      tag?: string,
     ) => {
       // Check response payload, in JSON:API format
-      expect(result.body?.data?.type).toEqual('geo_features');
-      expect(result.body?.data?.attributes?.isCustom).toEqual(true);
-      expect(result.body?.data?.attributes?.featureClassName).toEqual(name);
-      expect(result.body?.data?.attributes?.tag).toEqual(tag);
+      expect(result.status).toBe(HttpStatus.CREATED);
 
       const features = await geoFeaturesApiRepo.find({
         where: {
@@ -333,7 +399,7 @@ export const getFixtures = async () => {
           amountMin: 820348505.9774874,
           propertyName: null,
           intersection: null,
-          creationStatus: 'created',
+          creationStatus: JobStatus.created,
           projectId,
           isCustom: true,
           isLegacy: false,
@@ -382,6 +448,7 @@ export const getFixtures = async () => {
       expect(newFeaturesAdded[1].isLegacy).toBe(true);
       expect(newFeaturesAdded[0].amountMin).toEqual(3.245387225);
       expect(newFeaturesAdded[0].amountMax).toEqual(4.245387225);
+      expect(newFeaturesAdded[0].creationStatus).toEqual(JobStatus.created);
     },
 
     ThenNewFeaturesAmountsAreCreated: async () => {
@@ -465,22 +532,23 @@ export const getFixtures = async () => {
       expect(featureImportRegistryRecord?.projectId).toBeUndefined();
       expect(featureImportRegistryRecord?.uploadedFeatures).toBeUndefined();
     },
-    ThenMissingPUIDErrorIsReturned: async (result: request.Response) => {
-      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
-      expect(result.body.errors[0].title).toEqual('Missing PUID column');
+    ThenMissingPUIDErrorIsReturned: (event: ApiEventByTopicAndKind) => {
+      expect(event.data?.name).toEqual(BadRequestException.name);
+      expect(event.data?.message).toEqual('Missing PUID column');
     },
-    ThenNoFeaturesInCsvFileErrorIsReturned: async (
-      result: request.Response,
-    ) => {
-      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
+    ThenNoFeaturesInCsvFileErrorIsReturned: (event: ApiEventByTopicAndKind) => {
+      expect(event.data?.name).toEqual(BadRequestException.name);
+      expect(event.data?.message).toEqual(
+        'No features found in feature amount CSV upload',
+      );
     },
-    ThenDuplicatedPUIDErrorIsReturned: async (result: request.Response) => {
-      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
-      expect(result.body.errors[0].title).toEqual(
+    ThenDuplicatedPUIDErrorIsReturned: (event: ApiEventByTopicAndKind) => {
+      expect(event.data?.name).toEqual(BadRequestException.name);
+      expect(event.data?.message).toEqual(
         'Duplicate PUIDs in feature amount CSV upload',
       );
     },
-    ThenProjectNotFoundErrorIsReturned: async (
+    ThenProjectNotFoundErrorIsReturned: (
       result: request.Response,
       falseProjectId: string,
     ) => {
@@ -489,15 +557,15 @@ export const getFixtures = async () => {
         `Project with id ${falseProjectId} not found`,
       );
     },
-    ThenDuplicatedHeaderErrorIsReturned: async (result: request.Response) => {
-      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
-      expect(result.body.errors[0].title).toEqual(
+    ThenDuplicatedHeaderErrorIsReturned: (event: ApiEventByTopicAndKind) => {
+      expect(event.data?.name).toEqual(BadRequestException.name);
+      expect(event.data?.message).toEqual(
         'Duplicate headers found ["feat_1d666bd"]',
       );
     },
-    ThenPuidsNotPresentErrorIsReturned: async (result: request.Response) => {
-      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
-      expect(result.body.errors[0].title).toEqual('Unknown PUIDs');
+    ThenPuidsNotPresentErrorIsReturned: (event: ApiEventByTopicAndKind) => {
+      expect(event.data?.name).toEqual(BadRequestException.name);
+      expect(event.data?.message).toEqual('Unknown PUIDs');
     },
     AndNoFeatureUploadIsRegistered: async () => {
       const featureImportRegistryRecord = await featureImportRegistry.findOne({

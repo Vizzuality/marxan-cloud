@@ -16,6 +16,7 @@ import { isEqual } from 'lodash';
 import { FindOneOptions, In, Repository } from 'typeorm';
 import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
 import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -415,6 +416,10 @@ async function getFixtures() {
       findOne: jest.fn((_: any) => Promise.resolve({} as Scenario)),
     };
 
+  const fakeFeaturesRepo: jest.Mocked<Pick<Repository<GeoFeature>, 'count'>> = {
+    count: jest.fn((_: any) => Promise.resolve(1)),
+  };
+
   const fakePlaningAreaFacade = {
     locatePlanningAreaEntity: jest.fn(),
   };
@@ -431,6 +436,10 @@ async function getFixtures() {
       {
         provide: getRepositoryToken(Scenario),
         useValue: fakeScenariosRepo,
+      },
+      {
+        provide: getRepositoryToken(GeoFeature),
+        useValue: fakeFeaturesRepo,
       },
       {
         provide: PlanningAreasService,

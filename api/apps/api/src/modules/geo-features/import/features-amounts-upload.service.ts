@@ -8,22 +8,28 @@ import {
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { DataSource, EntityManager, QueryRunner } from 'typeorm';
 import { InjectDataSource, InjectEntityManager } from '@nestjs/typeorm';
-import { featureAmountCsvParser } from '@marxan-api/modules/geo-features/import/csv.parser';
+import {
+  duplicateHeadersInFeatureAmountCsvUpload,
+  duplicatePuidsInFeatureAmountCsvUpload,
+  featureAmountCsvParser,
+  noFeaturesFoundInInFeatureAmountCsvUpload,
+} from '@marxan-api/modules/geo-features/import/csv.parser';
 import { FeatureAmountCSVDto } from '@marxan-api/modules/geo-features/dto/feature-amount-csv.dto';
 import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
 import {
   GeoFeaturesService,
   importedFeatureNameAlreadyExist,
+  missingPuidColumnInFeatureAmountCsvUpload,
   unknownPuidsInFeatureAmountCsvUpload,
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import { isLeft, left, Right, right } from 'fp-ts/Either';
-import { FeatureImportEventsService } from '@marxan-api/modules/geo-features/import/feature-import.events';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { chunk } from 'lodash';
 import { Left } from 'fp-ts/lib/Either';
 import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
 import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/features-amounts-data.api.entity';
+import { FeatureCSVImportEventsService } from '@marxan-api/modules/geo-features/import/feature-csv-import.events';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -38,10 +44,28 @@ export class FeatureAmountUploadService {
     private readonly geoEntityManager: EntityManager,
     @InjectEntityManager(DbConnections.default)
     private readonly apiEntityManager: EntityManager,
-    private readonly events: FeatureImportEventsService,
+    private readonly events: FeatureCSVImportEventsService,
     @Inject(forwardRef(() => GeoFeaturesService))
     private readonly geoFeaturesService: GeoFeaturesService,
   ) {}
+
+  uploadFeatureFromCSVAsync(
+    fileBuffer: Buffer,
+    projectId: string,
+    userId: string,
+  ) {
+    setTimeout(async () => {
+      try {
+        await this.uploadFeatureFromCsv({
+          fileBuffer,
+          projectId,
+          userId,
+        });
+      } catch (e) {
+        this.logger.error(e);
+      }
+    });
+  }
 
   async uploadFeatureFromCsv(data: {
     fileBuffer: Buffer;
@@ -62,7 +86,7 @@ export class FeatureAmountUploadService {
       this.logger.log(
         `Starting process of parsing csv file and saving amount data to temporary storage`,
       );
-      await this.events.createEvent(data);
+
       // saving feature data to temporary table
       const featuresRegistry: Left<any> | Right<FeatureAmountUploadRegistry> =
         await this.saveCsvToRegistry(data, apiQueryRunner);
@@ -70,20 +94,21 @@ export class FeatureAmountUploadService {
       if (isLeft(featuresRegistry)) {
         // Some validations done while parsing csv in stream return nested Left object when being rejected as left
         // Todo: make validations during csv parse more unified
-        if (featuresRegistry.left.left) {
-          return featuresRegistry.left;
-        }
-        return featuresRegistry;
+        const errorCode = featuresRegistry.left.left ?? featuresRegistry.left;
+
+        throw this.csvErrorMapper(errorCode);
       }
       // Saving new features to apiDB 'features' table
 
       this.logger.log(`Saving new features to (apiBD).features table...`);
+      //features entities are created here
       newFeaturesFromCsvUpload = await this.saveNewFeaturesFromCsvUpload(
         apiQueryRunner,
         featuresRegistry.right.id,
         data.projectId,
       );
       this.logger.log(`New features saved in (apiBD).features table`);
+
       // Saving new features amounts and geoms to geoDB 'features_amounts' table
       this.logger.log(
         `Starting the process of saving new features amounts and geoms to (geoDB).features_amounts table`,
@@ -115,25 +140,36 @@ export class FeatureAmountUploadService {
         geoQueryRunner.manager,
       );
 
+      for (const feature of newFeaturesFromCsvUpload) {
+        await apiQueryRunner.manager
+          .getRepository(GeoFeature)
+          .update({ id: feature.id }, { creationStatus: JobStatus.created });
+      }
+
       this.logger.log(`Csv file upload process finished successfully`);
       // Committing transaction
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
+
+      // This is done, for now, in order to avoid unnecessary polling from FE
+      await this.events.submittedEvent(data.projectId, data);
+      await this.events.finishEvent(data.projectId);
     } catch (err) {
-      await this.events.failEvent(err);
       await apiQueryRunner.rollbackTransaction();
       await geoQueryRunner.rollbackTransaction();
+      // This is done, for now, in order to avoid unnecessary polling from FE
+      await this.events.submittedEvent(data.projectId, data);
+      await this.events.failEvent(data.projectId, err);
 
       this.logger.error(
         'An error occurred creating features and saving amounts from csv (changes have been rolled back)',
         String(err),
       );
-      throw new BadRequestException(err);
+      throw err;
     } finally {
       // you need to release a queryRunner which was manually instantiated
       await apiQueryRunner.release();
       await geoQueryRunner.release();
-      await this.events.finishEvent();
     }
     return right(newFeaturesFromCsvUpload);
   }
@@ -180,7 +216,7 @@ export class FeatureAmountUploadService {
       if (isLeft(e)) {
         return left(e);
       }
-      throw e;
+      throw new BadRequestException(e);
     }
   }
 
@@ -215,6 +251,38 @@ export class FeatureAmountUploadService {
     return newUpload;
   }
 
+  private csvErrorMapper(
+    error:
+      | typeof importedFeatureNameAlreadyExist
+      | typeof unknownPuidsInFeatureAmountCsvUpload
+      | typeof missingPuidColumnInFeatureAmountCsvUpload
+      | typeof duplicatePuidsInFeatureAmountCsvUpload
+      | typeof duplicateHeadersInFeatureAmountCsvUpload
+      | typeof noFeaturesFoundInInFeatureAmountCsvUpload
+      | Error,
+  ) {
+    switch (error) {
+      case importedFeatureNameAlreadyExist:
+        return new BadRequestException('Imported Features already present');
+      case unknownPuidsInFeatureAmountCsvUpload:
+        return new BadRequestException('Unknown PUIDs');
+      case missingPuidColumnInFeatureAmountCsvUpload:
+        return new BadRequestException('Missing PUID column');
+      case noFeaturesFoundInInFeatureAmountCsvUpload:
+        return new BadRequestException(
+          'No features found in feature amount CSV upload',
+        );
+      case duplicateHeadersInFeatureAmountCsvUpload:
+        return new BadRequestException(
+          'Duplicate headers in feature amount CSV upload',
+        );
+      case duplicatePuidsInFeatureAmountCsvUpload:
+        return new BadRequestException(
+          'Duplicate PUIDs in feature amount CSV upload',
+        );
+    }
+  }
+
   private async saveNewFeaturesFromCsvUpload(
     queryRunner: QueryRunner,
     uploadId: string,
@@ -232,7 +300,7 @@ export class FeatureAmountUploadService {
       return {
         featureClassName: feature.feature_name,
         projectId: projectId,
-        creationStatus: JobStatus.created,
+        creationStatus: JobStatus.running,
         isLegacy: true,
       };
     });

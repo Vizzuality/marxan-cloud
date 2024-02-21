@@ -1,11 +1,9 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   ForbiddenException,
   Get,
-  InternalServerErrorException,
   NotFoundException,
   Param,
   ParseUUIDPipe,
@@ -34,10 +32,7 @@ import {
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  ensureShapefileHasRequiredFiles,
-  uploadOptions,
-} from '@marxan-api/utils/file-uploads.utils';
+import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
 
 import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
@@ -55,8 +50,6 @@ import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { isLeft } from 'fp-ts/Either';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
-import { ShapefileService } from '@marxan/shapefile-converter';
-import { isFeatureCollection } from '@marxan/utils';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
 import {
   GeometryFileInterceptor,
@@ -77,7 +70,6 @@ import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
 import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
-import { isNil } from 'lodash';
 import { Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 
@@ -91,7 +83,6 @@ export class ProjectFeaturesController {
     private readonly geoFeatureSerializer: GeoFeatureSerializer,
     private readonly geoFeatureService: GeoFeaturesService,
     private readonly geoFeatureTagsService: GeoFeatureTagsService,
-    private readonly shapefileService: ShapefileService,
     private readonly proxyService: ProxyService,
   ) {}
 
@@ -111,6 +102,7 @@ export class ProjectFeaturesController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') featureClassAndAliasFilter?: string,
+    @Query('includeInProgress') includeInProgress?: boolean,
   ): Promise<GeoFeatureResult> {
     const result = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
@@ -118,7 +110,8 @@ export class ProjectFeaturesController {
         authenticatedUser: req.user,
         params: {
           projectId: projectId,
-          featureClassAndAliasFilter: featureClassAndAliasFilter,
+          featureClassAndAliasFilter,
+          includeInProgress,
         },
       },
     );
@@ -133,9 +126,9 @@ export class ProjectFeaturesController {
   @IsMissingAclImplementation()
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
-    description: `Upload shapefiles of species or bioregional features`,
+    description: `Upload shapefiles of species or bioregional features  asynchronously. Returns ok response after all validations, and then it is processed in the background`,
   })
-  @ApiOkResponse({ type: GeoFeature })
+  @ApiOkResponse()
   @ApiTags(inlineJobTag)
   @ApiBody({
     description: 'Shapefile to upload',
@@ -147,49 +140,33 @@ export class ProjectFeaturesController {
     @Param('id') projectId: string,
     @UploadedFile() shapefile: Express.Multer.File,
     @Body() body: UploadShapefileDTO,
-  ): Promise<GeoFeature> {
-    await ensureShapefileHasRequiredFiles(shapefile);
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.geoFeatureService.uploadFeatureFromShapefile(
+      projectId,
+      body,
+      shapefile,
+    );
 
-    const { data } = await this.shapefileService.transformToGeoJson(shapefile, {
-      allowOverlaps: true,
-    });
-
-    if (!isFeatureCollection(data)) {
-      throw new BadRequestException(`Only FeatureCollection is supported.`);
-    }
-
-    const newFeatureOrError =
-      await this.geoFeatureService.createFeaturesForShapefile(
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        userId: req.user.id,
         projectId,
-        body,
-        data.features,
-      );
-
-    if (isLeft(newFeatureOrError)) {
-      // @debt Use mapDomainToHttpException() instead
-      throw new InternalServerErrorException(newFeatureOrError.left);
-    } else {
-      const result = await this.geoFeatureService.getById(
-        newFeatureOrError.right.id,
-      );
-      if (isNil(result)) {
-        // @debt Use mapDomainToHttpException() instead
-        throw new NotFoundException();
-      }
-
-      return this.geoFeatureSerializer.serialize(result);
+        resourceType: projectResource.name.plural,
+      });
     }
   }
 
   @ImplementsAcl()
   @ApiConsumesCsv({
-    description: 'Upload a csv with feature amounts for each puid',
+    description:
+      'Upload a csv with feature amounts for each puid asynchronously. Returns ok response after all validations, and then it is processed in the background',
   })
   @ApiParam({
     name: 'projectId',
     description: 'Id of the Project the feature is part of',
   })
-  @ApiOkResponse({ type: GeoFeature, isArray: true })
+  @ApiOkResponse()
   @UseInterceptors(
     FileInterceptor('file', { limits: uploadOptions(50 * 1024 ** 2).limits }),
   )
@@ -198,7 +175,7 @@ export class ProjectFeaturesController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<GeoFeature[]> {
+  ): Promise<void> {
     const result = await this.geoFeatureService.saveFeaturesFromCsv(
       file.buffer,
       projectId,
@@ -212,7 +189,6 @@ export class ProjectFeaturesController {
         resourceType: projectResource.name.plural,
       });
     }
-    return result.right;
   }
 
   @ImplementsAcl()

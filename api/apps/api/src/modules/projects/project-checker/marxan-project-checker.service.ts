@@ -14,6 +14,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Either, left, right } from 'fp-ts/Either';
 import { isRight } from 'fp-ts/lib/These';
 import { In, Repository } from 'typeorm';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 @Injectable()
 export class MarxanProjectChecker implements ProjectChecker {
@@ -21,6 +23,8 @@ export class MarxanProjectChecker implements ProjectChecker {
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Project)
     private readonly repository: Repository<Project>,
+    @InjectRepository(GeoFeature)
+    private readonly featureRepo: Repository<GeoFeature>,
     private readonly planningAreas: PlanningAreasService,
     private readonly scenarioChecker: ScenarioChecker,
   ) {}
@@ -161,6 +165,25 @@ export class MarxanProjectChecker implements ProjectChecker {
     );
 
     return right(results.some((hasPendingMarxanRun) => hasPendingMarxanRun));
+  }
+
+  async hasPendingFeatures(
+    projectId: string,
+  ): Promise<Either<DoesntExist, boolean>> {
+    const project = await this.repository.findOne({
+      where: { id: projectId },
+      relations: { scenarios: true },
+    });
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
+    const pendingFeatures = await this.featureRepo.count({
+      where: { projectId, creationStatus: JobStatus.running },
+    });
+
+    return right(pendingFeatures > 0);
   }
 
   async isProjectReady(

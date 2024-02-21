@@ -33,6 +33,37 @@ describe('Project - update feature Name', () => {
     await fixtures.ThenFeatureWasNotFound(result, projectId, featureId);
   });
 
+  test('should return NotFound error when feature is not fully created', async () => {
+    //ARRANGE
+    const projectId = fixtures.anotherProjectId;
+    const runningId = await fixtures.GivenBaseFeature(
+      'running',
+      projectId,
+      JobStatus.running,
+    );
+    const failureId = await fixtures.GivenBaseFeature(
+      'failure',
+      projectId,
+      JobStatus.failure,
+    );
+
+    //ACT
+    const response1 = await fixtures.WhenUpdatingFeatureForProject(
+      runningId,
+      'forbidden update',
+    );
+    const response2 = await fixtures.WhenUpdatingFeatureForProject(
+      failureId,
+      'forbidden update',
+    );
+
+    //ASSERT
+    await fixtures.ThenFeatureWasNotFound(response1, projectId, runningId);
+    await fixtures.ThenGeoFeatureHasName(runningId, 'running');
+    await fixtures.ThenFeatureWasNotFound(response2, projectId, failureId);
+    await fixtures.ThenGeoFeatureHasName(failureId, 'failure');
+  });
+
   test('should not permit updating a given feature when the feature is associated to a different project', async () => {
     const originalName = 'someName';
     const anotherProjectId = fixtures.anotherProjectId;
@@ -215,12 +246,16 @@ const getFixtures = async () => {
     },
 
     // ARRANGE
-    GivenBaseFeature: async (featureClassName: string, projectId?: string) => {
+    GivenBaseFeature: async (
+      featureClassName: string,
+      projectId?: string,
+      creationStatus = JobStatus.created,
+    ) => {
       const baseFeature = await geoFeaturesApiRepo.save({
         id: v4(),
         featureClassName,
         projectId,
-        creationStatus: JobStatus.created,
+        creationStatus,
       });
       return baseFeature.id;
     },

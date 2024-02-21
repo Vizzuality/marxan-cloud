@@ -7,5 +7,6 @@ export interface GeoFeaturesRequestInfo extends AppInfoDTO {
     projectId?: string;
     bbox?: BBox;
     ids?: string[];
+    includeInProgress?: boolean;
   };
 }

@@ -18,7 +18,10 @@ import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { range } from 'lodash';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import {
+  JobStatus,
+  Scenario,
+} from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -55,19 +58,42 @@ describe('GeoFeaturesModule (e2e)', () => {
   /**
    * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2492
    */
-  test('As a user, I should be able to retrieve a list of features available within a project', async () => {
+  test('As a user, I should be able to retrieve a list features available within a project (excluding currently running and failed ones)', async () => {
     const response = await request(app.getHttpServer())
       .get(`/api/v1/projects/${world.projectWithCountry}/features`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .expect(HttpStatus.OK);
 
-    const geoFeaturesForProject: GeoFeature[] = response.body.data;
+    const geoFeaturesForProject: JSONAPIGeoFeaturesData[] = response.body.data;
     expect(geoFeaturesForProject.length).toBeGreaterThan(0);
     expect(response.body.data[0].type).toBe(geoFeatureResource.name.plural);
     expect(response.body.data[0].attributes.amountRange).toEqual({
       min: null,
       max: null,
     });
+    const statuses = geoFeaturesForProject.map(
+      (feat) => feat.attributes.creationStatus,
+    );
+    expect(statuses).not.toContain(JobStatus.failure);
+    expect(statuses).not.toContain(JobStatus.running);
+  });
+
+  test('As a user, I should be able to retrieve a list features available within a project, including currently running and failed ones if indicated in the request', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${world.projectWithCountry}/features`)
+      .query({ includeInProgress: true })
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(HttpStatus.OK);
+
+    const geoFeaturesForProject: JSONAPIGeoFeaturesData[] = response.body.data;
+    expect(geoFeaturesForProject.length).toBeGreaterThan(0);
+    expect(response.body.data[0].type).toBe(geoFeatureResource.name.plural);
+
+    const statuses = geoFeaturesForProject.map(
+      (feat) => feat.attributes.creationStatus,
+    );
+    expect(statuses).toContain(JobStatus.failure);
+    expect(statuses).toContain(JobStatus.running);
   });
 
   test('should include the min and max amount of the features in the proper units of measure', async () => {
@@ -221,6 +247,33 @@ describe('GeoFeaturesModule (e2e)', () => {
       geoFeaturesFilters.cheeta.featureClassName,
     );
     expect(response.body.data[0].attributes.isCustom).toEqual(false);
+
+    const response2 = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${world.projectWithCountry}/features`)
+      .query({ q: 'failed_feature' })
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(HttpStatus.OK);
+
+    expect(response2.body.data).toHaveLength(0);
+
+    const response3 = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${world.projectWithCountry}/features`)
+      .query({ q: 'running_feature' })
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(HttpStatus.OK);
+
+    expect(response3.body.data).toHaveLength(0);
+
+    const response4 = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${world.projectWithCountry}/features`)
+      .query({ q: 'running_feature', includeInProgress: true })
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(HttpStatus.OK);
+
+    expect(response4.body.data).toHaveLength(1);
+    expect(response4.body.data[0].attributes.featureClassName).toEqual(
+      'running_feature',
+    );
   });
 
   test.skip('should return a single result of geo-features whose alias property matches a given filter', async () => {
@@ -258,6 +311,17 @@ describe('GeoFeaturesModule (e2e)', () => {
 
     expect(response.body.data).toHaveLength(9);
     response.body.data.map((feature: JSONAPIGeoFeaturesData) => {
+      expect(feature.attributes.isCustom).toEqual(false);
+    });
+
+    const response2 = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${world.projectWithCountry}/features?q=`)
+      .query({ includeInProgress: true })
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(HttpStatus.OK);
+
+    expect(response2.body.data).toHaveLength(11);
+    response2.body.data.map((feature: JSONAPIGeoFeaturesData) => {
       expect(feature.attributes.isCustom).toEqual(false);
     });
   });
@@ -312,7 +376,9 @@ export const getGeoFeatureFixtures = async (app: INestApplication) => {
           VALUES
              ('${name}', '${name}', null,'${
                projectId ? projectId : 'null'
-             }', ' name', null, 'created', (SELECT id FROM users WHERE email = 'aa@example.com'))
+             }', ' name', null, '${
+               JobStatus.created
+             }', (SELECT id FROM users WHERE email = 'aa@example.com'))
               RETURNING feature_class_name, id;
           `);
 

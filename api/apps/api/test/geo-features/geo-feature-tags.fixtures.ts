@@ -15,6 +15,7 @@ import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dt
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 export const getGeoFeatureTagsFixtures = async () => {
   const app = await bootstrapApplication();
@@ -85,13 +86,17 @@ export const getGeoFeatureTagsFixtures = async () => {
 
       return projectResult.data.id;
     },
-    GivenFeatureOnProject: async (projectId: string, featureName: string) => {
+    GivenFeatureOnProject: async (
+      projectId: string,
+      featureName: string,
+      creationStatus = JobStatus.created,
+    ) => {
       const results: {
         id: string;
       }[] = await geoFeatureRepo.query(`INSERT INTO features
             (feature_class_name, alias, description, property_name, intersection, project_id, creation_status, created_by)
           VALUES
-            ('${featureName}', 'alias_${featureName}', null, ' name', null, '${projectId}', 'created', (SELECT id FROM users WHERE email = 'aa@example.com'))
+            ('${featureName}', 'alias_${featureName}', null, ' name', null, '${projectId}', '${creationStatus}', (SELECT id FROM users WHERE email = 'aa@example.com'))
           RETURNING id;
         `);
 

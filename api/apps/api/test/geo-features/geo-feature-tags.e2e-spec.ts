@@ -15,7 +15,7 @@ describe('GeoFeatureTag DELETE (e2e)', () => {
     await fixtures?.cleanup();
   });
 
-  test('should return error if feature is not found or not related to project', async () => {
+  test('should return error if feature is not found, not related to project, or not fully created', async () => {
     //ARRANGE
     const randomProjectId = v4();
     const randomFeatureId = v4();

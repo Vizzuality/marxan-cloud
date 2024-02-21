@@ -4,7 +4,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 
 // @todo: Refactor this once we design the uniform solution for events management
 @Injectable()
-export class FeatureImportEventsService {
+export class FeatureCSVImportEventsService {
   eventId!: string;
 
   submit = () => API_EVENT_KINDS.features__csv__import__submitted__v1__alpha;
@@ -13,25 +13,15 @@ export class FeatureImportEventsService {
 
   constructor(private readonly apiEvents: ApiEventsService) {}
 
-  async createEvent(data: any) {
-    this.eventId = await this.apiEvents
-      .create({
-        kind: this.submit(),
-        topic: data.userId,
-      })
-      .then(({ id }) => id);
+  async submittedEvent(topic: string, data: any) {
+    await this.apiEvents.create({ topic, kind: this.submit(), data });
   }
 
-  async finishEvent() {
-    await this.apiEvents.update(this.eventId, {
-      kind: this.finish(),
-    });
+  async finishEvent(topic: string) {
+    await this.apiEvents.create({ topic, kind: this.finish() });
   }
 
-  async failEvent(data: any) {
-    await this.apiEvents.update(this.eventId, {
-      kind: this.fail(),
-      data: data,
-    });
+  async failEvent(topic: string, data: any) {
+    await this.apiEvents.create({ topic, kind: this.fail(), data: data });
   }
 }
