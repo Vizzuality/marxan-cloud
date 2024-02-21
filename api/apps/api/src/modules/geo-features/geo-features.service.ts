@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import {
   InjectDataSource,
   InjectEntityManager,
@@ -6,6 +11,7 @@ import {
 } from '@nestjs/typeorm';
 import { DeepReadonly } from 'utility-types';
 import {
+  Brackets,
   DataSource,
   EntityManager,
   Not,
@@ -16,7 +22,7 @@ import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import { geoFeatureResource } from './geo-feature.geo.entity';
 import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
 
-import { BBox, Geometry } from 'geojson';
+import { BBox, GeoJSON, Geometry } from 'geojson';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -32,7 +38,11 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { v4 } from 'uuid';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
 import { GeoFeaturesRequestInfo } from './geo-features-request-info';
-import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo';
+import {
+  antimeridianBbox,
+  isFeatureCollection,
+  nominatim2bbox,
+} from '@marxan/utils/geo';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 import {
@@ -54,6 +64,12 @@ import {
 } from '@marxan/feature-amounts-per-planning-unit';
 import { ComputeFeatureAmountPerPlanningUnit } from '@marxan/feature-amounts-per-planning-unit/feature-amounts-per-planning-units.service';
 import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
+import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
+import { ShapefileService } from '@marxan/shapefile-converter';
+import {
+  FeatureShapefileImportEventsPort,
+  FeatureShapefileImportState,
+} from '@marxan-api/modules/geo-features/ports/feature-shapefile-import-events-port';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -91,6 +107,8 @@ export const missingPuidColumnInFeatureAmountCsvUpload = Symbol(
 export const unknownPuidsInFeatureAmountCsvUpload = Symbol(
   'there are unknown PUids in feature amount csv upload',
 );
+export const onlyFeatureCollectionShapefileSupported =
+  'only feature collection shapefile supported';
 
 export type FindResult = {
   data: (Partial<GeoFeature> | undefined)[];
@@ -128,6 +146,8 @@ export class GeoFeaturesService extends AppBaseService<
     private readonly projectAclService: ProjectAclService,
     private readonly featureAmountUploads: FeatureAmountUploadService,
     private readonly featureAmountsPerPlanningUnitService: FeatureAmountsPerPlanningUnitService,
+    private readonly shapefileService: ShapefileService,
+    private readonly featureShapefileImportEvents: FeatureShapefileImportEventsPort,
   ) {
     super(
       geoFeaturesRepository,
@@ -153,6 +173,7 @@ export class GeoFeaturesService extends AppBaseService<
         'tag',
         'scenarioUsageCount',
         'amountRange',
+        'creationStatus',
       ],
       keyForAttribute: 'camelCase',
     };
@@ -235,13 +256,37 @@ export class GeoFeaturesService extends AppBaseService<
         // Only apply narrowing by intersection with project bbox if there are
         // features falling within said bbox; otherwise return an empty set
         // by short-circuiting the query.
+
+        // Of all three possible creation status, (fail, running, created) we must also include failure and running (if
+        // indicated in the request) even if they don't intersect with the bounding box (because in those non created
+        // states there is no geospatial data in the geoDB to intersect with)
+        const creationStatusSelection = info?.params?.includeInProgress
+          ? [JobStatus.failure, JobStatus.running]
+          : [];
         if (geoFeaturesWithinProjectBbox?.length > 0) {
           query.andWhere(
-            `${this.alias}.id IN (:...geoFeaturesWithinProjectBbox)`,
-            { geoFeaturesWithinProjectBbox },
+            new Brackets((qb) => {
+              qb.where(
+                `${this.alias}.id IN (:...geoFeaturesWithinProjectBbox)`,
+                {
+                  geoFeaturesWithinProjectBbox,
+                },
+              );
+              if (creationStatusSelection.length > 0) {
+                qb.orWhere(
+                  `${this.alias}.creationStatus IN (:...creationStatusSelection)`,
+                  { creationStatusSelection },
+                );
+              }
+            }),
           );
         } else {
-          query.andWhere('false');
+          if (creationStatusSelection.length > 0) {
+            query.andWhere(
+              `${this.alias}.creationStatus IN (:...creationStatusSelection)`,
+              { creationStatusSelection },
+            );
+          }
         }
       }
 
@@ -379,10 +424,51 @@ export class GeoFeaturesService extends AppBaseService<
     return extendedResult;
   }
 
+  public async uploadFeatureFromShapefile(
+    projectId: string,
+    dto: UploadShapefileDTO,
+    shapefile: Express.Multer.File,
+  ): Promise<Either<typeof onlyFeatureCollectionShapefileSupported, void>> {
+    await ensureShapefileHasRequiredFiles(shapefile);
+
+    let data: GeoJSON;
+    try {
+      const geoJSON = await this.shapefileService.transformToGeoJson(
+        shapefile,
+        {
+          allowOverlaps: true,
+        },
+      );
+      data = geoJSON.data;
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
+
+    if (!isFeatureCollection(data)) {
+      return left(onlyFeatureCollectionShapefileSupported);
+    }
+
+    this.createFeaturesForShapefileAsync(projectId, dto, data.features);
+
+    return right(void 0);
+  }
+
+  public createFeaturesForShapefileAsync(
+    projectId: string,
+    data: UploadShapefileDTO,
+    featureDatas: Record<string, any>[],
+  ) {
+    try {
+      setTimeout(async () => {
+        await this.createFeaturesForShapefile(projectId, data, featureDatas);
+      });
+    } catch (e) {}
+  }
+
   public async createFeaturesForShapefile(
     projectId: string,
     data: UploadShapefileDTO,
-    features: Record<string, any>[],
+    featureDatas: Record<string, any>[],
   ): Promise<Either<Error, GeoFeature>> {
     /**
      * @debt Avoid duplicating transaction scaffolding in multiple sites
@@ -393,19 +479,29 @@ export class GeoFeaturesService extends AppBaseService<
     const apiQueryRunner = this.apiDataSource.createQueryRunner();
     const geoQueryRunner = this.geoDataSource.createQueryRunner();
 
+    // For shapefile uploads, the feature metadata remains persisted after failure (with creatinStatus failed) and
+    // everything else is rolled back (tags, feature data)
+    const geoFeature = await this.createFeature(
+      apiQueryRunner.manager,
+      projectId,
+      data,
+    );
+
     await apiQueryRunner.connect();
     await geoQueryRunner.connect();
 
     await apiQueryRunner.startTransaction();
     await geoQueryRunner.startTransaction();
 
-    let geoFeature: GeoFeature;
     try {
-      // Create single row in features
-      geoFeature = await this.createFeature(
-        apiQueryRunner.manager,
+      await this.featureShapefileImportEvents.event(
         projectId,
-        data,
+        FeatureShapefileImportState.FeatureShapefileSubmitted,
+        {
+          projectId,
+          id: geoFeature.id,
+          dto: data,
+        },
       );
 
       //Create Tag if provided
@@ -415,14 +511,13 @@ export class GeoFeaturesService extends AppBaseService<
         geoFeature.id,
         data.tagName,
       );
-
       // Store geometries in features_data table
-      for (const feature of features) {
+      for (const featureData of featureDatas) {
         await this.createFeatureData(
           geoQueryRunner.manager,
           geoFeature.id,
-          feature.geometry,
-          feature.properties,
+          featureData.geometry,
+          featureData.properties,
         );
       }
 
@@ -445,8 +540,17 @@ export class GeoFeaturesService extends AppBaseService<
         geoQueryRunner.manager,
       );
 
+      // set status created
+      geoFeature.creationStatus = JobStatus.created;
+      await apiQueryRunner.manager.getRepository(GeoFeature).save(geoFeature);
+
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
+
+      await this.featureShapefileImportEvents.event(
+        projectId,
+        FeatureShapefileImportState.FeatureShapefileFinished,
+      );
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
       await geoQueryRunner.rollbackTransaction();
@@ -455,7 +559,18 @@ export class GeoFeaturesService extends AppBaseService<
         'An error occurred creating features for shapefile (changes have been rolled back)',
         String(err),
       );
-      throw err;
+
+      // set status to fail
+      geoFeature.creationStatus = JobStatus.failure;
+      await apiQueryRunner.manager.getRepository(GeoFeature).save(geoFeature);
+
+      await this.featureShapefileImportEvents.event(
+        projectId,
+        FeatureShapefileImportState.FeatureShapefileFailed,
+        err,
+      );
+
+      return left(err);
     } finally {
       // you need to release a queryRunner which was manually instantiated
       await apiQueryRunner.release();
@@ -509,7 +624,7 @@ export class GeoFeaturesService extends AppBaseService<
     const feature = await this.geoFeaturesRepository.findOne({
       where: { id: featureId },
     });
-    if (!feature) {
+    if (!feature || feature.creationStatus !== JobStatus.created) {
       return left(featureNotFound);
     }
     if (!feature.isCustom || !feature.projectId) {
@@ -566,7 +681,11 @@ export class GeoFeaturesService extends AppBaseService<
     const feature = await this.geoFeaturesRepository.findOne({
       where: { id: featureId },
     });
-    if (!feature) {
+    if (
+      !feature ||
+      (feature.creationStatus !== JobStatus.created &&
+        feature.creationStatus !== JobStatus.failure)
+    ) {
       return left(featureNotFound);
     }
 
@@ -802,7 +921,7 @@ export class GeoFeaturesService extends AppBaseService<
         featureClassName: data.name,
         description: data.description,
         projectId,
-        creationStatus: JobStatus.created,
+        creationStatus: JobStatus.running,
       }),
     );
   }
@@ -852,11 +971,8 @@ export class GeoFeaturesService extends AppBaseService<
     userId: string,
   ): Promise<
     Either<
-      | typeof importedFeatureNameAlreadyExist
-      | typeof unknownPuidsInFeatureAmountCsvUpload
-      | typeof projectNotFound
-      | typeof featureDataCannotBeUploadedWithCsv,
-      GeoFeature[]
+      typeof projectNotFound | typeof featureDataCannotBeUploadedWithCsv,
+      void
     >
   > {
     const project = await this.projectRepository.findOne({
@@ -875,11 +991,12 @@ export class GeoFeaturesService extends AppBaseService<
       return left(featureDataCannotBeUploadedWithCsv);
     }
 
-    return await this.featureAmountUploads.uploadFeatureFromCsv({
+    this.featureAmountUploads.uploadFeatureFromCSVAsync(
       fileBuffer,
       projectId,
       userId,
-    });
+    );
+    return right(void 0);
   }
 
   private async extendFindAllGeoFeatureWithScenarioUsage(

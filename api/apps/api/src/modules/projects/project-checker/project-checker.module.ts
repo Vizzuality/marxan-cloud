@@ -6,14 +6,15 @@ import { PublishedProject } from '@marxan-api/modules/published-project/entities
 import { ScenarioCheckerModule } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Project } from '../project.api.entity';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 
 @Module({
   imports: [
     ApiEventsModule,
     ScenarioCheckerModule,
     PlanningAreasModule,
-    TypeOrmModule.forFeature([Project, PublishedProject]),
+    TypeOrmModule.forFeature([Project, GeoFeature, PublishedProject]),
   ],
   providers: [
     {

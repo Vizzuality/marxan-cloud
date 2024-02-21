@@ -87,15 +87,8 @@ import {
   featureNameAlreadyInUse,
   featureNotEditable,
   featureNotFound,
-  importedFeatureNameAlreadyExist,
-  missingPuidColumnInFeatureAmountCsvUpload,
-  unknownPuidsInFeatureAmountCsvUpload,
+  onlyFeatureCollectionShapefileSupported,
 } from '@marxan-api/modules/geo-features/geo-features.service';
-import {
-  duplicateHeadersInFeatureAmountCsvUpload,
-  duplicatePuidsInFeatureAmountCsvUpload,
-  noFeaturesFoundInInFeatureAmountCsvUpload,
-} from '@marxan-api/modules/geo-features/import/csv.parser';
 import {
   featureNotEditableByUserWithinProject,
   featureNotFoundWithinProject,
@@ -187,12 +180,6 @@ export const mapAclDomainToHttpError = (
     | typeof projectNotVisible
     | typeof tagNotFoundForProject
     | typeof scenarioNotCreated
-    | typeof importedFeatureNameAlreadyExist
-    | typeof unknownPuidsInFeatureAmountCsvUpload
-    | typeof missingPuidColumnInFeatureAmountCsvUpload
-    | typeof duplicatePuidsInFeatureAmountCsvUpload
-    | typeof duplicateHeadersInFeatureAmountCsvUpload
-    | typeof noFeaturesFoundInInFeatureAmountCsvUpload
     | ImportProjectError
     | typeof featureDataCannotBeUploadedWithCsv
     | typeof outputProjectSummaryNotFound
@@ -209,7 +196,8 @@ export const mapAclDomainToHttpError = (
     | typeof cannotDeleteDefaultCostSurface
     | typeof deleteCostSurfaceFailed
     | typeof scenarioNotEditable
-    | typeof linkCostSurfaceToScenarioFailed,
+    | typeof linkCostSurfaceToScenarioFailed
+    | typeof onlyFeatureCollectionShapefileSupported,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -421,24 +409,7 @@ export const mapAclDomainToHttpError = (
       throw new NotFoundException(
         `Scenario for Project with id ${options?.projectId} could not be created`,
       );
-    case importedFeatureNameAlreadyExist:
-      return new BadRequestException('Imported Features already present');
-    case unknownPuidsInFeatureAmountCsvUpload:
-      return new BadRequestException('Unknown PUIDs');
-    case missingPuidColumnInFeatureAmountCsvUpload:
-      return new BadRequestException('Missing PUID column');
-    case noFeaturesFoundInInFeatureAmountCsvUpload:
-      return new BadRequestException(
-        'No features found in feature amount CSV upload',
-      );
-    case duplicateHeadersInFeatureAmountCsvUpload:
-      return new BadRequestException(
-        'Duplicate headers in feature amount CSV upload',
-      );
-    case duplicatePuidsInFeatureAmountCsvUpload:
-      return new BadRequestException(
-        'Duplicate PUIDs in feature amount CSV upload',
-      );
+
     case featureDataCannotBeUploadedWithCsv:
       throw new ForbiddenException(
         `User with id ${options?.userId} cannot upload feature data with csv for project with id ${options?.projectId}`,
@@ -475,6 +446,8 @@ export const mapAclDomainToHttpError = (
       throw new BadRequestException(
         `Linking Cost Surface to Scenario ${options?.scenarioId} failed`,
       );
+    case onlyFeatureCollectionShapefileSupported:
+      throw new BadRequestException(`Only FeatureCollection is supported.`);
 
     default:
       const _exhaustiveCheck: never = errorToCheck;

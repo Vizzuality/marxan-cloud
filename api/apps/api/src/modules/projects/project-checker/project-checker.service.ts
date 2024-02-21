@@ -23,4 +23,8 @@ export abstract class ProjectChecker {
   abstract isProjectReady(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>>;
+
+  abstract hasPendingFeatures(
+    projectId: string,
+  ): Promise<Either<DoesntExist, boolean>>;
 }

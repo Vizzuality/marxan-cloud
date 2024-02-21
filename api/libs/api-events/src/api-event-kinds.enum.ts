@@ -104,6 +104,9 @@ export enum API_EVENT_KINDS {
   features__csv__import__submitted__v1__alpha = 'features.csv.import.submitted/v1/alpha',
   features__csv__import__finished__v1__alpha = 'features.csv.import.finished/v1/alpha',
   features__csv__import__failed__v1__alpha = 'features.csv.import.failed/v1/alpha',
+  features__shapefile__import__submitted__v1__alpha = 'features.shapefile.import.submitted/v1/alpha',
+  features__shapefile__import__finished__v1__alpha = 'features.shapefile.import.finished/v1/alpha',
+  features__shapefile__import__failed__v1__alpha = 'features.shapefile.import.failed/v1/alpha',
 }
 
 export type ProjectEvents = Pick<

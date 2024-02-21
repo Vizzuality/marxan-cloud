@@ -41,12 +41,14 @@ export class MarxanBlockGuard implements BlockGuard {
       hasPendingImports,
       hasPendingBlmCalibration,
       hasPendingMarxanRun,
+      hasPendingFeatures,
       hasImportedLegacyProject,
     ] = await Promise.all([
       this.projectChecker.hasPendingExports(projectId),
       this.projectChecker.hasPendingImports(projectId),
       this.projectChecker.hasPendingBlmCalibration(projectId),
       this.projectChecker.hasPendingMarxanRun(projectId),
+      this.projectChecker.hasPendingFeatures(projectId),
       this.legacyProjectImportChecker.isLegacyProjectImportCompletedFor(
         projectId,
       ),
@@ -74,6 +76,10 @@ export class MarxanBlockGuard implements BlockGuard {
     if (isRight(hasImportedLegacyProject) && !hasImportedLegacyProject.right)
       throw new BadRequestException(
         `Project ${projectId} editing is blocked because of pending legacy project import`,
+      );
+    if (isRight(hasPendingFeatures) && hasPendingFeatures.right)
+      throw new BadRequestException(
+        `Project ${projectId} editing is blocked because of pending features`,
       );
   }
 

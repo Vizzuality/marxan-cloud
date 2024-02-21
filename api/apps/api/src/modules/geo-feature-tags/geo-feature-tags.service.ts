@@ -12,6 +12,7 @@ import {
   projectNotVisible,
 } from '@marxan-api/modules/projects/projects.service';
 import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 export const featureNotFoundWithinProject = Symbol(
   'feature not found within project',
@@ -57,7 +58,11 @@ export class GeoFeatureTagsService {
       .createQueryBuilder('feature_tag')
       .select('feature_tag.tag', 'tag')
       .distinct(true)
-      .where({ projectId });
+      .innerJoin(GeoFeature, 'f', 'feature_tag.featureId = f.id')
+      .where(
+        'feature_tag.projectId = :projectId and f.creationStatus = :creationStatus',
+        { projectId, creationStatus: JobStatus.created },
+      );
 
     /** @debt
      * Even tho this is a highly focused endpoint returning only a list of, it should conform to JSON:API standards as well

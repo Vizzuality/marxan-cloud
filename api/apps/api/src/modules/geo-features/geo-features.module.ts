@@ -23,8 +23,10 @@ import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/im
 import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/features-amounts-data.api.entity';
 import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
-import { FeatureImportEventsService } from '@marxan-api/modules/geo-features/import/feature-import.events';
 import { FeatureAmountsPerPlanningUnitModule } from '@marxan/feature-amounts-per-planning-unit';
+import { ShapefilesModule } from '@marxan/shapefile-converter';
+import { GeoFeaturesAdaptersModule } from '@marxan-api/modules/geo-features/adapters/geo-features-adapters.module';
+import { FeatureCSVImportEventsService } from '@marxan-api/modules/geo-features/import/feature-csv-import.events';
 
 @Module({
   imports: [
@@ -45,7 +47,9 @@ import { FeatureAmountsPerPlanningUnitModule } from '@marxan/feature-amounts-per
     forwardRef(() => ScenarioFeaturesModule),
     ApiEventsModule,
     GeoFeatureTagsModule,
+    ShapefilesModule,
     FeatureAmountsPerPlanningUnitModule.for(DbConnections.geoprocessingDB),
+    GeoFeaturesAdaptersModule,
   ],
   providers: [
     GeoFeaturesService,
@@ -54,7 +58,7 @@ import { FeatureAmountsPerPlanningUnitModule } from '@marxan/feature-amounts-per
     GeoFeaturePropertySetService,
     ProxyService,
     FeatureAmountUploadService,
-    FeatureImportEventsService,
+    FeatureCSVImportEventsService,
   ],
   controllers: [GeoFeaturesController],
   exports: [

@@ -14,12 +14,21 @@ afterEach(async () => {
 });
 
 test(`custom feature upload`, async () => {
+  // ARRANGE
   const name = 'someFeature';
   const description = 'someDescrip';
   await fixtures.GivenProjectPusWithGeometryForProject();
 
+  // ACT
   const result = await fixtures.WhenUploadingCustomFeature(name, description);
+  await fixtures.ThenShapefileImportSubmittedEventWasSubmitted(
+    fixtures.projectId,
+  );
+  await fixtures.ThenShapefileImportFinishedEventWasSubmitted(
+    fixtures.projectId,
+  );
 
+  // ASSERT
   await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
   await fixtures.ThenFeatureAmountsFromShapefileAreCreated(name);
 });
@@ -37,7 +46,6 @@ test(`if tagging info is included in DTO but invalid, then error is returned and
     name,
     description,
     invalidTag1,
-    { skipWaitingForFeatureToBeReady: true }, // needed as this feature will never be actually created
   );
   expect(result1.status).toBe(HttpStatus.BAD_REQUEST);
   fixtures.ThenInvalidTagErrorWasReturned(result1);
@@ -47,7 +55,6 @@ test(`if tagging info is included in DTO but invalid, then error is returned and
     name,
     description,
     invalidTag2,
-    { skipWaitingForFeatureToBeReady: true }, // needed as this feature will never be actually created
   );
   expect(result2.status).toBe(HttpStatus.BAD_REQUEST);
   fixtures.ThenMaxLengthErrorWasReturned(result2);
@@ -67,9 +74,12 @@ test(`if tagging info is included in DTO and valid, created feature should be ta
     description,
     tag,
   );
+  await fixtures.ThenShapefileImportFinishedEventWasSubmitted(
+    fixtures.projectId,
+  );
 
   // ASSERT
-  await fixtures.ThenGeoFeaturesAreCreated(result, name, description, tag);
+  await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
   await fixtures.ThenGeoFeatureTagIsCreated(name, tag);
 });
 
@@ -86,14 +96,12 @@ test(`if tagging info is included in, the feature's tag should be trimmed down o
     description,
     paddedTag,
   );
+  await fixtures.ThenShapefileImportFinishedEventWasSubmitted(
+    fixtures.projectId,
+  );
 
   // ASSERT
-  await fixtures.ThenGeoFeaturesAreCreated(
-    result,
-    name,
-    description,
-    paddedTag.trim(),
-  );
+  await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
   await fixtures.ThenGeoFeatureTagIsCreated(name, paddedTag.trim());
 });
 
@@ -115,25 +123,29 @@ test(`if there is already an existing feature with a tag that has equivalent cap
     description,
     'SomE-TAG',
   );
+  await fixtures.ThenShapefileImportFinishedEventWasSubmitted(
+    fixtures.projectId,
+  );
 
   // ASSERT
-  await fixtures.ThenGeoFeaturesAreCreated(
-    result,
-    name,
-    description,
-    equivalentTag,
-  );
+  await fixtures.ThenGeoFeaturesAreCreated(result, name, description);
   await fixtures.ThenGeoFeatureTagIsCreated(name, equivalentTag);
   // TODO Check for update of last_modified_at for all affected tag rows for project when implemented
 });
 
 test('should delete feature_amounts_per_planning_unit data related to a feature when this is deleted', async () => {
+  // ARRANGE
   const name = 'someFeature';
   const description = 'someDescrip';
   await fixtures.GivenProjectPusWithGeometryForProject();
 
+  // ACT
   const result = await fixtures.WhenUploadingCustomFeature(name, description);
+  await fixtures.ThenShapefileImportFinishedEventWasSubmitted(
+    fixtures.projectId,
+  );
 
+  // ASSERT
   await fixtures.ThenFeatureAmountsFromShapefileAreCreated(name);
   await fixtures.WhenDeletingFeatureForProject(name);
   await fixtures.ThenFeatureAmountsPerPlanningUnitDataIsDeletedForFeatureWithGivenId(
