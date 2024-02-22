@@ -10,6 +10,21 @@ export class GeoFeatureGeometry {
   @PrimaryColumn()
   id!: string;
 
+  /**
+   * A stable id is not guaranteed to be globally unique, but it will be unique
+   * across each feature.
+   *
+   * This stable id is kept as is (hence the name) when feature data is copied
+   * over to a new project as part of project cloning. This way, the link
+   * established between features (in apidb) and all the matching
+   * `features_data` rows, via `GeoFeature.featureDataIds`, is preserved across
+   * clones (i.e. no need to update `GeoFeature.featureDataIds` throughout the
+   * import side of a cloning or project upload flow).
+   */
+  @ApiProperty()
+  @Column('uuid', { name: 'stable_id' })
+  stableId!: string;
+
   @Column('geometry', { name: 'the_geom' })
   theGeom?: Geometry;
 

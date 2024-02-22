@@ -67,6 +67,14 @@ export class GeoFeature extends BaseEntity {
   @Column('uuid')
   intersection?: string[];
 
+  /**
+   * Array of uuids that match all the stable_ids of (geodb)features_data rows
+   * relevant to the feature.
+   */
+  @ApiPropertyOptional()
+  @Column('uuid', { array: true, name: 'feature_data_stable_ids' })
+  featureDataStableIds?: string[];
+
   @Column('varchar', { name: 'creation_status' })
   creationStatus?: JobStatus;
 
