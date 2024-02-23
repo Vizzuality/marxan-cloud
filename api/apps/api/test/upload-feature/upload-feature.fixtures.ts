@@ -393,6 +393,7 @@ export const getFixtures = async () => {
         {
           id: expect.any(String),
           featureClassName: name,
+          featureDataStableIds: null,
           description,
           alias: null,
           amountMax: 5296399725.20094,
