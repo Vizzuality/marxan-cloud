@@ -86,7 +86,7 @@ export class ProjectCustomFeaturesPieceImporter
         const featureIdByClassName: Record<string, string> = {};
         const featureInsertValues: any[] = [];
         const featureTagInsertValues: any[] = [];
-        features.forEach(({ data, tag, ...feature }) => {
+        features.forEach(({ data: _data, tag, ...feature }) => {
           const featureId = v4();
           featureIdByClassName[feature.feature_class_name] = featureId;
 
@@ -139,6 +139,7 @@ export class ProjectCustomFeaturesPieceImporter
             theGeom: () => `'${data.the_geom}'`,
             properties: data.properties,
             source: data.source,
+            stableId: data.stable_id,
             featureId: featureIdByClassName[feature_class_name],
             amount: data.amount,
             projectPuId: projectPuPuid
