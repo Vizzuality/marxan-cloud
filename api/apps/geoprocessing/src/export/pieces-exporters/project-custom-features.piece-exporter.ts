@@ -27,6 +27,7 @@ type ProjectCustomFeaturesSelectResult = {
   alias: string;
   description: string;
   property_name: string;
+  feature_data_stable_ids: string[];
   intersection: string[];
   creation_status: CreationStatus;
   list_property_keys: string[];
@@ -38,6 +39,7 @@ type ProjectCustomFeaturesSelectResult = {
 
 type FeaturesDataSelectResult = {
   feature_id: string;
+  stable_id: string;
   the_geom: string;
   properties: Record<string, string | number>;
   source: GeometrySource;
@@ -80,6 +82,7 @@ export class ProjectCustomFeaturesPieceExporter
           'f.description',
           'f.property_name',
           'f.intersection',
+          'f.feature_data_stable_ids',
           'f.creation_status',
           'f.list_property_keys',
           'f.is_legacy',
@@ -100,6 +103,7 @@ export class ProjectCustomFeaturesPieceExporter
         .createQueryBuilder()
         .select([
           'feature_id',
+          'stable_id',
           'the_geom',
           'properties',
           'source',
@@ -120,7 +124,7 @@ export class ProjectCustomFeaturesPieceExporter
         ...feature,
         data: customFeaturesData
           .filter((data) => data.feature_id === id)
-          .map(({ feature_id, project_pu_id, ...data }) => {
+          .map(({ feature_id: _feature_id, project_pu_id, ...data }) => {
             const puid = project_pu_id
               ? projectPusMap[project_pu_id]
               : undefined;

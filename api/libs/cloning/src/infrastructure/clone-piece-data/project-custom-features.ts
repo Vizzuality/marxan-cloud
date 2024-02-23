@@ -15,6 +15,7 @@ export enum JobStatus {
 
 type FeatureData = {
   the_geom: string;
+  stable_id: string;
   properties: Record<string, string | number>;
   source: GeometrySource;
   amount: number | null;
@@ -27,6 +28,7 @@ export type ProjectCustomFeature = {
   description: string;
   property_name: string;
   intersection: string[];
+  feature_data_stable_ids: string[];
   creation_status: JobStatus;
   list_property_keys: string[];
   is_legacy: boolean;
