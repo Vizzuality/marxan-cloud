@@ -69,12 +69,5 @@ export class MoveDataFromPreparationHandler
         specificationId: command.specificationId,
       });
     });
-
-    this.eventBus.publish(
-      new DataMovedFormPreparationEvent(
-        command.scenarioId,
-        command.specificationId,
-      ),
-    );
   }
 }
