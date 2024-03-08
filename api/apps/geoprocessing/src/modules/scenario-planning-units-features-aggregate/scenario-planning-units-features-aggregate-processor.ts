@@ -44,6 +44,13 @@ export class ScenarioPlanningUnitsFeaturesAggregateProcessor
   ) {}
 
   async process(job: Job<JobInput, true>): Promise<true> {
+    /**
+     * @debt Bypassing the original query, whose results are not needed anymore,
+     * and which was expensive to run. The flow that includes this processor
+     * should be cleaned up instead, to fully bypass
+     * ScenarioPlanningUnitsFeaturesAggregateProcessor.
+     */
+    return true;
     const scenarioId = job.data.scenarioId;
     await this.entityManager.query(query, [scenarioId]);
     return true;
