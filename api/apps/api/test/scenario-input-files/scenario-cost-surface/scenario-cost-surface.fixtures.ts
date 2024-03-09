@@ -123,7 +123,7 @@ export const getFixtures = async () => {
             projectPuId: pu.id,
             scenarioId,
             lockStatus: lockStatuses[index] ?? null,
-            setByUser: [1, 2].includes(index) ? true : false,
+            lockStatusSetByUser: [1, 2].includes(index) ? true : false,
           }),
         ),
       );
