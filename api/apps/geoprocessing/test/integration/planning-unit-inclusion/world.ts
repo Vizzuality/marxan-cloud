@@ -239,7 +239,7 @@ export const createWorld = async (app: INestApplication) => {
           where: {
             scenarioId,
             lockStatus: LockStatus.LockedIn,
-            setByUser: true,
+            lockStatusSetByUser: true,
           },
         })
       )
@@ -252,7 +252,7 @@ export const createWorld = async (app: INestApplication) => {
             scenarioId,
             lockStatus: LockStatus.LockedIn,
             protectedByDefault: true,
-            setByUser: false,
+            lockStatusSetByUser: false,
           },
         })
       )

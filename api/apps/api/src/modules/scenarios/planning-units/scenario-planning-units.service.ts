@@ -36,7 +36,7 @@ export class ScenarioPlanningUnitsService {
       where: {
         scenarioId,
         lockStatus,
-        setByUser: true,
+        lockStatusSetByUser: true,
       },
     });
   }
@@ -63,7 +63,7 @@ export class ScenarioPlanningUnitsService {
         },
         {
           lockStatus: LockStatus.Available,
-          setByUser: false,
+          lockStatusSetByUser: false,
         },
       );
 
@@ -75,7 +75,7 @@ export class ScenarioPlanningUnitsService {
         },
         {
           lockStatus: LockStatus.LockedIn,
-          setByUser: false,
+          lockStatusSetByUser: false,
         },
       );
     });

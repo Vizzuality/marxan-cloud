@@ -92,6 +92,7 @@ export class ScenarioPlanningUnitsDataPieceImporter
                     featureList: puData.featureList,
                     projectPuId: projectPuIdByPuid[puData.puid],
                     lockStatus: toLockEnum[puData.lockinStatus ?? 0],
+                    lockStatusSetByUser: puData.lockStatusSetByUser,
                     protectedArea: puData.protectedArea,
                     protectedByDefault: puData.protectedByDefault,
                     xloc: puData.xloc,

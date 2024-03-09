@@ -19,7 +19,7 @@ export class ScenarioPlanningUnitSerializer {
         defaultStatus: unit.protectedByDefault
           ? LockStatus.LockedIn
           : LockStatus.Available,
-        setByUser: unit.setByUser,
+        setByUser: unit.lockStatusSetByUser,
       })),
     );
   }
