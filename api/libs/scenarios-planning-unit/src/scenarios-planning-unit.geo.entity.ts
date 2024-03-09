@@ -20,9 +20,6 @@ export class ScenariosPlanningUnitGeoEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /**
-   * missing FK
-   */
   @PrimaryColumn({
     type: 'uuid',
     name: 'project_pu_id',
@@ -30,7 +27,7 @@ export class ScenariosPlanningUnitGeoEntity {
   projectPuId!: string;
 
   /**
-   * missing FK
+   * Matches (apidb)scenarios.id
    */
   @Column({
     type: 'uuid',
@@ -57,12 +54,12 @@ export class ScenariosPlanningUnitGeoEntity {
     name: 'lockin_status',
     transformer: {
       from(value: number | null): LockStatus {
-        if (value !== null && (value === 1 || value === 2)) {
+        if (value !== null && (value === 0 || value === 1 || value === 2)) {
           return toLockEnum[value];
         }
         return LockStatus.Available;
       },
-      to(value: LockStatus): null | 1 | 2 {
+      to(value: LockStatus): null | 0 | 1 | 2 {
         return fromLockEnum[value];
       },
     },
@@ -80,7 +77,7 @@ export class ScenariosPlanningUnitGeoEntity {
     default: false,
     name: `lock_status_set_by_user`,
   })
-  setByUser!: boolean;
+  lockStatusSetByUser!: boolean;
 
   @Column({
     type: 'float8',

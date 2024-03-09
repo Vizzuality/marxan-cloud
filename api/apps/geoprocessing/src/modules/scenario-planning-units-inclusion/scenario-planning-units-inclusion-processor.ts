@@ -195,7 +195,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
       {
         lockStatus: LockStatus.Available,
-        setByUser: false,
+        lockStatusSetByUser: false,
       },
     );
 
@@ -207,7 +207,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
       {
         lockStatus: LockStatus.LockedIn,
-        setByUser: false,
+        lockStatusSetByUser: false,
       },
     );
 
@@ -219,7 +219,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
       {
         lockStatus: LockStatus.LockedIn,
-        setByUser: true,
+        lockStatusSetByUser: true,
       },
     );
 
@@ -231,7 +231,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
       {
         lockStatus: LockStatus.LockedOut,
-        setByUser: true,
+        lockStatusSetByUser: true,
       },
     );
 
@@ -243,7 +243,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
       {
         lockStatus: LockStatus.Available,
-        setByUser: true,
+        lockStatusSetByUser: true,
       },
     );
   }
