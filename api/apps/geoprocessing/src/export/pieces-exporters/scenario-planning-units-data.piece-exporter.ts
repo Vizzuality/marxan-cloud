@@ -15,7 +15,8 @@ import {
 } from '../pieces/export-piece-processor';
 
 type SelectResult = {
-  lockin_status?: 1 | 2;
+  lockin_status?: 0 | 1 | 2;
+  lock_status_set_by_user?: boolean;
   xloc?: number;
   yloc?: number;
   protected_area?: number;
@@ -74,6 +75,7 @@ export class ScenarioPlanningUnitsDataPieceExporter
         protectedByDefault: row.protected_by_default,
         puid: row.puid,
         lockinStatus: row.lockin_status,
+        lockStatusSetByUser: row.lock_status_set_by_user,
         xloc: row.xloc,
         yloc: row.yloc,
       })),
