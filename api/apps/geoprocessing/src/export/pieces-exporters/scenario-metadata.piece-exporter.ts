@@ -50,6 +50,20 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
     return piece === ClonePiece.ScenarioMetadata;
   }
 
+  private async getStableIdForScenarioCostSurface(
+    costSurfaceId: string,
+  ): Promise<string> {
+    return await this.entityManager
+      .createQueryBuilder()
+      .select(['stable_id'])
+      .from('cost_surfaces', 'cs')
+      .where('cs.id = :costSurfaceId', {
+        costSurfaceId: costSurfaceId,
+      })
+      .execute()
+      .then((result: { stable_id: string }[]) => result[0]?.stable_id);
+  }
+
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const scenarioId = input.resourceId;
 
@@ -77,6 +91,9 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
+    const scenarioCostSurfaceStableId: string =
+      await this.getStableIdForScenarioCostSurface(scenario.cost_surface_id);
+
     const [blmRange]: [SelectScenarioBlmResult] = await this.entityManager
       .createQueryBuilder()
       .select(['values', 'defaults', 'range'])
@@ -101,7 +118,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       solutionsAreLocked: scenario.solutions_are_locked,
       type: scenario.type,
       status: scenario.status ?? undefined,
-      cost_surface_id: scenario.cost_surface_id,
+      cost_surface_id: scenarioCostSurfaceStableId,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
