@@ -225,6 +225,7 @@ async function getFixtures() {
         costSurfaceId: '',
         costSurface: {
           id: '',
+          stableId: '',
           name: 'some cost surface',
           projectId: '',
           isDefault: false,
