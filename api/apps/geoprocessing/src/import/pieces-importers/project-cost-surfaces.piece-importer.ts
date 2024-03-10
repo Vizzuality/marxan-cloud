@@ -123,7 +123,7 @@ export class ProjectCostSurfacesPieceImporter implements ImportPieceProcessor {
               .createQueryBuilder()
               .insert()
               .into('cost_surfaces')
-              .values(omit(costSurfaceData, ['origin_id']))
+              .values(costSurfaceData)
               .execute(),
           ),
         );
