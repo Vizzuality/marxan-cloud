@@ -84,6 +84,21 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
       .execute();
   }
 
+  private async mapCostSurfaceStableIdToIdOfClonedCostSurface(
+    em: EntityManager,
+    costSurfaceId: string,
+    projectId: string,
+  ): Promise<string> {
+    return await em
+      .createQueryBuilder()
+      .select('id')
+      .from('cost_surfaces', 'cs')
+      .where('cs.stable_id = :costSurfaceId', { costSurfaceId })
+      .andWhere('cs.project_id = :projectId', { projectId })
+      .execute()
+      .then((result) => result[0]?.id);
+  }
+
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const {
       pieceResourceId: scenarioId,
@@ -121,6 +136,13 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
       const scenarioCloning = resourceKind === ResourceKind.Scenario;
 
       await this.entityManager.transaction(async (em) => {
+        const idOfClonedCostSurfaceLinkedToScenario =
+          await this.mapCostSurfaceStableIdToIdOfClonedCostSurface(
+            em,
+            metadata.cost_surface_id,
+            projectId,
+          );
+
         if (scenarioCloning) {
           await this.updateScenario(em, scenarioId, metadata, input.ownerId);
         } else {
@@ -135,7 +157,10 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
             em,
             scenarioId,
             projectId,
-            metadata,
+            {
+              ...metadata,
+              cost_surface_id: idOfClonedCostSurfaceLinkedToScenario,
+            },
             input.ownerId,
           );
         }
