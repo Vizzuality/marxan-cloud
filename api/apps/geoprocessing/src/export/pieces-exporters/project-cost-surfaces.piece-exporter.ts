@@ -2,12 +2,8 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import {
-  ProjectCustomFeature,
-  ProjectCustomFeaturesContent,
-} from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
+import { ProjectCustomFeature } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { GeometrySource } from '@marxan/geofeatures';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -24,6 +20,7 @@ type CreationStatus = ProjectCustomFeature['creation_status'];
 
 type ProjectCostSurfacesSelectResult = {
   id: string;
+  stable_id: string;
   name: string;
   min: number;
   max: number;
@@ -32,6 +29,7 @@ type ProjectCostSurfacesSelectResult = {
 
 type CostSurfaceDataSelectResult = {
   cost_surface_id: string;
+  stable_id: string;
   cost: number;
   projects_pu_id: number;
 };
@@ -61,7 +59,14 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
     const costSurfaces: ProjectCostSurfacesSelectResult[] =
       await this.apiEntityManager
         .createQueryBuilder()
-        .select(['cs.id', 'cs.name', 'cs.min', 'cs.max', 'cs.is_default'])
+        .select([
+          'cs.id',
+          'cs.stable_id',
+          'cs.name',
+          'cs.min',
+          'cs.max',
+          'cs.is_default',
+        ])
         .from('cost_surfaces', 'cs')
         .where('cs.project_id = :projectId', { projectId: input.resourceId })
         .execute();
@@ -94,16 +99,10 @@ export class ProjectCostSurfacesPieceExporter implements ExportPieceProcessor {
             (data: CostSurfaceDataSelectResult) =>
               data.cost_surface_id === costSurface.id,
           )
-          .map(
-            ({
-              cost_surface_id: _cost_surface_id,
-              projects_pu_id,
-              ...data
-            }) => {
-              const puid = projectPusMap[projects_pu_id];
-              return { puid, ...data };
-            },
-          ),
+          .map(({ projects_pu_id, ...data }) => {
+            const puid = projectPusMap[projects_pu_id];
+            return { puid, ...data };
+          }),
       })),
     };
 
