@@ -33,6 +33,9 @@ export class CostSurface {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @Column({ name: 'stable_id' })
+  stableId!: string;
+
   @ApiProperty({ type: () => Project })
   @ManyToOne((_type) => Project, (project) => project.costSurfaces)
   @JoinColumn({
