@@ -1,9 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ProjectCustomFeaturesContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -14,11 +12,12 @@ import {
   ImportPieceProcessor,
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
-import { chunk } from 'lodash';
+import { chunk, omit } from 'lodash';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import {
   CostSurfaceData,
+  ProjectCostSurface,
   ProjectCostSurfacesContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-cost-surfaces';
 import { CostSurfacePuDataEntity } from '@marxan/cost-surfaces';
@@ -85,8 +84,11 @@ export class ProjectCostSurfacesPieceImporter implements ImportPieceProcessor {
       const projectPusMap = await this.getProjectPusMap(projectId);
 
       await this.apiEntityManager.transaction(async (apiEm) => {
-        const costSurfacesInsertValues: any[] = [];
-        let costSurfacesDataInsertValues: any[] = [];
+        const costSurfacesInsertValues: (Omit<ProjectCostSurface, 'data'> & {
+          project_id: string;
+          stable_id: string;
+        })[] = [];
+        let costSurfacesDataInsertValues: Record<string, unknown>[] = [];
         costSurfaces.forEach(({ data, ...costSurface }) => {
           const costSurfaceId = v4();
 
@@ -94,6 +96,7 @@ export class ProjectCostSurfacesPieceImporter implements ImportPieceProcessor {
             ...costSurface,
             project_id: projectId,
             id: costSurfaceId,
+            stable_id: costSurface.stable_id,
           });
 
           const costSurfaceData = data.map((data: CostSurfaceData) => ({
@@ -115,12 +118,12 @@ export class ProjectCostSurfacesPieceImporter implements ImportPieceProcessor {
         });
 
         await Promise.all(
-          costSurfacesInsertValues.map((values) =>
+          costSurfacesInsertValues.map((costSurfaceData) =>
             apiEm
               .createQueryBuilder()
               .insert()
               .into('cost_surfaces')
-              .values(values)
+              .values(omit(costSurfaceData, ['origin_id']))
               .execute(),
           ),
         );
