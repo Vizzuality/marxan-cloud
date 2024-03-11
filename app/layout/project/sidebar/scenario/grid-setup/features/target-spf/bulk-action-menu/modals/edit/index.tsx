@@ -23,7 +23,7 @@ const EditModal = ({
   handleModal,
   onDone,
 }: {
-  selectedFeatures: (Feature & { name: string })[];
+  selectedFeatures: (Feature & { name: string; marxanSettings: { prop?: number; fpf?: number } })[];
   handleModal: (modalKey: 'split' | 'edit' | 'delete', isVisible: boolean) => void;
   onDone?: () => void;
 }): JSX.Element => {
@@ -178,8 +178,9 @@ const EditModal = ({
   return (
     <FormRFF<FormValues>
       initialValues={{
-        target: 50,
-        spf: 1,
+        target:
+          (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.prop) || 50,
+        spf: (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.fpf) || 1,
       }}
       ref={formRef}
       onSubmit={onEditSubmit}
