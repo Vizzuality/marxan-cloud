@@ -117,6 +117,7 @@ export async function GivenProjectExists(
   organizationId: string,
   projectData: Record<string, any> = {},
   costSurfaceId = v4(),
+  costSurfaceStableId = v4(),
 ) {
   await GivenOrganizationExists(em, organizationId);
 
@@ -133,7 +134,13 @@ export async function GivenProjectExists(
     })
     .execute();
 
-  await GivenDefaultCostSurfaceForProject(em, projectId, costSurfaceId);
+  await GivenDefaultCostSurfaceForProject(
+    em,
+    projectId,
+    costSurfaceId,
+    undefined,
+    costSurfaceStableId,
+  );
 
   return insertResult;
 }
@@ -150,6 +157,7 @@ async function GivenDefaultCostSurfaceForProject(
   projectId: string,
   id: string,
   name?: string,
+  costSurfaceStableId = v4(),
 ) {
   const nameForCostSurface = name || projectId;
   return em
@@ -165,6 +173,7 @@ async function GivenDefaultCostSurfaceForProject(
       min: 0,
       max: 0,
       is_default: true,
+      stable_id: costSurfaceStableId,
     })
     .execute();
 }
@@ -177,6 +186,7 @@ export async function GivenScenarioExists(
   scenarioData: Record<string, any> = {},
   projectData: Record<string, any> = {},
   costSurfaceId = v4(),
+  costSurfaceStableId = v4(),
 ) {
   await GivenProjectExists(
     em,
@@ -184,6 +194,7 @@ export async function GivenScenarioExists(
     organizationId,
     projectData,
     costSurfaceId,
+    costSurfaceStableId,
   );
 
   return em
