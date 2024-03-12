@@ -152,7 +152,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     if (filters.type) {
       const fuse = new Fuse(parsedData, {
         keys: ['type'],
-        threshold: 0.25,
+        threshold: -1,
       });
 
       parsedData = fuse.search(filters.type).map((f) => {

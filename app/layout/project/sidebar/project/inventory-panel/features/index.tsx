@@ -191,7 +191,7 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
     if (selectedTag) {
       const fuse = new Fuse(d, {
         keys: ['tag'],
-        threshold: 0.25,
+        threshold: -1,
       });
 
       d = fuse.search(selectedTag).map((f) => {
