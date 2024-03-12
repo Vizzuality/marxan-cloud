@@ -24,9 +24,8 @@ export class AddFeatureShapefileApiEvents1708099064649
         'features.shapefile.import.finished/v1/alpha',
         'features.shapefile.import.failed/v1/alpha')
     `);
-    await queryRunner.query(`
-      UPDATE features SET creation_status = 'done'
-      WHERE creation_status = 'created';
-    `);
+
+    // While creation_status mostly didn't have any real use so far, the 'created'->'done' migration is a non reversible operation
+    // as there's no way which creation_status any row had originally.
   }
 }

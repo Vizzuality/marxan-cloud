@@ -82,7 +82,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: first.id,
       projectPu: first,
       protectedByDefault,
-      setByUser: false,
+      lockStatusSetByUser: false,
     },
     {
       scenarioId,
@@ -90,7 +90,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: first.id,
       projectPu: first,
       protectedByDefault,
-      setByUser: false,
+      lockStatusSetByUser: false,
     },
     {
       scenarioId,
@@ -98,7 +98,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: first.id,
       projectPu: first,
       protectedByDefault,
-      setByUser: true,
+      lockStatusSetByUser: true,
     },
     {
       scenarioId,
@@ -106,7 +106,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: first.id,
       projectPu: first,
       protectedByDefault,
-      setByUser: true,
+      lockStatusSetByUser: true,
     },
     {
       scenarioId,
@@ -114,7 +114,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: first.id,
       projectPu: first,
       protectedByDefault,
-      setByUser: true,
+      lockStatusSetByUser: true,
     },
     {
       scenarioId,
@@ -122,7 +122,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: second.id,
       projectPu: second,
       protectedByDefault,
-      setByUser: true,
+      lockStatusSetByUser: true,
     },
     {
       scenarioId,
@@ -130,7 +130,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: second.id,
       projectPu: second,
       protectedByDefault,
-      setByUser: false,
+      lockStatusSetByUser: false,
     },
     {
       scenarioId,
@@ -138,7 +138,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: third.id,
       projectPu: third,
       protectedByDefault,
-      setByUser: true,
+      lockStatusSetByUser: true,
     },
     {
       scenarioId,
@@ -146,7 +146,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: third.id,
       projectPu: third,
       protectedByDefault,
-      setByUser: false,
+      lockStatusSetByUser: false,
     },
     {
       scenarioId,
@@ -154,7 +154,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
       projectPuId: third.id,
       projectPu: third,
       protectedByDefault,
-      setByUser: false,
+      lockStatusSetByUser: false,
     },
   ]);
   return rows as ScenariosPuPaDataGeo[];

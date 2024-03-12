@@ -458,11 +458,13 @@ export class GeoFeaturesService extends AppBaseService<
     data: UploadShapefileDTO,
     featureDatas: Record<string, any>[],
   ) {
-    try {
-      setTimeout(async () => {
+    setTimeout(async () => {
+      try {
         await this.createFeaturesForShapefile(projectId, data, featureDatas);
-      });
-    } catch (e) {}
+      } catch (e) {
+        this.logger.error(e.message, e.trace);
+      }
+    });
   }
 
   public async createFeaturesForShapefile(
@@ -991,7 +993,7 @@ export class GeoFeaturesService extends AppBaseService<
       return left(featureDataCannotBeUploadedWithCsv);
     }
 
-    this.featureAmountUploads.uploadFeatureFromCSVAsync(
+    await this.featureAmountUploads.uploadFeatureFromCSVAsync(
       fileBuffer,
       projectId,
       userId,

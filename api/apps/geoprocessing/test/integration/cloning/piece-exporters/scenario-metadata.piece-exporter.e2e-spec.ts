@@ -84,6 +84,7 @@ const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
   const costSurfaceId = v4();
+  const costSurfaceStableId = v4();
   const organizationId = v4();
   const sut = sandbox.get(ScenarioMetadataPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
@@ -106,7 +107,7 @@ const getFixtures = async () => {
     ranAtLeastOnce: false,
     solutionsAreLocked,
     type: 'marxan',
-    cost_surface_id: costSurfaceId,
+    cost_surface_id: costSurfaceStableId,
   });
 
   return {
@@ -144,6 +145,7 @@ const getFixtures = async () => {
         },
         {},
         costSurfaceId,
+        costSurfaceStableId,
       );
     },
     GivenScenarioBlmRangeExist: async () => {
