@@ -6,6 +6,8 @@ import { useCanEditScenario } from 'hooks/permissions';
 
 import Input from 'components/forms/input';
 
+const INPUT_CLASES = 'w-[55px] rounded-md border-solid border-gray-600 px-0 py-1 text-center';
+
 export const RowDetails = ({ item, onChange }): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
@@ -28,20 +30,26 @@ export const RowDetails = ({ item, onChange }): JSX.Element => {
       <div className="flex items-center space-x-2">
         <span>Target</span>
         <Input
-          className="w-[55px] rounded-md border-solid border-gray-600 py-1 text-center"
+          className={INPUT_CLASES}
           theme="dark"
           mode="dashed"
           type="number"
+          min={0}
+          max={100}
+          step={0.01}
           defaultValue={values.target}
           value={values.target}
           disabled={!editable}
           onChange={({ target: { value: inputValue } }) => {
+            const numericValue = Number(inputValue);
+            if (numericValue < 0 || numericValue > 100) return;
+
             setValues((prevValues) => ({
               ...prevValues,
-              target: Number(inputValue),
+              target: numericValue,
             }));
 
-            onChange(id, { target: Number(inputValue) });
+            onChange(id, { target: numericValue });
           }}
         />
         <span className="text-xs">%</span>
@@ -49,20 +57,25 @@ export const RowDetails = ({ item, onChange }): JSX.Element => {
       <div className="flex items-center space-x-2">
         <span>SPF</span>
         <Input
-          className="w-[55px] rounded border border-solid py-1 "
+          className={INPUT_CLASES}
           theme="dark"
           mode="dashed"
           type="number"
+          step={0.01}
+          min={0}
           defaultValue={values.spf}
           value={values.spf}
           disabled={!editable}
           onChange={({ target: { value: inputValue } }) => {
+            const numericValue = Number(inputValue);
+            if (numericValue <= 0) return;
+
             setValues((prevValues) => ({
               ...prevValues,
-              spf: Number(inputValue),
+              spf: numericValue,
             }));
 
-            onChange(id, { spf: Number(inputValue) });
+            onChange(id, { spf: numericValue });
           }}
         />
       </div>

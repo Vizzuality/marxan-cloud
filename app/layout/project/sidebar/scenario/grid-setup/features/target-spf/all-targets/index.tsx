@@ -34,13 +34,16 @@ const AllTargetsSelector = ({
             type="number"
             min={0}
             max={100}
+            step={0.01}
             defaultValue={values.target}
             value={values.target}
-            // disabled={!editable}
             onChange={({ target: { value: inputValue } }) => {
+              const numericValue = Number(inputValue);
+              if (numericValue < 0 || numericValue > 100) return;
+
               setValues((prevValues) => ({
                 ...prevValues,
-                target: Number(inputValue),
+                target: numericValue,
               }));
             }}
             onKeyDownCapture={(event) => {
@@ -75,12 +78,15 @@ const AllTargetsSelector = ({
             mode="dashed"
             type="number"
             defaultValue={values.spf}
-            // value={inputFPFValue}
-            // disabled={!editable}
+            step={0.01}
+            min={0}
             onChange={({ target: { value: inputValue } }) => {
+              const numericValue = Number(inputValue);
+              if (numericValue <= 0) return;
+
               setValues((prevValues) => ({
                 ...prevValues,
-                spf: Number(inputValue),
+                spf: numericValue,
               }));
             }}
             onKeyDownCapture={(event) => {
