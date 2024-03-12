@@ -18,12 +18,15 @@ export type FormValues = {
   spf: number;
 };
 
+const INPUT_CLASSES =
+  'h-10 w-full rounded-md border border-gray-400 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-600';
+
 const EditModal = ({
   selectedFeatures,
   handleModal,
   onDone,
 }: {
-  selectedFeatures: (Feature & { name: string })[];
+  selectedFeatures: (Feature & { name: string; marxanSettings: { prop?: number; fpf?: number } })[];
   handleModal: (modalKey: 'split' | 'edit' | 'delete', isVisible: boolean) => void;
   onDone?: () => void;
 }): JSX.Element => {
@@ -178,8 +181,9 @@ const EditModal = ({
   return (
     <FormRFF<FormValues>
       initialValues={{
-        target: 50,
-        spf: 1,
+        target:
+          (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.prop) || 50,
+        spf: (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.fpf) || 1,
       }}
       ref={formRef}
       onSubmit={onEditSubmit}
@@ -205,10 +209,11 @@ const EditModal = ({
                       <input
                         {...fprops.input}
                         type="number"
-                        className="h-10 w-full rounded-md border border-gray-400 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        className={INPUT_CLASSES}
                         defaultValue={fprops.input.value}
                         min={0}
                         max={100}
+                        step={0.01}
                       />
                     </Field>
                   )}
@@ -227,11 +232,10 @@ const EditModal = ({
                       <input
                         {...fprops.input}
                         type="number"
-                        className="h-10 w-full rounded-md border border-gray-400 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        className={INPUT_CLASSES}
                         defaultValue={fprops.input.value}
-                        min={0}
-                        max={1}
-                        step="0.01"
+                        min={1}
+                        step={0.01}
                       />
                     </Field>
                   )}

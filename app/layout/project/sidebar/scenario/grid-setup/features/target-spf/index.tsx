@@ -1,4 +1,4 @@
-import { ChangeEvent, ComponentProps, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useQueryClient } from 'react-query';
 
@@ -417,6 +417,21 @@ const TargetAndSPFFeatures = (): JSX.Element => {
 
   const displayBulkActions = selectedFeatureIds.length > 0;
   const displaySaveButton = selectedFeaturesQuery.data?.length > 0;
+
+  useEffect(() => {
+    setFeatureValues((prevValues) => ({
+      ...prevValues,
+      ...selectedFeaturesQuery.data?.reduce((acc, { id, marxanSettings }) => {
+        return {
+          ...acc,
+          [id]: {
+            target: marxanSettings?.prop * 100,
+            spf: marxanSettings?.fpf,
+          },
+        };
+      }, {}),
+    }));
+  }, [selectedFeaturesQuery.data]);
 
   return (
     <>

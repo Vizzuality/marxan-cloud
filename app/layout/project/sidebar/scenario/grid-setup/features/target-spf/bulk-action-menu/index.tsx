@@ -24,7 +24,7 @@ const SplitFeaturesBulkActionMenu = ({
   selectedFeatureIds,
   onDone,
 }: {
-  features: (Feature & { name: string })[];
+  features: (Feature & { name: string; marxanSettings: { prop?: number; fpf?: number } })[];
   selectedFeatureIds: Feature['id'][];
   onDone: () => void;
 }): JSX.Element => {
