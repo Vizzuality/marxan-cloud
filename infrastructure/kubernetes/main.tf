@@ -338,7 +338,7 @@ module "api_staging" {
   application_base_url               = "https://staging.${var.domain}"
   network_cors_origins               = "https://staging.${var.domain},http://localhost:3000"
   http_logging_morgan_format         = "short"
-  api_postgres_logging               = "query"
+  api_postgres_logging               = "error,warn,info,log"
   temp_data_pvc_name                 = local.temp_data_pvc_name
   cloning_pvc_name                   = local.cloning_pvc_name
   postgres_geodb_max_clients_in_pool = 10
@@ -357,7 +357,7 @@ module "geoprocessing_staging" {
   image                       = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-geoprocessing:staging"
   deployment_name             = "geoprocessing"
   cleanup_temporary_folders   = "false"
-  geo_postgres_logging        = "query"
+  geo_postgres_logging        = "error,warn,info,log"
   temp_data_pvc_name          = local.temp_data_pvc_name
   cloning_pvc_name            = local.cloning_pvc_name
   temp_data_volume_mount_path = local.temp_data_volume_mount_path
