@@ -11,6 +11,7 @@ import { useSaveScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Select from 'components/forms/select';
+import { ScrollArea } from 'components/scroll-area';
 import ActionsSummary from 'layout/project/sidebar/scenario/grid-setup/planning-unit-status/actions-summary';
 
 import DrawPUMethod from './draw';
@@ -107,8 +108,8 @@ export const PlanningUnitMethods = () => {
           },
         },
         {
-          onSuccess: ({ data: { meta } }) => {
-            dispatch(setJob(new Date(meta.isoDate).getTime()));
+          onSuccess: ({ data }) => {
+            dispatch(setJob(new Date(data.meta.isoDate).getTime()));
 
             dispatch(setTmpPuExcludedValue([]));
             dispatch(setTmpPuIncludedValue([]));
@@ -186,26 +187,30 @@ export const PlanningUnitMethods = () => {
           <form
             onSubmit={handleSubmit}
             autoComplete="off"
-            className="flex flex-grow flex-col space-y-4 text-black"
+            className="relative flex  w-full flex-grow flex-col space-y-4 overflow-hidden text-black"
           >
-            <FieldRFF name="pu-method">
-              {(fprops) => (
-                <Select
-                  {...fprops}
-                  size="base"
-                  theme="dark"
-                  placeholder="Select..."
-                  options={PU_METHODS}
-                  onChange={(value: (typeof PU_METHODS)[number]['value']) => {
-                    form.change('pu-method', value);
-                  }}
-                />
-              )}
-            </FieldRFF>
-            {values['pu-method'] === 'select' && <SelectPUMethod />}
-            {values['pu-method'] === 'draw' && <DrawPUMethod />}
-            {values['pu-method'] === 'upload' && <UploadPUMethod />}
-            <ActionsSummary method={values['pu-method']} />
+            <ScrollArea className="h-full pr-3">
+              <div className="space-y-4 px-0.5 pt-3">
+                <FieldRFF name="pu-method">
+                  {(fprops) => (
+                    <Select
+                      {...fprops}
+                      size="base"
+                      theme="dark"
+                      placeholder="Select..."
+                      options={PU_METHODS}
+                      onChange={(value: (typeof PU_METHODS)[number]['value']) => {
+                        form.change('pu-method', value);
+                      }}
+                    />
+                  )}
+                </FieldRFF>
+                {values['pu-method'] === 'select' && <SelectPUMethod />}
+                {values['pu-method'] === 'draw' && <DrawPUMethod />}
+                {values['pu-method'] === 'upload' && <UploadPUMethod />}
+                <ActionsSummary method={values['pu-method']} />
+              </div>
+            </ScrollArea>
           </form>
         );
       }}
