@@ -10,7 +10,7 @@ import { ScenarioSidebarTabs } from 'utils/tabs';
 
 import type { PUAction } from './types';
 
-interface ScenarioEditStateProps {
+export interface ScenarioEditStateProps {
   tab: string;
   subtab: string;
 
@@ -38,6 +38,7 @@ interface ScenarioEditStateProps {
   puTmpIncludedValue: ScenarioPlanningUnit['id'][];
   puTmpExcludedValue: ScenarioPlanningUnit['id'][];
   puTmpAvailableValue: ScenarioPlanningUnit['id'][];
+  submittingPU: boolean;
 
   clicking: boolean;
 
@@ -94,6 +95,7 @@ const initialState = {
   drawingValue: null,
   uploading: false,
   uploadingValue: null,
+  submittingPU: false,
 
   // SOLUTIONS
   selectedSolution: null,
@@ -207,6 +209,9 @@ export function getScenarioEditSlice(id) {
       },
       setUploadingValue: (state, action: PayloadAction<Record<string, object>>) => {
         state.uploadingValue = action.payload;
+      },
+      setSubmittingPU: (state, action: PayloadAction<ScenarioEditStateProps['submittingPU']>) => {
+        state.submittingPU = action.payload;
       },
 
       // SOLUTIONS

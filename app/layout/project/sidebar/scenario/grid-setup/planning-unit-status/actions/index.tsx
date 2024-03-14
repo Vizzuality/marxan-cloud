@@ -65,6 +65,7 @@ export const PlanningUnitMethods = () => {
     setTmpPuExcludedValue,
     setTmpPuIncludedValue,
     setTmpPuAvailableValue,
+    setSubmittingPU,
   } = scenarioSlice.actions;
 
   useEffect(() => {
@@ -81,6 +82,8 @@ export const PlanningUnitMethods = () => {
 
   const onSubmit = useCallback(
     async (values) => {
+      dispatch(setSubmittingPU(true));
+
       await scenarioPUMutation.mutate(
         {
           id: `${sid}`,
@@ -151,6 +154,9 @@ export const PlanningUnitMethods = () => {
                 level: 'error',
               }
             );
+          },
+          onSettled: () => {
+            dispatch(setSubmittingPU(false));
           },
         }
       );
