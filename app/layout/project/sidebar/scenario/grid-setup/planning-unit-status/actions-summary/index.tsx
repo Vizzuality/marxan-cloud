@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -13,6 +13,7 @@ import { useToasts } from 'hooks/toast';
 import Button from 'components/button';
 import type { ButtonProps } from 'components/button';
 import Icon from 'components/icon';
+import Loading from 'components/loading';
 import { cn } from 'utils/cn';
 
 import HEXAGON_SVG from 'svgs/map/hexagon.svg?sprite';
@@ -28,6 +29,11 @@ export const ActionsSummary = ({
   const { query } = useRouter();
   const { sid } = query as { sid: string };
   const { addToast } = useToasts();
+  const [clearLoading, setClearLoading] = useState<{ [key in PUAction]: boolean }>({
+    include: false,
+    exclude: false,
+    available: false,
+  });
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
@@ -75,6 +81,8 @@ export const ActionsSummary = ({
           PUKind = 'available';
           break;
       }
+
+      setClearLoading((prev) => ({ ...prev, [PUAction]: true }));
 
       scenarioPUDeletion.mutate(
         { sid, PUKind },
@@ -125,6 +133,9 @@ export const ActionsSummary = ({
                 level: 'error',
               }
             );
+          },
+          onSettled: () => {
+            setClearLoading((prev) => ({ ...prev, [PUAction]: false }));
           },
         }
       );
@@ -197,7 +208,12 @@ export const ActionsSummary = ({
           >
             {puTmpIncludedValue.length + puIncludedValue.length} PU
           </span>
-          <div className="flex flex-1 justify-end">
+          <div className="relative flex flex-1 items-center justify-end space-x-4">
+            <Loading
+              visible={clearLoading['include']}
+              className="static"
+              iconClassName="w-5 h-5 text-white"
+            />
             <Button
               className={cn('invisible', {
                 visible: PUData.included.length > 0,
@@ -206,6 +222,7 @@ export const ActionsSummary = ({
               size="s"
               data-up-action="include"
               onClick={onClearAreas}
+              disabled={clearLoading['include']}
             >
               <div className="flex items-center space-x-2">
                 <span>Clear</span>
@@ -236,7 +253,12 @@ export const ActionsSummary = ({
           >
             {puTmpExcludedValue.length + puExcludedValue.length} PU
           </span>
-          <div className="flex flex-1 justify-end">
+          <div className="relative flex flex-1 items-center justify-end space-x-4">
+            <Loading
+              visible={clearLoading['exclude']}
+              className="static"
+              iconClassName="w-5 h-5 text-white"
+            />
             <Button
               className={cn('invisible', {
                 visible: PUData.excluded.length > 0,
@@ -245,6 +267,7 @@ export const ActionsSummary = ({
               size="s"
               data-up-action="exclude"
               onClick={onClearAreas}
+              disabled={clearLoading['exclude']}
             >
               <div className="flex items-center space-x-2">
                 <span>Clear</span>
@@ -275,7 +298,12 @@ export const ActionsSummary = ({
           >
             {puTmpAvailableValue.length + puAvailableValue.length} PU
           </span>
-          <div className="flex flex-1 justify-end">
+          <div className="relative flex flex-1 items-center justify-end space-x-4">
+            <Loading
+              visible={clearLoading['available']}
+              className="static"
+              iconClassName="w-5 h-5 text-white"
+            />
             <Button
               className={cn('invisible', {
                 visible: PUData.available.length > 0,
@@ -284,6 +312,7 @@ export const ActionsSummary = ({
               size="s"
               data-up-action="available"
               onClick={onClearAreas}
+              disabled={clearLoading['available']}
             >
               <div className="flex items-center space-x-2">
                 <span>Clear</span>
