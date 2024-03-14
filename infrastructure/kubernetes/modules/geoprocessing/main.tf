@@ -270,6 +270,20 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
             }
           }
 
+          startup_probe {
+            http_get {
+              path = "/api/ping"
+              port = 3000
+              scheme = "HTTP"
+            }
+
+            success_threshold     = 1
+            failure_threshold     = 30
+            period_seconds        = 10
+            timeout_seconds       = 5
+            initial_delay_seconds = 30
+          }
+
           liveness_probe {
             http_get {
               path   = "/api/ping"
@@ -278,9 +292,10 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
             }
 
             success_threshold     = 1
+            failure_threshold     = 3
             timeout_seconds       = 5
-            initial_delay_seconds = 90
-            period_seconds        = 30
+            initial_delay_seconds = 15
+            period_seconds        = 15
           }
 
           readiness_probe {
@@ -291,9 +306,10 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
             }
 
             success_threshold     = 1
+            failure_threshold     = 3
             timeout_seconds       = 5
-            initial_delay_seconds = 30
-            period_seconds        = 15
+            initial_delay_seconds = 10
+            period_seconds        = 10
           }
         }
       }
