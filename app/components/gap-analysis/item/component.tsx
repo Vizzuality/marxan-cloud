@@ -41,7 +41,7 @@ export const Item: React.FC<ItemProps> = ({
 }: ItemProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const [chartEl, setChartEl] = useState(null);
-  const percentFormatter = useNumberFormatter({ style: 'percent' });
+  const percentFormatter = useNumberFormatter({ style: 'percent', maximumFractionDigits: 4 });
 
   const metStyles = useMemo(() => {
     if (chartEl) {
