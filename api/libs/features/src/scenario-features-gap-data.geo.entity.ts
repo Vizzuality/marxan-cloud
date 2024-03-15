@@ -20,7 +20,9 @@ export class ScenarioFeaturesGapData {
   metArea!: number;
 
   @ApiProperty()
-  @Column({ name: 'met' })
+  // explicitly set type, otherwise TypeORM (v10, at least) will cast to integer
+  // TypeORM will still represent the value as string though (https://github.com/typeorm/typeorm/issues/873#issuecomment-328912050)
+  @Column({ name: 'met', type: 'double precision' })
   met!: number;
 
   @ApiProperty()
@@ -28,7 +30,9 @@ export class ScenarioFeaturesGapData {
   coverageTargetArea!: number;
 
   @ApiProperty()
-  @Column({ name: 'coverage_target' })
+  // explicitly set type, otherwise TypeORM (v10, at least) will cast to integer
+  // TypeORM will still represent the value as string though (https://github.com/typeorm/typeorm/issues/873#issuecomment-328912050)
+  @Column({ name: 'coverage_target', type: 'double precision' })
   coverageTarget!: number;
 
   @ApiProperty()
