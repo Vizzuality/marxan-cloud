@@ -34,12 +34,12 @@ jobs:
       - name: Build and push image
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
+          login-server: ${{ env.REGISTRY_LOGIN_SERVER }}
+          username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
           docker build ./webshot \
-            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.sha }} \
-            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
-          docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-webshot
+            -t ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.sha }} \
+            -t ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker push -a ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-webshot
