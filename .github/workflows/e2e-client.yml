@@ -41,7 +41,7 @@ jobs:
         path: playwright-report/
         retention-days: 30
       env:
-        NEXT_PUBLIC_MAPBOX_API_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_API_TOKEN }}
+        NEXT_PUBLIC_MAPBOX_API_TOKEN: ${{ env.NEXT_PUBLIC_MAPBOX_API_TOKEN }}
         # Recommended: pass the GitHub token lets this action correctly
         # determine the unique run id necessary to re-run the checks
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

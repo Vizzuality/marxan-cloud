@@ -97,23 +97,39 @@ the services on kubernetes, which is done by this plan.
 
 #### Github Actions
 
-As part of this infrastructure, Github Actions are used to automatically build and push Docker images to Azure ACR, and
-to redeploy Kubernetes pods once that happens. Said Github Actions depend on specific Github Secrets, that are listed below
-for reference. Said secrets are automatically created by the `base` Terraform project, and do not need to be created manually.
+As part of this infrastructure, Github Actions are used to automatically build
+and push Docker images to Azure ACR, and to redeploy Kubernetes pods once that
+happens. Said Github Actions depend on specific Github Secrets and Variables,
+that are listed below for reference.
+
+Secrets and variables listed below are automatically created by the `base`
+Terraform project, and do not need to be created manually. Their value often
+depends on the outputs of other Terraform modules, so configuring all these via
+Terraform (and avoiding to change them manually within the settings of the
+relevant GitHub repository) guarantees that values available to GitHub actions
+are always coherent with the state of the terraformed infrastructure.
+
+For example, AKS-related variables depend on settings for the cluster name as
+well as the hostname of the AKS API server, which is assigned by Azure upon
+creation of an AKS cluster.
+
+##### Secrets
+
+- `AZURE_CLIENT_ID`: The hostname for the Azure ACT. Get from `Base`'s `container_registry_client_id`
+- `AZURE_SUBSCRIPTION_ID`: The Azure Subscription Id. Get from `Base`'s `azure_subscription_id`
+- `AZURE_TENANT_ID`: The Azure Tenant Id. Get from `Base`'s `azure_tenant_id`
+- `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
+- `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
+
+##### Variables
 
 - `AZURE_AKS_CLUSTER_NAME`: The name of the AKS cluster. Get from `Base`'s `k8s_cluster_name`
 - `AZURE_AKS_HOST`: The AKS cluster hostname (without port or protocol). Get from `Base`'s `k8s_cluster_private_fqdn`
-- `AZURE_CLIENT_ID`: The hostname for the Azure ACT. Get from `Base`'s `container_registry_client_id`
 - `AZURE_RESOURCE_GROUP`: The AKS Resource Group name. Specified by you when setting up the infrastructure.
-- `AZURE_SUBSCRIPTION_ID`: The Azure Subscription Id. Get from `Base`'s `azure_subscription_id`
-- `AZURE_TENANT_ID`: The Azure Tenant Id. Get from `Base`'s `azure_tenant_id`
 - `BASTION_HOST`: The hostname for the bastion machine. Get from `Base`'s `bastion_hostname`
 - `BASTION_USER`: By default this will be `ubuntu` if using the initial user created on bastion host instantiation. It is configurable in case infrastructure admins wish to configure a different user on the bastion host or the default distro user is renamed.
-- `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 - `REGISTRY_LOGIN_SERVER`: The hostname for the Azure ACR. Get from `Base`'s `container_registry_hostname`
 - `REGISTRY_USERNAME`: The username for the Azure ACR. Get from `Base`'s `container_registry_client_id`
-- `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
-- `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 
 Additional Github Actions Secrets are needed, as required by the [frontend application](../app/README.md#env-variables)
 and used by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
