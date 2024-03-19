@@ -67,15 +67,15 @@ jobs:
       - name: Build and push image
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
+          login-server: ${{ env.REGISTRY_LOGIN_SERVER }}
+          username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
           docker build ./api -f api/api.Dockerfile \
-            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }} \
-            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
-          docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api
+            -t ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }} \
+            -t ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker push -a ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-api
 
   push_geoprocessing_to_registry:
     name: Push Geoprocessing Docker image to Azure Container Registry
@@ -95,15 +95,15 @@ jobs:
       - name: Build and push image
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
+          login-server: ${{ env.REGISTRY_LOGIN_SERVER }}
+          username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
           docker build ./api -f api/geo.Dockerfile \
-            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} \
-            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
-          docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing
+            -t ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} \
+            -t ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker push -a ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing
 
   push_client_to_registry:
     name: Push Client Docker image to Azure Container Registry
@@ -124,19 +124,19 @@ jobs:
       - name: Build and push image
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
+          login-server: ${{ env.REGISTRY_LOGIN_SERVER }}
+          username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
           docker build ./app \
-            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} \
-            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }} \
-            --build-arg NEXT_PUBLIC_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXT_PUBLIC_URL_STAGING || secrets.NEXT_PUBLIC_URL_PRODUCTION }} \
-            --build-arg NEXT_PUBLIC_API_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXT_PUBLIC_API_URL_STAGING || secrets.NEXT_PUBLIC_API_URL_PRODUCTION }} \
-            --build-arg NEXTAUTH_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXTAUTH_URL_STAGING || secrets.NEXTAUTH_URL_PRODUCTION }} \
-            --build-arg NEXT_PUBLIC_FEATURE_FLAGS=${{ github.ref != 'refs/heads/main' && secrets.NEXT_PUBLIC_FEATURE_FLAGS_STAGING || secrets.NEXT_PUBLIC_FEATURE_FLAGS_PRODUCTION }} \
-            --build-arg NEXT_PUBLIC_MAPBOX_API_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_API_TOKEN }} \
+            -t ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} \
+            -t ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }} \
+            --build-arg NEXT_PUBLIC_URL=${{ github.ref != 'refs/heads/main' && env.NEXT_PUBLIC_URL_STAGING || env.NEXT_PUBLIC_URL_PRODUCTION }} \
+            --build-arg NEXT_PUBLIC_API_URL=${{ github.ref != 'refs/heads/main' && env.NEXT_PUBLIC_API_URL_STAGING || env.NEXT_PUBLIC_API_URL_PRODUCTION }} \
+            --build-arg NEXTAUTH_URL=${{ github.ref != 'refs/heads/main' && env.NEXTAUTH_URL_STAGING || env.NEXTAUTH_URL_PRODUCTION }} \
+            --build-arg NEXT_PUBLIC_FEATURE_FLAGS=${{ github.ref != 'refs/heads/main' && env.NEXT_PUBLIC_FEATURE_FLAGS_STAGING || env.NEXT_PUBLIC_FEATURE_FLAGS_PRODUCTION }} \
+            --build-arg NEXT_PUBLIC_MAPBOX_API_TOKEN=${{ env.NEXT_PUBLIC_MAPBOX_API_TOKEN }} \
             --build-arg ENABLE_MAINTENANCE_MODE=${{ github.event.inputs.enable_maintenance_mode }} \
-            --build-arg NEXT_PUBLIC_CONTACT_EMAIL=${{ secrets.NEXT_PUBLIC_CONTACT_EMAIL }}
-          docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client
+            --build-arg NEXT_PUBLIC_CONTACT_EMAIL=${{ env.NEXT_PUBLIC_CONTACT_EMAIL }}
+          docker push -a ${{ env.REGISTRY_LOGIN_SERVER }}/marxan-client
