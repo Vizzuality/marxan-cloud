@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { Column, ViewEntity } from 'typeorm';
 
 @ViewEntity('scenario_features_gap_data')
@@ -23,6 +24,7 @@ export class ScenarioFeaturesGapData {
   // explicitly set type, otherwise TypeORM (v10, at least) will cast to integer
   // TypeORM will still represent the value as string though (https://github.com/typeorm/typeorm/issues/873#issuecomment-328912050)
   @Column({ name: 'met', type: 'double precision' })
+  @Transform(parseFloat)
   met!: number;
 
   @ApiProperty()
@@ -33,6 +35,7 @@ export class ScenarioFeaturesGapData {
   // explicitly set type, otherwise TypeORM (v10, at least) will cast to integer
   // TypeORM will still represent the value as string though (https://github.com/typeorm/typeorm/issues/873#issuecomment-328912050)
   @Column({ name: 'coverage_target', type: 'double precision' })
+  @Transform(parseFloat)
   coverageTarget!: number;
 
   @ApiProperty()

@@ -17,6 +17,7 @@ import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenar
 import { assertDefined } from '@marxan/utils';
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { Either, left, right } from 'fp-ts/lib/Either';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ScenarioFeaturesGapDataService extends AppBaseService<
@@ -59,7 +60,19 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
     ) {
       return left(forbiddenError);
     }
-    return right(await super.findAllPaginated(fetchSpecification, info));
+    /**
+     * @debt Explicitly applying transforms (via `plainToClass()`) here: it
+     * would be best to do this at AppBaseService level, but that would
+     * currently open a rabbit hole due to the use of generics.
+     */
+    const { data, metadata } = await this.findAllPaginated(
+      fetchSpecification,
+      info,
+    );
+    return right({
+      data: plainToClass(ScenarioFeaturesGapData, data),
+      metadata,
+    });
   }
 
   async setFilters(

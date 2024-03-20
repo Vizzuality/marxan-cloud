@@ -18,6 +18,7 @@ import { forbiddenError } from '@marxan-api/modules/access-control';
 import { assertDefined } from '@marxan/utils';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
+import { plainToClass } from 'class-transformer';
 
 const scenarioFeaturesOutputGapDataFilterKeyNames = ['runId'] as const;
 type ScenarioFeaturesOutputGapDataFilterKeys = keyof Pick<
@@ -73,7 +74,19 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
     ) {
       return left(forbiddenError);
     }
-    return right(await super.findAllPaginated(fetchSpecification, info));
+    /**
+     * @debt Explicitly applying transforms (via `plainToClass()`) here: it
+     * would be best to do this at AppBaseService level, but that would
+     * currently open a rabbit hole due to the use of generics.
+     */
+    const { data, metadata } = await this.findAllPaginated(
+      fetchSpecification,
+      info,
+    );
+    return right({
+      data: plainToClass(ScenarioFeaturesOutputGapData, data),
+      metadata,
+    });
   }
 
   async setFilters(
