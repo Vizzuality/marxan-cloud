@@ -86,7 +86,6 @@ import {
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
 import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
-import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 import { ProtectedAreasChangeDto } from '@marxan-api/modules/scenarios/dto/protected-area-change.dto';
 import { StartScenarioBlmCalibrationDto } from '@marxan-api/modules/scenarios/dto/start-scenario-blm-calibration.dto';
 import { BlmCalibrationRunResultDto } from './dto/scenario-blm-calibration-results.dto';
@@ -108,8 +107,6 @@ import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 import { WebshotPdfReportConfig } from '@marxan/webshot/webshot.dto';
 import { ClearLockStatusParams } from '@marxan-api/modules/scenarios/dto/clear-lock-status-param.dto';
-import { CostRangeDto } from '@marxan-api/modules/scenarios/dto/cost-range.dto';
-import { plainToClass } from 'class-transformer';
 import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
 import { CostSurfaceService } from '@marxan-api/modules/cost-surface/cost-surface.service';
 
