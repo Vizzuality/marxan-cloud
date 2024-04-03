@@ -379,7 +379,7 @@ export const ScenariosList: React.FC = () => {
                     className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-900 bg-opacity-90"
                     iconClassName="w-10 h-10 text-primary-500"
                   />
-                  {`Export scenario${scenariosData.length > 1 ? 's' : ''} data`}
+                  {`Export scenario${scenariosData.length > 1 ? 's' : ''} results`}
                 </Button>
               )}
               <Button
