@@ -24,6 +24,7 @@ import { useToasts } from 'hooks/toast';
 import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon';
+import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
 import { ScrollArea } from 'components/scroll-area';
@@ -367,20 +368,27 @@ export const ScenariosList: React.FC = () => {
           {(hasScenarios || search || hasFilters) && (
             <Section className="flex w-full flex-col items-center justify-center space-y-5">
               {hasScenarios && (
-                <Button
-                  theme="primary-alt"
-                  size="base"
-                  className="flex w-full overflow-hidden uppercase"
-                  disabled={solutionsReportLoader || !atLeastOneScenarioIsRun}
-                  onClick={onDownloadSolutionsSummary}
-                >
-                  <Loading
-                    visible={solutionsReportLoader}
-                    className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-900 bg-opacity-90"
-                    iconClassName="w-10 h-10 text-primary-500"
-                  />
-                  {`Export scenario${scenariosData.length > 1 ? 's' : ''} data`}
-                </Button>
+                <div className="flex w-full items-center space-x-5">
+                  <Button
+                    theme="primary-alt"
+                    size="base"
+                    className="flex w-full flex-1 overflow-hidden uppercase"
+                    disabled={solutionsReportLoader || !atLeastOneScenarioIsRun}
+                    onClick={onDownloadSolutionsSummary}
+                  >
+                    <Loading
+                      visible={solutionsReportLoader}
+                      className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-900 bg-opacity-90"
+                      iconClassName="w-10 h-10 text-primary-500"
+                    />
+                    {`Export scenario${scenariosData.length > 1 ? 's' : ''} results`}
+                  </Button>
+                  <InfoButton>
+                    <span>
+                      Export Mapp Scenario codes, best solutions and selection frequency results.
+                    </span>
+                  </InfoButton>
+                </div>
               )}
               <Button
                 theme="primary"

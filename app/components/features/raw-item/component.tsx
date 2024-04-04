@@ -71,7 +71,7 @@ export const Item: React.FC<ItemProps> = ({
             size="xs"
             onClick={onToggleSelected}
           >
-            {selected ? 'Remove' : 'Add'}
+            {selected ? 'Remove' : 'Add to scenario'}
           </Button>
         </div>
       </header>
