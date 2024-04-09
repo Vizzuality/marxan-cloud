@@ -78,7 +78,7 @@ jobs:
 
       - name: Add custom host data
         run: |
-          sudo sh -c 'echo "127.0.0.1 ${{ env.AZURE_AKS_HOST }}" >> /etc/hosts'
+          sudo sh -c 'echo "127.0.0.1 ${{ vars.AZURE_AKS_HOST }}" >> /etc/hosts'
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
@@ -88,12 +88,12 @@ jobs:
       - name: Config kubectl
         run: |
           mkdir ~/.kube
-          az aks get-credentials --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_AKS_CLUSTER_NAME }}
+          az aks get-credentials --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_AKS_CLUSTER_NAME }}
           sed -i 's/\([[:alnum:]]\+\?.privatelink.[[:alnum:]]\+\?.azmk8s.io\):443/\1:4433/g' ~/.kube/config
 
       - name: Creating SSH tunnel
         run: |
-          ssh -i ~/.ssh/bastion.key -o StrictHostKeyChecking=no -N -L 4433:${{ env.AZURE_AKS_HOST }}:443 ${{ env.BASTION_USER }}@${{ env.BASTION_HOST }} -T &
+          ssh -i ~/.ssh/bastion.key -o StrictHostKeyChecking=no -N -L 4433:${{ vars.AZURE_AKS_HOST }}:443 ${{ vars.BASTION_USER }}@${{ vars.BASTION_HOST }} -T &
 
       - name: Redeploy production pods
         if: ${{ github.ref == 'refs/heads/main' }}
