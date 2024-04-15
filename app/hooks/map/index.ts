@@ -213,7 +213,7 @@ export function useCostSurfaceLayer({
                 ['get', 'cost'],
                 layerSettings.min === layerSettings.max ? 0 : layerSettings.min,
                 COLORS.cost[0],
-                layerSettings.max,
+                layerSettings.min === layerSettings.max ? layerSettings.max + 1 : layerSettings.max,
                 COLORS.cost[1],
               ],
               'fill-opacity': 0.75 * (layerSettings.opacity ?? 1),
