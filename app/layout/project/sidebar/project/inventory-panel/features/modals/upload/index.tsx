@@ -165,13 +165,16 @@ export const FeatureUploadModal = ({
           onClose();
 
           addToast(
-            'success-upload-feature-file',
+            'info-upload-feature-file',
             <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">File uploaded</p>
+              <h2 className="font-medium">Upload in progress</h2>
+              <p className="text-sm">
+                CSV file uploaded correctly. Starting features processing. This might take several
+                minutes.
+              </p>
             </>,
             {
-              level: 'success',
+              level: 'info',
             }
           );
         },
