@@ -16,11 +16,11 @@ export class FeatureShapefileImportApiEvents
     API_EVENT_KINDS
   > = {
     [FeatureShapefileImportState.FeatureShapefileSubmitted]:
-      API_EVENT_KINDS.features__shapefile__import__submitted__v1__alpha,
+      API_EVENT_KINDS.project__features__shapefile__import__submitted__v1__alpha,
     [FeatureShapefileImportState.FeatureShapefileFinished]:
-      API_EVENT_KINDS.features__shapefile__import__finished__v1__alpha,
+      API_EVENT_KINDS.project__features__shapefile__import__finished__v1__alpha,
     [FeatureShapefileImportState.FeatureShapefileFailed]:
-      API_EVENT_KINDS.features__shapefile__import__failed__v1__alpha,
+      API_EVENT_KINDS.project__features__shapefile__import__failed__v1__alpha,
   };
 
   async event(

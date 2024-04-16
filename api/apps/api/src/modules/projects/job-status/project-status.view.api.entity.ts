@@ -121,4 +121,16 @@ const eventToJobStatusMapping: Record<
     ApiEventJobStatus.running,
   [API_EVENT_KINDS.project__costSurface_shapeConversionFailed__v1alpha1]:
     ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__features__csv__import__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.project__features__csv__import__failed__v1__alpha]:
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__features__csv__import__finished__v1__alpha]:
+    ApiEventJobStatus.done,
+  [API_EVENT_KINDS.project__features__shapefile__import__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.project__features__shapefile__import__failed__v1__alpha]:
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__features__shapefile__import__finished__v1__alpha]:
+    ApiEventJobStatus.done,
 };
