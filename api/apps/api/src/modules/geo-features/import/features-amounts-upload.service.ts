@@ -72,6 +72,8 @@ export class FeatureAmountUploadService {
     projectId: string;
     userId: string;
   }): Promise<Left<any> | Right<GeoFeature[]>> {
+    await this.events.submittedEvent(data.projectId, data);
+
     const apiQueryRunner = this.apiDataSource.createQueryRunner();
     const geoQueryRunner = this.geoDataSource.createQueryRunner();
 
@@ -151,14 +153,11 @@ export class FeatureAmountUploadService {
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
 
-      // This is done, for now, in order to avoid unnecessary polling from FE
-      await this.events.submittedEvent(data.projectId, data);
       await this.events.finishEvent(data.projectId);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
       await geoQueryRunner.rollbackTransaction();
-      // This is done, for now, in order to avoid unnecessary polling from FE
-      await this.events.submittedEvent(data.projectId, data);
+
       await this.events.failEvent(data.projectId, err);
 
       this.logger.error(
