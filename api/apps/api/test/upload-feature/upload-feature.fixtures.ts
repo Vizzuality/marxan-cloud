@@ -294,21 +294,21 @@ export const getFixtures = async () => {
       await waitForEvent(
         apiEventService,
         topic,
-        API_EVENT_KINDS.features__csv__import__submitted__v1__alpha,
+        API_EVENT_KINDS.project__features__csv__import__submitted__v1__alpha,
       );
     },
     ThenCSVImportFinishedEventWasSubmitted: async (topic: string) => {
       await waitForEvent(
         apiEventService,
         topic,
-        API_EVENT_KINDS.features__csv__import__finished__v1__alpha,
+        API_EVENT_KINDS.project__features__csv__import__finished__v1__alpha,
       );
     },
     ThenCSVImportFailedEventWasSubmitted: async (topic: string) => {
       await waitForEvent(
         apiEventService,
         topic,
-        API_EVENT_KINDS.features__csv__import__failed__v1__alpha,
+        API_EVENT_KINDS.project__features__csv__import__failed__v1__alpha,
       );
     },
 
@@ -316,21 +316,21 @@ export const getFixtures = async () => {
       await waitForEvent(
         apiEventService,
         topic,
-        API_EVENT_KINDS.features__shapefile__import__submitted__v1__alpha,
+        API_EVENT_KINDS.project__features__shapefile__import__submitted__v1__alpha,
       );
     },
     ThenShapefileImportFinishedEventWasSubmitted: async (topic: string) => {
       await waitForEvent(
         apiEventService,
         topic,
-        API_EVENT_KINDS.features__shapefile__import__finished__v1__alpha,
+        API_EVENT_KINDS.project__features__shapefile__import__finished__v1__alpha,
       );
     },
     ThenShapefileImportFailedEventWasSubmitted: async (topic: string) => {
       await waitForEvent(
         apiEventService,
         topic,
-        API_EVENT_KINDS.features__shapefile__import__failed__v1__alpha,
+        API_EVENT_KINDS.project__features__shapefile__import__failed__v1__alpha,
       );
     },
 

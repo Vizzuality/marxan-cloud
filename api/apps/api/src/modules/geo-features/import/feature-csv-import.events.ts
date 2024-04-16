@@ -7,9 +7,12 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 export class FeatureCSVImportEventsService {
   eventId!: string;
 
-  submit = () => API_EVENT_KINDS.features__csv__import__submitted__v1__alpha;
-  finish = () => API_EVENT_KINDS.features__csv__import__finished__v1__alpha;
-  fail = () => API_EVENT_KINDS.features__csv__import__failed__v1__alpha;
+  submit = () =>
+    API_EVENT_KINDS.project__features__csv__import__submitted__v1__alpha;
+  finish = () =>
+    API_EVENT_KINDS.project__features__csv__import__finished__v1__alpha;
+  fail = () =>
+    API_EVENT_KINDS.project__features__csv__import__failed__v1__alpha;
 
   constructor(private readonly apiEvents: ApiEventsService) {}
 
