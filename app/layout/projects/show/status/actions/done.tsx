@@ -144,7 +144,7 @@ export const useProjectActionsDone = () => {
     [queryClient, pid, mutate]
   );
 
-  const onFeatureImportDone = useCallback(
+  const onFeaturesImportDone = useCallback(
     (JOB_REF: MutableRefObject<Job>) => {
       mutate(
         {
@@ -162,7 +162,7 @@ export const useProjectActionsDone = () => {
           },
           onError: () => {
             addToast(
-              'onFeatureImportDone',
+              'onFeaturesImportDone',
               <>
                 <h2 className="font-medium">Error during importation</h2>
                 <p className="text-sm">
@@ -189,9 +189,8 @@ export const useProjectActionsDone = () => {
       clone: onCloneImportDone,
       legacy: onLegacyImportDone,
       costSurface: onCostSurfaceUpload,
-      'features.csv.import': onFeatureImportDone,
-      'features.shapefile.import': onFeatureImportDone,
+      features: onFeaturesImportDone,
     }),
-    [onDone, onCloneImportDone, onLegacyImportDone, onCostSurfaceUpload, onFeatureImportDone]
+    [onDone, onCloneImportDone, onLegacyImportDone, onCostSurfaceUpload, onFeaturesImportDone]
   );
 };

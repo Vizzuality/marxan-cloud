@@ -17,7 +17,7 @@ import { AxiosError, isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 
 import { useUploadFeaturesCSV, useUploadFeaturesShapefile } from 'hooks/features';
-import { useDownloadShapefileTemplate } from 'hooks/projects';
+import { useDownloadShapefileTemplate, useSaveProject } from 'hooks/projects';
 import { useProjectTags } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -71,6 +71,12 @@ export const FeatureUploadModal = ({
   const { addToast } = useToasts();
 
   const tagsQuery = useProjectTags(pid);
+
+  const { mutate: mutateProject } = useSaveProject({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
 
   const uploadFeaturesShapefileMutation = useUploadFeaturesShapefile({
     requestConfig: {
@@ -211,11 +217,26 @@ export const FeatureUploadModal = ({
       };
 
       if (uploadMode === 'shapefile') {
-        uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, mutationResponse);
+        mutateProject(
+          {
+            id: pid,
+            data: {
+              metadata: {
+                lastJobCheck: new Date().getTime(),
+              },
+            },
+          },
+          {
+            onSuccess: async () => {
+              await queryClient.invalidateQueries(['project', pid]);
+              uploadFeaturesShapefileMutation.mutate({ data, id: pid }, mutationResponse);
+            },
+          }
+        );
       }
 
       if (uploadMode === 'csv') {
-        uploadFeaturesCSVMutation.mutate({ data, id: `${pid}` }, mutationResponse);
+        uploadFeaturesCSVMutation.mutate({ data, id: pid }, mutationResponse);
       }
     },
     [
@@ -226,6 +247,8 @@ export const FeatureUploadModal = ({
       uploadFeaturesShapefileMutation,
       uploadFeaturesCSVMutation,
       successFile,
+      queryClient,
+      mutateProject,
     ]
   );
 

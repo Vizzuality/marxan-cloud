@@ -24,6 +24,7 @@ export interface Project {
   metadata?: {
     [key: string]: unknown;
     cache: number;
+    lastJobCheck: number;
   };
 }
 
