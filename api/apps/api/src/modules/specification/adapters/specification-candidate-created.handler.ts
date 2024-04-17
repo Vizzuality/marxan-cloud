@@ -2,15 +2,28 @@ import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { SpecificationCandidateCreated } from '../domain';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { EntityManager } from 'typeorm';
+import { ScenarioFeaturesPreparation } from '@marxan/features';
 
 @EventsHandler(SpecificationCandidateCreated)
 export class SpecificationCandidateCreatedHandler
   implements IEventHandler<SpecificationCandidateCreated>
 {
-  constructor(private readonly apiEvents: ApiEventsService) {}
+  constructor(
+    private readonly apiEvents: ApiEventsService,
+    @InjectEntityManager(DbConnections.geoprocessingDB)
+    private readonly geoEntityManager: EntityManager,
+  ) {}
 
   async handle(event: SpecificationCandidateCreated) {
     if (event.draft) return;
+
+    await this.geoEntityManager.delete(ScenarioFeaturesPreparation, {
+      scenarioId: event.scenarioId,
+    });
+
     await this.apiEvents.create({
       kind: API_EVENT_KINDS.scenario__specification__submitted__v1__alpha1,
       topic: event.scenarioId,

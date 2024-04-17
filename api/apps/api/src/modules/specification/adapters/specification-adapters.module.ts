@@ -9,6 +9,8 @@ import { SpecificationFeatureConfigApiEntity } from './specification-feature-con
 import { SpecificationCandidateCreatedHandler } from './specification-candidate-created.handler';
 
 import { SpecificationRepository } from '../application/specification.repository';
+import { ScenarioFeaturesPreparation } from '@marxan/features';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Module({
   imports: [
@@ -16,6 +18,10 @@ import { SpecificationRepository } from '../application/specification.repository
       SpecificationApiEntity,
       SpecificationFeatureConfigApiEntity,
     ]),
+    TypeOrmModule.forFeature(
+      [ScenarioFeaturesPreparation],
+      DbConnections.geoprocessingDB,
+    ),
     ApiEventsModule,
   ],
   providers: [
