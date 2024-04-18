@@ -26,7 +26,7 @@ const SplitFeaturesBulkActionMenu = ({
 }: {
   features: (Feature & { name: string; marxanSettings: { prop?: number; fpf?: number } })[];
   selectedFeatureIds: Feature['id'][];
-  onDone: () => void;
+  onDone: (res?: unknown) => void;
 }): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
