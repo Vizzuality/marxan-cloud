@@ -1,4 +1,4 @@
-import { ChangeEvent, ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, ComponentProps, useCallback, useMemo, useState } from 'react';
 
 import { useQueryClient } from 'react-query';
 
@@ -415,23 +415,25 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     [selectedFeaturesQuery.data, queryClient, sid, selectedFeaturesMutation]
   );
 
-  const displayBulkActions = selectedFeatureIds.length > 0;
-  const displaySaveButton = selectedFeaturesQuery.data?.length > 0;
+  const onDoneEditing = useCallback((res: { data: { features: any[] } }) => {
+    setSelectedFeatureIds([]);
+    const { features } = res?.data || {};
 
-  useEffect(() => {
-    setFeatureValues((prevValues) => ({
-      ...prevValues,
-      ...selectedFeaturesQuery.data?.reduce((acc, { id, marxanSettings }) => {
+    setFeatureValues(() => ({
+      ...features?.reduce((acc, { featureId, marxanSettings }) => {
         return {
           ...acc,
-          [id]: {
+          [featureId]: {
             target: marxanSettings?.prop * 100,
             spf: marxanSettings?.fpf,
           },
         };
       }, {}),
     }));
-  }, [selectedFeaturesQuery.data]);
+  }, []);
+
+  const displayBulkActions = selectedFeatureIds.length > 0;
+  const displaySaveButton = selectedFeaturesQuery.data?.length > 0;
 
   return (
     <>
@@ -524,9 +526,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           <FeaturesBulkActionMenu
             features={targetedFeatures}
             selectedFeatureIds={selectedFeatureIds}
-            onDone={() => {
-              setSelectedFeatureIds([]);
-            }}
+            onDone={onDoneEditing}
           />
         )}
       </Section>

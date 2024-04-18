@@ -28,7 +28,7 @@ const EditModal = ({
 }: {
   selectedFeatures: (Feature & { name: string; marxanSettings: { prop?: number; fpf?: number } })[];
   handleModal: (modalKey: 'split' | 'edit' | 'delete', isVisible: boolean) => void;
-  onDone?: () => void;
+  onDone?: (res?: unknown) => void;
 }): JSX.Element => {
   const { addToast } = useToasts();
   const { query } = useRouter();
@@ -136,8 +136,8 @@ const EditModal = ({
           data,
         },
         {
-          onSuccess: () => {
-            onDone?.();
+          onSuccess: (res) => {
+            onDone?.(res);
             handleModal('edit', false);
 
             addToast(
