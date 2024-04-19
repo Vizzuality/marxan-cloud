@@ -49,7 +49,7 @@ export class FeatureAmountUploadService {
     private readonly geoFeaturesService: GeoFeaturesService,
   ) {}
 
-  uploadFeatureFromCSVAsync(
+  async uploadFeatureFromCsvAsync(
     fileBuffer: Buffer,
     projectId: string,
     userId: string,
