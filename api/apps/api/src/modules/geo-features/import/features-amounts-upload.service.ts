@@ -398,18 +398,19 @@ export class FeatureAmountUploadService {
           `,
           parameters,
         );
-        await geoQueryRunner.manager.query(
-          ` INSERT INTO feature_amounts_per_planning_unit (project_id, feature_id, amount, project_pu_id)
-                  SELECT $1, $2, amount, project_pu_id
-                  FROM features_data where feature_id = $2`,
-          [projectId, newFeature.id],
-        );
         this.logger.log(
           `Chunk ${amountIndex}/${featuresChunks.length} saved to (geoDB).features_data`,
         );
       }
       this.logger.log(
         `All chunks of feature ${newFeature.feature_class_name} saved`,
+      );
+
+      await geoQueryRunner.manager.query(
+        `INSERT INTO feature_amounts_per_planning_unit (project_id, feature_id, amount, project_pu_id)
+                SELECT $1, $2, amount, project_pu_id
+                FROM features_data where feature_id = $2`,
+        [projectId, newFeature.id],
       );
     }
     this.logger.log(
