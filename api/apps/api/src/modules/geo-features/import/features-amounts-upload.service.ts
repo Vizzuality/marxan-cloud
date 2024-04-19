@@ -74,7 +74,7 @@ export class FeatureAmountUploadService {
   }): Promise<Left<any> | Right<GeoFeature[]>> {
     //Because feature CSV files are bound to be increasingly larger, this can cause problems when trying to save a big
     //JSONB value into postgres eventually crashing due to an memory error, so the CSV file is ignored for the api event
-    const { fileBuffer, ...apiEventData } = data;
+    const { fileBuffer: _fileBuffer, ...apiEventData } = data;
     await this.events.submittedEvent(data.projectId, apiEventData);
 
     const apiQueryRunner = this.apiDataSource.createQueryRunner();
