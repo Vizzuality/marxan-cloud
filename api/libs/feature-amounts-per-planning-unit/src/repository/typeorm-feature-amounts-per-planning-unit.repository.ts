@@ -40,6 +40,9 @@ export class TypeormFeatureAmountsPerPlanningUnitRepository
       .from(FeatureAmountsPerPlanningUnitEntity, 'fappu')
       .where('project_id = :projectId', { projectId })
       .andWhere('feature_id IN (:...featureIds)', { featureIds })
+      /** The Marxan solver will show unexpected behaviour when seeing
+       * puvspr.dat rows with amount = 0 */
+      .andWhere('amount > 0')
       .execute();
   }
 
