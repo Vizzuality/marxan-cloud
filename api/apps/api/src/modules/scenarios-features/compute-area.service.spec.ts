@@ -30,6 +30,21 @@ describe(ComputeArea, () => {
     await fixtures.ThenMinMaxAmountWasSaved();
   });
 
+  it('does not include rows with amount = 0 in puvspr.dat files', async () => {
+    const { projectId, scenarioId } = fixtures.GivenProject();
+    const featureId =
+      fixtures.GivenFeatureWasCreatedWithSomeAmountsPerPuEqualToZero();
+    fixtures.GivenMinMaxAmount(featureId, undefined, undefined);
+
+    await fixtures.WhenComputing(projectId, scenarioId, featureId);
+
+    await fixtures.ThenNoPuvsprRowsWithAmountEqualToZeroShouldBeGenerated(
+      projectId,
+      featureId,
+    );
+    await fixtures.ThenMinMaxAmountWasSaved();
+  });
+
   it('does not save saves amounts per planning unit when computation has already been made but saves min/max amount for the feature', async () => {
     const { projectId, scenarioId } = fixtures.GivenProject();
     const featureId = fixtures.GivenNoComputationHasBeenSaved();
@@ -111,6 +126,7 @@ const getFixtures = async () => {
     sandbox.get(FeatureAmountsPerPlanningUnitRepository);
 
   const expectedPuid = v4();
+  const expectedPuidWithAmountEqualToZero = v4();
   const expectedAmount = 20;
   return {
     GivenProject: () => {
@@ -140,6 +156,27 @@ const getFixtures = async () => {
             projectPuId: expectedPuid,
             amount: expectedAmount,
             puId: 1,
+          },
+        ];
+      });
+
+      return featureId;
+    },
+    GivenFeatureWasCreatedWithSomeAmountsPerPuEqualToZero: () => {
+      const featureId = v4();
+      computeMarxanAmountPerPlanningUnitMock.mockImplementation(async () => {
+        return [
+          {
+            featureId,
+            projectPuId: expectedPuid,
+            amount: expectedAmount,
+            puId: 1,
+          },
+          {
+            featureId,
+            projectPuId: expectedPuidWithAmountEqualToZero,
+            amount: 0,
+            puId: 2,
           },
         ];
       });
@@ -176,6 +213,29 @@ const getFixtures = async () => {
         projectPuId: expectedPuid,
         featureId,
       });
+    },
+    ThenNoPuvsprRowsWithAmountEqualToZeroShouldBeGenerated: async (
+      projectId: string,
+      featureId: string,
+    ) => {
+      const savedCalculations =
+        await featureAmountsPerPlanningUnitRepo.getAmountPerPlanningUnitAndFeature(
+          projectId,
+          [featureId],
+        );
+
+      expect(savedCalculations).toBeDefined();
+      expect(savedCalculations[0]).toEqual({
+        amount: expectedAmount,
+        projectPuId: expectedPuid,
+        featureId,
+      });
+      expect(savedCalculations).not.toContain({
+        amount: 0,
+        projectPuId: expectedPuidWithAmountEqualToZero,
+        featureId,
+      });
+      expect(savedCalculations.length).toBe(1);
     },
     ThenComputationsWasNotDone: async () => {
       expect(computeMarxanAmountPerPlanningUnitMock).not.toHaveBeenCalled();
