@@ -26,8 +26,12 @@ export class MemoryFeatureAmountsPerPlanningUnitRepository
 
     if (!featureAmountsPerPlanningUnit) return [];
 
-    return featureAmountsPerPlanningUnit.filter(({ featureId }) =>
-      featureIds.includes(featureId),
+    return (
+      featureAmountsPerPlanningUnit
+        .filter(({ featureId }) => featureIds.includes(featureId))
+        /** The Marxan solver will show unexpected behaviour when seeing
+         * puvspr.dat rows with amount = 0 */
+        .filter(({ amount }) => amount > 0)
     );
   }
   async saveAmountPerPlanningUnitAndFeature(
