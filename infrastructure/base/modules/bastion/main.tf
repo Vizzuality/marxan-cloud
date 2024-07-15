@@ -30,6 +30,16 @@ resource "tls_private_key" "ssh_private_key" {
 
 locals {
   admin_user = "ubuntu"
+
+  cloud_init_custom_data = <<-EOF
+    #cloud-config
+    runcmd:
+      - fallocate -l 2G /swapfile
+      - chmod 600 /swapfile
+      - mkswap /swapfile
+      - swapon /swapfile
+      - echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
+  EOF
 }
 
 resource "azurerm_linux_virtual_machine" "bastion" {
@@ -63,6 +73,14 @@ resource "azurerm_linux_virtual_machine" "bastion" {
     sku       = "20_04-lts"
     version   = "latest"
   }
+
+  # Since the VM for this bastion host is provisioned with a very small VM size
+  # by default (Standard_B1ls, with 1 vCPU core and 0.5GiB of memory), memory
+  # may typically not be enough if needing to run an apt update/upgrade to pull
+  # in security-fix packages, so a small swapfile should help here. This is
+  # created via cloud-init
+  # (https://learn.microsoft.com/en-us/azure/virtual-machines/linux/tutorial-automate-vm-deployment)
+  custom_data = base64encode(local.cloud_init_custom_data)
 }
 
 resource "azurerm_dns_a_record" "bastion_dns_record" {
