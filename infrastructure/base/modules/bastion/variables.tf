@@ -21,6 +21,10 @@ variable "bastion_subnet_id" {
   description = "The id of the subnet where the bastion host will be placed"
 }
 
+variable "bastion_nsg_id" {
+  description = "The id of the network security group for the bastion host"
+}
+
 variable "dns_zone" {
   description = "The Azure DNS zone where the bastion A record will be added"
 }

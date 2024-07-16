@@ -23,6 +23,11 @@ resource "azurerm_network_interface" "bastion_nic" {
   }
 }
 
+resource "azurerm_network_interface_security_group_association" "bastion_nic_nsg_association" {
+  network_interface_id      = azurerm_network_interface.bastion_nic.id
+  network_security_group_id = var.bastion_nsg_id
+}
+
 resource "tls_private_key" "ssh_private_key" {
   algorithm = "RSA"
   rsa_bits  = 4096

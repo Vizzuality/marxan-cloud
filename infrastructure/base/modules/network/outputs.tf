@@ -26,6 +26,10 @@ output "bastion_subnet_id" {
   value = azurerm_subnet.bastion_subnet.id
 }
 
+output "bastion_nsg_id" {
+  value = azurerm_network_security_group.bastion_nsg.id
+}
+
 output "firewall_subnet_id" {
   value = azurerm_subnet.firewall_subnet.id
 }
