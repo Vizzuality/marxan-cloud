@@ -39,6 +39,7 @@ module "bastion" {
   project_name            = var.project_name
   bastion_ssh_public_keys = var.bastion_ssh_public_keys
   bastion_subnet_id       = module.network.bastion_subnet_id
+  bastion_nsg_id          = module.network.bastion_nsg_id
   dns_zone                = module.dns.dns_zone
 }
 
