@@ -4,6 +4,9 @@ import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form'
 
 import { useRouter } from 'next/router';
 
+import { useAppSelector, useAppDispatch } from 'store/hooks';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { useToasts } from 'hooks/toast';
 
@@ -36,6 +39,11 @@ const EditModal = ({
 
   const formRef = useRef<FormProps<FormValues>['form']>(null);
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
+  const dispatch = useAppDispatch();
+
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setOriginalFeatureValues } = scenarioSlice.actions;
+  const { originalFeatureValues } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const selectedFeaturesQuery = useSelectedFeatures(
     sid,
@@ -122,8 +130,8 @@ const EditModal = ({
             kind,
             marxanSettings: selectedFeatures.find((f) => f.id === featureId)
               ? {
-                  prop: target / 100 || 0.5,
-                  fpf: +spf,
+                  prop: targetChanged || unChangedFields ? target / 100 : sf.marxanSettings.prop,
+                  fpf: spfChanged || unChangedFields ? +spf : sf.marxanSettings.fpf,
                 }
               : sf.marxanSettings,
           };
@@ -139,6 +147,8 @@ const EditModal = ({
           onSuccess: (res) => {
             onDone?.(res);
             handleModal('edit', false);
+
+            dispatch(setOriginalFeatureValues({}));
 
             addToast(
               'success-edit-features',
@@ -175,8 +185,34 @@ const EditModal = ({
       handleModal,
       sid,
       onDone,
+      dispatch,
+      setOriginalFeatureValues,
     ]
   );
+
+  const [targetChanged, spfChanged] = useMemo(() => {
+    const newValues = selectedFeatures.reduce((acc, feature) => {
+      return {
+        ...acc,
+        [feature.id]: {
+          prop: feature.marxanSettings.prop,
+          fpf: feature.marxanSettings.fpf,
+        },
+      };
+    }, {});
+
+    const changed = Object.keys(newValues).map((id) => ({
+      id,
+      target: originalFeatureValues[id]
+        ? originalFeatureValues[id].prop !== newValues[id].prop
+        : false,
+      fpf: originalFeatureValues[id] ? originalFeatureValues[id].fpf !== newValues[id].fpf : false,
+    }));
+
+    return [changed.some((c) => c.target), changed.some((c) => c.fpf)];
+  }, [selectedFeatures, originalFeatureValues]);
+
+  const unChangedFields = !targetChanged && !spfChanged;
 
   return (
     <FormRFF<FormValues>
@@ -196,50 +232,54 @@ const EditModal = ({
               <h2 className="font-heading font-bold text-black">Edit selected features</h2>
 
               <div className="flex w-full space-x-2">
-                <FieldRFF<FormValues['target']>
-                  name="target"
-                  validate={composeValidators([{ presence: true }])}
-                >
-                  {(fprops) => (
-                    <Field id="target" {...fprops} className="flex-1">
-                      <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
-                        Target (%)
-                      </Label>
+                {(targetChanged || unChangedFields) && (
+                  <FieldRFF<FormValues['target']>
+                    name="target"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="target" {...fprops} className="flex-1">
+                        <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
+                          Target (%)
+                        </Label>
 
-                      <input
-                        {...fprops.input}
-                        type="number"
-                        className={INPUT_CLASSES}
-                        defaultValue={fprops.input.value}
-                        min={0}
-                        max={100}
-                        step={0.01}
-                      />
-                    </Field>
-                  )}
-                </FieldRFF>
+                        <input
+                          {...fprops.input}
+                          type="number"
+                          className={INPUT_CLASSES}
+                          defaultValue={fprops.input.value}
+                          min={0}
+                          max={100}
+                          step={0.01}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                )}
 
-                <FieldRFF<FormValues['spf']>
-                  name="spf"
-                  validate={composeValidators([{ presence: true }])}
-                >
-                  {(fprops) => (
-                    <Field id="spf" {...fprops} className="flex-1">
-                      <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
-                        SPF
-                      </Label>
+                {(spfChanged || unChangedFields) && (
+                  <FieldRFF<FormValues['spf']>
+                    name="spf"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="spf" {...fprops} className="flex-1">
+                        <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
+                          SPF
+                        </Label>
 
-                      <input
-                        {...fprops.input}
-                        type="number"
-                        className={INPUT_CLASSES}
-                        defaultValue={fprops.input.value}
-                        min={1}
-                        step={0.01}
-                      />
-                    </Field>
-                  )}
-                </FieldRFF>
+                        <input
+                          {...fprops.input}
+                          type="number"
+                          className={INPUT_CLASSES}
+                          defaultValue={fprops.input.value}
+                          min={1}
+                          step={0.01}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                )}
               </div>
 
               <div className="mt-16 flex justify-center space-x-6">

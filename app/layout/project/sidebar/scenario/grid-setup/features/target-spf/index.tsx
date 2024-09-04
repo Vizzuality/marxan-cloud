@@ -68,8 +68,10 @@ const TargetAndSPFFeatures = (): JSX.Element => {
   const dispatch = useAppDispatch();
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setLayerSettings } = scenarioSlice.actions;
-  const { layerSettings } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { setLayerSettings, setOriginalFeatureValues } = scenarioSlice.actions;
+  const { layerSettings, originalFeatureValues } = useAppSelector(
+    (state) => state[`/scenarios/${sid}/edit`]
+  );
 
   const allFeaturesQuery = useAllFeatures(
     pid,
@@ -274,15 +276,38 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     [targetedFeatures]
   );
 
-  const handleSelectFeature = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
-    if (evt.target.checked) {
-      setSelectedFeatureIds((prevFeatureIds) => [...prevFeatureIds, evt.target.value]);
-    } else {
-      setSelectedFeatureIds((prevFeatureIds) =>
-        prevFeatureIds.filter((featureId) => featureId !== evt.target.value)
-      );
-    }
-  }, []);
+  const handleSelectFeature = useCallback(
+    (evt: ChangeEvent<HTMLInputElement>) => {
+      if (evt.target.checked) {
+        setSelectedFeatureIds((prevFeatureIds) => [...prevFeatureIds, evt.target.value]);
+
+        const selectedFeature = selectedFeaturesQuery.data?.find(
+          ({ id: _id }) => _id === evt.target.value
+        );
+
+        dispatch(
+          setOriginalFeatureValues({
+            ...originalFeatureValues,
+            [evt.target.value]: {
+              ...selectedFeature.marxanSettings,
+              prop: selectedFeature.marxanSettings.prop * 100,
+              fpf: selectedFeature.marxanSettings.spf || selectedFeature.marxanSettings.fpf,
+            },
+          })
+        );
+      } else {
+        setSelectedFeatureIds((prevFeatureIds) =>
+          prevFeatureIds.filter((featureId) => featureId !== evt.target.value)
+        );
+
+        const clonedOriginalFeatureValues = { ...originalFeatureValues };
+        delete clonedOriginalFeatureValues[evt.target.value];
+
+        dispatch(setOriginalFeatureValues(clonedOriginalFeatureValues));
+      }
+    },
+    [originalFeatureValues, setOriginalFeatureValues, dispatch, selectedFeaturesQuery.data]
+  );
 
   const onSubmit = useCallback(() => {
     const data = {
@@ -343,15 +368,32 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     });
   }, [sid, selectedFeaturesMutation, featureValues, selectedFeaturesQuery.data, targetedFeatures]);
 
-  const handleRowValues = useCallback((id, values) => {
-    setFeatureValues((prevValues) => ({
-      ...prevValues,
-      [id]: {
-        ...prevValues[id],
-        ...values,
-      },
-    }));
-  }, []);
+  const handleRowValues = useCallback(
+    (id: string, values) => {
+      const selectedFeature = selectedFeaturesQuery.data?.find(({ id: _id }) => _id === id);
+
+      setFeatureValues((prevValues) => {
+        dispatch(
+          setOriginalFeatureValues({
+            ...originalFeatureValues,
+            [id]: {
+              prop: selectedFeature.marxanSettings.prop * 100,
+              fpf: selectedFeature.marxanSettings.fpf,
+            },
+          })
+        );
+
+        return {
+          ...prevValues,
+          [id]: {
+            ...prevValues[id],
+            ...values,
+          },
+        };
+      });
+    },
+    [selectedFeaturesQuery.data, dispatch, setOriginalFeatureValues, originalFeatureValues]
+  );
 
   const handleRowDeletion = useCallback(
     (featureToRemove) => {

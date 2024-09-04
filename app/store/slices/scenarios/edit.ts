@@ -25,6 +25,14 @@ export interface ScenarioEditStateProps {
   selectedContinuousFeatures: Feature['id'][];
   preHighlightFeatures: string[];
   postHighlightFeatures: string[];
+  originalFeatureValues:
+    | {
+        [key: Feature['id']]: {
+          prop: number;
+          fpf: number;
+        };
+      }
+    | {};
 
   // Cost Surface
   selectedCostSurface: CostSurface['id'];
@@ -80,6 +88,7 @@ const initialState = {
   postHighlightFeatures: [],
 
   selectedCostSurface: null,
+  originalFeatureValues: {},
 
   // ADJUST PLANNING UNITS
   cache: Date.now(),
@@ -162,7 +171,12 @@ export function getScenarioEditSlice(id) {
       setPostHighlightFeatures: (state, action: PayloadAction<string[]>) => {
         state.postHighlightFeatures = action.payload;
       },
-
+      setOriginalFeatureValues: (
+        state,
+        action: PayloadAction<ScenarioEditStateProps['originalFeatureValues']>
+      ) => {
+        state.originalFeatureValues = action.payload;
+      },
       setSelectedCostSurface: (
         state,
         action: PayloadAction<ScenarioEditStateProps['selectedCostSurface']>
