@@ -211,8 +211,11 @@ const EditModal = ({
       initialValues={{
         mode: 'all',
         target:
-          (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.prop) || 50,
-        spf: (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.fpf) || 1,
+          (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.prop) ||
+          undefined,
+        spf:
+          (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.fpf) ||
+          undefined,
       }}
       onSubmit={onEditSubmit}
       render={({ form, handleSubmit }) => {
@@ -297,7 +300,12 @@ const EditModal = ({
                   Cancel
                 </Button>
 
-                <Button theme="primary" size="xl" type="submit">
+                <Button
+                  theme="primary"
+                  size="xl"
+                  type="submit"
+                  disabled={formRef.current?.getState().invalid}
+                >
                   Save
                 </Button>
               </div>
