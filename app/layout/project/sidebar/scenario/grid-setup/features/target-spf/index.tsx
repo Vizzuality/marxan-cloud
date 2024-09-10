@@ -24,6 +24,7 @@ import TargetsSPFTable from 'layout/project/sidebar/scenario/grid-setup/features
 import ActionsMenu from 'layout/project/sidebar/scenario/grid-setup/features/target-spf/targets-spf-table/actions-menu';
 import Section from 'layout/section';
 import { Feature } from 'types/api/feature';
+import { toFixedWithoutZeros } from 'utils/numbers';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -103,7 +104,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           splitted: true,
           marxanSettings: {
             ...splitFeature.marxanSettings,
-            prop: splitFeature.marxanSettings?.prop * 100,
+            prop: toFixedWithoutZeros(splitFeature.marxanSettings?.prop * 100),
             ...(featureValues[`${feature.id}-${splitFeature.name}`]?.target && {
               prop: featureValues[`${feature.id}-${splitFeature.name}`].target,
             }),
@@ -127,7 +128,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
             type: featureMetadata?.tag,
             marxanSettings: {
               ...feature.marxanSettings,
-              prop: feature.marxanSettings?.prop * 100,
+              prop: toFixedWithoutZeros(feature.marxanSettings?.prop * 100),
               ...(featureValues[feature.id]?.target && {
                 prop: featureValues[feature.id].target,
               }),
@@ -424,7 +425,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
         return {
           ...acc,
           [featureId]: {
-            target: marxanSettings?.prop * 100,
+            target: toFixedWithoutZeros(marxanSettings?.prop * 100),
             spf: marxanSettings?.fpf,
           },
         };
