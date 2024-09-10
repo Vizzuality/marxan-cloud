@@ -57,6 +57,7 @@ const TargetsSPFTable = ({
                   theme="light"
                   className="block h-4 w-4 checked:bg-blue-500"
                   onChange={onSelectAll}
+                  checked={selectedIds.length === data.length}
                   disabled={noDataCustom}
                 />
               </th>

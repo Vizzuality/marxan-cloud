@@ -1,4 +1,6 @@
+import { numericStringToFloat } from '@marxan/utils/numeric-string-to-float.utils';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { Column, ViewEntity } from 'typeorm';
 
 @ViewEntity('scenario_features_gap_data')
@@ -20,7 +22,10 @@ export class ScenarioFeaturesGapData {
   metArea!: number;
 
   @ApiProperty()
-  @Column({ name: 'met' })
+  // explicitly set type, otherwise TypeORM (v10, at least) will cast to integer
+  // TypeORM will still represent the value as string though (https://github.com/typeorm/typeorm/issues/873#issuecomment-328912050)
+  @Column({ name: 'met', type: 'double precision' })
+  @Transform(numericStringToFloat)
   met!: number;
 
   @ApiProperty()
@@ -28,7 +33,10 @@ export class ScenarioFeaturesGapData {
   coverageTargetArea!: number;
 
   @ApiProperty()
-  @Column({ name: 'coverage_target' })
+  // explicitly set type, otherwise TypeORM (v10, at least) will cast to integer
+  // TypeORM will still represent the value as string though (https://github.com/typeorm/typeorm/issues/873#issuecomment-328912050)
+  @Column({ name: 'coverage_target', type: 'double precision' })
+  @Transform(numericStringToFloat)
   coverageTarget!: number;
 
   @ApiProperty()
