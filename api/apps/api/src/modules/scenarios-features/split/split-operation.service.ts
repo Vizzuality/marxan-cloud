@@ -54,11 +54,25 @@ export class SplitOperation {
           protectedAreaFilterByIds,
           project,
         );
-        const ids: { id: string }[] = await this.geoEntityManager.query(
-          query,
-          parameters,
+        const scenarioFeaturePreparationIdsForFeature: {
+          id: string;
+          features_data_id: string;
+        }[] = await this.geoEntityManager.query(query, parameters);
+        scenarioFeaturePreparationIds.push(
+          ...scenarioFeaturePreparationIdsForFeature,
         );
-        scenarioFeaturePreparationIds.push(...ids);
+        const featureDataStableIds = await this.geoEntityManager.query(
+          'select stable_id from features_data where id = any($1)',
+          [
+            scenarioFeaturePreparationIdsForFeature.map(
+              (i) => i.features_data_id,
+            ),
+          ],
+        );
+        await this.splitCreateFeatures.setFeatureDataStableIdsForFeature(
+          singleSplitFeatureWithId.id,
+          featureDataStableIds,
+        );
       }
 
       await this.computeAmountPerFeature(

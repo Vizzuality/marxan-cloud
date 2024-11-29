@@ -103,7 +103,7 @@ So this needs to be changed to:
 Piece exporters and importers will need to:
 
 - export and import the new `(geodb)features_data.stable_id` column
-- export and import the new `(apidb)feature_data_stable_ids` column
+- export and import the new `(apidb)features.feature_data_stable_ids` column
 
 ## Updating queries for tiles of features
 

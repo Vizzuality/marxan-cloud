@@ -42,6 +42,7 @@ export class FeatureAmountsPerPlanningUnitService {
   public async computeMarxanAmountPerPlanningUnit(
     featureId: string,
     projectId: string,
+    featureDataStableIds: string[],
     geoEntityManager: EntityManager = this.geoEntityManager,
   ): Promise<ComputeFeatureAmountPerPlanningUnit[]> {
     /**
@@ -67,7 +68,7 @@ export class FeatureAmountsPerPlanningUnitService {
               (
                 select st_union(the_geom) as the_geom
                 from features_data fd
-                where fd.feature_id = $2
+                where fd.stable_id = ANY($3)
                 group by fd.feature_id
               ) species,
               (
@@ -81,7 +82,7 @@ export class FeatureAmountsPerPlanningUnitService {
           )
           select * from all_amount_per_planning_unit where amount > 0 order by puid;
         `,
-      [projectId, featureId],
+      [projectId, featureId, featureDataStableIds],
     );
 
     return rows.map(({ featureid, projectpuid, puid, amount }) => ({
