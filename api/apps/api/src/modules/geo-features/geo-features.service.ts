@@ -513,20 +513,31 @@ export class GeoFeaturesService extends AppBaseService<
         geoFeature.id,
         data.tagName,
       );
+
+      const featureDataStableIds: string[] = [];
       // Store geometries in features_data table
       for (const featureData of featureDatas) {
-        await this.createFeatureData(
-          geoQueryRunner.manager,
-          geoFeature.id,
-          featureData.geometry,
-          featureData.properties,
+        featureDataStableIds.push(
+          await this.createFeatureData(
+            geoQueryRunner.manager,
+            geoFeature.id,
+            featureData.geometry,
+            featureData.properties,
+          ),
         );
       }
+
+      await this.setFeatureDataStableIdsForFeature(
+        apiQueryRunner.manager,
+        geoFeature.id,
+        featureDataStableIds,
+      );
 
       const computedFeatureAmounts =
         await this.featureAmountsPerPlanningUnitService.computeMarxanAmountPerPlanningUnit(
           geoFeature.id,
           projectId,
+          featureDataStableIds,
           geoQueryRunner.manager,
         );
 
@@ -580,6 +591,25 @@ export class GeoFeaturesService extends AppBaseService<
     }
 
     return right(geoFeature);
+  }
+
+  private async setFeatureDataStableIdsForFeature(
+    apiEntityManager: EntityManager,
+    featureId: string,
+    featureDataStableIds: string[],
+  ): Promise<void> {
+    this.logger.debug(
+      `Setting feature data stable ids for feature ${featureId}: ${featureDataStableIds}`,
+    );
+    const repo = apiEntityManager.getRepository(GeoFeature);
+    await repo.update(
+      {
+        id: featureId,
+      },
+      {
+        featureDataStableIds,
+      },
+    );
   }
 
   private async saveFeatureAmountPerPlanningUnit(
@@ -954,14 +984,20 @@ export class GeoFeaturesService extends AppBaseService<
     featureId: string,
     geometry: Geometry,
     properties: Record<string, string | number>,
-  ): Promise<void> {
-    await entityManager.query(
-      `INSERT INTO "features_data"
-       ("id", "the_geom", "properties", "source", "feature_id")
-       VALUES (DEFAULT, ST_MakeValid(ST_GeomFromGeoJSON($1)::geometry), $2, $3,
-               $4);`,
-      [geometry, properties, GeometrySource.user_imported, featureId],
+  ): Promise<string> {
+    const stableId = await entityManager
+      .query(
+        `INSERT INTO "features_data"
+        ("id", "the_geom", "properties", "source", "feature_id")
+        VALUES (DEFAULT, ST_MakeValid(ST_GeomFromGeoJSON($1)::geometry), $2, $3,
+                $4) RETURNING stable_id;`,
+        [geometry, properties, GeometrySource.user_imported, featureId],
+      )
+      .then((result) => result[0].stable_id);
+    this.logger.debug(
+      `Created feature data with stable id ${stableId} for feature ${featureId} (properties: ${properties})`,
     );
+    return stableId;
   }
 
   // TODO: this should be a 2 step process: We temporarily store the new features and their amounts

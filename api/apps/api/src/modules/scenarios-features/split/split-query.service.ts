@@ -112,7 +112,7 @@ export class SplitQuery {
         or st_intersects(ST_MakeEnvelope(${fields.eastBbox
           .map((coordinate) => coordinate)
           .join(',')}, 4326), fd.the_geom)
-        returning sfp.id as id;
+        returning sfp.id as id, sfp.feature_class_id as features_data_id;
     `;
     return { parameters, query };
   }

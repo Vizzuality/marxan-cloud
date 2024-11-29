@@ -38,10 +38,20 @@ export class ComputeArea {
       );
 
     if (!alreadyComputed) {
+      const featureDataStableIds = await this.geoFeatureRepo
+        .findOne({
+          where: {
+            id: featureId,
+            projectId,
+          },
+          select: ['featureDataStableIds'],
+        })
+        .then((result) => result?.featureDataStableIds);
       const amountPerPlanningUnitOfFeature =
         await this.featureAmountsPerPlanningUnit.computeMarxanAmountPerPlanningUnit(
           featureId,
           projectId,
+          featureDataStableIds || [],
         );
 
       await this.featureAmountsPerPlanningUnitRepo.saveAmountPerPlanningUnitAndFeature(
