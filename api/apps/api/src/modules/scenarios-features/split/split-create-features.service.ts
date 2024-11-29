@@ -3,7 +3,7 @@ import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { SplitFeatureConfigMapper } from '@marxan-api/modules/scenarios/specification/split-feature-config.mapper';
 import { FeatureConfigSplit } from '@marxan-api/modules/specification';
 import { isDefined } from '@marxan/utils';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
@@ -65,6 +65,23 @@ export class SplitCreateFeatures {
     );
 
     return featuresAlreadyExisting.concat(newFeaturesCreated);
+  }
+
+  async setFeatureDataStableIdsForFeature(
+    featureId: string,
+    featureDataStableIds: any[],
+  ): Promise<void> {
+    Logger.debug(
+      `Setting feature data stable ids for feature ${featureId}: ${JSON.stringify(
+        featureDataStableIds.map((i) => i.stable_id),
+      )}`,
+    );
+    await this.featuresRepo.update(
+      { id: featureId },
+      {
+        featureDataStableIds: featureDataStableIds.map((i) => i.stable_id),
+      },
+    );
   }
 
   private async isBaseFeatureADerivedFeature(input: FeatureConfigSplit) {
