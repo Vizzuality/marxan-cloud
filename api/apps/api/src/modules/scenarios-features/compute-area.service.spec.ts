@@ -85,7 +85,8 @@ describe(ComputeArea, () => {
 const getFixtures = async () => {
   const computeMarxanAmountPerPlanningUnitMock = jest.fn();
   const findProjectMock = jest.fn();
-  const findGeoFeatureMock = jest.fn();
+  const findOneOrFailGeoFeatureMock = jest.fn();
+  const findOneGeoFeatureMock = jest.fn();
   const saveAmountRangeForFeaturesMock = jest.fn();
   const sandbox = await Test.createTestingModule({
     imports: [],
@@ -96,7 +97,10 @@ const getFixtures = async () => {
       },
       {
         provide: getRepositoryToken(GeoFeature),
-        useValue: { findOneOrFail: findGeoFeatureMock },
+        useValue: {
+          findOneOrFail: findOneOrFailGeoFeatureMock,
+          findOne: findOneGeoFeatureMock,
+        },
       },
       {
         provide: GeoFeaturesService,
@@ -189,10 +193,13 @@ const getFixtures = async () => {
       ];
     },
     GivenMinMaxAmount: (featureId: string, min?: number, max?: number) => {
-      findGeoFeatureMock.mockResolvedValueOnce({
+      findOneOrFailGeoFeatureMock.mockResolvedValueOnce({
         id: featureId,
         amountMin: min,
         amountMax: max,
+      });
+      findOneGeoFeatureMock.mockResolvedValueOnce({
+        featureDataStableIds: [],
       });
     },
     WhenComputing: (projectId: string, scenarioId: string, featureId: string) =>

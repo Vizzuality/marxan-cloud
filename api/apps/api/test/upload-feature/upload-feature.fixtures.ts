@@ -389,25 +389,25 @@ export const getFixtures = async () => {
           featureClassName: name,
         },
       });
-      expect(features).toEqual([
-        {
-          id: expect.any(String),
-          featureClassName: name,
-          featureDataStableIds: null,
-          description,
-          alias: null,
-          amountMax: 5296399725.20094,
-          amountMin: 820348505.9774874,
-          propertyName: null,
-          intersection: null,
-          creationStatus: JobStatus.created,
-          projectId,
-          isCustom: true,
-          isLegacy: false,
-          fromGeoprocessingOps: null,
-          geoprocessingOpsHash: null,
-        },
-      ]);
+      const expectedFeature = new GeoFeature();
+      Object.assign(expectedFeature, {
+        id: expect.any(String),
+        featureClassName: name,
+        featureDataStableIds: [expect.any(String)],
+        description,
+        alias: null,
+        amountMax: 5296399725.20094,
+        amountMin: 820348505.9774874,
+        propertyName: null,
+        intersection: null,
+        creationStatus: JobStatus.created,
+        projectId,
+        isCustom: true,
+        isLegacy: false,
+        fromGeoprocessingOps: null,
+        geoprocessingOpsHash: null,
+      });
+      expect(features).toEqual([expectedFeature]);
       expect(
         await geoFeatureDataRepo.find({
           where: {
