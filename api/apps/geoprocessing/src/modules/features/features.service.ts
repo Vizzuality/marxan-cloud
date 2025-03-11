@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -10,6 +10,7 @@ import { BBox } from 'geojson';
 import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo';
 
 import { TileRequest } from '@marxan/tiles';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 export class TileSpecification extends TileRequest {
   @ApiProperty()
@@ -35,6 +36,8 @@ export class FeatureService {
   constructor(
     @InjectRepository(GeoFeatureGeometry)
     private readonly featuresRepository: Repository<GeoFeatureGeometry>,
+    @InjectEntityManager(geoprocessingConnections.apiDB)
+    private readonly apiEntityManager: EntityManager,
     private readonly tileService: TileService,
   ) {}
 
@@ -44,8 +47,15 @@ export class FeatureService {
    * @todo move the string to int transformation to the AdminAreaLevelFilters class
    */
 
-  buildFeaturesWhereQuery(id: string, bbox?: BBox): string {
+  async buildFeaturesWhereQuery(id: string, bbox?: BBox): Promise<string> {
     let whereQuery = `feature_id = '${id}'`;
+    const featureDataStableIds: Array<string> = await this.apiEntityManager
+      .createQueryBuilder()
+      .select('feature_data_stable_ids')
+      .from('features', 'f')
+      .where('id = :id', { id })
+      .execute()
+      .then((result) => result?.[0].feature_data_stable_ids);
 
     if (bbox) {
       const { westBbox, eastBbox } = antimeridianBbox(nominatim2bbox(bbox));
@@ -60,6 +70,13 @@ export class FeatureService {
       the_geom
       ))`;
     }
+
+    if (featureDataStableIds?.length > 0) {
+      const formattedIds = featureDataStableIds
+        .map((id) => `'${id}'`)
+        .join(', ');
+      whereQuery += `AND feature_data_stable_ids = ANY(ARRAY[${formattedIds}]::uuid[])`;
+    }
     return whereQuery;
   }
 
@@ -67,7 +84,7 @@ export class FeatureService {
    * @todo get attributes from Entity, based on user selection
    * @todo simplification level based on zoom level
    */
-  public findTile(
+  public async findTile(
     tileSpecification: TileSpecification,
     forProject: boolean,
     bbox?: BBox,
@@ -89,7 +106,7 @@ export class FeatureService {
                  feature_id
                  from "${this.featuresRepository.metadata.tableName}")`;
 
-    const customQuery = this.buildFeaturesWhereQuery(id, bbox);
+    const customQuery = await this.buildFeaturesWhereQuery(id, bbox);
     return this.tileService.getTile({
       z,
       x,
