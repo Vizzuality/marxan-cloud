@@ -135,6 +135,9 @@ export class ScenarioFeaturesSpecificationPieceImporter
       .flatMap((specification) => {
         return specification.configs;
       })
+      // @debt: workaround for edge cases where config may be undefined, until
+      // frontend is updated to handle materialized splits
+      .filter((config) => isDefined(config))
       .flatMap((config) => {
         if (isDefined(config.againstFeature))
           return [config.baseFeature, config.againstFeature];
