@@ -1,12 +1,6 @@
 import { User } from '@marxan-api/modules/users/user.api.entity';
-import {
-  CsvFormatterStream,
-  format,
-  FormatterRow,
-  parseString,
-} from 'fast-csv';
+import { CsvFormatterStream, format, FormatterRow } from 'fast-csv';
 import { Repository } from 'typeorm';
-import { validateOrReject } from 'class-validator';
 
 const columnsAndCsvHeaders = [
   'display_name',
@@ -16,6 +10,7 @@ const columnsAndCsvHeaders = [
   'country',
   'background',
   'level',
+  'created_at',
 ];
 
 export const buildUsersInfoCsv = async (
@@ -34,6 +29,13 @@ export const buildUsersInfoCsv = async (
 
   allUsersStream
     .on('data', (row) => {
+      // Format the created_at timestamp to YYYY-MM-DDTHH:MM:SS
+      if (typeof row === 'object' && row !== null && !Buffer.isBuffer(row)) {
+        const rowObj = row as any;
+        if (rowObj['created_at'] instanceof Date) {
+          rowObj['created_at'] = rowObj['created_at'].toISOString();
+        }
+      }
       csvHeaderStream.write(row);
     })
     .on('end', () => csvHeaderStream.end());
