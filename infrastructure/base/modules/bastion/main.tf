@@ -6,7 +6,8 @@ resource "azurerm_public_ip" "public_ip" {
   name                = "${var.project_name}-ip"
   location            = var.resource_group.location
   resource_group_name = var.resource_group.name
-  allocation_method   = "Dynamic"
+  sku                 = "Standard"
+  allocation_method   = "Static"
 }
 
 
@@ -23,6 +24,11 @@ resource "azurerm_network_interface" "bastion_nic" {
   }
 }
 
+resource "azurerm_network_interface_security_group_association" "bastion_nic_nsg_association" {
+  network_interface_id      = azurerm_network_interface.bastion_nic.id
+  network_security_group_id = var.bastion_nsg_id
+}
+
 resource "tls_private_key" "ssh_private_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -30,6 +36,16 @@ resource "tls_private_key" "ssh_private_key" {
 
 locals {
   admin_user = "ubuntu"
+
+  cloud_init_custom_data = <<-EOF
+    #cloud-config
+    runcmd:
+      - fallocate -l 2G /swapfile
+      - chmod 600 /swapfile
+      - mkswap /swapfile
+      - swapon /swapfile
+      - echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
+  EOF
 }
 
 resource "azurerm_linux_virtual_machine" "bastion" {
@@ -59,10 +75,18 @@ resource "azurerm_linux_virtual_machine" "bastion" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-focal"
-    sku       = "20_04-lts"
+    offer     = "ubuntu-24_04-lts"
+    sku       = "minimal"
     version   = "latest"
   }
+
+  # Since the VM for this bastion host is provisioned with a very small VM size
+  # by default (Standard_B1ls, with 1 vCPU core and 0.5GiB of memory), memory
+  # may typically not be enough if needing to run an apt update/upgrade to pull
+  # in security-fix packages, so a small swapfile should help here. This is
+  # created via cloud-init
+  # (https://learn.microsoft.com/en-us/azure/virtual-machines/linux/tutorial-automate-vm-deployment)
+  custom_data = base64encode(local.cloud_init_custom_data)
 }
 
 resource "azurerm_dns_a_record" "bastion_dns_record" {

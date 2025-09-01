@@ -6,19 +6,20 @@ locals {
 }
 
 resource "azurerm_postgresql_flexible_server" "marxan" {
-  name                   = "${var.project_name}-sql-server"
-  resource_group_name    = var.resource_group.name
-  location               = var.resource_group.location
-  version                = var.postgresql_version
-  delegated_subnet_id    = var.subnet_id
-  private_dns_zone_id    = var.private_dns_zone_id
-  administrator_login    = local.postgres_secret_json.username
-  administrator_password = local.postgres_secret_json.password
-  zone                   = "1"
+  name                          = "${var.project_name}-sql-server"
+  resource_group_name           = var.resource_group.name
+  location                      = var.resource_group.location
+  version                       = var.postgresql_version
+  delegated_subnet_id           = var.subnet_id
+  private_dns_zone_id           = var.private_dns_zone_id
+  administrator_login           = local.postgres_secret_json.username
+  administrator_password        = local.postgres_secret_json.password
+  zone                          = "1"
+  public_network_access_enabled = false
 
   storage_mb = var.storage_size
 
-  sku_name   = var.instance_size
+  sku_name = var.instance_size
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "marxan_allowed_extensions" {

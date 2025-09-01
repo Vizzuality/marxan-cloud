@@ -1,4 +1,4 @@
-import { ChangeEvent, ComponentProps, useCallback, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, ComponentProps, useCallback, useMemo, useState } from 'react';
 
 import { useQueryClient } from 'react-query';
 
@@ -24,6 +24,7 @@ import TargetsSPFTable from 'layout/project/sidebar/scenario/grid-setup/features
 import ActionsMenu from 'layout/project/sidebar/scenario/grid-setup/features/target-spf/targets-spf-table/actions-menu';
 import Section from 'layout/section';
 import { Feature } from 'types/api/feature';
+import { toFixedWithoutZeros } from 'utils/numbers';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -103,7 +104,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           splitted: true,
           marxanSettings: {
             ...splitFeature.marxanSettings,
-            prop: splitFeature.marxanSettings?.prop * 100,
+            prop: toFixedWithoutZeros(splitFeature.marxanSettings?.prop * 100),
             ...(featureValues[`${feature.id}-${splitFeature.name}`]?.target && {
               prop: featureValues[`${feature.id}-${splitFeature.name}`].target,
             }),
@@ -127,7 +128,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
             type: featureMetadata?.tag,
             marxanSettings: {
               ...feature.marxanSettings,
-              prop: feature.marxanSettings?.prop * 100,
+              prop: toFixedWithoutZeros(feature.marxanSettings?.prop * 100),
               ...(featureValues[feature.id]?.target && {
                 prop: featureValues[feature.id].target,
               }),
@@ -415,23 +416,25 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     [selectedFeaturesQuery.data, queryClient, sid, selectedFeaturesMutation]
   );
 
-  const displayBulkActions = selectedFeatureIds.length > 0;
-  const displaySaveButton = selectedFeaturesQuery.data?.length > 0;
+  const onDoneEditing = useCallback((res: { data: { features: any[] } }) => {
+    setSelectedFeatureIds([]);
+    const { features } = res?.data || {};
 
-  useEffect(() => {
-    setFeatureValues((prevValues) => ({
-      ...prevValues,
-      ...selectedFeaturesQuery.data?.reduce((acc, { id, marxanSettings }) => {
+    setFeatureValues(() => ({
+      ...features?.reduce((acc, { featureId, marxanSettings }) => {
         return {
           ...acc,
-          [id]: {
-            target: marxanSettings?.prop * 100,
+          [featureId]: {
+            target: toFixedWithoutZeros(marxanSettings?.prop * 100),
             spf: marxanSettings?.fpf,
           },
         };
       }, {}),
     }));
-  }, [selectedFeaturesQuery.data]);
+  }, []);
+
+  const displayBulkActions = selectedFeatureIds.length > 0;
+  const displaySaveButton = selectedFeaturesQuery.data?.length > 0;
 
   return (
     <>
@@ -524,9 +527,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           <FeaturesBulkActionMenu
             features={targetedFeatures}
             selectedFeatureIds={selectedFeatureIds}
-            onDone={() => {
-              setSelectedFeatureIds([]);
-            }}
+            onDone={onDoneEditing}
           />
         )}
       </Section>

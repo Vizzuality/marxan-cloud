@@ -32,15 +32,20 @@ export class TypeormFeatureAmountsPerPlanningUnitRepository
     projectId: string,
     featureIds: string[],
   ): Promise<FeatureAmountPerProjectPlanningUnit[]> {
-    return this.geoEntityManager
-      .createQueryBuilder()
-      .select('amount')
-      .addSelect('project_pu_id', 'projectPuId')
-      .addSelect('feature_id', 'featureId')
-      .from(FeatureAmountsPerPlanningUnitEntity, 'fappu')
-      .where('project_id = :projectId', { projectId })
-      .andWhere('feature_id IN (:...featureIds)', { featureIds })
-      .execute();
+    return (
+      this.geoEntityManager
+        .createQueryBuilder()
+        .select('amount')
+        .addSelect('project_pu_id', 'projectPuId')
+        .addSelect('feature_id', 'featureId')
+        .from(FeatureAmountsPerPlanningUnitEntity, 'fappu')
+        .where('project_id = :projectId', { projectId })
+        .andWhere('feature_id IN (:...featureIds)', { featureIds })
+        /** The Marxan solver will show unexpected behaviour when seeing
+         * puvspr.dat rows with amount = 0 */
+        .andWhere('amount > 0')
+        .execute()
+    );
   }
 
   public async saveAmountPerPlanningUnitAndFeature(

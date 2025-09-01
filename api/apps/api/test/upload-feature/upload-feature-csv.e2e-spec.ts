@@ -41,7 +41,7 @@ test('custom feature csv upload with missing puids', async () => {
   await fixtures.ThenCSVImportSubmitEventWasSubmitted(fixtures.projectId);
   const event = await fixtures.ThenWaitForApiEvent(
     fixtures.projectId,
-    API_EVENT_KINDS.features__csv__import__failed__v1__alpha,
+    API_EVENT_KINDS.project__features__csv__import__failed__v1__alpha,
   );
   fixtures.ThenMissingPUIDErrorIsReturned(event);
   await fixtures.AndNoFeatureUploadIsRegistered();
@@ -55,7 +55,7 @@ test('custom feature csv upload with no features', async () => {
   await fixtures.ThenCSVImportSubmitEventWasSubmitted(fixtures.projectId);
   const event = await fixtures.ThenWaitForApiEvent(
     fixtures.projectId,
-    API_EVENT_KINDS.features__csv__import__failed__v1__alpha,
+    API_EVENT_KINDS.project__features__csv__import__failed__v1__alpha,
   );
   fixtures.ThenNoFeaturesInCsvFileErrorIsReturned(event);
   await fixtures.AndNoFeatureUploadIsRegistered();
@@ -69,7 +69,7 @@ test('custom feature csv upload with duplicated puids', async () => {
   await fixtures.ThenCSVImportSubmitEventWasSubmitted(fixtures.projectId);
   const event = await fixtures.ThenWaitForApiEvent(
     fixtures.projectId,
-    API_EVENT_KINDS.features__csv__import__failed__v1__alpha,
+    API_EVENT_KINDS.project__features__csv__import__failed__v1__alpha,
   );
   fixtures.ThenDuplicatedPUIDErrorIsReturned(event);
   await fixtures.AndNoFeatureUploadIsRegistered();
@@ -83,7 +83,7 @@ test('custom feature csv with puids not present in the project', async () => {
   await fixtures.ThenCSVImportSubmitEventWasSubmitted(fixtures.projectId);
   const event = await fixtures.ThenWaitForApiEvent(
     fixtures.projectId,
-    API_EVENT_KINDS.features__csv__import__failed__v1__alpha,
+    API_EVENT_KINDS.project__features__csv__import__failed__v1__alpha,
   );
   fixtures.ThenPuidsNotPresentErrorIsReturned(event);
   await fixtures.AndNoFeatureUploadIsRegistered();
@@ -97,7 +97,7 @@ test('custom feature csv upload with duplicated header', async () => {
   await fixtures.ThenCSVImportSubmitEventWasSubmitted(fixtures.projectId);
   const event = await fixtures.ThenWaitForApiEvent(
     fixtures.projectId,
-    API_EVENT_KINDS.features__csv__import__failed__v1__alpha,
+    API_EVENT_KINDS.project__features__csv__import__failed__v1__alpha,
   );
 
   fixtures.ThenDuplicatedHeaderErrorIsReturned(event);

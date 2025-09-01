@@ -49,7 +49,7 @@ export class FeatureAmountUploadService {
     private readonly geoFeaturesService: GeoFeaturesService,
   ) {}
 
-  uploadFeatureFromCSVAsync(
+  async uploadFeatureFromCsvAsync(
     fileBuffer: Buffer,
     projectId: string,
     userId: string,
@@ -72,6 +72,11 @@ export class FeatureAmountUploadService {
     projectId: string;
     userId: string;
   }): Promise<Left<any> | Right<GeoFeature[]>> {
+    //Because feature CSV files are bound to be increasingly larger, this can cause problems when trying to save a big
+    //JSONB value into postgres eventually crashing due to an memory error, so the CSV file is ignored for the api event
+    const { fileBuffer: _fileBuffer, ...apiEventData } = data;
+    await this.events.submittedEvent(data.projectId, apiEventData);
+
     const apiQueryRunner = this.apiDataSource.createQueryRunner();
     const geoQueryRunner = this.geoDataSource.createQueryRunner();
 
@@ -151,18 +156,15 @@ export class FeatureAmountUploadService {
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
 
-      // This is done, for now, in order to avoid unnecessary polling from FE
-      await this.events.submittedEvent(data.projectId, data);
       await this.events.finishEvent(data.projectId);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
       await geoQueryRunner.rollbackTransaction();
-      // This is done, for now, in order to avoid unnecessary polling from FE
-      await this.events.submittedEvent(data.projectId, data);
+
       await this.events.failEvent(data.projectId, err);
 
       this.logger.error(
-        'An error occurred creating features and saving amounts from csv (changes have been rolled back)',
+        'An error occurred while creating features and saving amounts from csv (changes have been rolled back)',
         String(err),
       );
       throw err;
@@ -239,7 +241,9 @@ export class FeatureAmountUploadService {
         userId,
       });
     for (const [index, chunk] of featuresChunks.entries()) {
-      this.logger.log(`Inserting chunk ${index} to temporary table...`);
+      this.logger.log(
+        `Inserting chunk ${index}/${featuresChunks.length} to temporary table...`,
+      );
       await entityManager
         .createQueryBuilder()
         .insert()
@@ -247,7 +251,7 @@ export class FeatureAmountUploadService {
         .values(chunk.map((feature) => ({ ...feature, upload: newUpload })))
         .execute();
     }
-    this.logger.log(`New csv upload data from saved to temporary tables`);
+    this.logger.log(`Data from CSV file saved to temporary table`);
     return newUpload;
   }
 
@@ -345,16 +349,16 @@ export class FeatureAmountUploadService {
       );
 
       this.logger.log(
-        `Feature data divided into  ${featuresChunks.length} chunks`,
+        `Feature data divided into ${featuresChunks.length} chunks`,
       );
       for (const [amountIndex, featureChunk] of featuresChunks.entries()) {
         this.logger.log(
-          `Starting the process of saving chunk with index ${amountIndex} of amounts of feature ${newFeature.feature_class_name}...`,
+          `Starting to save chunk ${amountIndex}/${featuresChunks.length} of amounts of feature ${newFeature.feature_class_name}...`,
         );
         const firstParameterNumber = 2;
         const parameters: any[] = [projectId];
         this.logger.log(
-          `Generating values to insert for chunk with index ${amountIndex}...`,
+          `Generating values to insert for chunk ${amountIndex}/${featuresChunks.length}...`,
         );
         const valuesToInsert = featureChunk.map((featureAmount, index) => {
           parameters.push(
@@ -380,7 +384,7 @@ export class FeatureAmountUploadService {
         });
 
         this.logger.log(
-          `Inserting amount values of chunk with index ${amountIndex} into (geoDB).features_data table...`,
+          `Inserting amounts of feature per planning unit of chunk ${amountIndex}/${featuresChunks.length} into (geoDB).features_data table...`,
         );
         await geoQueryRunner.manager.query(
           `
@@ -394,21 +398,24 @@ export class FeatureAmountUploadService {
           `,
           parameters,
         );
-        await geoQueryRunner.manager.query(
-          ` INSERT INTO feature_amounts_per_planning_unit (project_id, feature_id, amount, project_pu_id)
-                  SELECT $1, $2, amount, project_pu_id
-                  FROM features_data where feature_id = $2`,
-          [projectId, newFeature.id],
-        );
         this.logger.log(
-          `Chunk with index ${amountIndex} saved to (geoDB).features_data`,
+          `Chunk ${amountIndex}/${featuresChunks.length} saved to (geoDB).features_data`,
         );
       }
       this.logger.log(
         `All chunks of feature ${newFeature.feature_class_name} saved`,
       );
+
+      await geoQueryRunner.manager.query(
+        `INSERT INTO feature_amounts_per_planning_unit (project_id, feature_id, amount, project_pu_id)
+                SELECT $1, $2, amount, project_pu_id
+                FROM features_data where feature_id = $2`,
+        [projectId, newFeature.id],
+      );
     }
-    this.logger.log(`All new features data saved to (geoDB).features_data`);
+    this.logger.log(
+      `Data for all new features was saved to (geoDB).features_data`,
+    );
   }
 
   private async areFeatureNamesNotAlreadyUsedInProject(

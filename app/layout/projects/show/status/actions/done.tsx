@@ -144,6 +144,42 @@ export const useProjectActionsDone = () => {
     [queryClient, pid, mutate]
   );
 
+  const onFeaturesImportDone = useCallback(
+    (JOB_REF: MutableRefObject<Job>) => {
+      mutate(
+        {
+          id: pid,
+          data: {
+            metadata: {
+              cache: new Date().getTime(),
+            },
+          },
+        },
+        {
+          onSuccess: async () => {
+            await queryClient.invalidateQueries(['all-features', pid]);
+            JOB_REF.current = null;
+          },
+          onError: () => {
+            addToast(
+              'onFeaturesImportDone',
+              <>
+                <h2 className="font-medium">Error during importation</h2>
+                <p className="text-sm">
+                  An error occurred while importing the features. Please try again.
+                </p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [pid, mutate, addToast, queryClient]
+  );
+
   return useMemo(
     () => ({
       default: onDone,
@@ -153,7 +189,8 @@ export const useProjectActionsDone = () => {
       clone: onCloneImportDone,
       legacy: onLegacyImportDone,
       costSurface: onCostSurfaceUpload,
+      features: onFeaturesImportDone,
     }),
-    [onDone, onCloneImportDone, onLegacyImportDone, onCostSurfaceUpload]
+    [onDone, onCloneImportDone, onLegacyImportDone, onCostSurfaceUpload, onFeaturesImportDone]
   );
 };

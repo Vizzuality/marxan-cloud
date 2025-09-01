@@ -10,13 +10,21 @@ import { useToasts } from 'hooks/toast';
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
+import Radio from 'components/forms/radio';
 import { composeValidators } from 'components/forms/validations';
 import { Feature } from 'types/api/feature';
 
 export type FormValues = {
   target: number;
   spf: number;
+  mode: 'all' | 'only-target' | 'only-spf';
 };
+
+const EDITION_MODES = [
+  { value: 'all', label: 'Target & SPF' },
+  { value: 'only-target', label: 'Target' },
+  { value: 'only-spf', label: 'SPF' },
+];
 
 const INPUT_CLASSES =
   'h-10 w-full rounded-md border border-gray-400 px-3 text-gray-900 focus:border-none focus:outline-none focus:ring-1 focus:ring-blue-600';
@@ -28,7 +36,7 @@ const EditModal = ({
 }: {
   selectedFeatures: (Feature & { name: string; marxanSettings: { prop?: number; fpf?: number } })[];
   handleModal: (modalKey: 'split' | 'edit' | 'delete', isVisible: boolean) => void;
-  onDone?: () => void;
+  onDone?: (res?: unknown) => void;
 }): JSX.Element => {
   const { addToast } = useToasts();
   const { query } = useRouter();
@@ -75,7 +83,7 @@ const EditModal = ({
 
   const onEditSubmit = useCallback(
     (values: FormValues) => {
-      const { target, spf = 1 } = values;
+      const { target, spf = 1, mode } = values;
 
       const data = {
         status: 'created',
@@ -117,14 +125,34 @@ const EditModal = ({
             };
           }
 
+          let newMarxanSettings = sf.marxanSettings;
+
+          if (mode === 'only-target') {
+            newMarxanSettings = {
+              ...newMarxanSettings,
+              prop: target / 100,
+            };
+          }
+
+          if (mode === 'only-spf') {
+            newMarxanSettings = {
+              ...newMarxanSettings,
+              fpf: +spf,
+            };
+          }
+
+          if (mode === 'all') {
+            newMarxanSettings = {
+              prop: target / 100,
+              fpf: +spf,
+            };
+          }
+
           return {
             featureId,
             kind,
             marxanSettings: selectedFeatures.find((f) => f.id === featureId)
-              ? {
-                  prop: target / 100 || 0.5,
-                  fpf: +spf,
-                }
+              ? newMarxanSettings
               : sf.marxanSettings,
           };
         }),
@@ -136,8 +164,8 @@ const EditModal = ({
           data,
         },
         {
-          onSuccess: () => {
-            onDone?.();
+          onSuccess: (res) => {
+            onDone?.(res);
             handleModal('edit', false);
 
             addToast(
@@ -181,65 +209,90 @@ const EditModal = ({
   return (
     <FormRFF<FormValues>
       initialValues={{
+        mode: 'all',
         target:
-          (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.prop) || 50,
-        spf: (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.fpf) || 1,
+          (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.prop) ||
+          undefined,
+        spf:
+          (selectedFeatures?.length === 1 && selectedFeatures?.[0]?.marxanSettings?.fpf) ||
+          undefined,
       }}
-      ref={formRef}
       onSubmit={onEditSubmit}
       render={({ form, handleSubmit }) => {
         formRef.current = form;
+
+        const currentMode = form?.getState()?.values?.mode;
 
         return (
           <form onSubmit={handleSubmit} className="relative">
             <div className="flex flex-col space-y-5 px-8 py-1">
               <h2 className="font-heading font-bold text-black">Edit selected features</h2>
 
+              <div className="flex space-x-2">
+                {EDITION_MODES.map(({ value, label }) => {
+                  return (
+                    <FieldRFF key={value} name="mode" type="radio" value={value}>
+                      {(fprops) => (
+                        <div className="flex space-x-2">
+                          <Radio theme="light" id={value} {...fprops.input} />
+                          <Label theme="light" id={value} className="ml-2">
+                            {label}
+                          </Label>
+                        </div>
+                      )}
+                    </FieldRFF>
+                  );
+                })}
+              </div>
+
               <div className="flex w-full space-x-2">
-                <FieldRFF<FormValues['target']>
-                  name="target"
-                  validate={composeValidators([{ presence: true }])}
-                >
-                  {(fprops) => (
-                    <Field id="target" {...fprops} className="flex-1">
-                      <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
-                        Target (%)
-                      </Label>
+                {['only-target', 'all'].includes(currentMode) && (
+                  <FieldRFF<FormValues['target']>
+                    name="target"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="target" {...fprops} className="flex-1">
+                        <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
+                          Target (%)
+                        </Label>
 
-                      <input
-                        {...fprops.input}
-                        type="number"
-                        className={INPUT_CLASSES}
-                        defaultValue={fprops.input.value}
-                        min={0}
-                        max={100}
-                        step={0.01}
-                      />
-                    </Field>
-                  )}
-                </FieldRFF>
+                        <input
+                          {...fprops.input}
+                          type="number"
+                          className={INPUT_CLASSES}
+                          defaultValue={fprops.input.value}
+                          min={0}
+                          max={100}
+                          step={0.01}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                )}
+                {['only-spf', 'all'].includes(currentMode) && (
+                  <FieldRFF<FormValues['spf']>
+                    name="spf"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="spf" {...fprops} className="flex-1">
+                        <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
+                          SPF
+                        </Label>
 
-                <FieldRFF<FormValues['spf']>
-                  name="spf"
-                  validate={composeValidators([{ presence: true }])}
-                >
-                  {(fprops) => (
-                    <Field id="spf" {...fprops} className="flex-1">
-                      <Label theme="light" className="mb-3 text-xs font-semibold uppercase">
-                        SPF
-                      </Label>
-
-                      <input
-                        {...fprops.input}
-                        type="number"
-                        className={INPUT_CLASSES}
-                        defaultValue={fprops.input.value}
-                        min={1}
-                        step={0.01}
-                      />
-                    </Field>
-                  )}
-                </FieldRFF>
+                        <input
+                          {...fprops.input}
+                          type="number"
+                          className={INPUT_CLASSES}
+                          defaultValue={fprops.input.value}
+                          min={1}
+                          step={0.01}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                )}
               </div>
 
               <div className="mt-16 flex justify-center space-x-6">
@@ -247,7 +300,12 @@ const EditModal = ({
                   Cancel
                 </Button>
 
-                <Button theme="primary" size="xl" type="submit">
+                <Button
+                  theme="primary"
+                  size="xl"
+                  type="submit"
+                  disabled={formRef.current?.getState().invalid}
+                >
                   Save
                 </Button>
               </div>

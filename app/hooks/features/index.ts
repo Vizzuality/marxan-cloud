@@ -13,6 +13,7 @@ import partition from 'lodash/partition';
 import { useSession } from 'next-auth/react';
 
 import { COLORS } from 'hooks/map/constants';
+import { useSaveProject } from 'hooks/projects';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
@@ -602,12 +603,7 @@ export function useUploadFeaturesShapefile({
     } as typeof requestConfig);
   };
 
-  return useMutation(uploadFeatureShapefile, {
-    onSuccess: async (data, variables) => {
-      const { id: projectId } = variables;
-      await queryClient.invalidateQueries(['all-features', projectId]);
-    },
-  });
+  return useMutation(uploadFeatureShapefile);
 }
 
 export function useUploadFeaturesCSV({
@@ -619,6 +615,12 @@ export function useUploadFeaturesCSV({
 }) {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
+
+  const { mutate } = useSaveProject({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
 
   const uploadFeatureCSV = ({ id, data }: { id: Project['id']; data: FormData }) => {
     return UPLOADS.request<{ success: true }>({
@@ -633,9 +635,23 @@ export function useUploadFeaturesCSV({
   };
 
   return useMutation(uploadFeatureCSV, {
-    onSuccess: async (data, variables) => {
+    onSuccess: (data, variables) => {
       const { id: projectId } = variables;
-      await queryClient.invalidateQueries(['all-features', projectId]);
+      mutate(
+        {
+          id: projectId,
+          data: {
+            metadata: {
+              lastJobCheck: new Date().getTime(),
+            },
+          },
+        },
+        {
+          onSuccess: async () => {
+            await queryClient.invalidateQueries(['project', projectId]);
+          },
+        }
+      );
     },
   });
 }

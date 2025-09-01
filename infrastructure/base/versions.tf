@@ -2,11 +2,11 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.32.0"
+      version = "3.117.1"
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "2.30.0"
+      version = "2.53.1"
     }
 
     template = {
@@ -18,10 +18,16 @@ terraform {
       version = "6.1.0"
     }
   }
-  required_version = "1.4.5"
+  # Tracking OpenTofu versions 🚀
+  required_version = "1.9.0"
 }
 
 provider "azurerm" {
+  # Skip provider registration: the user running Tofu may not have permissions
+  # to register providers, and the TF provider should be able to use
+  # existing ones.
+  skip_provider_registration = "true"
+
   features {
     resource_group {
       prevent_deletion_if_contains_resources = true

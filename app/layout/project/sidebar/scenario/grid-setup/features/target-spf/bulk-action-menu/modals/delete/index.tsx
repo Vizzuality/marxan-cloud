@@ -19,7 +19,7 @@ const DeleteModal = ({
   features: any[];
   selectedFeaturesIds: Feature['id'][];
   onDismiss?: ModalProps['onDismiss'];
-  onDone?: () => void;
+  onDone?: (res?: unknown) => void;
 }): JSX.Element => {
   const queryClient = useQueryClient();
   const { query } = useRouter();
