@@ -18,9 +18,9 @@ general, a lightweight "[GitHub
 Flow](https://docs.github.com/en/get-started/quickstart/github-flow)" may be
 used, such as the one outlined below:
 
-- Develop changes in feature branches, rebased on `develop`
+- Develop changes in feature branches, rebased on `main`
 - Review and test changes
-- When ready, merge to `develop`
+- When ready, merge to `main`
 - QA in a development environment
 
 For reference, the workflow used during the initial phase of development is
@@ -40,19 +40,19 @@ all the changes from TNC's own `develop` - in other words, it assumes that
 respective AKS clusters, and not as development branches where changes are
 carried on without first landing them in the `develop` branch.
 
-Or even more succintly: `develop` should always be the source of truth.
+Or even more succintly: `main` should always be the source of truth.
 
 Given these assumptions, once changes in a downstream repositories have been
-merged into the downstream `develop` branch, the reference deployment flow
+merged into the downstream `main` branch, the reference deployment flow
 should be:
 
 1. Sync changes and deploy to TNC's staging cluster
 
-  - Downstream, merge the upstream `tnc/develop` branch into the downstream
-    `develop` branch (this will make sure any changes applied on TNC's side are
+  - Downstream, merge the upstream `tnc/main` branch into the downstream
+    `main` branch (this will make sure any changes applied on TNC's side are
     incorporated downstream).
-  - Downstream, push the resulting, merged `develop` branch to TNC's repository.
-  - Downstream, merge `develop` into a downstream branch that is used to sync
+  - Downstream, push the resulting, merged `main` branch to TNC's repository.
+  - Downstream, merge `main` into a downstream branch that is used to sync
     with TNC's `staging` (for example, `tnc-staging`): this is so that
     downstream forks can keep a local branch that tracks upstream's `staging`,
     for extra checks, reference and so on.
@@ -82,8 +82,8 @@ validation), key steps of the QA/validation process should be repeated to make
 sure that there are no regressions introduced in the meanwhile.
 
 Moreover, if further changes have been deployed to the TNC staging environment,
-synchronization of TNC's `develop` and `staging` to their downstream counterpart
-branches (within section 1. above) should be repeated.
+synchronization of TNC's `production` and `staging` to their downstream
+counterpart branches (within section 1. above) should be repeated.
 
 In general, especially if extra care cannot always taken to keep downstream
 `staging`, `production`, `tnc-staging` and `tnc-production` branches in sync

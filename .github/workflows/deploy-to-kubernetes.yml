@@ -7,13 +7,13 @@ permissions:
 on:
   push:
     branches:
-      - 'main'
-      - 'staging'
+      - "production"
+      - "staging"
     paths:
-      - 'app/**'
-      - 'api/**'
-      - 'webshot/**'
-      - '.github/**'
+      - "app/**"
+      - "api/**"
+      - "webshot/**"
+      - ".github/**"
   workflow_dispatch:
 
 jobs:
@@ -83,7 +83,7 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         with:
-          version: 'v1.25.16'
+          version: "v1.25.16"
 
       - name: Config kubectl
         run: |
@@ -96,7 +96,7 @@ jobs:
           ssh -i ~/.ssh/bastion.key -o StrictHostKeyChecking=no -N -L 4433:${{ vars.AZURE_AKS_HOST }}:443 ${{ vars.BASTION_USER }}@${{ vars.BASTION_HOST }} -T &
 
       - name: Redeploy production pods
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/production' }}
         run: |
           kubectl rollout restart deployment api -n production
           kubectl rollout restart deployment client -n production
