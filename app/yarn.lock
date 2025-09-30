@@ -3497,10 +3497,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:4.14.192":
-  version: 4.14.192
-  resolution: "@types/lodash@npm:4.14.192"
-  checksum: 31e1f0543a04158d2c429c45efd7c77882736630d0652f82eb337d6159ec0c249c5d175c0af731537b53271e665ff8d76f43221d75d03646d31cb4bd6f0056b1
+"@types/lodash@npm:4.17.20":
+  version: 4.17.20
+  resolution: "@types/lodash@npm:4.17.20"
+  checksum: dc7bb4653514dd91117a4c4cec2c37e2b5a163d7643445e4757d76a360fabe064422ec7a42dde7450c5e7e0e7e678d5e6eae6d2a919abcddf581d81e63e63839
   languageName: node
   linkType: hard
 
@@ -8354,13 +8354,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.20":
-  version: 4.17.20
-  resolution: "lodash@npm:4.17.20"
-  checksum: b31afa09739b7292a88ec49ffdb2fcaeb41f690def010f7a067eeedffece32da6b6847bfe4d38a77e6f41778b9b2bca75eeab91209936518173271f0b69376ea
-  languageName: node
-  linkType: hard
-
 "lodash@npm:^4.17.21":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
@@ -8581,7 +8574,7 @@ __metadata:
     "@turf/area": 6.5.0
     "@types/chroma-js": 2.4.1
     "@types/d3": ^6.3.0
-    "@types/lodash": 4.14.192
+    "@types/lodash": 4.17.20
     "@types/mapbox-gl": 2.7.15
     "@types/node": 18.15.11
     "@types/react": 18.0.32
@@ -8613,7 +8606,7 @@ __metadata:
     jsona: ^1.9.2
     jsonwebtoken: ^9.0.0
     lint-staged: ^10.5.2
-    lodash: ^4.17.20
+    lodash: ^4.17.21
     luma.gl: 7.3.2
     next: 13.5.11
     next-auth: 4.24.5
