@@ -3,15 +3,14 @@ name: Build and publish container images for test jobs to GitHub Container Regis
 on:
   push:
     branches:
-      - 'main'
-      - 'develop'
-      - 'staging'
-      - 'production'
+      - "main"
+      - "staging"
+      - "production"
     paths:
-      - 'api/**'
-      - 'postgresql/**'
-      - 'webshot/**'
-      - '.github/**'
+      - "api/**"
+      - "postgresql/**"
+      - "webshot/**"
+      - ".github/**"
   pull_request:
   workflow_dispatch:
   workflow_call:
@@ -36,7 +35,6 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-
   build_and_push_api:
     name: Build and push API service container image to registry
     runs-on: ubuntu-22.04

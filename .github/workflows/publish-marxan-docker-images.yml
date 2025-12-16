@@ -7,13 +7,13 @@ permissions:
 on:
   push:
     branches:
-      - 'main'
-      - 'staging'
+      - "main"
+      - "staging"
     paths:
-      - '.github/**'
-      - 'api/**'
-      - 'app/**'
-      - 'webshot/**'
+      - ".github/**"
+      - "api/**"
+      - "app/**"
+      - "webshot/**"
   workflow_dispatch:
     inputs:
       enable_maintenance_mode:
@@ -23,7 +23,7 @@ on:
       waitForTest:
         description: 'Set to "false" to skip waiting for tests to pass.'
         required: true
-        default: 'true'
+        default: "true"
 
 jobs:
   wait_for_tests:
@@ -57,7 +57,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: 'Login via Azure CLI'
+      - name: "Login via Azure CLI"
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -74,7 +74,7 @@ jobs:
       - run: |
           docker build ./api -f api/api.Dockerfile \
             -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }} \
-            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.ref != 'refs/heads/production' && 'staging' || 'production' }}
           docker push -a ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-api
 
   push_geoprocessing_to_registry:
@@ -102,7 +102,7 @@ jobs:
       - run: |
           docker build ./api -f api/geo.Dockerfile \
             -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} \
-            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.ref != 'refs/heads/production' && 'staging' || 'production' }}
           docker push -a ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing
 
   push_client_to_registry:
@@ -131,11 +131,11 @@ jobs:
       - run: |
           docker build ./app \
             -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} \
-            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }} \
-            --build-arg NEXT_PUBLIC_URL=${{ github.ref != 'refs/heads/main' && vars.NEXT_PUBLIC_URL_STAGING || vars.NEXT_PUBLIC_URL_PRODUCTION }} \
-            --build-arg NEXT_PUBLIC_API_URL=${{ github.ref != 'refs/heads/main' && vars.NEXT_PUBLIC_API_URL_STAGING || vars.NEXT_PUBLIC_API_URL_PRODUCTION }} \
-            --build-arg NEXTAUTH_URL=${{ github.ref != 'refs/heads/main' && vars.NEXTAUTH_URL_STAGING || vars.NEXTAUTH_URL_PRODUCTION }} \
-            --build-arg NEXT_PUBLIC_FEATURE_FLAGS=${{ github.ref != 'refs/heads/main' && vars.NEXT_PUBLIC_FEATURE_FLAGS_STAGING || vars.NEXT_PUBLIC_FEATURE_FLAGS_PRODUCTION }} \
+            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.ref != 'refs/heads/production' && 'staging' || 'production' }} \
+            --build-arg NEXT_PUBLIC_URL=${{ github.ref != 'refs/heads/production' && vars.NEXT_PUBLIC_URL_STAGING || vars.NEXT_PUBLIC_URL_PRODUCTION }} \
+            --build-arg NEXT_PUBLIC_API_URL=${{ github.ref != 'refs/heads/production' && vars.NEXT_PUBLIC_API_URL_STAGING || vars.NEXT_PUBLIC_API_URL_PRODUCTION }} \
+            --build-arg NEXTAUTH_URL=${{ github.ref != 'refs/heads/production' && vars.NEXTAUTH_URL_STAGING || vars.NEXTAUTH_URL_PRODUCTION }} \
+            --build-arg NEXT_PUBLIC_FEATURE_FLAGS=${{ github.ref != 'refs/heads/production' && vars.NEXT_PUBLIC_FEATURE_FLAGS_STAGING || vars.NEXT_PUBLIC_FEATURE_FLAGS_PRODUCTION }} \
             --build-arg NEXT_PUBLIC_MAPBOX_API_TOKEN=${{ vars.NEXT_PUBLIC_MAPBOX_API_TOKEN }} \
             --build-arg ENABLE_MAINTENANCE_MODE=${{ github.event.inputs.enable_maintenance_mode }} \
             --build-arg NEXT_PUBLIC_CONTACT_EMAIL=${{ vars.NEXT_PUBLIC_CONTACT_EMAIL }}

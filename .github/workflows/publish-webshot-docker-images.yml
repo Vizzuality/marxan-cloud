@@ -7,19 +7,19 @@ permissions:
 on:
   push:
     branches:
-      - 'main'
-      - 'staging'
+      - "production"
+      - "staging"
     paths:
-      - '.github/**'
-      - 'api/**'
-      - 'app/**'
-      - 'webshot/**'
+      - ".github/**"
+      - "api/**"
+      - "app/**"
+      - "webshot/**"
   workflow_dispatch:
 
 jobs:
   push_webshot_to_registry:
     name: Push Webshot Docker image to Azure Container Registry
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -41,5 +41,5 @@ jobs:
       - run: |
           docker build ./webshot \
             -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.sha }} \
-            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.ref != 'refs/heads/production' && 'staging' || 'production' }}
           docker push -a ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-webshot
