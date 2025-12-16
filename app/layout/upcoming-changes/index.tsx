@@ -22,12 +22,9 @@ export const UpcomingChangesBanner = (): JSX.Element => {
       <Wrapper>
         <div className="flex items-center space-x-5 py-2 text-sm text-gray-800">
           <p>
-            <span className="font-bold">Attention users</span>: MaPP has undergone a transformative
-            upgrade, introducing an enhanced interface and new features. The new version is live,
-            with all improvements implemented as of January 25th. Your existing projects have
-            seamlessly transitioned to the improved MaPP. If you encounter any issues, please
-            don&apos;t hesitate to reach out to us. Thank you and get ready to enjoy an enhanced
-            planning experience!
+            <span className="font-bold">Holiday notice</span>: Support through the usual MaPP
+            contact channels will be limited from 22 December 2025 to 4 January 2026. We appreciate
+            your patience and will aim to respond to support requests as soon as possible.
           </p>
           <Button
             theme="secondary"
