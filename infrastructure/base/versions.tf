@@ -18,8 +18,8 @@ terraform {
       version = "6.1.0"
     }
   }
-  # Tracking OpenTofu versions 🚀
-  required_version = "1.9.0"
+  # OpenTofu versions
+  required_version = ">= 1.11.0, < 1.12.0"
 }
 
 provider "azurerm" {
