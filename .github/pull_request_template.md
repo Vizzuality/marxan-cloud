@@ -1,8 +1,16 @@
-## Substitute this line for a meaningful title for your changes
+Please provide a description for this PR.
 
-### Overview
+Ideally, each PR should addresses exactly a self-container Jira item, in which case all that would be needed is to provide a link to the Jira item below.
 
-_Please write a description. If the PR is hard to understand, provide a quick explanation of the code._
+The Jira item should include
+
+- description
+- acceptance criteria
+- testing instructions
+
+## Jira story
+
+Provide a link to the story this PR is linked to.
 
 ### Designs
 
@@ -12,16 +20,9 @@ _Link to the related design prototypes (if applicable)_
 
 _Please explain how to test the PR: ID of a dataset, steps to reach the feature, etc._
 
-### Feature relevant tickets
-
-_Link to the related task manager tickets_
-
 ---
 
 ## Checklist before submitting
 
-- [ ] Meaningful commits and code rebased on `develop`.
-- [ ] If this PR adds feature that should be tested for regressions when
-      deploying to staging/production, please add brief testing instructions
-      to the deploy checklist (`docs/deployment-checklist.md`)
+- [ ] Meaningful commits and code rebased on `main`.
 - [ ] Update CHANGELOG file
