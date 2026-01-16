@@ -9,12 +9,11 @@ github_org               = "Vizzuality"
 github_repo              = "marxan-cloud"
 github_production_branch = "production"
 github_staging_branch    = "staging"
-key_vault_access_users  = ["tiago.garcia_vizzuality.com#EXT#", "andrea.rota_vizzuality.com#EXT#"]
+key_vault_access_users   = ["kevin.sanches_vizzuality.com#EXT#", "andrea.rota_vizzuality.com#EXT#"]
 sparkpost_dns_dkim_name  = ""
 sparkpost_dns_dkim_value = ""
 project_tags             = {}
-key_vault_access_users = []
-mapbox_api_token = "pleaseChangeThis"
+mapbox_api_token         = "pleaseChangeThis"
 
 deploy_production           = true
 production_db_instance_size = "GP_Standard_D32ds_v4"
