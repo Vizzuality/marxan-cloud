@@ -62,7 +62,7 @@
     "fuse.js": "^6.4.6",
     "jsona": "^1.9.2",
     "jsonwebtoken": "^9.0.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.23",
     "luma.gl": "7.3.2",
     "next": "13.5.11",
     "next-auth": "4.24.5",
