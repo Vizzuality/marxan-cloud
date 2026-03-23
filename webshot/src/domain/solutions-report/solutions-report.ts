@@ -42,6 +42,7 @@ export const generateSummaryReportForScenario = async (
   });
   try {
     const page = await browser.newPage();
+    page.setDefaultTimeout(60e3);
     // Pass through browser console to our own service's console
     page.on('console', passthroughConsole);
 
@@ -65,8 +66,8 @@ export const generateSummaryReportForScenario = async (
 
     console.info(`Rendering ${pageUrl} as PDF`);
     await page.goto(pageUrl);
-    await page.waitForFunction(waitForReportReady, { timeout: 60e3 });
-    const pageAsPdf = await page.pdf({ ...pdfOptions, timeout: 60e3 });
+    await page.waitForFunction(waitForReportReady);
+    const pageAsPdf = await page.pdf(pdfOptions);
 
     res.type("application/pdf");
     res.end(pageAsPdf);

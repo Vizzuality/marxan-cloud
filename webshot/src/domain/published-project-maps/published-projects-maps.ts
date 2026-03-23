@@ -50,6 +50,7 @@ export const generatePngImageFromPublishedProjectData = async (
   });
   try {
     const page = await browser.newPage();
+    page.setDefaultTimeout(30e3);
     // Pass through browser console to our own service's console
     page.on("console", passthroughConsole);
 
@@ -76,9 +77,9 @@ export const generatePngImageFromPublishedProjectData = async (
 
     console.info(`Rendering ${pageUrl} as PNG`);
     await page.goto(pageUrl);
-    await page.waitForFunction(waitForReportReady, { timeout: 30e3 });
+    await page.waitForFunction(waitForReportReady);
 
-    const pageAsPng = await page.screenshot({ ...screenshotOptions, timeout: 30e3 });
+    const pageAsPng = await page.screenshot(screenshotOptions);
 
     res.type("image/png");
     res.end(pageAsPng);

@@ -46,6 +46,7 @@ export const generateSelectionFrequencyComparisonMapForScenarios = async (
   });
   try {
     const page = await browser.newPage();
+    page.setDefaultTimeout(30e3);
     // Pass through browser console to our own service's console
     page.on("console", passthroughConsole);
 
@@ -72,8 +73,8 @@ export const generateSelectionFrequencyComparisonMapForScenarios = async (
 
     console.info(`Rendering ${pageUrl} as PDF`);
     await page.goto(pageUrl);
-    await page.waitForFunction(waitForReportReady, { timeout: 30e3 });
-    const pageAsPdf = await page.pdf({ ...comparisonMapOptions, timeout: 30e3 });
+    await page.waitForFunction(waitForReportReady);
+    const pageAsPdf = await page.pdf(comparisonMapOptions);
 
     res.type("application/pdf");
     res.end(pageAsPdf);
