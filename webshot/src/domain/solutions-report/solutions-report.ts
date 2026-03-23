@@ -3,6 +3,7 @@ import puppeteer, { PDFOptions } from "puppeteer";
 import { ReportOptions } from "./report-options.dto";
 import { waitForReportReady } from "../../utils/wait-function";
 import { passthroughConsole } from "../../utils/passthrough-console.utils";
+import { validateRequest } from "../../utils/validation";
 
 const appRouteTemplate = "/reports/:projectId/:scenarioId/solutions?solutionId=:solutionId";
 
@@ -21,24 +22,12 @@ export const generateSummaryReportForScenario = async (
 
   const solutionId = reportOptions.solutionId
 
-  if (!(projectId || scenarioId || solutionId)) {
-    res.status(400).json({
-      error: `Invalid request: projectId (${projectId}), scenarioId (${scenarioId}) or solutionId (${solutionId}) were not provided.`,
-    });
-    return;
-  }
-
-  if (!baseUrl) {
-    res.status(400).json({ error: "No baseUrl was provided." });
-    return;
-  }
-
-  try {
-    new URL(baseUrl);
-  } catch (error) {
-    res
-      .status(400)
-      .json({ error: `The provided baseUrl (${baseUrl} is not a valid URL.` });
+  const validation = validateRequest(
+    { projectId, scenarioId, solutionId },
+    baseUrl,
+  );
+  if (!validation.valid) {
+    res.status(validation.status).json({ error: validation.error });
     return;
   }
 
@@ -51,36 +40,39 @@ export const generateSummaryReportForScenario = async (
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     headless: 'new',
   });
-  const page = await browser.newPage();
-  // Pass through browser console to our own service's console
-  page.on('console', passthroughConsole);
+  try {
+    const page = await browser.newPage();
+    // Pass through browser console to our own service's console
+    page.on('console', passthroughConsole);
 
-  /**
-   * The webshot service authenticates to the upstream frontend instance by
-   * passing through the cookie that it receives from the API. In practice, all
-   * that is needed is the `__Secure-next-auth.session-token` cookie (or
-   * `next-auth.session-token` in development environments where the frontend
-   * may not be running behind an HTTPS reverse proxy).
-   *
-   * @todo remove Bypass-Tunnel-Reminder once done with all development and
-   * checks via LocalTunnel; the following line will do instead.
-   *
-   * if (cookie) await page.setExtraHTTPHeaders({ cookie });
-   */
-   if (cookie) {
-    await page.setExtraHTTPHeaders({ cookie, 'Bypass-Tunnel-Reminder': 'true' });
-  } else {
-    await page.setExtraHTTPHeaders({ 'Bypass-Tunnel-Reminder': 'true' });
+    /**
+     * The webshot service authenticates to the upstream frontend instance by
+     * passing through the cookie that it receives from the API. In practice, all
+     * that is needed is the `__Secure-next-auth.session-token` cookie (or
+     * `next-auth.session-token` in development environments where the frontend
+     * may not be running behind an HTTPS reverse proxy).
+     *
+     * @todo remove Bypass-Tunnel-Reminder once done with all development and
+     * checks via LocalTunnel; the following line will do instead.
+     *
+     * if (cookie) await page.setExtraHTTPHeaders({ cookie });
+     */
+     if (cookie) {
+      await page.setExtraHTTPHeaders({ cookie, 'Bypass-Tunnel-Reminder': 'true' });
+    } else {
+      await page.setExtraHTTPHeaders({ 'Bypass-Tunnel-Reminder': 'true' });
+    }
+
+    console.info(`Rendering ${pageUrl} as PDF`);
+    await page.goto(pageUrl);
+    await page.waitForFunction(waitForReportReady, { timeout: 60e3 });
+    const pageAsPdf = await page.pdf({ ...pdfOptions, timeout: 60e3 });
+
+    res.type("application/pdf");
+    res.end(pageAsPdf);
+  } finally {
+    await browser.close().catch((err: unknown) =>
+      console.error('Failed to close browser:', err),
+    );
   }
-
-  console.info(`Rendering ${pageUrl} as PDF`);
-  await page.goto(pageUrl);
-  await page.waitForFunction(waitForReportReady, { timeout: 60e3 });
-  const pageAsPdf = await page.pdf({ ...pdfOptions, timeout: 60e3 });
-
-  await page.close();
-  await browser.close();
-
-  res.type("application/pdf");
-  res.end(pageAsPdf);
 };
