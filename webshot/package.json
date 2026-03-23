@@ -9,7 +9,7 @@
     "start:dev": "nodemon --exec 'ts-node --files --project tsconfig.json -r tsconfig-paths/register src/main.ts' -L | bunyan",
     "start:debug": "nodemon --exec 'NODE_OPTIONS=\"--inspect=0.0.0.0\" ts-node --files --project tsconfig.json -r tsconfig-paths/register src/main.ts' -L | bunyan",
     "format": "prettier --write \"src/**/*.ts\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --passWithNoTests"
   },
   "engines": {
     "node": "~18.16"
@@ -30,10 +30,13 @@
     "@types/config": "^3.3.0",
     "@types/cors": "2.8.13",
     "@types/express": "4.17.17",
+    "@types/jest": "29.5.0",
     "bunyan": "1.8.15",
+    "jest": "29.7.0",
     "nodemon": "2.0.20",
     "prettier": "2.8.1",
     "rimraf": "3.0.2",
+    "ts-jest": "29.1.0",
     "ts-node": "10.9.1",
     "tsconfig-paths": "4.1.1"
   },
