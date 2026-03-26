@@ -298,7 +298,7 @@ export const LEGEND_LAYERS = {
       }),
     };
   },
-  features: () => ({
+  features: (options?: { onChangeVisibility?: () => void }) => ({
     id: 'features',
     name: 'Features',
     icon: (
@@ -312,6 +312,7 @@ export const LEGEND_LAYERS = {
       opacity: true,
       visibility: true,
     },
+    ...(options?.onChangeVisibility && { onChangeVisibility: options.onChangeVisibility }),
   }),
   // ANALYSIS
   ['continuous-features']: (options: {
