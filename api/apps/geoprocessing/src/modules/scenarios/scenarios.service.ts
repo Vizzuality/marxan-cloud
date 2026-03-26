@@ -33,8 +33,9 @@ const includeSelections: IncludeSelections = {
     select: 'lockin_status as "lockinStatus"',
   },
   features: {
-    attributes: ', "featureList"',
-    select: 'array_to_string(feature_list, \';\') as "featureList"',
+    attributes: ', "featureList", "featureCount"',
+    select:
+      'array_to_string(feature_list, \';\') as "featureList", COALESCE(array_length(feature_list, 1), 0) as "featureCount"',
     alias: 'features',
   },
 
