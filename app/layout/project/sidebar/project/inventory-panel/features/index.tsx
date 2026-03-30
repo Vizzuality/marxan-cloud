@@ -80,6 +80,8 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
             isCustom: feature.isCustom,
             color,
             amountRange: feature.amountRange,
+            amountMin: feature.amountMin,
+            amountMax: feature.amountMax,
             isFeature: true,
             creationStatus: feature.creationStatus,
             // ! keep for testing. Remove once done.
@@ -159,7 +161,10 @@ const InventoryPanelFeatures = ({ noData: noDataMessage }: { noData: string }): 
             visibility: !(isIncludedInBinary || isIncludedInContinuous),
             color: selectedFeature.color,
             ...(isContinuous && {
-              amountRange: feature.amountRange,
+              amountRange: {
+                min: feature.amountMin ?? feature.amountRange.min,
+                max: feature.amountMax ?? feature.amountRange.max,
+              },
             }),
           },
         })
