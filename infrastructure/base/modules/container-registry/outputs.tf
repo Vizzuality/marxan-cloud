@@ -18,11 +18,29 @@ output "azure_client_id" {
   value = azuread_service_principal.github-actions-access.application_id
 }
 
+# TODO: remove once the ACR token login is approved and integrated
 output "azuread_application_username" {
   value = nonsensitive(azuread_application_password.github-actions-access.value)
 }
 
-
+# TODO: remove once the ACR token login is approved and integrated
 output "azuread_application_password" {
   value = nonsensitive(azuread_application_password.github-actions-access.value)
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ACR token-based authentication outputs
+# ──────────────────────────────────────────────────────────────────────────────
+
+output "azurerm_container_registry_name" {
+  value = azurerm_container_registry.acr.name
+}
+
+output "registry_token_username" {
+  value = azurerm_container_registry_token.ci_push.name
+}
+
+output "registry_token_password" {
+  value     = azurerm_container_registry_token_password.ci_push.password1[0].value
+  sensitive = true
 }

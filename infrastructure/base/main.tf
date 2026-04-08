@@ -107,8 +107,8 @@ module "github_secrets" {
   bastion_user            = module.bastion.bastion_user
   client_id               = module.container_registry.azure_client_id
   registry_login_server   = module.container_registry.azurerm_container_registry_login_server
-  registry_password       = module.container_registry.azuread_application_password
-  registry_username       = module.container_registry.azure_client_id
+  registry_password       = module.container_registry.azuread_application_password  # TODO: remove once the ACR token login is approved and integrated
+  registry_username       = module.container_registry.azure_client_id              # TODO: remove once the ACR token login is approved and integrated
   repo_name               = var.github_repo
   resource_group_name     = data.azurerm_resource_group.resource_group.name
   subscription_id         = data.azurerm_subscription.subscription.subscription_id
@@ -116,6 +116,9 @@ module "github_secrets" {
   mapbox_api_token        = var.mapbox_api_token
   domain                  = var.domain
   support_email           = var.support_email
+  registry_name           = module.container_registry.azurerm_container_registry_name
+  registry_token_username = module.container_registry.registry_token_username
+  registry_token_password = module.container_registry.registry_token_password
 }
 
 module "log_analytics_workspace" {

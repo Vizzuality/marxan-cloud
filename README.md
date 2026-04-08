@@ -448,15 +448,20 @@ For code merged to key branches (currently `main` and `develop`), once tests run
 successfully, [Docker](https://www.docker.com/) images are built and pushed to a 
 private [Azure Container Registry](https://azure.microsoft.com/en-us/services/container-registry/).
 
-The GitHub Actions workflows currently configured requires a few [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
-to be set on GitHub in order to work properly:
+The GitHub Actions workflows currently configured require a few [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+and [variables](https://docs.github.com/en/actions/learn-github-actions/variables) to be set on GitHub in order to work properly:
 
-- `AZURE_CLIENT_ID`: Obtain from Terraform's `azure_client_id` output
-- `AZURE_TENANT_ID`: Obtain from Terraform's `azure_tenant_id` output
-- `AZURE_SUBSCRIPTION_ID`: Obtain from Terraform's `azure_subscription_id` output
-- `REGISTRY_LOGIN_SERVER`: Obtain from Terraform's `azurerm_container_registry_login_server` output
-- `REGISTRY_USERNAME`: Obtain from Terraform's `azure_client_id` output
-- `REGISTRY_PASSWORD`: Obtain from Terraform's `azuread_application_password` output
+**For pushing Docker images to ACR (using ACR token-based auth):**
+
+- `REGISTRY_LOGIN_SERVER` (variable): Obtain from Terraform's `azurerm_container_registry_login_server` output
+- `REGISTRY_TOKEN_USERNAME` (variable): Obtain from Terraform's `registry_token_username` output
+- `REGISTRY_TOKEN_PASSWORD` (secret): Obtain from Terraform's `registry_token_password` output
+
+**For deploying to Kubernetes (using OIDC federated credentials):**
+
+- `AZURE_CLIENT_ID` (secret): Obtain from Terraform's `azure_client_id` output
+- `AZURE_TENANT_ID` (secret): Obtain from Terraform's `azure_tenant_id` output
+- `AZURE_SUBSCRIPTION_ID` (secret): Obtain from Terraform's `azure_subscription_id` output
 
 Some of these values are obtained from Terraform output values, which will be documented
 in more detail in the [Infrastructure](#infrastructure) docs.

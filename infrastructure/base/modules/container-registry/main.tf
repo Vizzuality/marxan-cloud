@@ -58,10 +58,12 @@ resource "azurerm_role_assignment" "resource-group-contributor" {
   principal_id         = azuread_service_principal.github-actions-access.object_id
 }
 
+# TODO: remove once the ACR token login is approved and integrated
 resource "azuread_application_password" "github-actions-access" {
   application_object_id = azuread_application.github-actions-access.object_id
 }
 
+# TODO: remove once the ACR token login is approved and integrated
 resource "azurerm_role_assignment" "acr-push" {
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "AcrPush"
@@ -84,4 +86,24 @@ resource "azuread_application_federated_identity_credential" "github-actions-acc
   audiences             = ["api://AzureADTokenExchange"]
   issuer                = "https://token.actions.githubusercontent.com"
   subject               = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${var.github_production_branch}"
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ACR token-based authentication for CI image push
+#
+# This provides a cloud-agnostic username/password for docker login, independent
+# of the Azure AD service principal above. Uses the built-in _repositories_push
+# scope map (read + write on all repositories).
+# ──────────────────────────────────────────────────────────────────────────────
+
+resource "azurerm_container_registry_token" "ci_push" {
+  name                    = "ci-push"
+  container_registry_name = azurerm_container_registry.acr.name
+  resource_group_name     = var.resource_group.name
+  scope_map_id            = "${azurerm_container_registry.acr.id}/scopeMaps/_repositories_push"
+}
+
+resource "azurerm_container_registry_token_password" "ci_push" {
+  container_registry_token_id = azurerm_container_registry_token.ci_push.id
+  password1 {}
 }

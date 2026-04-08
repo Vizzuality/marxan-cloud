@@ -115,11 +115,11 @@ creation of an AKS cluster.
 
 ##### Secrets
 
-- `AZURE_CLIENT_ID`: The hostname for the Azure ACT. Get from `Base`'s `container_registry_client_id`
+- `AZURE_CLIENT_ID`: The client ID of the Azure AD application used for OIDC login to Azure (for K8s deployments). Get from `Base`'s `container_registry_client_id`
 - `AZURE_SUBSCRIPTION_ID`: The Azure Subscription Id. Get from `Base`'s `azure_subscription_id`
 - `AZURE_TENANT_ID`: The Azure Tenant Id. Get from `Base`'s `azure_tenant_id`
 - `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
-- `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
+- `REGISTRY_TOKEN_PASSWORD`: The ACR token password for pushing Docker images. Get from `Base`'s `registry_token_password`
 
 ##### Variables
 
@@ -129,7 +129,7 @@ creation of an AKS cluster.
 - `BASTION_HOST`: The hostname for the bastion machine. Get from `Base`'s `bastion_hostname`
 - `BASTION_USER`: By default this will be `ubuntu` if using the initial user created on bastion host instantiation. It is configurable in case infrastructure admins wish to configure a different user on the bastion host or the default distro user is renamed.
 - `REGISTRY_LOGIN_SERVER`: The hostname for the Azure ACR. Get from `Base`'s `container_registry_hostname`
-- `REGISTRY_USERNAME`: The username for the Azure ACR. Get from `Base`'s `container_registry_client_id`
+- `REGISTRY_TOKEN_USERNAME`: The ACR token username for pushing Docker images. Get from `Base`'s `registry_token_username`
 
 Additional Github Actions Secrets are needed, as required by the [frontend application](../app/README.md#env-variables)
 and used by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
