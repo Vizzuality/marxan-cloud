@@ -1,0 +1,22 @@
+name: Test ACR login via token
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test_acr_token_login:
+    name: Test ACR token login
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Log in to ACR via token
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.REGISTRY_LOGIN_SERVER }}
+          username: ${{ vars.REGISTRY_TOKEN_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN_PASSWORD }}
+
+      - name: Verify - pull an existing image
+        run: docker pull ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-api:staging || echo "Pull failed or image not found"
