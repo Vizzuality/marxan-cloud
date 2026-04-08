@@ -42,10 +42,12 @@ variable "registry_login_server" {
   type = string
 }
 
+# TODO: remove once the ACR token login is approved and integrated
 variable "registry_password" {
   type = string
 }
 
+# TODO: remove once the ACR token login is approved and integrated
 variable "registry_username" {
   type = string
 }
@@ -62,4 +64,21 @@ variable "domain" {
 variable "support_email" {
   type = string
   description = "Email address to which users can send support requests"
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ACR token-based authentication
+# ──────────────────────────────────────────────────────────────────────────────
+
+variable "registry_name" {
+  type = string
+}
+
+variable "registry_token_username" {
+  type = string
+}
+
+variable "registry_token_password" {
+  type      = string
+  sensitive = true
 }

@@ -58,12 +58,14 @@ resource "github_actions_variable" "registry_login_server" {
   value            = var.registry_login_server
 }
 
+# TODO: remove once the ACR token login is approved and integrated
 resource "github_actions_secret" "registry_password" {
   repository       = var.repo_name
   secret_name      = "REGISTRY_PASSWORD"
   plaintext_value  = var.registry_password
 }
 
+# TODO: remove once the ACR token login is approved and integrated
 resource "github_actions_variable" "registry_username" {
   repository       = var.repo_name
   variable_name    = "REGISTRY_USERNAME"
@@ -116,4 +118,26 @@ resource "github_actions_variable" "nextauth_url_staging" {
   repository       = var.repo_name
   variable_name    = "NEXTAUTH_URL_STAGING"
   value            = "https://client.staging.${var.domain}"
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ACR token-based authentication
+# ──────────────────────────────────────────────────────────────────────────────
+
+resource "github_actions_variable" "registry_name" {
+  repository    = var.repo_name
+  variable_name = "REGISTRY_NAME"
+  value         = var.registry_name
+}
+
+resource "github_actions_variable" "registry_token_username" {
+  repository    = var.repo_name
+  variable_name = "REGISTRY_TOKEN_USERNAME"
+  value         = var.registry_token_username
+}
+
+resource "github_actions_secret" "registry_token_password" {
+  repository      = var.repo_name
+  secret_name     = "REGISTRY_TOKEN_PASSWORD"
+  plaintext_value = var.registry_token_password
 }
