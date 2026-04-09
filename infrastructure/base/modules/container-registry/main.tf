@@ -103,6 +103,8 @@ resource "azurerm_container_registry_token" "ci_push" {
   scope_map_id            = "${azurerm_container_registry.acr.id}/scopeMaps/_repositories_push"
 }
 
+# TODO: the current token password is set to not expire; a possible improvement
+# is to research how to get a rotating password mechanism working.
 resource "azurerm_container_registry_token_password" "ci_push" {
   container_registry_token_id = azurerm_container_registry_token.ci_push.id
   password1 {}

@@ -136,6 +136,8 @@ resource "github_actions_variable" "registry_token_username" {
   value         = var.registry_token_username
 }
 
+# TODO: the current token password is set to not expire; a possible improvement
+# is to research how to get a rotating password mechanism working.
 resource "github_actions_secret" "registry_token_password" {
   repository      = var.repo_name
   secret_name     = "REGISTRY_TOKEN_PASSWORD"
