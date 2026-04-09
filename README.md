@@ -453,9 +453,16 @@ and [variables](https://docs.github.com/en/actions/learn-github-actions/variable
 
 **For pushing Docker images to ACR (using ACR token-based auth):**
 
+Docker images are pushed to the Azure Container Registry using an ACR scope-map
+token (`_repositories_push`), which provides a cloud-agnostic username/password
+for `docker login` without depending on Azure AD service principal credentials.
+
 - `REGISTRY_LOGIN_SERVER` (variable): Obtain from Terraform's `azurerm_container_registry_login_server` output
 - `REGISTRY_TOKEN_USERNAME` (variable): Obtain from Terraform's `registry_token_username` output
 - `REGISTRY_TOKEN_PASSWORD` (secret): Obtain from Terraform's `registry_token_password` output
+
+> **Note:** the token password is currently set to not expire. A possible
+> improvement is to research how to get a rotating password mechanism working.
 
 **For deploying to Kubernetes (using OIDC federated credentials):**
 

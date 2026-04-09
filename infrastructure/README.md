@@ -99,7 +99,13 @@ the services on kubernetes, which is done by this plan.
 
 As part of this infrastructure, Github Actions are used to automatically build
 and push Docker images to Azure ACR, and to redeploy Kubernetes pods once that
-happens. Said Github Actions depend on specific Github Secrets and Variables,
+happens. Docker image push uses ACR token-based authentication (scope-map token
+with `_repositories_push` permissions), which provides a cloud-agnostic
+username/password for `docker login` without depending on Azure AD service
+principal credentials. Kubernetes deployments use OIDC federated credentials
+for Azure CLI login.
+
+Said Github Actions depend on specific Github Secrets and Variables,
 that are listed below for reference.
 
 Secrets and variables listed below are automatically created by the `base`
@@ -130,6 +136,12 @@ creation of an AKS cluster.
 - `BASTION_USER`: By default this will be `ubuntu` if using the initial user created on bastion host instantiation. It is configurable in case infrastructure admins wish to configure a different user on the bastion host or the default distro user is renamed.
 - `REGISTRY_LOGIN_SERVER`: The hostname for the Azure ACR. Get from `Base`'s `container_registry_hostname`
 - `REGISTRY_TOKEN_USERNAME`: The ACR token username for pushing Docker images. Get from `Base`'s `registry_token_username`
+
+> **Note:** the ACR token password is currently set to not expire. A possible
+> improvement is to research how to get a rotating password mechanism working.
+> Legacy secrets `REGISTRY_PASSWORD` and `REGISTRY_USERNAME` (based on Azure AD
+> service principal credentials) are still present but no longer used by CI
+> workflows and are pending removal.
 
 Additional Github Actions Secrets are needed, as required by the [frontend application](../app/README.md#env-variables)
 and used by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
