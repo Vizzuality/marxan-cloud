@@ -52,6 +52,7 @@ export const generateSelectionFrequencyComparisonMapForScenarios = async (
     .replace(":scenarioIdB", scenarioIdB)}`;
 
   const browser = await puppeteer.launch({
+    executablePath: '/usr/bin/google-chrome-stable',
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     headless: "new",
   });
