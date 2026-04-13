@@ -239,40 +239,46 @@ export function useContinuousFeaturesLayers({
   return useMemo(() => {
     if (!active) return [];
 
-    return features.map((fid) => {
-      const { amountRange, color, opacity = 1 } = layerSettings[fid] || {};
+    return features
+      .map((fid) => {
+        const { amountRange, color, opacity = 1 } = layerSettings[fid] || {};
 
-      return {
-        id: `continuous-features-layer-${pid}-${fid}`,
-        type: 'vector',
-        source: {
+        if (!amountRange || amountRange.min == null || amountRange.max == null || !color) {
+          return null;
+        }
+
+        return {
+          id: `continuous-features-layer-${pid}-${fid}`,
           type: 'vector',
-          tiles: [
-            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/features/${fid}/preview/tiles/{z}/{x}/{y}.mvt`,
-          ],
-        },
-        render: {
-          layers: [
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-color': [
-                  'interpolate',
-                  ['linear'],
-                  ['get', 'amount'],
-                  amountRange.min,
-                  COLORS.continuous.default,
-                  amountRange.max,
-                  color,
-                ],
-                'fill-opacity': opacity,
+          source: {
+            type: 'vector',
+            tiles: [
+              `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/features/${fid}/preview/tiles/{z}/{x}/{y}.mvt`,
+            ],
+          },
+          render: {
+            layers: [
+              {
+                type: 'fill',
+                'source-layer': 'layer0',
+                paint: {
+                  'fill-color': [
+                    'interpolate',
+                    ['linear'],
+                    ['get', 'amount'],
+                    amountRange.min,
+                    COLORS.continuous.default,
+                    amountRange.max,
+                    color,
+                  ],
+                  'fill-opacity': opacity,
+                },
               },
-            },
-          ],
-        },
-      };
-    });
+            ],
+          },
+        };
+      })
+      .filter(Boolean);
   }, [active, pid, features, layerSettings]);
 }
 
