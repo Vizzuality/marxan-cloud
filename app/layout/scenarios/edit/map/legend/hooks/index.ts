@@ -512,7 +512,7 @@ export const useGapAnalysisLegend = () => {
         setLayerSettings({
           id: `gap-analysis-${featureId}`,
           settings: {
-            visibility: !layerSettings[`gap-analysis-${featureId}`]?.visibility,
+            visibility: !isIncluded,
           },
         })
       );
