@@ -160,11 +160,13 @@ export const useFeaturesLegend = () => {
 
   const continuousFeaturesItems =
     projectFeaturesQuery.data?.continuousFeatures.map(
-      ({ id, featureClassName, amountRange, color }) => {
+      ({ id, featureClassName, amountRange, amountMin, amountMax, color }) => {
         return {
           id,
           name: featureClassName,
           amountRange,
+          amountMin,
+          amountMax,
           color,
         };
       }
@@ -200,7 +202,7 @@ export const useFeaturesLegend = () => {
     ...LEGEND_LAYERS['continuous-features']({
       items: continuousFeaturesItems,
       onChangeVisibility: (featureId: Feature['id']) => {
-        const { color, amountRange } =
+        const { color, amountRange, amountMin, amountMax } =
           continuousFeaturesItems.find(({ id }) => id === featureId) || {};
 
         const newSelectedFeatures = [...selectedContinuousFeatures];
@@ -218,7 +220,10 @@ export const useFeaturesLegend = () => {
             id: featureId,
             settings: {
               visibility: !isIncluded,
-              amountRange,
+              amountRange: {
+                min: amountMin ?? amountRange?.min,
+                max: amountMax ?? amountRange?.max,
+              },
               color,
             },
           })
