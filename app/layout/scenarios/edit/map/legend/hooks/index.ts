@@ -426,6 +426,61 @@ export const useWDPAPreviewLegend = () => {
   });
 };
 
+export const useFeaturesLayerLegend = () => {
+  const { query } = useRouter();
+  const { sid } = query as { sid: string };
+  const dispatch = useAppDispatch();
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setLayerSettings, setPreHighlightFeatures } = scenarioSlice.actions;
+  const { layerSettings, preHighlightFeatures } = useAppSelector(
+    (state) => state[`/scenarios/${sid}/edit`]
+  );
+
+  const gapAnalysisQuery = usePreGapAnalysis(sid, {});
+  const allFeatureIds = gapAnalysisQuery.data?.map(({ id }) => id) || [];
+
+  return LEGEND_LAYERS['features']({
+    onChangeVisibility: () => {
+      const isCurrentlyVisible = layerSettings['features']?.visibility;
+      const newVisibility = !isCurrentlyVisible;
+
+      dispatch(
+        setLayerSettings({
+          id: 'features',
+          settings: { visibility: newVisibility },
+        })
+      );
+
+      if (newVisibility) {
+        // Toggle ALL gap analysis features ON (purple PU highlights)
+        dispatch(setPreHighlightFeatures(allFeatureIds));
+
+        allFeatureIds.forEach((featureId) => {
+          dispatch(
+            setLayerSettings({
+              id: `gap-analysis-${featureId}`,
+              settings: { visibility: true },
+            })
+          );
+        });
+      } else {
+        // Toggle ALL gap analysis features OFF
+        const featuresToClear = [...preHighlightFeatures];
+        dispatch(setPreHighlightFeatures([]));
+
+        featuresToClear.forEach((featureId) => {
+          dispatch(
+            setLayerSettings({
+              id: `gap-analysis-${featureId}`,
+              settings: { visibility: false },
+            })
+          );
+        });
+      }
+    },
+  });
+};
+
 export const useGapAnalysisLegend = () => {
   const { query } = useRouter();
   const { sid } = query as { sid: string };
@@ -437,6 +492,8 @@ export const useGapAnalysisLegend = () => {
   );
 
   const gapAnalysisQuery = usePreGapAnalysis(sid, {});
+
+  const allFeatureIds = gapAnalysisQuery.data?.map(({ id }) => id) || [];
 
   return LEGEND_LAYERS['gap-analysis']({
     items: gapAnalysisQuery.data,
@@ -455,10 +512,21 @@ export const useGapAnalysisLegend = () => {
         setLayerSettings({
           id: `gap-analysis-${featureId}`,
           settings: {
-            visibility: !layerSettings[`gap-analysis-${featureId}`]?.visibility,
+            visibility: !isIncluded,
           },
         })
       );
+
+      // Keep master "Features" toggle in sync: active only when all features are visible
+      const allVisible = allFeatureIds.every((id) => newPreHighlightFeatures.includes(id));
+      if (layerSettings['features']?.visibility !== allVisible) {
+        dispatch(
+          setLayerSettings({
+            id: 'features',
+            settings: { visibility: allVisible },
+          })
+        );
+      }
     },
   });
 };
@@ -524,6 +592,7 @@ export const useScenarioLegend = () => {
       name: 'Planning Grid',
       layers: [
         usePlanningGridLegend(),
+        useFeaturesLayerLegend(),
         ...useCostSurfaceLegend(),
         useLockInLegend(),
         useLockOutLegend(),
