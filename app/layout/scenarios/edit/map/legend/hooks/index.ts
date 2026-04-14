@@ -205,12 +205,14 @@ export const useFeaturesLegend = () => {
       exact: false,
     })?.data;
 
-    const f = allFeatures?.find(({ id: featureId }) => (splitted ? parentId : id === featureId));
+    const f = allFeatures?.find(({ id: featureId }) =>
+      splitted ? parentId === featureId : id === featureId
+    );
 
     return {
       id,
       name,
-      amountRange: f?.amountRange || {},
+      amountRange: f?.amountRange ?? { min: null, max: null },
       splitted,
       color: featureColors?.find(({ id: featureId }) => featureId === id)?.color,
     };

@@ -61,11 +61,14 @@ const projectsDetailSlice = createSlice({
       }>
     ) => {
       const { id: layerId, settings } = action.payload;
+      const definedSettings = Object.fromEntries(
+        Object.entries(settings).filter(([, v]) => v !== undefined)
+      );
       const newSettings = {
         ...state.layerSettings,
         [layerId]: {
           ...state.layerSettings[layerId],
-          ...settings,
+          ...definedSettings,
         },
       };
       state.layerSettings = newSettings;
