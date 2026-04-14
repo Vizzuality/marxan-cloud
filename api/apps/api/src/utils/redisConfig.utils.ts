@@ -11,6 +11,18 @@ export function getRedisConfig() {
       port: redisConfig.port,
       password: redisConfig.password,
       tls: useTLS ? {} : undefined,
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+      enableOfflineQueue: true,
+      keepAlive: 10000,
+      connectTimeout: 10000,
+      retryStrategy(times: number) {
+        return Math.min(times * 500, 5000);
+      },
+      reconnectOnError(err: Error) {
+        const targetErrors = ['READONLY', 'ECONNRESET', 'ETIMEDOUT'];
+        return targetErrors.some((e) => err.message.includes(e));
+      },
     },
   };
 

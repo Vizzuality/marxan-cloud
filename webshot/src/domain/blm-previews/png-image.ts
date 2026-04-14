@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import puppeteer, { ScreenshotOptions } from "puppeteer";
 import { passthroughConsole } from "../../utils/passthrough-console.utils";
 import { waitForReportReady } from "../../utils/wait-function";
+import { validateRequest } from "../../utils/validation";
 
 const appRouteTemplate =
   "/reports/:projectId/:scenarioId/blm?blmValue=:blmValue";
@@ -24,24 +25,12 @@ export const generatePngImageFromBlmData = async (
     params: { projectId, scenarioId, blmValue },
   } = req;
 
-  if (!(projectId || scenarioId || blmValue)) {
-    res.status(400).json({
-      error: `Invalid request: projectId (${projectId}), scenarioId (${scenarioId}) or blmValue (${blmValue}) were not provided.`,
-    });
-    return;
-  }
-
-  if (!baseUrl) {
-    res.status(400).json({ error: "No baseUrl was provided." });
-    return;
-  }
-
-  try {
-    new URL(baseUrl);
-  } catch (error) {
-    res
-      .status(400)
-      .json({ error: `The provided baseUrl (${baseUrl} is not a valid URL.` });
+  const validation = validateRequest(
+    { projectId, scenarioId, blmValue },
+    baseUrl,
+  );
+  if (!validation.valid) {
+    res.status(validation.status).json({ error: validation.error });
     return;
   }
 
@@ -61,42 +50,44 @@ export const generatePngImageFromBlmData = async (
     ],
     headless: 'new',
   });
-  const page = await browser.newPage();
-  // Pass through browser console to our own service's console
-  page.on("console", passthroughConsole);
+  try {
+    const page = await browser.newPage();
+    page.setDefaultTimeout(30e3);
+    // Pass through browser console to our own service's console
+    page.on("console", passthroughConsole);
 
-  /**
-   * The webshot service authenticates to the upstream frontend instance by
-   * passing through the cookie that it receives from the API. In practice, all
-   * that is needed is the `__Secure-next-auth.session-token` cookie (or
-   * `next-auth.session-token` in development environments where the frontend
-   * may not be running behind an HTTPS reverse proxy).
-   *
-   * @todo remove Bypass-Tunnel-Reminder once done with all development and
-   * checks via LocalTunnel; the following line will do instead.
-   *
-   * if (cookie) await page.setExtraHTTPHeaders({ cookie });
-   */
-  if (cookie) {
-    await page.setExtraHTTPHeaders({
-      cookie,
-      "Bypass-Tunnel-Reminder": "true",
-    });
-  } else {
-    await page.setExtraHTTPHeaders({ "Bypass-Tunnel-Reminder": "true" });
+    /**
+     * The webshot service authenticates to the upstream frontend instance by
+     * passing through the cookie that it receives from the API. In practice, all
+     * that is needed is the `__Secure-next-auth.session-token` cookie (or
+     * `next-auth.session-token` in development environments where the frontend
+     * may not be running behind an HTTPS reverse proxy).
+     *
+     * @todo remove Bypass-Tunnel-Reminder once done with all development and
+     * checks via LocalTunnel; the following line will do instead.
+     *
+     * if (cookie) await page.setExtraHTTPHeaders({ cookie });
+     */
+    if (cookie) {
+      await page.setExtraHTTPHeaders({
+        cookie,
+        "Bypass-Tunnel-Reminder": "true",
+      });
+    } else {
+      await page.setExtraHTTPHeaders({ "Bypass-Tunnel-Reminder": "true" });
+    }
+
+    console.info(`Rendering ${pageUrl} as PNG`);
+    await page.goto(pageUrl);
+    await page.waitForFunction(waitForReportReady);
+
+    const pageAsPng = await page.screenshot(screenshotOptions);
+
+    res.type("image/png");
+    res.end(pageAsPng);
+  } finally {
+    await browser.close().catch((err: unknown) =>
+      console.error('Failed to close browser:', err),
+    );
   }
-
-  console.info(`Rendering ${pageUrl} as PNG`);
-  await page.goto(pageUrl);
-  await page.waitForFunction(waitForReportReady, { timeout: 30e3 });
-
-  const pageAsPng = await Promise.race([
-    page.screenshot({ ...screenshotOptions }),
-    new Promise((resolve, reject) => setTimeout(reject, 30e3)),
-  ]);
-  await page.close();
-  await browser.close();
-
-  res.type("image/png");
-  res.end(pageAsPng);
 };

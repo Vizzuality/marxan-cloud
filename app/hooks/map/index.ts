@@ -239,40 +239,46 @@ export function useContinuousFeaturesLayers({
   return useMemo(() => {
     if (!active) return [];
 
-    return features.map((fid) => {
-      const { amountRange, color, opacity = 1 } = layerSettings[fid] || {};
+    return features
+      .map((fid) => {
+        const { amountRange, color, opacity = 1 } = layerSettings[fid] || {};
 
-      return {
-        id: `continuous-features-layer-${pid}-${fid}`,
-        type: 'vector',
-        source: {
+        if (!amountRange || amountRange.min == null || amountRange.max == null || !color) {
+          return null;
+        }
+
+        return {
+          id: `continuous-features-layer-${pid}-${fid}`,
           type: 'vector',
-          tiles: [
-            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/features/${fid}/preview/tiles/{z}/{x}/{y}.mvt`,
-          ],
-        },
-        render: {
-          layers: [
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-color': [
-                  'interpolate',
-                  ['linear'],
-                  ['get', 'amount'],
-                  amountRange.min === amountRange.max ? 0 : amountRange.min,
-                  COLORS.continuous.default,
-                  amountRange.min === amountRange.max ? amountRange.max + 1 : amountRange.max,
-                  color,
-                ],
-                'fill-opacity': opacity,
+          source: {
+            type: 'vector',
+            tiles: [
+              `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/features/${fid}/preview/tiles/{z}/{x}/{y}.mvt`,
+            ],
+          },
+          render: {
+            layers: [
+              {
+                type: 'fill',
+                'source-layer': 'layer0',
+                paint: {
+                  'fill-color': [
+                    'interpolate',
+                    ['linear'],
+                    ['get', 'amount'],
+                    amountRange.min,
+                    COLORS.continuous.default,
+                    amountRange.max,
+                    color,
+                  ],
+                  'fill-opacity': opacity,
+                },
               },
-            },
-          ],
-        },
-      };
-    });
+            ],
+          },
+        };
+      })
+      .filter(Boolean);
   }, [active, pid, features, layerSettings]);
 }
 
@@ -785,7 +791,7 @@ export function usePUGridLayer({
                     'fill-color': COLORS.highlightFeatures,
                     'fill-opacity': [
                       'case',
-                      ['in', id, ['get', 'featureList']],
+                      ['any', ['in', id, ['get', 'featureList']]],
                       0.5 * (restLayerSettings[`gap-analysis-${id}`]?.opacity ?? 1),
                       0,
                     ],
@@ -801,7 +807,7 @@ export function usePUGridLayer({
                     'fill-color': COLORS.highlightFeatures,
                     'fill-opacity': [
                       'case',
-                      ['in', id, ['get', 'featureList']],
+                      ['any', ['in', id, ['get', 'featureList']]],
                       0.5 * (restLayerSettings[id]?.opacity ?? 1),
                       0,
                     ],
