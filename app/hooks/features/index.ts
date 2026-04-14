@@ -785,5 +785,22 @@ export function useColorFeatures(projectId: Project['id'], sid: Scenario['id']) 
     });
   }
 
+  // When no scenario ID is available (e.g., project page), compute colors
+  // from all features alone so the legend and inventory panel can load feature data.
+  if (!sid && useAllFeaturesQuery.isSuccess) {
+    const data = useAllFeaturesQuery.data?.data || [];
+    return data.map(({ id }, index) => {
+      const color =
+        data.length > COLORS['features-preview'].ramp.length
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(data.length)[index]
+          : COLORS['features-preview'].ramp[index];
+
+      return {
+        id,
+        color,
+      };
+    });
+  }
+
   return [];
 }
