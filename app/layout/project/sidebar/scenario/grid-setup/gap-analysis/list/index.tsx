@@ -52,7 +52,7 @@ export const ScenariosPreGapAnalysisList = ({ search }: { search?: string }) => 
         setLayerSettings({
           id: `gap-analysis-${id}`,
           settings: {
-            visibility: layerSettings[`gap-analysis-${id}`]?.visibility || 1,
+            visibility: newHighlightFeatures.includes(id),
           },
         })
       );
