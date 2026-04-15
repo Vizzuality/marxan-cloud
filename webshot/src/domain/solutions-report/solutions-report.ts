@@ -37,6 +37,7 @@ export const generateSummaryReportForScenario = async (
     .replace(":solutionId", solutionId)}`;
 
   const browser = await puppeteer.launch({
+    executablePath: '/usr/bin/google-chrome-stable',
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     headless: 'new',
   });

@@ -4,7 +4,7 @@ LABEL maintainer="hello@vizzuality.com"
 ENV NAME marxan-webshot
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME
-ENV PUPPETEER_CACHE_DIR $APP_HOME
+ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV YARN_VERSION 3.6.4
 
 RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add -

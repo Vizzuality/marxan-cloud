@@ -48,6 +48,29 @@ export const usePlanningGridLegend = () => {
   });
 };
 
+export const useFeaturesGridLegend = () => {
+  const { query } = useRouter();
+  const { sid } = query as { pid: string; sid: string };
+
+  const dispatch = useAppDispatch();
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setLayerSettings } = scenarioSlice.actions;
+  const { layerSettings } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  return LEGEND_LAYERS['features']({
+    onChangeVisibility: () => {
+      dispatch(
+        setLayerSettings({
+          id: 'features',
+          settings: {
+            visibility: !layerSettings['features']?.visibility,
+          },
+        })
+      );
+    },
+  });
+};
+
 export const useCostSurfaceLegend = () => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };

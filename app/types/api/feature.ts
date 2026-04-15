@@ -13,5 +13,7 @@ export interface Feature {
     min: number;
     max: number;
   };
+  amountMin?: number;
+  amountMax?: number;
   creationStatus: 'created' | 'failure' | 'running';
 }

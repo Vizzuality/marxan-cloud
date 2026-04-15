@@ -173,6 +173,8 @@ export class GeoFeaturesService extends AppBaseService<
         'tag',
         'scenarioUsageCount',
         'amountRange',
+        'amountMin',
+        'amountMax',
         'creationStatus',
       ],
       keyForAttribute: 'camelCase',
