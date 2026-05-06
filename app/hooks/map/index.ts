@@ -261,6 +261,7 @@ export function useContinuousFeaturesLayers({
               {
                 type: 'fill',
                 'source-layer': 'layer0',
+                filter: ['>', ['get', 'amount'], 0],
                 paint: {
                   'fill-color': [
                     'interpolate',
