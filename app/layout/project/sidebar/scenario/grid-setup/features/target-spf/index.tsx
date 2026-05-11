@@ -69,8 +69,11 @@ const TargetAndSPFFeatures = (): JSX.Element => {
   const dispatch = useAppDispatch();
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setLayerSettings } = scenarioSlice.actions;
-  const { layerSettings } = useAppSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { setLayerSettings, setSelectedFeatures, setSelectedContinuousFeatures } =
+    scenarioSlice.actions;
+  const { layerSettings, selectedFeatures, selectedContinuousFeatures } = useAppSelector(
+    (state) => state[`/scenarios/${sid}/edit`]
+  );
 
   const allFeaturesQuery = useAllFeatures(
     pid,
@@ -211,21 +214,63 @@ const TargetAndSPFFeatures = (): JSX.Element => {
       const selectedFeature = targetedFeatures.find(({ id: featureId }) => featureId === id);
       const isContinuous =
         selectedFeature.amountRange.min !== null && selectedFeature.amountRange.max !== null;
+      const { splitted } = selectedFeature;
+
+      if (isContinuous) {
+        const newSelectedFeatures = [...selectedContinuousFeatures];
+        const isIncluded = newSelectedFeatures.includes(id);
+
+        if (!splitted) {
+          if (!isIncluded) {
+            newSelectedFeatures.push(id);
+          } else {
+            newSelectedFeatures.splice(newSelectedFeatures.indexOf(id), 1);
+          }
+          dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
+        }
+
+        dispatch(
+          setLayerSettings({
+            id,
+            settings: {
+              visibility: !isIncluded,
+              color: selectedFeature?.color,
+              amountRange: selectedFeature.amountRange,
+            },
+          })
+        );
+        return;
+      }
+
+      const newSelectedFeatures = [...selectedFeatures];
+      const isIncluded = newSelectedFeatures.includes(id);
+
+      if (!isIncluded) {
+        newSelectedFeatures.push(id);
+      } else {
+        newSelectedFeatures.splice(newSelectedFeatures.indexOf(id), 1);
+      }
+      dispatch(setSelectedFeatures(newSelectedFeatures));
 
       dispatch(
         setLayerSettings({
           id,
           settings: {
-            visibility: layerSettings[id] ? !layerSettings[id].visibility : true,
+            visibility: !isIncluded,
             color: selectedFeature?.color,
-            ...(isContinuous && {
-              amountRange: selectedFeature.amountRange,
-            }),
           },
         })
       );
     },
-    [dispatch, setLayerSettings, targetedFeatures, layerSettings]
+    [
+      dispatch,
+      setLayerSettings,
+      setSelectedContinuousFeatures,
+      setSelectedFeatures,
+      targetedFeatures,
+      selectedContinuousFeatures,
+      selectedFeatures,
+    ]
   );
 
   const onApplyAllTargets = useCallback(() => {

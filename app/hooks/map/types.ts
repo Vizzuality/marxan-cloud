@@ -105,7 +105,15 @@ export interface UseTargetedPreviewLayers {
     selectedFeatures?: Array<string>;
     opacity?: number;
     visibility?: boolean;
-    layerSettings?: Record<string, { opacity?: number; visibility?: boolean; color: string }>;
+    layerSettings?: Record<
+      string,
+      {
+        opacity?: number;
+        visibility?: boolean;
+        color: string;
+        amountRange?: { min: number; max: number };
+      }
+    >;
   };
 }
 
