@@ -492,7 +492,12 @@ export function useTargetedPreviewLayers({
 
     const { layerSettings = {} } = options;
 
-    const FEATURES = features.filter((ft) => Object.keys(layerSettings).includes(ft.id));
+    // Continuous features render their gradient via useContinuousFeaturesLayers;
+    // a solid-color underlay here would bleed through the gradient at edges and
+    // mask amount=0 PUs filtered out by that hook.
+    const FEATURES = features.filter(
+      (ft) => Object.keys(layerSettings).includes(ft.id) && !layerSettings[ft.id]?.amountRange
+    );
 
     const getLayerVisibility = (
       visibility: UseTargetedPreviewLayers['options']['layerSettings'][string]['visibility']
