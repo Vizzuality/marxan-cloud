@@ -19,6 +19,7 @@ export default defineConfig({
       NEXTAUTH_URL: `http://localhost:${PORT}`,
       NEXTAUTH_SECRET: 'cats',
       NEXT_PUBLIC_API_URL: 'https://marxan23.northeurope.cloudapp.azure.com',
+      NEXT_PUBLIC_FEATURE_FLAGS: 'platformTransition',
     },
   },
   /* Run tests in files in parallel */

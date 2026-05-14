@@ -18,6 +18,7 @@ import { ToastProvider } from 'hooks/toast';
 
 import Loading from 'layout/loading';
 import { MediaContextProvider } from 'layout/media';
+import PlatformTransitionModal from 'layout/platform-transition';
 import store from 'store';
 import { cn } from 'utils/cn';
 
@@ -98,6 +99,7 @@ const MarxanApp = ({ Component, pageProps }: AppProps) => {
                           >
                             <Component {...pageProps} />
                           </div>
+                          <PlatformTransitionModal />
                         </PlausibleProvider>
                       </HelpProvider>
                     </ToastProvider>
