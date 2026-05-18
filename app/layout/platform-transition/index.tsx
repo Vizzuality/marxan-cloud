@@ -21,18 +21,24 @@ export const PlatformTransitionModal = (): JSX.Element | null => {
     setMounted(true);
   }, []);
 
-  const dismissed = cookies[COOKIE_NAME] === 'true';
+  const persistedDismissal = cookies[COOKIE_NAME] === 'true';
+  const [open, setOpen] = useState(true);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   const onDismiss = useCallback(() => {
-    setCookie(COOKIE_NAME, 'true', {
-      path: '/',
-      expires: COOKIE_EXPIRY,
-    });
-  }, [setCookie]);
+    if (dontShowAgain) {
+      setCookie(COOKIE_NAME, 'true', {
+        path: '/',
+        expires: COOKIE_EXPIRY,
+      });
+    }
+    setOpen(false);
+  }, [dontShowAgain, setCookie]);
 
   if (!platformTransition) return null;
-  if (dismissed) return null;
+  if (persistedDismissal) return null;
   if (!mounted) return null;
+  if (!open) return null;
 
   return (
     <Modal
@@ -43,7 +49,10 @@ export const PlatformTransitionModal = (): JSX.Element | null => {
       size="default"
       onDismiss={onDismiss}
     >
-      <PlatformTransitionContent />
+      <PlatformTransitionContent
+        dontShowAgain={dontShowAgain}
+        onDontShowAgainChange={setDontShowAgain}
+      />
     </Modal>
   );
 };
