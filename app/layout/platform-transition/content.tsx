@@ -1,15 +1,21 @@
 import React from 'react';
 
 import Button from 'components/button';
+import Checkbox from 'components/forms/checkbox';
 
 const GUIDE_URL = 'https://tnc.box.com/s/io7czx68a8nnnj3yos8qa724br86lfis';
+const DONT_SHOW_AGAIN_ID = 'platform-transition-dont-show-again';
 
 export interface PlatformTransitionContentProps {
   onDismiss?: () => void;
+  dontShowAgain?: boolean;
+  onDontShowAgainChange?: (value: boolean) => void;
 }
 
 export const PlatformTransitionContent: React.FC<PlatformTransitionContentProps> = ({
   onDismiss,
+  dontShowAgain = false,
+  onDontShowAgainChange,
 }) => {
   return (
     <div className="flex max-h-[80vh] flex-col overflow-y-auto px-10 pb-8 pt-2 text-gray-700">
@@ -75,7 +81,16 @@ export const PlatformTransitionContent: React.FC<PlatformTransitionContentProps>
         </p>
       </div>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex items-center justify-between gap-4">
+        <label htmlFor={DONT_SHOW_AGAIN_ID} className="flex cursor-pointer items-center gap-2">
+          <Checkbox
+            id={DONT_SHOW_AGAIN_ID}
+            theme="light"
+            checked={dontShowAgain}
+            onChange={(event) => onDontShowAgainChange?.(event.target.checked)}
+          />
+          <span className="text-sm text-gray-700">Don&apos;t show me this again</span>
+        </label>
         <Button theme="primary" size="base" onClick={onDismiss}>
           Got it
         </Button>
