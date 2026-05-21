@@ -52,6 +52,7 @@ import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import MapScale from 'components/map/scale';
 import HelpBeacon from 'layout/help/beacon';
+import { SIDEBAR_WIDTH } from 'layout/project/sidebar/constants';
 import { Scenario } from 'types/api/scenario';
 import { MapProps } from 'types/map';
 import { cn } from 'utils/cn';
@@ -276,9 +277,25 @@ export const ProjectMap = (): JSX.Element => {
   }, [rawScenariosData, sid1]);
 
   useEffect(() => {
+    // On narrow viewports the sidebar overlays (or hides) the map instead of
+    // offsetting it, so reserving SIDEBAR_WIDTH of left padding would push the
+    // padded area past the viewport. @math.gl/web-mercator's fitBounds()
+    // asserts padding fits inside the container — exceeding it throws
+    // "assertion failed" and crashes the page (MRXNM-87).
+    const viewportWidth =
+      typeof window === 'undefined' ? Number.POSITIVE_INFINITY : window.innerWidth;
+    const fitsSidebar = viewportWidth > SIDEBAR_WIDTH + 200;
+
     setBounds({
       bbox: BBOX,
-      options: { padding: { top: 50, right: 50, bottom: 50, left: 575 } },
+      options: {
+        padding: {
+          top: 50,
+          right: 50,
+          bottom: 50,
+          left: fitsSidebar ? SIDEBAR_WIDTH + 25 : 50,
+        },
+      },
       viewportOptions: { transitionDuration: 0 },
     });
   }, [BBOX]);
