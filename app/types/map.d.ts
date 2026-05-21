@@ -17,7 +17,12 @@ export interface MapProps extends InteractiveMapProps {
   /** An object that defines the bounds */
   bounds?: {
     bbox: number[];
-    options?: {};
+    options?: {
+      padding?: number | { top: number; right: number; bottom: number; left: number };
+      minExtent?: number;
+      maxZoom?: number;
+      offset?: number[];
+    };
     viewportOptions?: Partial<ViewportProps>;
   };
 

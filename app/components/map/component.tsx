@@ -16,6 +16,37 @@ const DEFAULT_VIEWPORT = {
   longitude: 0,
 };
 
+type FitBoundsPadding = { top: number; right: number; bottom: number; left: number };
+
+// fitBounds() throws "@math.gl/web-mercator: assertion failed." when the
+// passed padding doesn't leave room inside the viewport. Scale padding down
+// proportionally so callers can pass desktop-sized padding without crashing
+// on narrow (mobile) containers.
+const clampFitBoundsPadding = (
+  padding: number | FitBoundsPadding | undefined,
+  width: number,
+  height: number
+): number | FitBoundsPadding | undefined => {
+  if (padding == null) return padding;
+  const maxHorizontal = Math.max(0, width - 1);
+  const maxVertical = Math.max(0, height - 1);
+  if (typeof padding === 'number') {
+    return Math.min(padding, Math.floor(maxHorizontal / 2), Math.floor(maxVertical / 2));
+  }
+  const { top, right, bottom, left } = padding;
+  const horizontal = left + right;
+  const vertical = top + bottom;
+  const scaleX = horizontal > maxHorizontal && horizontal > 0 ? maxHorizontal / horizontal : 1;
+  const scaleY = vertical > maxVertical && vertical > 0 ? maxVertical / vertical : 1;
+  if (scaleX >= 1 && scaleY >= 1) return padding;
+  return {
+    top: Math.floor(top * scaleY),
+    right: Math.floor(right * scaleX),
+    bottom: Math.floor(bottom * scaleY),
+    left: Math.floor(left * scaleX),
+  };
+};
+
 export const Map = ({
   mapboxApiAccessToken,
   children,
@@ -95,19 +126,25 @@ export const Map = ({
     const { bbox, options = {}, viewportOptions = {} } = bounds;
     const { transitionDuration = 0 } = viewportOptions;
 
-    if (mapContainerRef.current.offsetWidth <= 0 || mapContainerRef.current.offsetHeight <= 0) {
+    const containerWidth = mapContainerRef.current.offsetWidth;
+    const containerHeight = mapContainerRef.current.offsetHeight;
+
+    if (containerWidth <= 0 || containerHeight <= 0) {
       console.error("mapContainerRef doesn't have dimensions");
       return null;
     }
 
+    const safePadding = clampFitBoundsPadding(options.padding, containerWidth, containerHeight);
+
     const { longitude, latitude, zoom } = fitBounds({
-      width: mapContainerRef.current.offsetWidth,
-      height: mapContainerRef.current.offsetHeight,
+      width: containerWidth,
+      height: containerHeight,
       bounds: [
         [bbox[1], bbox[3]],
         [bbox[0], bbox[2]],
       ],
       ...options,
+      ...(safePadding !== undefined && { padding: safePadding }),
     });
 
     const newViewport = {
