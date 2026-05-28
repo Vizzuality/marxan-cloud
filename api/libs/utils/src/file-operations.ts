@@ -2,6 +2,7 @@ import { Either, left, right } from 'fp-ts/lib/Either';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
 import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
 
 export const fileAlreadyExists = Symbol(`file already exists`);
 export const unknownError = Symbol(`unknown error`);
@@ -37,24 +38,17 @@ export async function storeFile(
   stream: Readable,
   opts: StoreFileOptions = { override: false },
 ): Promise<Either<StoreFileError, string>> {
-  const fileExists = existsSync(path);
-
-  if (fileExists && !opts.override) {
+  if (existsSync(path) && !opts.override) {
     return left(fileAlreadyExists);
   }
 
-  const writer = createWriteStream(path);
-
-  return new Promise((resolve) => {
-    writer.on('close', () => {});
-    writer.on(`finish`, () => {
-      resolve(right(path));
-    });
-    writer.on('error', (error) => {
-      console.error(error);
-      resolve(left(unknownError));
-    });
-
-    stream.pipe(writer);
-  });
+  try {
+    // pipeline (not raw .pipe()) so a source-side error doesn't escape as
+    // an unhandled 'error' event.
+    await pipeline(stream, createWriteStream(path));
+    return right(path);
+  } catch (error) {
+    console.error(error);
+    return left(unknownError);
+  }
 }
