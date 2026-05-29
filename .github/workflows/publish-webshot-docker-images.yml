@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     branches:
-      - "production"
+      - "main"
       - "staging"
     paths:
       - ".github/**"
@@ -33,5 +33,5 @@ jobs:
       - run: |
           docker build ./webshot \
             -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.sha }} \
-            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.ref != 'refs/heads/production' && 'staging' || 'production' }}
+            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
           docker push -a ${{ vars.REGISTRY_LOGIN_SERVER }}/marxan-webshot

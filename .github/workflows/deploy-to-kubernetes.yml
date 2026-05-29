@@ -7,7 +7,7 @@ permissions:
 on:
   push:
     branches:
-      - "production"
+      - "main"
       - "staging"
     paths:
       - "app/**"
@@ -96,7 +96,7 @@ jobs:
           ssh -i ~/.ssh/bastion.key -o StrictHostKeyChecking=no -N -L 4433:${{ vars.AZURE_AKS_HOST }}:443 ${{ vars.BASTION_USER }}@${{ vars.BASTION_HOST }} -T &
 
       - name: Redeploy production pods
-        if: ${{ github.ref == 'refs/heads/production' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           kubectl rollout restart deployment api -n production
           kubectl rollout restart deployment client -n production
