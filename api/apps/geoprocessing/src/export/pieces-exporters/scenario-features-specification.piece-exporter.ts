@@ -268,7 +268,9 @@ export class ScenarioFeaturesSpecificationPieceExporter
         return {
           draft,
           raw: parsedRaw,
-          configs: scenarioFeatureConfigsBySpecificationId[id],
+          // Default to [] so JSON.stringify keeps the field for specs with no
+          // rows in specification_feature_configs (e.g. an empty draft).
+          configs: scenarioFeatureConfigsBySpecificationId[id] ?? [],
           activeSpecification: id === scenarioSpecificationIds.active,
           candidateSpecification: id === scenarioSpecificationIds.candidate,
         };

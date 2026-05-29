@@ -76,6 +76,18 @@ describe(ScenarioFeaturesSpecificationPieceExporter, () => {
       .WhenPieceExporterIsInvoked(input)
       .ThenAScenarioFeaturesSpecificationFileIsSaved({ customFeatures: false });
   });
+
+  it('serialises configs as [] when a specification has no specification_feature_configs rows', async () => {
+    const input = fixtures.GivenAScenarioFeaturesSpecificationExportJob();
+    await fixtures.GivenScenarioExist();
+    await fixtures.GivenCustomFeatureExist();
+    await fixtures.GivenScenarioSpecification();
+    // Intentionally no GivenScenarioSpecificationFeaturesConfigExist — mirrors
+    // the empty-draft case that was crashing the importer on staging.
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenSavedFileHasConfigsArrayForEachSpecification();
+  });
 });
 
 const getFixtures = async () => {
@@ -298,6 +310,20 @@ const getFixtures = async () => {
                 calculated: true,
               })),
             );
+          });
+        },
+        ThenSavedFileHasConfigsArrayForEachSpecification: async () => {
+          const result = await sut.run(input);
+          const file = await fileRepository.get(result.uris[0].uri);
+          if (isLeft(file)) throw new Error();
+          const content =
+            await readSavedFile<ScenarioFeaturesSpecificationContent[]>(
+              file.right,
+            );
+          expect(content.length).toBeGreaterThan(0);
+          content.forEach((spec) => {
+            expect(Array.isArray(spec.configs)).toBe(true);
+            expect(spec.configs).toEqual([]);
           });
         },
       };
