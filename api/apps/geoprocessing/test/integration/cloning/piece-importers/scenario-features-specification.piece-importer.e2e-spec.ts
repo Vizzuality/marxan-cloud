@@ -96,6 +96,16 @@ describe(ScenarioFeaturesSpecificationPieceImporter, () => {
       .WhenPieceImporterIsInvoked(input)
       .ThenScenarioFeaturesDataShouldBeImported();
   });
+
+  it('imports specifications when the configs field is missing on some specifications', async () => {
+    await fixtures.GivenScenario();
+    const archiveLocation =
+      await fixtures.GivenScenarioFeaturesSpecificationFileWithMissingConfigs();
+    const input = fixtures.GivenJobInput(archiveLocation);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenSpecificationsImportedWithoutFeatureConfigs();
+  });
 });
 
 const getFixtures = async () => {
@@ -271,6 +281,70 @@ const getFixtures = async () => {
         relativePath,
       );
 
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
+    },
+    GivenScenarioFeaturesSpecificationFileWithMissingConfigs: async () => {
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
+        ClonePiece.FeaturesSpecification,
+        { kind: resourceKind, scenarioId: oldScenarioId },
+      );
+      const { customFeatures } = await GivenFeatures(
+        apiEntityManager,
+        0,
+        1,
+        projectId,
+      );
+      const customFeatureId = customFeatures[0].id;
+      featureIds = [customFeatureId];
+      const customScenarioFeaturesData = await GivenScenarioFeaturesData(
+        geoEntityManager,
+        recordsOfDataForEachFeature,
+        [customFeatureId],
+        scenarioId,
+      );
+      const customFeatureName = getFeatureClassNameByIdMap(customFeatures)[
+        customFeatureId
+      ];
+      // Reproduces the on-disk shape produced by older exports: alongside a
+      // normal active spec, one specification is serialised WITHOUT the
+      // `configs` field because the source row had no entries in
+      // specification_feature_configs (e.g. an empty draft).
+      const malformedSpecifications: unknown[] = [
+        {
+          draft: false,
+          raw: { status: 'create', features: [] },
+          activeSpecification: true,
+          candidateSpecification: true,
+          configs: [
+            {
+              baseFeature: customFeatureName,
+              againstFeature: null,
+              featuresDetermined: false,
+              features: customScenarioFeaturesData.map(({ featureId }) => ({
+                featureId,
+                calculated: true,
+              })),
+              selectSubSets: null,
+              splitByProperty: null,
+              operation: 'copy',
+            },
+          ],
+        },
+        {
+          draft: true,
+          raw: { status: 'draft', features: [] },
+          activeSpecification: false,
+          candidateSpecification: false,
+          // intentionally no `configs` field
+        },
+      ];
+      const exportId = v4();
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(malformedSpecifications)),
+        relativePath,
+      );
       if (isLeft(uriOrError)) throw new Error("couldn't save file");
       return new ArchiveLocation(uriOrError.right);
     },
@@ -486,6 +560,34 @@ const getFixtures = async () => {
               return isDefined(featureData.specificationId);
             }),
           ).toBe(true);
+        },
+        ThenSpecificationsImportedWithoutFeatureConfigs: async () => {
+          await expect(sut.run(input)).resolves.toBeDefined();
+
+          const specifications: { id: string }[] = await apiEntityManager
+            .createQueryBuilder()
+            .select('id')
+            .from('specifications', 's')
+            .where('scenario_id = :scenarioId', { scenarioId })
+            .execute();
+
+          // The malformed file has 2 specs: one active with configs, one
+          // empty draft missing the configs field. Both must be persisted.
+          expect(specifications).toHaveLength(2);
+
+          const featureConfigs: { specification_id: string }[] =
+            await apiEntityManager
+              .createQueryBuilder()
+              .select('specification_id')
+              .from('specification_feature_configs', 'c')
+              .where('specification_id IN (:...specificationIds)', {
+                specificationIds: specifications.map((s) => s.id),
+              })
+              .execute();
+
+          // Only the active spec contributes one feature config; the empty
+          // draft contributes zero (which is the regression we're protecting).
+          expect(featureConfigs).toHaveLength(1);
         },
         ThenNoScenarioFeaturesDataShouldBeImported: async () => {
           const beforeRunScenarioFeaturesData =

@@ -327,9 +327,15 @@ export class ScenarioFeaturesSpecificationPieceImporter
       const buffer = await readableToBuffer(readableOrError.right);
       const specificationaOrError = buffer.toString();
 
-      const specifications: ScenarioFeaturesSpecificationContent[] = JSON.parse(
-        specificationaOrError,
-      );
+      // Older archives may serialise specs without a `configs` field when the
+      // source row had no specification_feature_configs entries (e.g. an empty
+      // draft). Normalise to [] so downstream iteration is safe.
+      const specifications: ScenarioFeaturesSpecificationContent[] = (
+        JSON.parse(specificationaOrError) as ScenarioFeaturesSpecificationContent[]
+      ).map((spec) => ({
+        ...spec,
+        configs: Array.isArray(spec.configs) ? spec.configs : [],
+      }));
       if (!specifications.length)
         return {
           importId: input.importId,
