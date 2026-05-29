@@ -18,7 +18,7 @@ import { Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { Entry, Parse } from 'unzipper';
+import { Open } from 'unzipper';
 import { ExportId } from '../../export';
 import { ExportRepository } from '../../export/application/export-repository.port';
 import { ManifestFileService } from '../../export/application/manifest-file-service.port';
@@ -48,7 +48,7 @@ export class GenerateExportFromZipFileHandler
     private readonly manifestFileService: ManifestFileService,
   ) {}
 
-  private storeCloningFiles(
+  private async storeCloningFiles(
     exportId: string,
     zipReadable: Readable,
   ): Promise<
@@ -58,49 +58,32 @@ export class GenerateExportFromZipFileHandler
     >
   > {
     const uris: Record<string, string> = {};
-    let error = false;
+    // Open.buffer (central-directory) instead of Parse() (streaming): the
+    // streaming parser stalled / threw on nested-zip entries and the old
+    // event-listener shape let those failures escape uncaught.
+    try {
+      const buffer = await readableToBuffer(zipReadable);
+      const dir = await Open.buffer(buffer);
+      for (const file of dir.files) {
+        if (file.type !== 'File') continue;
 
-    return new Promise<
-      Either<
-        typeof errorStoringCloningFile | typeof unknownError,
-        Record<string, string>
-      >
-    >((resolve) => {
-      zipReadable
-        .pipe(Parse())
-        .on('entry', async (entry: Entry) => {
-          if (entry.type !== 'File' || error) {
-            entry.autodrain();
-            return;
-          }
+        const result = await this.fileRepository.saveCloningFile(
+          exportId,
+          file.stream(),
+          file.path,
+        );
 
-          const result = await this.fileRepository.saveCloningFile(
-            exportId,
-            entry,
-            entry.path,
-          );
+        if (isLeft(result)) {
+          return left(errorStoringCloningFile);
+        }
 
-          if (isLeft(result)) {
-            error = true;
-            return;
-          }
-
-          uris[entry.path] = result.right;
-        })
-        .on('close', () => {
-          if (error) {
-            this.logger.error(error);
-            resolve(left(errorStoringCloningFile));
-            return;
-          }
-
-          resolve(right(uris));
-        })
-        .on('error', () => {
-          this.logger.error(error);
-          resolve(left(errorStoringCloningFile));
-        });
-    });
+        uris[file.path] = result.right;
+      }
+      return right(uris);
+    } catch (err) {
+      this.logger.error(err);
+      return left(errorStoringCloningFile);
+    }
   }
 
   private getExportComponents(

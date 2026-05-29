@@ -27,7 +27,7 @@ import { HttpStatus } from '@nestjs/common';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import * as archiver from 'archiver';
 import { isLeft } from 'fp-ts/lib/These';
-import { createWriteStream, rmSync } from 'fs';
+import { createWriteStream, readFileSync, rmSync, writeFileSync } from 'fs';
 import { Readable } from 'stream';
 import * as request from 'supertest';
 import { DataSource } from 'typeorm';
@@ -81,6 +81,11 @@ test('should deny importing project when a modified zip is provided', async () =
   await fixtures.WhenImportIsRequested().ThenABadRequestErrorIsReturned();
 });
 
+test('should reject a truncated zip with a 400 rather than crashing the process', async () => {
+  await fixtures.GivenImportFile({ withZipFileTruncation: true });
+  await fixtures.WhenImportIsRequested().ThenABadRequestErrorIsReturned();
+});
+
 export const getFixtures = async () => {
   const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
   const manifestFileService = app.get(ManifestFileService);
@@ -113,7 +118,13 @@ export const getFixtures = async () => {
       await app.close();
     },
     GivenImportFile: async (
-      { withZipFileModification } = { withZipFileModification: false },
+      {
+        withZipFileModification,
+        withZipFileTruncation,
+      }: {
+        withZipFileModification?: boolean;
+        withZipFileTruncation?: boolean;
+      } = {},
     ) => {
       const exportConfigContent: ProjectExportConfigContent = {
         version: exportVersion,
@@ -196,6 +207,14 @@ export const getFixtures = async () => {
       await cloningFilesRepo.deleteExportFolder(exportId.value);
 
       uriZipFile = await saveFile(__dirname + '/export.zip', zipFile);
+
+      if (withZipFileTruncation) {
+        const original = readFileSync(uriZipFile);
+        writeFileSync(
+          uriZipFile,
+          original.subarray(0, Math.floor(original.length / 2)),
+        );
+      }
     },
     GivenImportWasRequested: async () => {
       const response = await request(app.getHttpServer())
