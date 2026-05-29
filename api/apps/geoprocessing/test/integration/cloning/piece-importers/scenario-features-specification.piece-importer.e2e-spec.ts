@@ -306,10 +306,12 @@ const getFixtures = async () => {
       const customFeatureName = getFeatureClassNameByIdMap(customFeatures)[
         customFeatureId
       ];
-      // Reproduces the on-disk shape produced by older exports: alongside a
-      // normal active spec, one specification is serialised WITHOUT the
-      // `configs` field because the source row had no entries in
-      // specification_feature_configs (e.g. an empty draft).
+      // Reproduces the on-disk shape produced by older exports:
+      //   - spec[0] is a normal active spec with one valid config AND one
+      //     malformed config missing `baseFeature` (from a half-configured
+      //     draft whose source row had a null/orphaned base_feature_id);
+      //   - spec[1] is serialised WITHOUT the `configs` field because the
+      //     source row had no entries in specification_feature_configs.
       const malformedSpecifications: unknown[] = [
         {
           draft: false,
@@ -325,6 +327,15 @@ const getFixtures = async () => {
                 featureId,
                 calculated: true,
               })),
+              selectSubSets: null,
+              splitByProperty: null,
+              operation: 'copy',
+            },
+            {
+              // baseFeature intentionally omitted
+              againstFeature: null,
+              featuresDetermined: false,
+              features: [],
               selectSubSets: null,
               splitByProperty: null,
               operation: 'copy',

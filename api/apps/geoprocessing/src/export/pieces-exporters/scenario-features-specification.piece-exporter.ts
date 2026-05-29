@@ -149,11 +149,22 @@ export class ScenarioFeaturesSpecificationPieceExporter
     const featuresById = await this.getFeaturesById(Array.from(featuresIds));
 
     scenarioFeatureConfigs.forEach((config) => {
+      const baseFeature = featuresById[config.baseFeatureId];
+      // Skip configs whose base feature can't be resolved (null/orphaned
+      // base_feature_id from a half-configured draft). Emitting them would
+      // produce { baseFeature: undefined } which JSON.stringify drops, and
+      // the importer would then crash on the missing field.
+      if (typeof baseFeature !== 'string') {
+        this.logger.warn(
+          `Skipping features-specification config with unresolved baseFeature for specification ${config.specificationId}`,
+        );
+        return;
+      }
       const result = {
         againstFeature: !isDefined(config.againstFeatureId)
           ? null
           : featuresById[config.againstFeatureId],
-        baseFeature: featuresById[config.baseFeatureId],
+        baseFeature,
         featuresDetermined: config.featuresDetermined,
         operation: config.operation,
         selectSubSets: config.selectSubSets,

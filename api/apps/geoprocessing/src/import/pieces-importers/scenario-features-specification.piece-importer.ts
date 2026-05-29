@@ -329,12 +329,25 @@ export class ScenarioFeaturesSpecificationPieceImporter
 
       // Older archives may serialise specs without a `configs` field when the
       // source row had no specification_feature_configs entries (e.g. an empty
-      // draft). Normalise to [] so downstream iteration is safe.
+      // draft). Normalise to [] so downstream iteration is safe. Also drop any
+      // config that lacks a usable `baseFeature` string — these come from half-
+      // configured draft rows whose base_feature_id was null/orphaned, and they
+      // would crash the feature-name extraction further down.
       const specifications: ScenarioFeaturesSpecificationContent[] = (
         JSON.parse(specificationaOrError) as ScenarioFeaturesSpecificationContent[]
       ).map((spec) => ({
         ...spec,
-        configs: Array.isArray(spec.configs) ? spec.configs : [],
+        configs: (Array.isArray(spec.configs) ? spec.configs : []).filter(
+          (config) => {
+            if (config == null || typeof config.baseFeature !== 'string') {
+              this.logger.warn(
+                `Skipping malformed features-specification config (missing baseFeature) for scenario ${scenarioId}`,
+              );
+              return false;
+            }
+            return true;
+          },
+        ),
       }));
       if (!specifications.length)
         return {
