@@ -109,3 +109,32 @@ Piece exporters and importers will need to:
 
 These will need to use the list of relevant `features_data` rows as stored
 alongside each feature.
+
+## Frontend integration (read-back model) — MRXNM-82
+
+The frontend treats split children as **materialized** features and discovers
+them via a *read-back* flow rather than synthesising them client-side:
+
+1. The user configures a split in the scenario Features step (behind the `split`
+   feature flag) and confirms; the frontend submits the feature specification
+   with the `split/v1` operation and `status: 'created'` (a `draft` spec does not
+   trigger materialization).
+2. The backend materializes the child features asynchronously (the
+   `geofeatureSplit` job).
+3. While that job runs the frontend shows the existing scenario status banner;
+   when it finishes the frontend refetches the specification.
+4. `GET /scenarios/:id/features/specification` echoes, per split entry, the real
+   child `featureId` (plus `amountRange`/`creationStatus`), matched to each split
+   `value` via the child's stored `from_geoprocessing_ops` canonical config
+   (`baseFeatureId` + `splitByProperty` + `value`). The frontend renders the
+   materialized children (their own tiles + amounts) using those real ids, while
+   keeping a stable synthetic row key for UI state.
+
+Splitting is **scenario-only**: materialized children are deliberately excluded
+from `GET /projects/:pid/features`, so they never appear in the project feature
+inventory or the scenario "add features" list.
+
+The `featureId`/`amountRange`/`creationStatus` fields added to each split entry
+are whitelisted on the request DTO (`SplitV1Settings`) so the specification
+survives `forbidNonWhitelisted` validation when the frontend round-trips it on
+save.
