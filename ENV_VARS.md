@@ -52,6 +52,17 @@ applications.
   environments and via Persistent Volumes in Kubernetes environments) should
   be set accordingly
 
+* `API_UPLOAD_PROJECT_IMPORT_MAX_SIZE` (number, optional, default is
+  `1073741824`, i.e. 1 GiB): maximum size, in bytes, accepted by the project
+  import and legacy-project import upload endpoints. Must mirror the frontend
+  `PROJECT_UPLOADER_MAX_SIZE` constant
+  (`app/constants/file-uploader-size-limits.js`)
+
+* `API_UPLOAD_FEATURE_CSV_MAX_SIZE` (number, optional, default is `52428800`,
+  i.e. 50 MiB): maximum size, in bytes, accepted by the feature-amounts CSV
+  upload endpoint. Must mirror the frontend `FEATURES_UPLOADER_CSV_MAX_SIZE`
+  constant
+
 * `API_DAEMON_LISTEN_PORT` (number, optional, default is 3000; this variable is
   only useful when running the service natively, not in a Docker container):
   port on which the Express daemon of the API service will listen. If
