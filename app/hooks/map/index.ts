@@ -509,11 +509,15 @@ export function useTargetedPreviewLayers({
     };
 
     return FEATURES.map((f) => {
-      const { id, parentId, value, splitSelected } = f;
+      const { id, parentId, value, splitSelected, childFeatureId } = f;
 
       const { opacity = 1, color } = layerSettings[id] || {};
 
-      const _id = splitSelected ? parentId : id;
+      // Materialized split child → render its own tiles (no property filter needed).
+      // Still pending (or non-split) → fall back to parent tiles + property filter.
+      const useChildTiles = Boolean(childFeatureId);
+      const _id = useChildTiles ? childFeatureId : splitSelected ? parentId : id;
+      const applySplitFilter = Boolean(splitSelected) && !useChildTiles;
 
       return {
         id: `feature-${id}-targeted-preview-layer-${cache}`,
@@ -529,7 +533,7 @@ export function useTargetedPreviewLayers({
             {
               type: 'fill',
               'source-layer': 'layer0',
-              ...(f.splitSelected && {
+              ...(applySplitFilter && {
                 filter: [
                   'all',
                   ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],
@@ -546,7 +550,7 @@ export function useTargetedPreviewLayers({
             {
               type: 'line',
               'source-layer': 'layer0',
-              ...(f.splitSelected && {
+              ...(applySplitFilter && {
                 filter: [
                   'all',
                   ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],

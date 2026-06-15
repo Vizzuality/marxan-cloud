@@ -9,6 +9,7 @@ export interface TargetSPFItemProps {
     id: string;
   }[];
   value?: string;
+  childFeatureId?: string | null;
   defaultTarget?: number;
   defaultFPF?: number;
   target?: number;
