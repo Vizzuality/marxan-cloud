@@ -3,6 +3,7 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  IsUUID,
   ValidateNested,
 } from 'class-validator';
 import { SpecForGeofeature } from '../dto/geo-feature-set-specification.dto';
@@ -19,6 +20,25 @@ class SplitV1Settings {
   @ValidateNested()
   @Type(() => MarxanSettingsForGeoFeature)
   marxanSettings!: MarxanSettingsForGeoFeature;
+
+  /**
+   * Real id of the materialized child feature for this split value. Set by the
+   * backend on the read path (`extendGeoFeatureProcessingSpecification`) once
+   * the split has materialized; optional and ignored on write. Whitelisted here
+   * so the specification survives `forbidNonWhitelisted` when the frontend
+   * round-trips it back on save.
+   */
+  @IsOptional()
+  @IsUUID()
+  featureId?: string;
+
+  @IsOptional()
+  @IsObject()
+  amountRange?: { min: number; max: number };
+
+  @IsOptional()
+  @IsString()
+  creationStatus?: string;
 }
 
 export class GeoprocessingOpSplitV1 extends GeoprocessingOp {
