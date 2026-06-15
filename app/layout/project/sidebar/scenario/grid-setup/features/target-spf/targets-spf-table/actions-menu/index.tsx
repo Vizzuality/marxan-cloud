@@ -5,6 +5,7 @@ import { useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
 
 import { useFeatureFlags } from 'hooks/feature-flags';
+import { useScenarioStatus } from 'hooks/scenarios';
 
 import Icon from 'components/icon';
 import Modal from 'components/modal/component';
@@ -33,11 +34,15 @@ const ActionsMenu = ({
   onDismissMenu,
 }: Parameters<ComponentProps<typeof RowItem>['ActionsComponent']>[0]): JSX.Element => {
   const { query } = useRouter();
-  const { sid } = query as { sid: string };
+  const { pid, sid } = query as { pid: string; sid: string };
   const queryClient = useQueryClient();
   const isDeletable = item.isCustom;
   const isSplittable = Boolean(item.splitOptions?.length);
   const { split } = useFeatureFlags();
+  const scenarioStatusQuery = useScenarioStatus(pid, sid);
+  const isSplitting = (scenarioStatusQuery.data?.jobs ?? []).some(
+    (job) => job.kind === 'geofeatureSplit' && job.status === 'running'
+  );
 
   const [modalState, setModalState] = useState<{ edit: boolean; split: boolean }>({
     edit: false,
@@ -95,9 +100,9 @@ const ActionsMenu = ({
             }}
             className={cn({
               [BUTTON_CLASSES]: true,
-              [BUTTON_DISABLED_CLASSES]: !isDeletable,
+              [BUTTON_DISABLED_CLASSES]: !isDeletable || isSplitting,
             })}
-            disabled={!isDeletable}
+            disabled={!isDeletable || isSplitting}
           >
             <Icon
               icon={SPLIT_SVG}

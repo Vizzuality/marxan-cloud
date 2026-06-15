@@ -1,4 +1,12 @@
-import { ChangeEvent, ComponentProps, useCallback, useMemo, useState } from 'react';
+import {
+  ChangeEvent,
+  ComponentProps,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useQueryClient } from 'react-query';
 
@@ -12,6 +20,7 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { useCanEditScenario } from 'hooks/permissions';
+import { useScenarioStatus } from 'hooks/scenarios';
 
 import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
@@ -86,6 +95,24 @@ const TargetAndSPFFeatures = (): JSX.Element => {
   const selectedFeaturesQuery = useSelectedFeatures(sid, filters, {
     keepPreviousData: true,
   });
+
+  // A split materialises its child features asynchronously (the `geofeatureSplit`
+  // job). Once that job finishes, refetch the specification so the real,
+  // materialised child ids read back from the API replace the pending
+  // placeholders. Running/failure feedback is already handled globally by the
+  // scenario-edit status banner.
+  const scenarioStatusQuery = useScenarioStatus(pid, sid);
+  const isSplitting = (scenarioStatusQuery.data?.jobs ?? []).some(
+    (job) => job.kind === 'geofeatureSplit' && job.status === 'running'
+  );
+  const wasSplitting = useRef(false);
+  useEffect(() => {
+    if (wasSplitting.current && !isSplitting) {
+      void queryClient.invalidateQueries(['selected-features', sid]);
+      void queryClient.invalidateQueries(['targeted-features', sid]);
+    }
+    wasSplitting.current = isSplitting;
+  }, [isSplitting, queryClient, sid]);
 
   const targetedFeatures = useMemo(() => {
     let parsedData = [];
