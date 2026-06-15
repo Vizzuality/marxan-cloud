@@ -100,18 +100,35 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onDismiss }: UploadMod
 
             console.info('Project uploaded');
           },
-          onError: ({ response }) => {
-            const { errors } = response.data;
-
+          onError: (error: any) => {
             setLoading(false);
+
+            const response = error?.response;
+            const appErrors = response?.data?.errors;
+            // No response (timeout/aborted/network) or a gateway/server 5xx with
+            // no structured app error: the upload likely timed out. Large projects
+            // can take a while and may still be importing in the background.
+            const timedOutOrUnreachable = error?.code === 'ECONNABORTED' || !response;
+            const gatewayOrServerError = response?.status >= 500 && !Array.isArray(appErrors);
+
+            let messages: string[];
+            if (timedOutOrUnreachable || gatewayOrServerError) {
+              messages = [
+                'The upload took too long or could not be completed. Large projects may exceed the upload time limit; the import may still be processing. Check your projects in a few minutes, and contact support if it does not appear.',
+              ];
+            } else if (Array.isArray(appErrors) && appErrors.length > 0) {
+              messages = appErrors.map((e) => e.title);
+            } else {
+              messages = ['Something went wrong uploading the project. Please try again.'];
+            }
 
             addToast(
               'error-upload-project',
               <>
                 <h2 className="font-medium">Error!</h2>
                 <ul className="text-sm">
-                  {errors.map((e) => (
-                    <li key={`${e.status}`}>{e.title}</li>
+                  {messages.map((m, i) => (
+                    <li key={i}>{m}</li>
                   ))}
                 </ul>
               </>,
