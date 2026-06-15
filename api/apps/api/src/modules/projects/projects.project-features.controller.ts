@@ -32,7 +32,7 @@ import {
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
+import { featureCsvUpload } from '@marxan-api/modules/uploads';
 
 import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
@@ -167,9 +167,7 @@ export class ProjectFeaturesController {
     description: 'Id of the Project the feature is part of',
   })
   @ApiOkResponse()
-  @UseInterceptors(
-    FileInterceptor('file', { limits: uploadOptions(50 * 1024 ** 2).limits }),
-  )
+  @UseInterceptors(FileInterceptor('file', { limits: featureCsvUpload() }))
   @Post(`:projectId/features/csv`)
   async setFeatureAmountFromCSV(
     @Param('projectId', ParseUUIDPipe) projectId: string,
