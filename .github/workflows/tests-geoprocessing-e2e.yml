@@ -27,6 +27,7 @@ jobs:
           - 'integration/planning-unit-grid'
           - 'integration/planning-unit-inclusion'
           - 'integration/protected-areas'
+          - 'integration/scenario-planning-units-features-aggregate'
           - 'tiles'
           - 'worker-module'
 
