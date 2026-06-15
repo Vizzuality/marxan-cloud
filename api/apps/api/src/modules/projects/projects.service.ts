@@ -7,6 +7,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -146,6 +147,8 @@ export const projectNotFoundForExport = Symbol(`project not found`);
 
 @Injectable()
 export class ProjectsService {
+  private readonly logger = new Logger(ProjectsService.name);
+
   constructor(
     private readonly geoCrud: GeoFeaturesService,
     private readonly projectsCrud: ProjectsCrudService,
@@ -772,15 +775,30 @@ export class ProjectsService {
       ImportProjectCommandResult
     >
   > {
+    const archiveMiB = ((exportFile?.size ?? 0) / 1024 ** 2).toFixed(1);
+    const startedAt = Date.now();
+    this.logger.log(
+      `Project import started: ${archiveMiB} MiB archive (user ${userId})`,
+    );
+
     if (!(await this.projectAclService.canImportProject(userId))) {
+      this.logger.warn(
+        `Project import forbidden for user ${userId} (${archiveMiB} MiB archive)`,
+      );
       return left(forbiddenError);
     }
 
+    const generateStartedAt = Date.now();
     const exportIdOrError = await this.commandBus.execute(
       new GenerateExportFromZipFile(exportFile, new UserId(userId)),
     );
+    const generateMs = Date.now() - generateStartedAt;
 
     if (isLeft(exportIdOrError)) {
+      this.logger.warn(
+        `Project import failed validating ${archiveMiB} MiB archive after ${generateMs}ms ` +
+          `(${String(exportIdOrError.left)}, user ${userId})`,
+      );
       return exportIdOrError;
     }
 
@@ -789,9 +807,17 @@ export class ProjectsService {
     );
 
     if (isLeft(idsOrError)) {
+      this.logger.warn(
+        `Project import failed scheduling import after ${Date.now() - startedAt}ms ` +
+          `(${String(idsOrError.left)}, ${archiveMiB} MiB archive, user ${userId})`,
+      );
       return idsOrError;
     }
 
+    this.logger.log(
+      `Project import accepted in ${Date.now() - startedAt}ms ` +
+        `(archive validation ${generateMs}ms, ${archiveMiB} MiB, user ${userId})`,
+    );
     return right(idsOrError.right);
   }
 

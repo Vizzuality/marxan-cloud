@@ -6,6 +6,7 @@ import {
   Get,
   Header,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   Param,
   Post,
@@ -64,6 +65,8 @@ import {
 @ApiTags('Project - cloning')
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectCloningController {
+  private readonly logger = new Logger(ProjectCloningController.name);
+
   constructor(private readonly projectsService: ProjectsService) {}
 
   @ImplementsAcl()
@@ -307,6 +310,11 @@ export class ProjectCloningController {
         case invalidExportZipFile:
           throw new BadRequestException('Invalid export zip file');
         default:
+          this.logger.error(
+            `Unexpected error importing project (user ${req.user.id}): ${String(
+              idsOrError.left,
+            )}`,
+          );
           throw new InternalServerErrorException(idsOrError.left);
       }
     }
