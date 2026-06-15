@@ -15,6 +15,16 @@ import { JobInput } from '@marxan/planning-unit-features';
  * Format per element: "featureId:amount"
  *
  * Only includes features that are part of the scenario (via scenario_features_data).
+ *
+ * Membership in the scenario is expressed as a `WHERE EXISTS` semi-join rather
+ * than an `INNER JOIN` on scenario_features_data: that table has no unique
+ * constraint on (scenario_id, api_feature_id), so a join would multiply every
+ * matching amount row by the number of duplicate feature rows, producing a
+ * huge intermediate result that PostgreSQL sorts (and spills to disk) before
+ * DISTINCT collapses it again. EXISTS short-circuits on the first match, so the
+ * de-duplicated set never materialises. DISTINCT is retained because neither
+ * feature_amounts_per_planning_unit nor scenario_features_data guarantees
+ * uniqueness, but it now sorts only the de-multiplied rows.
  */
 const query = `
 UPDATE scenarios_pu_data
@@ -27,10 +37,13 @@ FROM (
   FROM scenarios_pu_data spd
   INNER JOIN feature_amounts_per_planning_unit fappu
     ON fappu.project_pu_id = spd.project_pu_id
-  INNER JOIN scenario_features_data sfd
-    ON sfd.api_feature_id = fappu.feature_id
-   AND sfd.scenario_id = spd.scenario_id
   WHERE spd.scenario_id = $1
+    AND EXISTS (
+      SELECT 1
+      FROM scenario_features_data sfd
+      WHERE sfd.api_feature_id = fappu.feature_id
+        AND sfd.scenario_id = spd.scenario_id
+    )
   GROUP BY spd.id
 ) AS sub
 WHERE scenarios_pu_data.id = sub.scenario_pu_id;
