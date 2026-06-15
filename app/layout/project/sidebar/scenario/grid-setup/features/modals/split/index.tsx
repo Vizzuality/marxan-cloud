@@ -93,7 +93,7 @@ const SplitModal = ({
         {
           id: sid,
           data: {
-            status: 'draft',
+            status: 'created',
             features: selectedFeaturesQuery.data.map((sf) => {
               if (sf.id === featureId) {
                 return {
