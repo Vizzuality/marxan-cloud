@@ -389,6 +389,8 @@ export function useTargetedFeatures(
               ...s,
               id: s.value,
               name: s.value,
+              childFeatureId: s.featureId ?? null,
+              amountRange: s.amountRange ?? null,
             };
           });
         }
@@ -470,12 +472,21 @@ export function useTargetedFeatures(
               splitFeaturesSelected
                 // .sort((a, b) => a.name.localeCompare(b.name))
                 .map((sf) => {
-                  const { id: sfId, name: sfName, marxanSettings: sfMarxanSettings } = sf;
+                  const {
+                    id: sfId,
+                    name: sfName,
+                    marxanSettings: sfMarxanSettings,
+                    childFeatureId,
+                    amountRange: sfAmountRange,
+                  } = sf;
 
                   return {
                     ...sf,
-                    id: `${id}-${sfId}`,
+                    id: `${id}-${sfId}`, // keep synthetic row key (stable across materialization)
                     parentId: id,
+                    value: sfId,
+                    childFeatureId: childFeatureId ?? null, // real id for map tiles / amounts
+                    amountRange: sfAmountRange ?? null,
                     name: `${name} / ${sfName}`,
                     splitted: true,
                     splitSelected,
