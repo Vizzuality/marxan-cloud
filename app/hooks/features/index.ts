@@ -248,6 +248,11 @@ export function useSelectedFeatures(
               ...s,
               id: `${s.value}`,
               name: s.value,
+              // real materialized child id from the backend read-back (null while pending)
+              childFeatureId: s.featureId ?? null,
+              // child's own amounts when provided; the UI falls back to parent amounts
+              amountRange: s.amountRange ?? null,
+              creationStatus: s.creationStatus ?? null,
             };
           });
         }
