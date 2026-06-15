@@ -25,7 +25,7 @@ import {
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
+import { projectImport } from '@marxan-api/modules/uploads';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { ProjectsService } from './projects.service';
 import { isLeft } from 'fp-ts/Either';
@@ -208,7 +208,7 @@ export class LegacyProjectsController {
   @Post('import/legacy/:projectId/data-file')
   @ApiOkResponse({ type: AddFileToLegacyProjectImportResponseDto })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions().limits }))
+  @UseInterceptors(FileInterceptor('file', { limits: projectImport() }))
   async addFileToLegacyProjectImport(
     @Body() dto: AddFileToLegacyProjectImportBodyDto,
     @Param('projectId', ParseUUIDPipe) projectId: string,
