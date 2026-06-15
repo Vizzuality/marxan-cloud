@@ -53,7 +53,12 @@ describe('scenario planning units features aggregate', () => {
     processor = new ScenarioPlanningUnitsFeaturesAggregateProcessor(
       geoEntityManager,
     );
+  });
 
+  beforeEach(async () => {
+    // The geo e2e harness truncates every table in a global beforeEach
+    // (test/utils/handle-database.ts), which runs after this describe's
+    // beforeAll. Seed here so the data survives into the test body.
     scenarioPuData = await GivenScenarioPuDataExists(
       geoEntityManager,
       projectId,
@@ -76,7 +81,6 @@ describe('scenario planning units features aggregate', () => {
   });
 
   afterAll(async () => {
-    await CleanUp(geoEntityManager, scenarioId, projectId);
     await app.close();
   });
 
@@ -148,26 +152,4 @@ const GivenScenarioFeatureMembership = async (
       [v4(), scenarioId, apiFeatureId, v4()],
     );
   }
-};
-
-const CleanUp = async (
-  entityManager: EntityManager,
-  scenarioId: string,
-  projectId: string,
-): Promise<void> => {
-  await entityManager.query(
-    `DELETE FROM scenario_features_data WHERE scenario_id = $1`,
-    [scenarioId],
-  );
-  await entityManager.query(
-    `DELETE FROM feature_amounts_per_planning_unit WHERE project_id = $1`,
-    [projectId],
-  );
-  await entityManager.query(
-    `DELETE FROM scenarios_pu_data WHERE scenario_id = $1`,
-    [scenarioId],
-  );
-  await entityManager.query(`DELETE FROM projects_pu WHERE project_id = $1`, [
-    projectId,
-  ]);
 };
