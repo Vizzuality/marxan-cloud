@@ -95,12 +95,15 @@ const TargetAndSPFFeatures = (): JSX.Element => {
 
         const splitFeatures = feature.splitFeaturesSelected.map((splitFeature) => ({
           ...splitFeature,
-          id: `${feature.id}-${splitFeature.name}`,
+          id: `${feature.id}-${splitFeature.name}`, // stable synthetic row key
           parentId: feature.id,
+          value: splitFeature.value,
+          childFeatureId: splitFeature.childFeatureId ?? null, // real id, when materialized
           name: `${feature.name} / ${splitFeature.name}`,
           isVisibleOnMap: layerSettings[`${feature.id}-${splitFeature.name}`]?.visibility ?? false,
           color: feature.color,
-          amountRange: feature.amountRange,
+          // prefer the materialized child's own amounts; fall back to the parent's
+          amountRange: splitFeature.amountRange ?? feature.amountRange,
           isCustom: feature.metadata?.isCustom,
           scenarioUsageCount: featureMetadata?.scenarioUsageCount,
           type: featureMetadata?.tag,
