@@ -1,10 +1,17 @@
 import { Feature } from './feature';
 import { Project } from './project';
+import { SplitEntry } from './split';
+
+export interface GeoprocessingOperationSplitV1 {
+  kind: 'split/v1';
+  splitByProperty: string;
+  splits: SplitEntry[];
+}
 
 export interface GeoFeatureSet {
-  status: 'draft';
+  status: 'draft' | 'created';
   features: {
-    kind: 'plain';
+    kind: 'plain' | 'withGeoprocessing';
     featureId: Feature['id'];
     marxanSettings: Record<string, number>;
     metadata: {
@@ -18,6 +25,6 @@ export interface GeoFeatureSet {
       projectId: Project['id'];
       properties: Record<string, [number]>;
     };
-    geoprocessingOperations: any;
+    geoprocessingOperations?: GeoprocessingOperationSplitV1[];
   }[];
 }
