@@ -906,20 +906,6 @@ export class GeoFeaturesService extends AppBaseService<
       )
       .then((result) => result.map((i: { id: string }) => i.id));
 
-    const projectSpecificFeaturesFromGeoprocessingOperations =
-      await this.geoFeaturesRepository
-        .query(
-          `
-          SELECT id FROM features
-            WHERE
-              project_id = $1
-              AND
-              geoprocessing_ops_hash IS NOT NULL;
-          `,
-          [projectId],
-        )
-        .then((result) => result.map((i: { id: string }) => i.id));
-
     /**
      * Then narrow down the list of features relevant to the project to those
      * that effectively intersect the project's bbox.
@@ -952,10 +938,7 @@ export class GeoFeaturesService extends AppBaseService<
           throw new Error(error);
         });
 
-    return [
-      ...geoFeaturesWithinProjectBbox,
-      ...projectSpecificFeaturesFromGeoprocessingOperations,
-    ];
+    return geoFeaturesWithinProjectBbox;
   }
 
   private async createFeature(
