@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { flatten } from 'lodash';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Not, Repository } from 'typeorm';
 import { inspect } from 'util';
 import { Project } from '../projects/project.api.entity';
 import { Scenario } from '../scenarios/scenario.api.entity';
@@ -130,14 +130,67 @@ export class GeoFeaturePropertySetService {
         featuresInSpecification,
         metadataForFeaturesInSpecification,
       );
+    // Materialized split children are real features; surface each child's real
+    // id (plus its amounts / creation status) per split value so the frontend
+    // can read them back instead of relying on virtual `${parentId}-${value}`
+    // ids. Each split value is matched against the canonical config stored on
+    // the derived feature (`fromGeoprocessingOps`).
+    const hasSplitOperations = specification.features.some((feature) =>
+      feature.geoprocessingOperations?.some((op) => op.kind === 'split/v1'),
+    );
+    const derivedChildFeatures = hasSplitOperations
+      ? await this.geoFeaturesRepository.find({
+          where: {
+            projectId: scenario.projectId,
+            geoprocessingOpsHash: Not(IsNull()),
+          },
+        })
+      : [];
     return {
       status: specification.status,
       features: specification.features.map((feature) => {
+        const metadata = featuresInSpecificationWithPropertiesMetadata.find(
+          (f) => f.id === feature.featureId,
+        );
+        const geoprocessingOperations = feature.geoprocessingOperations?.map(
+          (op) => {
+            if (op.kind !== 'split/v1') {
+              return op;
+            }
+            return {
+              ...op,
+              splits: op.splits.map((split) => {
+                const child = derivedChildFeatures.find(
+                  (candidate) =>
+                    candidate.fromGeoprocessingOps?.baseFeatureId ===
+                      feature.featureId &&
+                    candidate.fromGeoprocessingOps?.splitByProperty ===
+                      op.splitByProperty &&
+                    candidate.fromGeoprocessingOps?.value === split.value,
+                );
+                if (!child) {
+                  return split;
+                }
+                return {
+                  ...split,
+                  featureId: child.id,
+                  creationStatus: child.creationStatus,
+                  ...(child.amountMin != null &&
+                    child.amountMax != null && {
+                      amountRange: {
+                        min: child.amountMin,
+                        max: child.amountMax,
+                      },
+                    }),
+                };
+              }),
+            };
+          },
+        );
         return {
           ...feature,
-          metadata: featuresInSpecificationWithPropertiesMetadata.find(
-            (f) => f.id === feature.featureId,
-          ),
+          ...(geoprocessingOperations && { geoprocessingOperations }),
+          metadata,
         };
       }),
     };
