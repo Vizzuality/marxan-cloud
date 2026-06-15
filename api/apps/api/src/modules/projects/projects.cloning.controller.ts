@@ -26,7 +26,7 @@ import {
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
+import { projectImport } from '@marxan-api/modules/uploads';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import {
   notAllowed,
@@ -285,9 +285,7 @@ export class ProjectCloningController {
    * handle bigger archives, which may came with their own set of additional
    * challenges.
    */
-  @UseInterceptors(
-    FileInterceptor('file', { limits: uploadOptions(50 * 1024 ** 2).limits }),
-  )
+  @UseInterceptors(FileInterceptor('file', { limits: projectImport() }))
   async importProject(
     @Body() dto: RequestProjectImportBodyDto,
     @UploadedFile() file: Express.Multer.File,
