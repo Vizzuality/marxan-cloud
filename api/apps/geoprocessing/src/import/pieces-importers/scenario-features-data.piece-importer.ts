@@ -2,18 +2,20 @@ import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/uti
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import {
-  FeatureDataElement,
-  ScenarioFeaturesDataContent,
-} from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
+import { FeatureDataElement } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
-import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { chunk } from 'lodash';
+import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
+import { parser } from 'stream-json';
+import { pick } from 'stream-json/filters/Pick';
+import { streamArray } from 'stream-json/streamers/StreamArray';
+import { batch as groupIntoBatches } from 'stream-json/utils/Batch';
 import { DeepPartial, EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
@@ -40,12 +42,24 @@ type FeatureSelectResult = {
   feature_class_name: string;
 };
 
+// Cross-batch lookup caches: each distinct feature / feature-data id is
+// resolved once and reused by every later batch that references it.
+type FeatureLookupCaches = {
+  customFeaturesMap: FeatureIdByClassNameMap;
+  platformFeaturesMap: FeatureIdByClassNameMap;
+  featureDataIdByFeatureIdAndHash: FeatureDataIdByFeatureIdAndHashMap;
+};
+
 @Injectable()
 @PieceImportProvider()
 export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
   private readonly logger: Logger = new Logger(
     ScenarioFeaturesDataPieceImporter.name,
   );
+
+  // Default to the prod chunk size; overridable in tests to exercise the
+  // multi-batch streaming path with small fixtures. See MRXNM-94.
+  private batchSize: number = CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS;
 
   constructor(
     private readonly fileRepository: CloningFilesRepository,
@@ -59,21 +73,6 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     return piece === ClonePiece.ScenarioFeaturesData;
   }
 
-  private getUniqueFeaturesNames(
-    featuresData: FeatureDataElement[],
-    opts: { isCustom: boolean },
-  ): string[] {
-    const uniqueNames = new Set<string>();
-    featuresData.forEach(({ apiFeature, featureDataFeature }) => {
-      if (apiFeature.isCustom === opts.isCustom)
-        uniqueNames.add(apiFeature.featureClassName);
-      if (featureDataFeature.isCustom === opts.isCustom)
-        uniqueNames.add(featureDataFeature.featureClassName);
-    });
-
-    return Array.from(uniqueNames);
-  }
-
   private ensureFeaturesWereFound(expected: string[], actual: string[]): void {
     const notFound = expected.filter((name) => !actual.includes(name));
 
@@ -82,113 +81,112 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     }
   }
 
-  private getFeatureMapByClassName(
-    features: FeatureSelectResult[],
-  ): FeatureIdByClassNameMap {
-    const map: FeatureIdByClassNameMap = {};
-    features.forEach((feature) => {
-      map[feature.feature_class_name] = feature.id;
-    });
-
-    return map;
-  }
-
-  private async getFeatureIdByClassNameMaps(
+  /**
+   * Resolves the API feature id for every feature class name referenced by the
+   * batch, populating the (cross-batch) name->id caches. Only class names not
+   * already cached are queried, so on a large import each distinct feature is
+   * looked up once regardless of how many rows reference it.
+   */
+  private async resolveFeatureIdsForBatch(
     projectId: string,
-    customFeaturesNames: string[],
-    platformFeaturesNames: string[],
-  ): Promise<FeatureIdByClassNameMaps> {
-    let customFeatures: FeatureSelectResult[] = [];
-    let platformFeatures: FeatureSelectResult[] = [];
+    batch: FeatureDataElement[],
+    customFeaturesMap: FeatureIdByClassNameMap,
+    platformFeaturesMap: FeatureIdByClassNameMap,
+  ): Promise<void> {
+    const missingCustom = new Set<string>();
+    const missingPlatform = new Set<string>();
 
-    if (customFeaturesNames.length > 0) {
-      customFeatures = await this.apiEntityManager
+    for (const element of batch) {
+      for (const f of [element.apiFeature, element.featureDataFeature]) {
+        const map = f.isCustom ? customFeaturesMap : platformFeaturesMap;
+        const missing = f.isCustom ? missingCustom : missingPlatform;
+        if (map[f.featureClassName] === undefined)
+          missing.add(f.featureClassName);
+      }
+    }
+
+    if (missingCustom.size > 0) {
+      const names = Array.from(missingCustom);
+      const rows: FeatureSelectResult[] = await this.apiEntityManager
         .createQueryBuilder()
         .select('id, feature_class_name')
         .from('features', 'f')
-        .where('feature_class_name IN (:...customFeaturesNames)', {
-          customFeaturesNames,
-        })
+        .where('feature_class_name IN (:...names)', { names })
         .andWhere('project_id = :projectId', { projectId })
         .execute();
-
       this.ensureFeaturesWereFound(
-        customFeaturesNames,
-        customFeatures.map((feature) => feature.feature_class_name),
+        names,
+        rows.map((r) => r.feature_class_name),
       );
+      rows.forEach((r) => {
+        customFeaturesMap[r.feature_class_name] = r.id;
+      });
     }
 
-    if (platformFeaturesNames.length > 0) {
-      platformFeatures = await this.apiEntityManager
+    if (missingPlatform.size > 0) {
+      const names = Array.from(missingPlatform);
+      const rows: FeatureSelectResult[] = await this.apiEntityManager
         .createQueryBuilder()
         .select('id, feature_class_name')
         .from('features', 'f')
-        .where('feature_class_name IN (:...platformFeaturesNames)', {
-          platformFeaturesNames,
-        })
+        .where('feature_class_name IN (:...names)', { names })
         .andWhere('project_id IS NULL')
         .execute();
-
       this.ensureFeaturesWereFound(
-        platformFeaturesNames,
-        platformFeatures.map((feature) => feature.feature_class_name),
+        names,
+        rows.map((r) => r.feature_class_name),
       );
+      rows.forEach((r) => {
+        platformFeaturesMap[r.feature_class_name] = r.id;
+      });
     }
-
-    return {
-      customFeaturesMap: this.getFeatureMapByClassName(customFeatures),
-      platformFeaturesMap: this.getFeatureMapByClassName(platformFeatures),
-    };
   }
 
-  private getFeatureIdsAndHashes(
-    featuresData: FeatureDataElement[],
-    { customFeaturesMap, platformFeaturesMap }: FeatureIdByClassNameMaps,
-  ): string[] {
-    return featuresData.map((feature) => {
-      const { isCustom, featureClassName } = feature.featureDataFeature;
+  /**
+   * Resolves the geo `feature_data` id for every `featureId/hash` combination
+   * referenced by the batch, populating the (cross-batch) cache. Only
+   * combinations not already cached are queried.
+   */
+  private async resolveFeatureDataIdsForBatch(
+    batch: FeatureDataElement[],
+    customFeaturesMap: FeatureIdByClassNameMap,
+    platformFeaturesMap: FeatureIdByClassNameMap,
+    featureDataIdByFeatureIdAndHash: FeatureDataIdByFeatureIdAndHashMap,
+  ): Promise<void> {
+    const missing = new Set<string>();
+    for (const element of batch) {
+      const { isCustom, featureClassName } = element.featureDataFeature;
       const featureId = isCustom
         ? customFeaturesMap[featureClassName]
         : platformFeaturesMap[featureClassName];
-
-      return `${featureId}/${feature.featureDataHash}`;
-    });
-  }
-
-  private async getFeatureDataIdByFeatureIdAndHashMap(
-    fileContent: FeatureDataElement[],
-    featureIdsByClassNameMaps: FeatureIdByClassNameMaps,
-  ): Promise<FeatureDataIdByFeatureIdAndHashMap> {
-    const featureIdAndHashes = this.getFeatureIdsAndHashes(
-      fileContent,
-      featureIdsByClassNameMaps,
-    );
-    let featureData: FeatureDataSelectResult[] = [];
-
-    if (featureIdAndHashes.length > 0) {
-      const records = await Promise.all(
-        chunk(featureIdAndHashes, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
-          (idAndHashes) =>
-            this.geoEntityManager
-              .createQueryBuilder()
-              .select('id', 'featureDataId')
-              .addSelect(`feature_id || '/' || hash`, 'featureIdAndHash')
-              .from(GeoFeatureGeometry, 'fd')
-              .where(`feature_id || '/' || hash IN (:...idAndHashes)`, {
-                idAndHashes,
-              })
-              .execute(),
-        ),
-      );
-      featureData = records.flat();
+      const key = `${featureId}/${element.featureDataHash}`;
+      if (featureDataIdByFeatureIdAndHash[key] === undefined) missing.add(key);
     }
 
-    const map: FeatureDataIdByFeatureIdAndHashMap = {};
-    featureData.forEach(({ featureDataId, featureIdAndHash }) => {
-      map[featureIdAndHash] = featureDataId;
-    });
+    if (missing.size === 0) return;
 
-    return map;
+    const idAndHashesChunks = chunk(
+      Array.from(missing),
+      CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+    );
+    const records = await Promise.all(
+      idAndHashesChunks.map((idAndHashes) =>
+        this.geoEntityManager
+          .createQueryBuilder()
+          .select('id', 'featureDataId')
+          .addSelect(`feature_id || '/' || hash`, 'featureIdAndHash')
+          .from(GeoFeatureGeometry, 'fd')
+          .where(`feature_id || '/' || hash IN (:...idAndHashes)`, {
+            idAndHashes,
+          })
+          .execute(),
+      ),
+    );
+    (records.flat() as FeatureDataSelectResult[]).forEach(
+      ({ featureDataId, featureIdAndHash }) => {
+        featureDataIdByFeatureIdAndHash[featureIdAndHash] = featureDataId;
+      },
+    );
   }
 
   private getScenarioFeaturesDataInsertValues(
@@ -248,6 +246,94 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     };
   }
 
+  /**
+   * Streams the `featuresData` array out of the (potentially hundreds of MB)
+   * clone file and inserts it batch by batch — the whole file is never buffered
+   * or `JSON.parse`d at once. `pipeline` propagates errors from any stage and
+   * destroys every stream on error/early-exit (no leaked file read);
+   * `stream-json`'s batch stage groups elements into arrays of `batchSize` and
+   * iterating them applies backpressure (parsing pauses while a batch is
+   * inserted), keeping the event loop responsive. See MRXNM-94.
+   */
+  private async importFeaturesData(
+    em: EntityManager,
+    readable: Readable,
+    scenarioId: string,
+    projectId: string,
+  ): Promise<void> {
+    const caches: FeatureLookupCaches = {
+      customFeaturesMap: {},
+      platformFeaturesMap: {},
+      featureDataIdByFeatureIdAndHash: {},
+    };
+
+    await pipeline(
+      readable,
+      parser(),
+      pick({ filter: 'featuresData' }),
+      streamArray(),
+      groupIntoBatches({ batchSize: this.batchSize }),
+      async (batches: AsyncIterable<{ value: FeatureDataElement }[]>) => {
+        for await (const items of batches) {
+          await this.insertFeaturesDataBatch(
+            em,
+            items.map(({ value }) => value),
+            caches,
+            scenarioId,
+            projectId,
+          );
+        }
+      },
+    );
+  }
+
+  /** Resolves a batch's lookups (using the shared caches) and inserts it. */
+  private async insertFeaturesDataBatch(
+    em: EntityManager,
+    batch: FeatureDataElement[],
+    caches: FeatureLookupCaches,
+    scenarioId: string,
+    projectId: string,
+  ): Promise<void> {
+    const {
+      customFeaturesMap,
+      platformFeaturesMap,
+      featureDataIdByFeatureIdAndHash,
+    } = caches;
+
+    await this.resolveFeatureIdsForBatch(
+      projectId,
+      batch,
+      customFeaturesMap,
+      platformFeaturesMap,
+    );
+    await this.resolveFeatureDataIdsForBatch(
+      batch,
+      customFeaturesMap,
+      platformFeaturesMap,
+      featureDataIdByFeatureIdAndHash,
+    );
+
+    const { scenarioFeaturesData, outputScenariosFeatureData } =
+      this.getScenarioFeaturesDataInsertValues(
+        batch,
+        { customFeaturesMap, platformFeaturesMap },
+        featureDataIdByFeatureIdAndHash,
+        scenarioId,
+      );
+
+    await em.getRepository(ScenarioFeaturesData).save(scenarioFeaturesData, {
+      chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+    });
+    if (outputScenariosFeatureData.length > 0) {
+      await em
+        .getRepository(OutputScenariosFeaturesDataGeoEntity)
+        .save(outputScenariosFeatureData, {
+          chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+        });
+    }
+  }
+
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { pieceResourceId: scenarioId, projectId, uris, piece } = input;
 
@@ -269,52 +355,11 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
         throw new Error(errorMessage);
       }
 
-      const buffer = await readableToBuffer(readableOrError.right);
-      const stringScenarioFeaturesDataOrError = buffer.toString();
+      const readable = readableOrError.right;
 
-      const { featuresData }: ScenarioFeaturesDataContent = JSON.parse(
-        stringScenarioFeaturesDataOrError,
+      await this.geoEntityManager.transaction((em) =>
+        this.importFeaturesData(em, readable, scenarioId, projectId),
       );
-
-      const customFeaturesName = this.getUniqueFeaturesNames(featuresData, {
-        isCustom: true,
-      });
-      const platformFeaturesName = this.getUniqueFeaturesNames(featuresData, {
-        isCustom: false,
-      });
-
-      const featureIdByClassNameMaps = await this.getFeatureIdByClassNameMaps(
-        projectId,
-        customFeaturesName,
-        platformFeaturesName,
-      );
-
-      const featureDataIdByFeatureIdAndHashMap =
-        await this.getFeatureDataIdByFeatureIdAndHashMap(
-          featuresData,
-          featureIdByClassNameMaps,
-        );
-
-      await this.geoEntityManager.transaction(async (em) => {
-        const scenarioFeaturesDataRepo = em.getRepository(ScenarioFeaturesData);
-        const outputScenariosFeatureDataRepo = em.getRepository(
-          OutputScenariosFeaturesDataGeoEntity,
-        );
-        const { scenarioFeaturesData, outputScenariosFeatureData } =
-          this.getScenarioFeaturesDataInsertValues(
-            featuresData,
-            featureIdByClassNameMaps,
-            featureDataIdByFeatureIdAndHashMap,
-            scenarioId,
-          );
-
-        await scenarioFeaturesDataRepo.save(scenarioFeaturesData, {
-          chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-        });
-        await outputScenariosFeatureDataRepo.save(outputScenariosFeatureData, {
-          chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-        });
-      });
     } catch (e) {
       this.logger.error(e);
       throw e;

@@ -1233,6 +1233,7 @@ __metadata:
     "@types/puppeteer": ^5.4.5
     "@types/slug": ^5.0.3
     "@types/sparkpost": ^2.1.5
+    "@types/stream-json": ^1.7.8
     "@types/supertest": ^2.0.10
     "@types/unzipper": ^0.10.3
     "@types/uuid": 8.3.0
@@ -1292,6 +1293,7 @@ __metadata:
     rxjs: ^7.8.0
     slug: ^5.3.0
     sparkpost: 2.1.4
+    stream-json: ^1.8.0
     stronger-typed-streams: 0.2.0
     supertest: ^6.3.3
     swagger-ui-express: ^4.1.6
@@ -3965,6 +3967,25 @@ __metadata:
   version: 2.0.0
   resolution: "@types/stack-utils@npm:2.0.0"
   checksum: b3fbae25b073116977ecb5c67d22f14567b51a7792403b0bf46e5de8f29bde3bd4ec1626afb22065495ca7f1c699c8bd66720050c94b8f8f9bcefbee79d161fd
+  languageName: node
+  linkType: hard
+
+"@types/stream-chain@npm:*":
+  version: 2.1.0
+  resolution: "@types/stream-chain@npm:2.1.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 0cc764e01abb0d86725081206751f1dd1c52ba147c2d15b03698aa373ad06ff0085afd577b92927347d288539803af78166314a4f50c2d17d275cb911ee92a29
+  languageName: node
+  linkType: hard
+
+"@types/stream-json@npm:^1.7.8":
+  version: 1.7.8
+  resolution: "@types/stream-json@npm:1.7.8"
+  dependencies:
+    "@types/node": "*"
+    "@types/stream-chain": "*"
+  checksum: c36bb76343199bdbc290ca99afa951da0a970b42f2020ec0f1de2224f723f0324e6edbfc156e9b27eb5c60c1153849f8ce5a942979588b7a78401832a48a061d
   languageName: node
   linkType: hard
 
@@ -12840,6 +12861,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"stream-chain@npm:^2.2.5":
+  version: 2.2.5
+  resolution: "stream-chain@npm:2.2.5"
+  checksum: c83cbf504bd11e2bcbe761a92801295b3decac7ffa4092ceffca2eb1b5d0763bcc511fa22cd8044e8a18c21ca66794fd10c8d9cd1292a3e6c0d83a4194c6b8ed
+  languageName: node
+  linkType: hard
+
 "stream-combiner@npm:^0.2.2":
   version: 0.2.2
   resolution: "stream-combiner@npm:0.2.2"
@@ -12847,6 +12875,15 @@ __metadata:
     duplexer: ~0.1.1
     through: ~2.3.4
   checksum: 5d3f4f6dd3604b3c5acf16150eabbbd131247378b54719c39cac5b5793150a92842306f662b58df65f2bd2e64bf8081f21449489591fed440c2b280021474e7d
+  languageName: node
+  linkType: hard
+
+"stream-json@npm:^1.8.0":
+  version: 1.9.1
+  resolution: "stream-json@npm:1.9.1"
+  dependencies:
+    stream-chain: ^2.2.5
+  checksum: 2ebf0648f9ed82ee79727a9a47805231a70d5032e0c21cee3e05cd3c449d3ce49c72b371555447eeef55904bae22ac64be8ae6086fc6cce0b83b3aa617736b64
   languageName: node
   linkType: hard
 
