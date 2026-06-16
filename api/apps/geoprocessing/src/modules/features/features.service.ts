@@ -47,19 +47,45 @@ export class FeatureService {
    * @todo move the string to int transformation to the AdminAreaLevelFilters class
    */
 
-  async buildFeaturesWhereQuery(id: string, bbox?: BBox): Promise<string> {
-    let whereQuery = `feature_id = '${id}'`;
-    const featureDataStableIds: Array<string> = await this.apiEntityManager
-      .createQueryBuilder()
-      .select('feature_data_stable_ids')
-      .from('features', 'f')
-      .where('id = :id', { id })
-      .execute()
-      .then((result) => result?.[0].feature_data_stable_ids);
+  async buildFeaturesWhereQuery(
+    id: string,
+    forProject: boolean,
+    bbox?: BBox,
+  ): Promise<string> {
+    /**
+     * Materialized split features own no `features_data` rows of their own:
+     * their geometries are a subset of the *parent* feature's rows, linked via
+     * the stable ids stored in `(apidb)features.feature_data_stable_ids`. On the
+     * geometry path (`forProject === false`, reading from `features_data`) we
+     * must therefore select rows by `stable_id`, since the split feature's own
+     * `feature_id` matches no rows.
+     *
+     * On the project path (`forProject === true`) tiles are rendered from
+     * `feature_amounts_per_planning_unit`, where amounts are already
+     * materialized per feature id (including for split features); that table has
+     * no `stable_id` column, so we keep filtering by `feature_id` and skip the
+     * stable-id lookup entirely.
+     */
+    const featureDataStableIds: Array<string> | null = forProject
+      ? null
+      : await this.apiEntityManager
+          .createQueryBuilder()
+          .select('feature_data_stable_ids')
+          .from('features', 'f')
+          .where('id = :id', { id })
+          .execute()
+          .then((result) => result?.[0]?.feature_data_stable_ids ?? null);
+
+    let whereQuery =
+      featureDataStableIds && featureDataStableIds.length > 0
+        ? `stable_id = ANY(ARRAY[${featureDataStableIds
+            .map((stableId) => `'${stableId}'`)
+            .join(', ')}]::uuid[])`
+        : `feature_id = '${id}'`;
 
     if (bbox) {
       const { westBbox, eastBbox } = antimeridianBbox(nominatim2bbox(bbox));
-      whereQuery += `AND
+      whereQuery += ` AND
       (st_intersects(
         st_intersection(st_makeenvelope(${eastBbox}, 4326),
         ST_MakeEnvelope(0, -90, 180, 90, 4326)),
@@ -71,12 +97,6 @@ export class FeatureService {
       ))`;
     }
 
-    if (featureDataStableIds?.length > 0) {
-      const formattedIds = featureDataStableIds
-        .map((id) => `'${id}'`)
-        .join(', ');
-      whereQuery += `AND feature_data_stable_ids = ANY(ARRAY[${formattedIds}]::uuid[])`;
-    }
     return whereQuery;
   }
 
@@ -103,10 +123,15 @@ export class FeatureService {
                  INNER JOIN planning_units_geom pug on pug.id=ppu.geom_id)`
       : `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, ${simplificationLevel}) as the_geom,
                  (coalesce(properties,'{}'::jsonb) || jsonb_build_object('amount', amount)) as properties,
-                 feature_id
+                 feature_id,
+                 stable_id
                  from "${this.featuresRepository.metadata.tableName}")`;
 
-    const customQuery = await this.buildFeaturesWhereQuery(id, bbox);
+    const customQuery = await this.buildFeaturesWhereQuery(
+      id,
+      forProject,
+      bbox,
+    );
     return this.tileService.getTile({
       z,
       x,
