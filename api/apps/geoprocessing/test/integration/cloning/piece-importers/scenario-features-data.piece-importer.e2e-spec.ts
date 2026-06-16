@@ -86,6 +86,18 @@ describe(ScenarioFeaturesDataPieceImporter, () => {
       .WhenPieceImporterIsInvoked(input)
       .ThenScenarioFeaturesDataShouldBeImported();
   });
+
+  it('imports scenario features data across multiple batches (MRXNM-94)', async () => {
+    await fixtures.GivenScenario();
+    const archiveLocation = await fixtures.GivenValidScenarioFeaturesDataFile();
+    const input = fixtures.GivenJobInput(archiveLocation);
+    // Force many small batches so the streaming flush + cross-batch cache path
+    // is exercised with the tiny fixture instead of a 1.14M-row file.
+    fixtures.GivenABatchSizeSmallerThanTheNumberOfRecords();
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenScenarioFeaturesDataShouldBeImported();
+  });
 });
 
 const getFixtures = async () => {
@@ -155,6 +167,11 @@ const getFixtures = async () => {
         projectId,
         organizationId,
       ),
+    GivenABatchSizeSmallerThanTheNumberOfRecords: () => {
+      // The valid fixture creates (3 custom + 2 platform) x 3 = 15 records;
+      // a batch size of 2 forces 8 flushes, exercising the multi-batch path.
+      (sut as unknown as { batchSize: number }).batchSize = 2;
+    },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioFeaturesData,
