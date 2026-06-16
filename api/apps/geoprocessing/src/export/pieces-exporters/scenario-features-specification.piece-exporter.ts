@@ -221,15 +221,47 @@ export class ScenarioFeaturesSpecificationPieceExporter
         input.resourceId,
       );
 
+    /**
+     * Export only the active and candidate specifications, not every historical
+     * snapshot. Each time a specification is (re)computed a brand new full
+     * snapshot of all feature configs is written and previous snapshots are
+     * never pruned, so a heavily-edited scenario accumulates many stale
+     * specifications. `specification_feature_configs.features` holds a large
+     * per-feature calculated payload, so loading every snapshot inflates heap
+     * usage to several GB and crashes the exporter (`JavaScript heap out of
+     * memory`) on large scenarios. A clone only needs the active/candidate
+     * specifications to reproduce the scenario: the importer keys off the
+     * active/candidate flags, and every scenario_features_data row references
+     * the active specification (stale snapshots have no references), so
+     * dropping them changes no scenario_features_data -> specification linkage.
+     * This is a deliberate "stop cloning stale specification history" change.
+     * See MRXNM-21.
+     */
+    const wantedSpecificationIds = [
+      ...new Set(
+        [
+          scenarioSpecificationIds.active,
+          scenarioSpecificationIds.candidate,
+        ].filter((id): id is string => isDefined(id)),
+      ),
+    ];
+
     const specifications: SelectSpecificationsResult[] =
-      await this.apiEntityManager
-        .createQueryBuilder()
-        .select('id')
-        .addSelect('draft')
-        .addSelect('raw')
-        .from('specifications', 's')
-        .where('scenario_id = :scenarioId', { scenarioId: input.resourceId })
-        .execute();
+      wantedSpecificationIds.length === 0
+        ? []
+        : await this.apiEntityManager
+            .createQueryBuilder()
+            .select('id')
+            .addSelect('draft')
+            .addSelect('raw')
+            .from('specifications', 's')
+            .where('scenario_id = :scenarioId', {
+              scenarioId: input.resourceId,
+            })
+            .andWhere('id IN (:...wantedSpecificationIds)', {
+              wantedSpecificationIds,
+            })
+            .execute();
     const specificationIds = specifications.map(
       (specification) => specification.id,
     );
