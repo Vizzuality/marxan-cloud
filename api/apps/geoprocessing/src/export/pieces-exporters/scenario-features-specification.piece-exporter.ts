@@ -16,7 +16,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { EntityManager } from 'typeorm/entity-manager/EntityManager';
 import {
   ExportPieceProcessor,
@@ -41,7 +41,10 @@ type SelectSpecificationsResult = {
   raw: Record<string, unknown>;
 };
 
-type ScenarioFeaturesDataById = Record<string, ScenarioFeaturesData>;
+// Maps a scenario_features_data.id (uuid) to its integer marxan featureId.
+// We deliberately keep only the integer id here instead of the full entity:
+// see the query in `run()` (MRXNM-21).
+type ScenarioFeaturesDataById = Record<string, number>;
 
 type SelectScenarioFeaturesConfigs = {
   specificationId: string;
@@ -123,12 +126,12 @@ export class ScenarioFeaturesSpecificationPieceExporter
   }
 
   private getScenarioFeaturesDataById(
-    scenarioFeaturesData: ScenarioFeaturesData[],
+    scenarioFeaturesData: { id: string; featureId: number }[],
   ) {
     const scenarioFeaturesDataById: ScenarioFeaturesDataById = {};
 
-    scenarioFeaturesData.forEach((feature) => {
-      scenarioFeaturesDataById[feature.id] = feature;
+    scenarioFeaturesData.forEach(({ id, featureId }) => {
+      scenarioFeaturesDataById[id] = featureId;
     });
 
     return scenarioFeaturesDataById;
@@ -176,11 +179,12 @@ export class ScenarioFeaturesSpecificationPieceExporter
         // config.features array should be filtered here. In practice, only the features
         // array of the last non-draft feature specification config will be exported
         features: config.features
-          .filter(({ featureId }) =>
-            Boolean(scenarioFeaturesDataById[featureId]),
+          .filter(
+            ({ featureId }) =>
+              scenarioFeaturesDataById[featureId] !== undefined,
           )
           .map(({ calculated, featureId }) => ({
-            featureId: scenarioFeaturesDataById[featureId].featureId,
+            featureId: scenarioFeaturesDataById[featureId],
             calculated,
           })),
       };
@@ -268,13 +272,30 @@ export class ScenarioFeaturesSpecificationPieceExporter
     let fileContent: ScenarioFeaturesSpecificationContent[] = [];
 
     if (specifications.length) {
-      const scenarioFeaturesData = await this.scenarioFeaturesDataRepo.find({
-        where: {
-          specificationId: In(specificationIds),
-          scenarioId: input.resourceId,
-        },
-        relations: ['featureData'],
-      });
+      /**
+       * Only the scenario_features_data `id -> integer featureId` mapping is
+       * used below (to translate the specification config feature ids). The
+       * previous `.find({ relations: ['featureData'] })` hydrated every
+       * matching row as a full TypeORM entity AND eagerly loaded the heavy
+       * `featureData` (GeoFeatureGeometry) relation — which is never read here.
+       * On large scenarios the active specification references ~1.14M
+       * scenario_features_data rows, so this materialised millions of entities
+       * and spiked the heap to several GB, blocking the event loop long enough
+       * for the liveness probe to kill the pod mid-export. Selecting just the
+       * two scalar columns we actually need keeps memory flat. See MRXNM-21.
+       */
+      const scenarioFeaturesData: { id: string; featureId: number }[] =
+        await this.scenarioFeaturesDataRepo
+          .createQueryBuilder('sfd')
+          .select('sfd.id', 'id')
+          .addSelect('sfd.featureId', 'featureId')
+          .where('sfd.specificationId IN (:...specificationIds)', {
+            specificationIds,
+          })
+          .andWhere('sfd.scenarioId = :scenarioId', {
+            scenarioId: input.resourceId,
+          })
+          .getRawMany();
 
       const scenarioFeaturesDataById =
         this.getScenarioFeaturesDataById(scenarioFeaturesData);
