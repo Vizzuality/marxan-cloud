@@ -88,6 +88,19 @@ describe(ScenarioFeaturesSpecificationPieceExporter, () => {
       .WhenPieceExporterIsInvoked(input)
       .ThenSavedFileHasConfigsArrayForEachSpecification();
   });
+
+  it('exports only the active/candidate specification, dropping stale snapshots (MRXNM-21)', async () => {
+    const input = fixtures.GivenAScenarioFeaturesSpecificationExportJob();
+    await fixtures.GivenScenarioExist();
+    await fixtures.GivenCustomFeatureExist();
+    await fixtures.GivenScenarioSpecification();
+    await fixtures.GivenScenarioFeaturesDataExist();
+    await fixtures.GivenScenarioSpecificationFeaturesConfigExist(2);
+    await fixtures.GivenStaleSpecificationsAlsoExist();
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenOnlyTheActiveAndCandidateSpecificationIsSaved();
+  });
 });
 
 const getFixtures = async () => {
@@ -237,6 +250,27 @@ const getFixtures = async () => {
         { features: JSON.stringify(features) },
       );
     },
+    GivenStaleSpecificationsAlsoExist: async () => {
+      // Extra non-active/non-candidate specifications (with their own configs),
+      // mirroring the stale snapshots that accumulate on heavily-edited
+      // scenarios. The exporter must NOT include these. See MRXNM-21.
+      const staleSpecifications = await GivenSpecifications(
+        apiEntityManager,
+        [feature.id, feature.id],
+        scenarioId,
+      );
+      const features = scenarioFeatureDataIds.map((featureId) => ({
+        featureId,
+        calculated: true,
+      }));
+      await GivenSpecificationFeaturesConfig(
+        apiEntityManager,
+        feature.id,
+        staleSpecifications,
+        2,
+        { features: JSON.stringify(features) },
+      );
+    },
     GivenNoScenarioFeaturesSpecification: async (): Promise<void> => {},
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
@@ -325,6 +359,21 @@ const getFixtures = async () => {
             expect(Array.isArray(spec.configs)).toBe(true);
             expect(spec.configs).toEqual([]);
           });
+        },
+        ThenOnlyTheActiveAndCandidateSpecificationIsSaved: async () => {
+          const result = await sut.run(input);
+          const file = await fileRepository.get(result.uris[0].uri);
+          expect((file as Right<Readable>).right).toBeDefined();
+          if (isLeft(file)) throw new Error();
+          const content =
+            await readSavedFile<ScenarioFeaturesSpecificationContent[]>(
+              file.right,
+            );
+          // Only the active (== candidate) specification is exported; the stale
+          // snapshots are dropped. See MRXNM-21.
+          expect(content).toHaveLength(1);
+          expect(content[0].activeSpecification).toEqual(true);
+          expect(content[0].candidateSpecification).toEqual(true);
         },
       };
     },

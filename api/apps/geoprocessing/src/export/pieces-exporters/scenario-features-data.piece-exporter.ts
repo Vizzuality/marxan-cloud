@@ -30,18 +30,25 @@ type OutputScenarioFeaturesDataSelectResult = OutputFeatureDataElement & {
   scenarioFeaturesId: string;
 };
 
-type FeatureDataElementWithFeatureId = Omit<
-  FeatureDataElement,
-  'apiFeature' | 'featureDataFeature'
-> & {
+/**
+ * Raw row shape returned by the scenario_features_data QueryBuilder below.
+ * Keys match the second argument passed to `.select`/`.addSelect`.
+ */
+type ScenarioFeaturesDataRawRow = {
   sfdId: string;
   apiFeatureId: string;
+  featureId: number;
+  currentArea: number;
+  totalArea: number;
+  fpf?: number;
+  metadata?: Record<'sepdistance', number | string>;
+  prop?: number;
+  sepNum?: number;
+  target2?: number;
+  target?: number;
+  targetocc?: number;
   featureDataFeatureId: string;
-};
-
-type FeatureDataElementWithIsCustom = FeatureDataElementWithFeatureId & {
-  apiFeature: { isCustom: boolean; featureClassName: string };
-  featureDataFeature: { isCustom: boolean; featureClassName: string };
+  featureDataHash: string;
 };
 
 @Injectable()
@@ -63,106 +70,48 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
     return piece === ClonePiece.ScenarioFeaturesData;
   }
 
-  private parseScenarioFeaturesDataToFeatureDataElementWithFeatureId(
-    scenarioFeaturesData: ScenarioFeaturesData[],
-  ): FeatureDataElementWithFeatureId[] {
-    return scenarioFeaturesData
-      .filter((sfd) => sfd.featureData.featureId)
-      .map((sfd) => ({
-        sfdId: sfd.id,
-        apiFeatureId: sfd.apiFeatureId,
-        featureDataFeatureId: sfd.featureData.featureId!,
-        currentArea: sfd.currentArea,
-        featureDataHash: sfd.featureData.hash,
-        featureId: sfd.featureId,
-        specificationId: undefined,
-        totalArea: sfd.totalArea,
-        fpf: sfd.fpf,
-        metadata: sfd.metadata,
-        prop: sfd.prop,
-        sepNum: sfd.sepNum,
-        target2: sfd.target2,
-        target: sfd.target,
-        targetocc: sfd.targetocc,
-        outputFeaturesData: [],
-      }));
-  }
-
-  private getScenarioFeaturesDataWithIsCustom(
-    featuresDataWithFeatureId: FeatureDataElementWithFeatureId[],
-    features: FeaturesSelectResult[],
-  ): FeatureDataElementWithIsCustom[] {
-    const featurePropertiesById: Record<
-      string,
-      Omit<FeaturesSelectResult, 'id'>
-    > = {};
-    features.forEach(({ id, feature_class_name, is_custom }) => {
-      featurePropertiesById[id] = { feature_class_name, is_custom };
-    });
-
-    return featuresDataWithFeatureId.map((el) => {
-      const apiFeatureProperties = featurePropertiesById[el.apiFeatureId];
-      const featureDataFeatureProperties =
-        featurePropertiesById[el.featureDataFeatureId];
-
-      if (!apiFeatureProperties)
-        throw new Error(
-          `Feature properties not found for feature with id ${el.apiFeatureId}`,
-        );
-
-      if (!featureDataFeatureProperties)
-        throw new Error(
-          `Feature properties not found for feature with id ${el.featureDataFeatureId}`,
-        );
-      return {
-        ...el,
-        apiFeature: {
-          isCustom: apiFeatureProperties.is_custom,
-          featureClassName: apiFeatureProperties.feature_class_name ?? '',
-        },
-        featureDataFeature: {
-          isCustom: featureDataFeatureProperties.is_custom,
-          featureClassName:
-            featureDataFeatureProperties.feature_class_name ?? '',
-        },
-      };
-    });
-  }
-
-  private getFileContent(
-    scenarioFeaturesDataWithIsCustom: FeatureDataElementWithIsCustom[],
-    outputScenariosFeaturesData: OutputScenarioFeaturesDataSelectResult[],
-  ): ScenarioFeaturesDataContent {
-    const featuresData: FeatureDataElement[] = [];
-
-    scenarioFeaturesDataWithIsCustom.forEach(
-      ({ sfdId, apiFeatureId, featureDataFeatureId, ...sfd }) => {
-        const outputData = outputScenariosFeaturesData.filter(
-          (el) => el.scenarioFeaturesId === sfdId,
-        );
-        featuresData.push({
-          ...sfd,
-          outputFeaturesData: outputData.map(
-            ({ scenarioFeaturesId, ...rest }) => ({
-              ...rest,
-            }),
-          ),
-        });
-      },
-    );
-
-    return {
-      featuresData,
-    };
-  }
-
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const scenarioFeaturesData = await this.geoprocessingEntityManager
-      .getRepository(ScenarioFeaturesData)
-      .find({
-        where: { scenarioId: input.resourceId },
-        relations: ['featureData'],
-      });
+    /**
+     * Memory/CPU efficiency (MRXNM-21):
+     *
+     * Large scenarios produce ~1.14M scenario_features_data rows
+     * (14.5k planning units x 79 features). The previous implementation:
+     *   1. Hydrated every row as a TypeORM entity with its `featureData`
+     *      relation (a heavy object graph kept fully in memory).
+     *   2. Ran a nested `.filter(...)` over the output rows for EACH sfd row,
+     *      i.e. O(N x M) ~= 1.14M x 7.9k comparisons (a CPU + GC bomb).
+     *   3. Built several full-size intermediate arrays simultaneously.
+     * All three caused the exporter to OOM.
+     *
+     * This rewrite instead:
+     *   - Reads plain rows via `.getRawMany()` (no entity hydration).
+     *   - Indexes the output rows once into a Map for O(1) lookups.
+     *   - Produces the final `featuresData` array in a single pass.
+     * The output file shape (`ScenarioFeaturesDataContent`) is unchanged so
+     * the importer keeps working as-is.
+     */
+    const rows: ScenarioFeaturesDataRawRow[] =
+      await this.geoprocessingEntityManager
+        .createQueryBuilder(ScenarioFeaturesData, 'sfd')
+        .innerJoin('sfd.featureData', 'fd')
+        .select('sfd.id', 'sfdId')
+        .addSelect('sfd.apiFeatureId', 'apiFeatureId')
+        .addSelect('sfd.featureId', 'featureId') // integer marxan feature id
+        .addSelect('sfd.currentArea', 'currentArea')
+        .addSelect('sfd.totalArea', 'totalArea')
+        .addSelect('sfd.fpf', 'fpf')
+        .addSelect('sfd.metadata', 'metadata')
+        .addSelect('sfd.prop', 'prop')
+        .addSelect('sfd.sepNum', 'sepNum')
+        .addSelect('sfd.target2', 'target2')
+        .addSelect('sfd.target', 'target')
+        .addSelect('sfd.targetocc', 'targetocc')
+        .addSelect('fd.featureId', 'featureDataFeatureId') // uuid (features.id)
+        .addSelect('fd.hash', 'featureDataHash')
+        .where('sfd.scenarioId = :scenarioId', { scenarioId: input.resourceId })
+        // Replicates the old `.filter((sfd) => sfd.featureData.featureId)`
+        .andWhere('fd.featureId IS NOT NULL')
+        .getRawMany();
 
     const outputScenariosFeaturesData: OutputScenarioFeaturesDataSelectResult[] =
       await this.geoprocessingEntityManager
@@ -186,16 +135,23 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
         })
         .execute();
 
-    const scenarioFeaturesDataWithFeatureId =
-      this.parseScenarioFeaturesDataToFeatureDataElementWithFeatureId(
-        scenarioFeaturesData,
-      );
+    // Index output rows by scenarioFeaturesId once -> O(1) lookups per sfd row.
+    const outputDataBySfdId = new Map<string, OutputFeatureDataElement[]>();
+    for (const {
+      scenarioFeaturesId,
+      ...outputData
+    } of outputScenariosFeaturesData) {
+      const existing = outputDataBySfdId.get(scenarioFeaturesId);
+      if (existing) {
+        existing.push(outputData);
+      } else {
+        outputDataBySfdId.set(scenarioFeaturesId, [outputData]);
+      }
+    }
+
     const featuresIds = [
       ...new Set<string>(
-        scenarioFeaturesDataWithFeatureId.flatMap((sfd) => [
-          sfd.apiFeatureId,
-          sfd.featureDataFeatureId,
-        ]),
+        rows.flatMap((row) => [row.apiFeatureId, row.featureDataFeatureId]),
       ),
     ];
 
@@ -212,16 +168,58 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
         .execute();
     }
 
-    const scenarioFeaturesDataWithIsCustom =
-      this.getScenarioFeaturesDataWithIsCustom(
-        scenarioFeaturesDataWithFeatureId,
-        features,
-      );
+    const featurePropertiesById: Record<
+      string,
+      Omit<FeaturesSelectResult, 'id'>
+    > = {};
+    features.forEach(({ id, feature_class_name, is_custom }) => {
+      featurePropertiesById[id] = { feature_class_name, is_custom };
+    });
 
-    const fileContent = this.getFileContent(
-      scenarioFeaturesDataWithIsCustom,
-      outputScenariosFeaturesData,
-    );
+    const featuresData: FeatureDataElement[] = rows.map((row) => {
+      const apiFeatureProperties = featurePropertiesById[row.apiFeatureId];
+      const featureDataFeatureProperties =
+        featurePropertiesById[row.featureDataFeatureId];
+
+      if (!apiFeatureProperties)
+        throw new Error(
+          `Feature properties not found for feature with id ${row.apiFeatureId}`,
+        );
+
+      if (!featureDataFeatureProperties)
+        throw new Error(
+          `Feature properties not found for feature with id ${row.featureDataFeatureId}`,
+        );
+
+      return {
+        currentArea: row.currentArea,
+        featureDataHash: row.featureDataHash,
+        featureId: row.featureId,
+        specificationId: undefined,
+        totalArea: row.totalArea,
+        fpf: row.fpf,
+        metadata: row.metadata,
+        prop: row.prop,
+        sepNum: row.sepNum,
+        target2: row.target2,
+        target: row.target,
+        targetocc: row.targetocc,
+        apiFeature: {
+          isCustom: apiFeatureProperties.is_custom,
+          featureClassName: apiFeatureProperties.feature_class_name ?? '',
+        },
+        featureDataFeature: {
+          isCustom: featureDataFeatureProperties.is_custom,
+          featureClassName:
+            featureDataFeatureProperties.feature_class_name ?? '',
+        },
+        outputFeaturesData: outputDataBySfdId.get(row.sfdId) ?? [],
+      };
+    });
+
+    const fileContent: ScenarioFeaturesDataContent = {
+      featuresData,
+    };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
       ClonePiece.ScenarioFeaturesData,
