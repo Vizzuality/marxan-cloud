@@ -205,6 +205,22 @@ const getFixtures = async () => {
             data.length * recordsOfOutputDataForEachScenarioFeaturesData,
           );
 
+          // Every scenario features data record must carry exactly its own
+          // output data, proving the per-sfd Map lookup (MRXNM-21 rewrite)
+          // resolves the same association the previous nested filter did.
+          expect(
+            data.every(
+              (record) =>
+                record.outputFeaturesData.length ===
+                  recordsOfOutputDataForEachScenarioFeaturesData &&
+                record.outputFeaturesData.every(
+                  (output) =>
+                    typeof output.runId === 'number' &&
+                    output.totalArea === 1000,
+                ),
+            ),
+          ).toBe(true);
+
           expect(
             data.every(
               (sfd) =>
@@ -212,7 +228,7 @@ const getFixtures = async () => {
                   sfd.featureDataFeature.featureClassName &&
                 sfd.apiFeature.isCustom === sfd.featureDataFeature.isCustom,
             ),
-          );
+          ).toBe(true);
         },
       };
     },
