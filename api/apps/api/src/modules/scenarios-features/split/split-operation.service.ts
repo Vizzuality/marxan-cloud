@@ -61,13 +61,21 @@ export class SplitOperation {
         scenarioFeaturePreparationIds.push(
           ...scenarioFeaturePreparationIdsForFeature,
         );
+        // Link the split feature to the FULL key/value-matching subset of the
+        // parent's features_data rows — not the bbox-filtered scenario-prep rows
+        // SplitQuery returns. This matches how splits render (the full class) and
+        // the legacy backport; amounts are planning-unit-bounded, so the broader
+        // set is harmless. Value match mirrors SplitQuery's.
+        const { baseFeatureId, splitByProperty, subset } =
+          singleSplitFeatureWithId.singleSplitFeature;
         const featureDataStableIds = await this.geoEntityManager.query(
-          'select stable_id from features_data where id = any($1)',
-          [
-            scenarioFeaturePreparationIdsForFeature.map(
-              (i) => i.features_data_id,
-            ),
-          ],
+          `select fd.stable_id
+             from feature_properties_kv fpkv
+             join features_data fd on fd.id = fpkv.feature_data_id
+            where fpkv.feature_id = $1
+              and fpkv.key = $2
+              and trim('"' from fpkv.value::text) = trim('"' from $3::text)`,
+          [baseFeatureId, splitByProperty, subset?.value],
         );
         await this.splitCreateFeatures.setFeatureDataStableIdsForFeature(
           singleSplitFeatureWithId.id,
