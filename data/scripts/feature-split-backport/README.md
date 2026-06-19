@@ -1,11 +1,18 @@
-# Backport `feature_data_stable_ids` for legacy split features [MRXNM-82]
+# Restore legacy split features [MRXNM-82]
 
-Legacy materialized split features (`(apidb)features` rows with
-`from_geoprocessing_ops->>'operation' = 'split'`) were created before the
-materialized-splits work and have an empty `feature_data_stable_ids`. The new
-code renders them with no geometry. `backport_feature_data_stable_ids.py`
-reconstructs that linkage from the parent feature's
-`(geodb)feature_properties_kv` → `features_data.stable_id`.
+Two one-off scripts that repair legacy materialized split features
+(`(apidb)features` rows with `from_geoprocessing_ops->>'operation' = 'split'`)
+created before the materialized-splits work:
+
+1. **`backport_feature_data_stable_ids.py`** — relinks geometry: populates the
+   empty `features.feature_data_stable_ids` from the parent feature's
+   `(geodb)feature_properties_kv` -> `features_data.stable_id`.
+2. **`backfill_split_feature_amounts.py`** — recomputes the per-planning-unit
+   amounts (`feature_amounts_per_planning_unit`) for the subset of live splits
+   that never had them.
+
+New splits created by the current `split-operation` code need NEITHER — they get
+both at creation. These scripts only touch pre-existing legacy splits.
 
 ## Subset definition (decided 2026-06-18)
 
@@ -22,7 +29,7 @@ rows — NOT bbox-filtered. Rationale:
 
 Value match mirrors `SplitQuery`: `trim('"' FROM fpkv.value::text)`.
 
-## Usage
+## Phase 1 — geometry backport (`backport_feature_data_stable_ids.py`)
 
 ```bash
 # via the bastion tunnel (staging->9432, prod->9433), dry-run (default):
@@ -30,45 +37,72 @@ python3 backport_feature_data_stable_ids.py --env staging
 python3 backport_feature_data_stable_ids.py --env production
 # commit:
 python3 backport_feature_data_stable_ids.py --env production --apply
-# Nectar / any host — pass connection explicitly (password via ~/.pgpass):
-python3 backport_feature_data_stable_ids.py \
-  --host <h> --port 5432 \
-  --api-db marxan-api --api-user marxan-api \
-  --geo-db marxan-geo-api --geo-user marxan-geo-api --apply
 ```
 
 Additive + idempotent (only touches splits whose array is NULL/empty). Dry-run
 rolls back. Reconstructions that return 0 rows are SKIPPED and reported, never
 written as an empty array.
 
-## Production dry-run findings (2026-06-18, Azure prod)
+## Phase 2 — amounts backfill (`backfill_split_feature_amounts.py`)
 
-639 split features total:
+Phase 1 makes a split render via the **raw-geometry** tile path
+(`forProject=false`, by `stable_id`). But the scenario **abundance** view renders
+via the `forProject=true` path, which reads `feature_amounts_per_planning_unit`
+by `feature_id`. Most legacy splits already have those amounts (their values
+*were* calculated at scenario time); some live ones never got them and stay blank
+in the abundance view until recomputed.
 
-| Outcome | Count |
-|---|---|
-| Reconstructable → backported | **463** (1–58,820 ids each; median 2; ~3.27M ids total) |
-| Skipped — parent has no `features_data` (orphaned) | 154 |
-| Skipped — no `value` in `from_geoprocessing_ops` | 22 |
+This script computes & inserts those per-PU amounts, mirroring
+`ComputeArea.computeAreaPerPlanningUnitOfFeature` /
+`FeatureAmountsPerPlanningUnitService.computeMarxanAmountPerPlanningUnit`
+(ST_Union of the `features_data` matched by `stable_id`, `&&` prefilter, then
+`ST_Area(ST_Transform(ST_Intersection(...),3410))`, keeping `amount > 0`).
 
-- The **176 skipped** splits are pre-existing broken data the backport cannot
-  fix (their source geometry is gone, or they have no split value). They also
-  have no stored amounts — empty shells. Decide separately (delete / leave).
-- **112 reconstructable splits have >10k stable ids (max 58,820).** See the tile
-  perf follow-up below.
+**Safety / scope** — only touches a feature when ALL hold: `operation = 'split'`
+**and** `feature_data_stable_ids` non-empty **and** it has NO
+`feature_amounts_per_planning_unit` rows yet. Each compute is scoped to that one
+feature's own `stable_ids` and its own project's planning units, so it can never
+write amounts for any other feature. Dry-run default; idempotent;
+`--only-feature` / `--limit` / `--skip-legacy-projects` flags. It reads the
+`stable_ids` phase 1 writes, so **run it after the backport.** `amount_min/max`
+is intentionally not set (NULL even for working splits; not needed for rendering).
+
+## Production findings (2026-06-18 / amounts cut 2026-06-19, Azure prod)
+
+639 split features total. Backport reconstructs **463**; cross-referenced with
+`feature_amounts_per_planning_unit`:
+
+| Bucket | Count | Action |
+|---|---|---|
+| Reconstructable **+ has amounts** | **422** | phase 1 alone — fully restored |
+| Reconstructable **- amounts** (live, non-draft scenarios) | **41** | phase 1 **+** phase 2 |
+| Broken — 0 K/V rows (154) or no `value` (22), no amounts | **176** | delete (data cleanup) |
+
+(422 + 41 + 176 = 639; backport ids range 1–58,820, median 2, ~3.27M total.)
+
+## Nectar runbook
+
+```bash
+# phase 1 — relink geometry for all 463 reconstructable splits
+python3 backport_feature_data_stable_ids.py --host <h> --port 5432 \
+  --api-db marxan-api --api-user marxan-api \
+  --geo-db marxan-geo-api --geo-user marxan-geo-api --apply
+# phase 2 — amounts for the 41 live-but-amount-less (auto-targeted by the filter)
+python3 backfill_split_feature_amounts.py --host <h> --port 5432 \
+  --api-db marxan-api --api-user marxan-api \
+  --geo-db marxan-geo-api --geo-user marxan-geo-api --apply
+```
+
+Validated on staging (2026-06-19): phase 1 relinked the one Spain split (5485
+ids); phase 2 dry-run computed its amounts (2 PU rows); a fresh UI split on the
+Rwanda project rendered correctly (geometry + amounts), confirming the
+steady-state path.
 
 ## Open follow-ups
 
-1. **Tile perf for large-array splits.** `FeatureService.buildFeaturesWhereQuery`
-   (fix in commit on `fix/mrxnm-82-split-feature-tiles`) emits
-   `stable_id = ANY(ARRAY[...]::uuid[])` inline. For 10k–58k-element arrays this
-   is multi-MB SQL per tile and won't scale. Needs a better predicate (join
-   against a values set / temp table, or re-derive) before those splits render
-   in production.
-2. **New-code alignment (note to Andrés).** `split-operation.service.ts` sets
-   `feature_data_stable_ids` from the **bbox-filtered** `SplitQuery` result. By
-   the rationale above that's an over-constraint (and rides the `nominatim2bbox`
-   debt): new splits would render narrower / mis-placed vs legacy ones. Suggest
-   deriving from the full K/V subset there too, so new + backported splits match.
-3. **Orphaned/valueless splits (176).** Data-quality cleanup, independent of this
-   backport.
+1. **Tile perf for large-array splits — [MRXNM-97].** `buildFeaturesWhereQuery`
+   emits `stable_id = ANY(ARRAY[...])` inline; 112 reconstructable splits have
+   >10k ids (max 58,820) → multi-MB SQL per tile. Needs a better predicate
+   (values set / temp table, or re-derive) before those render in prod.
+2. **Broken/dead splits (176).** Data-quality cleanup, independent of these
+   scripts (no geometry to reconstruct, no amounts). Delete candidates.
