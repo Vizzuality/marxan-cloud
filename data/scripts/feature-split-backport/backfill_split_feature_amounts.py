@@ -1,0 +1,235 @@
+#!/usr/bin/env python3
+"""
+Backfill `feature_amounts_per_planning_unit` for legacy SPLIT features that have
+geometry (`features.feature_data_stable_ids`, e.g. after the stable-id backport)
+but never had their per-planning-unit amounts computed [MRXNM-82].
+
+WHY
+---
+A materialized split renders in two ways:
+  * raw geometry  -> tile path `forProject=false`, filters `features_data` by
+    `stable_id` (fixed by the stable-id backport);
+  * abundance/amounts -> tile path `forProject=true`, reads
+    `feature_amounts_per_planning_unit` by `feature_id`.
+Some legacy live splits have geometry-reconstructable `stable_ids` (after the
+backport) yet were never materialized into `feature_amounts_per_planning_unit`,
+so they stay blank in the scenario amounts view. This computes & inserts those
+amounts, mirroring `ComputeArea.computeAreaPerPlanningUnitOfFeature` ->
+`FeatureAmountsPerPlanningUnitService.computeMarxanAmountPerPlanningUnit`.
+
+SCOPE / SAFETY (limited to the relevant split features only)
+------------------------------------------------------------
+A feature is processed ONLY if ALL hold:
+  * from_geoprocessing_ops->>'operation' = 'split'   (split features only)
+  * feature_data_stable_ids is non-empty             (geometry present)
+  * it has NO rows in feature_amounts_per_planning_unit yet (the gap; idempotent)
+The amount computation is run PER FEATURE, scoped to that feature's OWN
+stable_ids and its OWN project's planning units -> it can never write amounts for
+any other feature. Non-split features are never read or touched.
+
+NOTE: the API code path SKIPS `legacyImport`-source projects. This script does
+not special-case sources by default because every in-scope prod split lives in a
+`marxan_cloud` project; pass --skip-legacy-projects to enforce the skip anyway.
+
+ORDER: run AFTER `backport_feature_data_stable_ids.py` (this reads the stable_ids
+that backport writes). Dry-run by default (rolls back); --apply to commit.
+Idempotent. `amount_min/max` is intentionally NOT set (it is NULL even for the
+working splits and is not needed for rendering).
+
+USAGE
+-----
+  # via the bastion tunnel (staging->9432, prod->9433), dry-run:
+  python3 backfill_split_feature_amounts.py --env staging
+  python3 backfill_split_feature_amounts.py --env production
+  # rehearse a single feature, then commit:
+  python3 backfill_split_feature_amounts.py --env staging --only-feature <id>
+  python3 backfill_split_feature_amounts.py --env production --apply
+  # Nectar / any host -- pass connection explicitly:
+  python3 backfill_split_feature_amounts.py \
+      --host <h> --port 5432 \
+      --api-db marxan-api --api-user marxan-api \
+      --geo-db marxan-geo-api --geo-user marxan-geo-api --apply
+"""
+import argparse
+import sys
+
+import psycopg2
+import psycopg2.extras
+
+# Azure-tunnel presets (api DB and geo DB live on the same server / port per env).
+ENV_PRESETS = {
+    "staging": {
+        "port": 9432,
+        "api_db": "api-staging", "api_user": "api-staging",
+        "geo_db": "geoprocessing-staging", "geo_user": "geoprocessing-staging",
+    },
+    "production": {
+        "port": 9433,
+        "api_db": "api-production", "api_user": "api-production",
+        "geo_db": "geoprocessing-production", "geo_user": "geoprocessing-production",
+    },
+}
+
+# Candidate split features (api DB). stable_ids cast to text[] so psycopg2 parses
+# it to a Python list (a bare uuid[] would come back as the raw '{...}' string).
+FIND_TARGETS_SQL = """
+    SELECT f.id,
+           f.project_id,
+           f.feature_class_name,
+           f.feature_data_stable_ids::text[] AS stable_ids,
+           p.sources::text                   AS project_sources
+    FROM features f
+    JOIN projects p ON p.id = f.project_id
+    WHERE f.from_geoprocessing_ops->>'operation' = 'split'
+      AND f.feature_data_stable_ids IS NOT NULL
+      AND cardinality(f.feature_data_stable_ids) > 0
+    ORDER BY f.project_id, f.id
+"""
+
+# Already has amounts? (geo DB) -> skip (idempotent).
+AMOUNTS_EXIST_SQL = """
+    SELECT 1 FROM feature_amounts_per_planning_unit
+    WHERE feature_id = %(feature_id)s LIMIT 1
+"""
+
+# Compute + insert in one statement, scoped to THIS feature's stable_ids and THIS
+# project's planning units. Mirrors computeMarxanAmountPerPlanningUnit exactly
+# (st_union of the feature_data matched by stable_id, && bbox prefilter, then
+# ST_Area(ST_Transform(ST_Intersection(...),3410)); amount > 0 only).
+COMPUTE_INSERT_SQL = """
+    INSERT INTO feature_amounts_per_planning_unit
+        (id, project_id, feature_id, project_pu_id, amount)
+    WITH all_amount_per_planning_unit AS (
+        SELECT pu.id AS projectpuid,
+               ST_Area(
+                 ST_Transform(ST_Intersection(species.the_geom, pu.the_geom), 3410)
+               ) AS amount
+        FROM (
+            SELECT st_union(the_geom) AS the_geom
+            FROM features_data fd
+            WHERE fd.stable_id = ANY(%(stable_ids)s::uuid[])
+            GROUP BY fd.feature_id
+        ) species,
+        (
+            SELECT pug.the_geom, ppu.id AS id
+            FROM planning_units_geom pug
+            INNER JOIN projects_pu ppu ON pug.id = ppu.geom_id
+            WHERE ppu.project_id = %(project_id)s::uuid
+        ) pu
+        WHERE species.the_geom && pu.the_geom
+    )
+    SELECT gen_random_uuid(), %(project_id)s::uuid, %(feature_id)s::uuid,
+           projectpuid, amount
+    FROM all_amount_per_planning_unit
+    WHERE amount > 0
+"""
+
+
+def parse_args():
+    p = argparse.ArgumentParser(description=__doc__,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--env", choices=ENV_PRESETS.keys(),
+                   help="Azure-tunnel connection preset")
+    p.add_argument("--host", default="localhost")
+    p.add_argument("--port", type=int)
+    p.add_argument("--api-db"), p.add_argument("--api-user")
+    p.add_argument("--geo-db"), p.add_argument("--geo-user")
+    p.add_argument("--apply", action="store_true",
+                   help="commit changes (default: dry-run, rolls back)")
+    p.add_argument("--skip-legacy-projects", action="store_true",
+                   help="skip features in legacyImport-source projects (matches API)")
+    p.add_argument("--only-feature", action="append", default=[],
+                   help="restrict to specific feature id(s) (repeatable; testing)")
+    p.add_argument("--limit", type=int, help="process at most N features (testing)")
+    args = p.parse_args()
+
+    preset = ENV_PRESETS.get(args.env, {})
+    args.port = args.port or preset.get("port")
+    args.api_db = args.api_db or preset.get("api_db")
+    args.api_user = args.api_user or preset.get("api_user")
+    args.geo_db = args.geo_db or preset.get("geo_db")
+    args.geo_user = args.geo_user or preset.get("geo_user")
+
+    missing = [n for n in ("port", "api_db", "api_user", "geo_db", "geo_user")
+               if not getattr(args, n)]
+    if missing:
+        p.error(f"missing connection settings: {', '.join(missing)} "
+                f"(use --env, or pass them explicitly)")
+    return args
+
+
+def connect(host, port, dbname, user):
+    return psycopg2.connect(host=host, port=port, dbname=dbname, user=user,
+                            sslmode="require")
+
+
+def main():
+    args = parse_args()
+    dry_run = not args.apply
+
+    api_conn = connect(args.host, args.port, args.api_db, args.api_user)
+    geo_conn = connect(args.host, args.port, args.geo_db, args.geo_user)
+    geo_conn.autocommit = False
+
+    print(f"[amounts] host={args.host}:{args.port} api={args.api_db} "
+          f"geo={args.geo_db} mode={'DRY-RUN' if dry_run else 'APPLY'}")
+
+    api = api_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    geo = geo_conn.cursor()
+
+    api.execute(FIND_TARGETS_SQL)
+    targets = api.fetchall()
+    if args.only_feature:
+        wanted = set(args.only_feature)
+        targets = [t for t in targets if str(t["id"]) in wanted]
+    if args.limit:
+        targets = targets[: args.limit]
+    print(f"[amounts] {len(targets)} candidate split feature(s) "
+          f"(split + non-empty stable_ids)\n")
+
+    computed, skipped = 0, []
+    for f in targets:
+        fid = str(f["id"])
+        if args.skip_legacy_projects and f["project_sources"] == "legacyImport":
+            skipped.append((f, "legacyImport project"))
+            print(f"  SKIP  {fid} ({f['feature_class_name']}): legacyImport project")
+            continue
+
+        geo.execute(AMOUNTS_EXIST_SQL, {"feature_id": fid})
+        if geo.fetchone():
+            skipped.append((f, "amounts already present"))
+            print(f"  SKIP  {fid} ({f['feature_class_name']}): amounts already present")
+            continue
+
+        geo.execute(COMPUTE_INSERT_SQL, {
+            "project_id": str(f["project_id"]),
+            "feature_id": fid,
+            "stable_ids": f["stable_ids"],
+        })
+        n = geo.rowcount
+        if n == 0:
+            skipped.append((f, "0 PU rows (no geometry/PU overlap)"))
+            print(f"  WARN  {fid} ({f['feature_class_name']}): computed 0 PU rows "
+                  f"(no overlap?) [{len(f['stable_ids'])} stable ids]")
+            continue
+        computed += 1
+        print(f"  OK    {fid} ({f['feature_class_name']}): inserted {n} PU amount row(s) "
+              f"[{len(f['stable_ids'])} stable ids]")
+
+    print(f"\n[amounts] summary: {computed} computed, {len(skipped)} skipped, "
+          f"{len(targets)} candidates")
+
+    if dry_run:
+        geo_conn.rollback()
+        print("[amounts] DRY-RUN — rolled back. Re-run with --apply to commit.")
+    else:
+        geo_conn.commit()
+        print(f"[amounts] APPLIED — committed amounts for {computed} feature(s).")
+    api_conn.rollback()  # read-only
+
+    api.close(); geo.close(); api_conn.close(); geo_conn.close()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
