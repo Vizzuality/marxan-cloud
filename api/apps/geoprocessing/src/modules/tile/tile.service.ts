@@ -37,6 +37,12 @@ export interface TileInput<T> extends TileRequest {
    * @description Custom query for the different entities
    */
   customQuery?: T | undefined;
+  /**
+   * @description Bound parameters for `customQuery`. Lets callers pass values
+   * (e.g. large id arrays) as query parameters instead of inlining them as SQL
+   * literals, so the generated SQL text stays small and is plan-cached.
+   */
+  customQueryParameters?: Record<string, unknown>;
 
   /**
    * @description Input projection, by default 4326
@@ -97,6 +103,7 @@ export class TileService {
     extent = 4096,
     buffer = 256,
     customQuery = undefined,
+    customQueryParameters = undefined,
     inputProjection = 4326,
     attributes,
   }: TileInput<string>): Promise<Record<'mvt', Buffer>[]> {
@@ -119,7 +126,7 @@ export class TileService {
             { z, x, y },
           );
         if (customQuery) {
-          subQuery.andWhere(customQuery);
+          subQuery.andWhere(customQuery, customQueryParameters);
         }
         return subQuery;
       }, 'tile');
