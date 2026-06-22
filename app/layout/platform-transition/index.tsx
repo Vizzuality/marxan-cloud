@@ -2,17 +2,21 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { useCookies } from 'react-cookie';
 
+import { useRouter } from 'next/router';
+
 import { useFeatureFlags } from 'hooks/feature-flags';
 
 import Modal from 'components/modal';
 
 import PlatformTransitionContent from './content';
+import { isReportRoute } from './utils';
 
 const COOKIE_NAME = 'platform-transition';
 const COOKIE_EXPIRY = new Date('2026-12-31T23:59:59Z');
 const MODAL_TITLE = 'Important Platform Transition Notice';
 
 export const PlatformTransitionModal = (): JSX.Element | null => {
+  const { pathname } = useRouter();
   const [cookies, setCookie] = useCookies([COOKIE_NAME]);
   const { platformTransition } = useFeatureFlags();
 
@@ -35,6 +39,7 @@ export const PlatformTransitionModal = (): JSX.Element | null => {
     setOpen(false);
   }, [dontShowAgain, setCookie]);
 
+  if (isReportRoute(pathname)) return null;
   if (!platformTransition) return null;
   if (persistedDismissal) return null;
   if (!mounted) return null;
