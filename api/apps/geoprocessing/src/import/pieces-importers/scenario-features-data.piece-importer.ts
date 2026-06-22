@@ -9,7 +9,6 @@ import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
-import { chunk } from 'lodash';
 import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import { parser } from 'stream-json';
@@ -34,7 +33,8 @@ type FeatureDataIdByFeatureIdAndHashMap = Record<string, string>;
 
 type FeatureDataSelectResult = {
   featureDataId: string;
-  featureIdAndHash: string;
+  featureId: string;
+  hash: string;
 };
 
 type FeatureSelectResult = {
@@ -60,6 +60,16 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
   // Default to the prod chunk size; overridable in tests to exercise the
   // multi-batch streaming path with small fixtures. See MRXNM-94.
   private batchSize: number = CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS;
+
+  // The geo features_data table name is invariant; resolve it once (lazily, so
+  // it never races entity-metadata initialisation at construction time).
+  private cachedFeaturesDataTable?: string;
+  private get featuresDataTable(): string {
+    return (this.cachedFeaturesDataTable ??=
+      this.geoEntityManager.getRepository(
+        GeoFeatureGeometry,
+      ).metadata.tableName);
+  }
 
   constructor(
     private readonly fileRepository: CloningFilesRepository,
@@ -153,40 +163,43 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     platformFeaturesMap: FeatureIdByClassNameMap,
     featureDataIdByFeatureIdAndHash: FeatureDataIdByFeatureIdAndHashMap,
   ): Promise<void> {
-    const missing = new Set<string>();
+    const missing = new Map<string, { featureId: string; hash: string }>();
     for (const element of batch) {
       const { isCustom, featureClassName } = element.featureDataFeature;
       const featureId = isCustom
         ? customFeaturesMap[featureClassName]
         : platformFeaturesMap[featureClassName];
       const key = `${featureId}/${element.featureDataHash}`;
-      if (featureDataIdByFeatureIdAndHash[key] === undefined) missing.add(key);
+      // Map.set is idempotent for an already-present key, so the cross-batch
+      // cache check alone is enough to dedup within the batch too.
+      if (featureDataIdByFeatureIdAndHash[key] === undefined)
+        missing.set(key, { featureId, hash: element.featureDataHash });
     }
 
     if (missing.size === 0) return;
 
-    const idAndHashesChunks = chunk(
-      Array.from(missing),
-      CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+    const pairs = Array.from(missing.values());
+    const featureIds = pairs.map((p) => p.featureId);
+    const hashes = pairs.map((p) => p.hash);
+
+    // Match on the raw (feature_id, hash) columns via an unnest-paired-array
+    // join so the planner can use the unique_feature_data_per_project
+    // (hash, feature_id) index. The previous `feature_id || '/' || hash IN (...)`
+    // predicate was non-sargable: Postgres had to compute the concatenation for
+    // every row of the ~30M-row features_data table, forcing an IO-bound seq
+    // scan on every batch. Passing the keys as two arrays also avoids the
+    // bind-parameter explosion of a large IN list. See MRXNM-95.
+    const rows: FeatureDataSelectResult[] = await this.geoEntityManager.query(
+      `SELECT fd.id AS "featureDataId", fd.feature_id AS "featureId", fd.hash AS "hash"
+       FROM "${this.featuresDataTable}" fd
+       JOIN unnest($1::uuid[], $2::text[]) AS k(feature_id, hash)
+         ON fd.feature_id = k.feature_id AND fd.hash = k.hash`,
+      [featureIds, hashes],
     );
-    const records = await Promise.all(
-      idAndHashesChunks.map((idAndHashes) =>
-        this.geoEntityManager
-          .createQueryBuilder()
-          .select('id', 'featureDataId')
-          .addSelect(`feature_id || '/' || hash`, 'featureIdAndHash')
-          .from(GeoFeatureGeometry, 'fd')
-          .where(`feature_id || '/' || hash IN (:...idAndHashes)`, {
-            idAndHashes,
-          })
-          .execute(),
-      ),
-    );
-    (records.flat() as FeatureDataSelectResult[]).forEach(
-      ({ featureDataId, featureIdAndHash }) => {
-        featureDataIdByFeatureIdAndHash[featureIdAndHash] = featureDataId;
-      },
-    );
+
+    rows.forEach(({ featureDataId, featureId, hash }) => {
+      featureDataIdByFeatureIdAndHash[`${featureId}/${hash}`] = featureDataId;
+    });
   }
 
   private getScenarioFeaturesDataInsertValues(
