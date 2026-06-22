@@ -51,7 +51,7 @@ export class FeatureService {
     id: string,
     forProject: boolean,
     bbox?: BBox,
-  ): Promise<string> {
+  ): Promise<{ where: string; parameters?: Record<string, unknown> }> {
     /**
      * Materialized split features own no `features_data` rows of their own:
      * their geometries are a subset of the *parent* feature's rows, linked via
@@ -76,12 +76,21 @@ export class FeatureService {
           .execute()
           .then((result) => result?.[0]?.feature_data_stable_ids ?? null);
 
-    let whereQuery =
-      featureDataStableIds && featureDataStableIds.length > 0
-        ? `stable_id = ANY(ARRAY[${featureDataStableIds
-            .map((stableId) => `'${stableId}'`)
-            .join(', ')}]::uuid[])`
-        : `feature_id = '${id}'`;
+    /**
+     * Bind the stable ids as a single array parameter rather than inlining them
+     * as SQL literals. A split of a large/global parent can carry tens of
+     * thousands of ids (≈59k seen in production); inlining them builds multi-MB
+     * of SQL text that is re-parsed on every `{z}/{x}/{y}` tile request. As a
+     * bound parameter the SQL text stays tiny and the plan is cached [MRXNM-97].
+     */
+    let whereQuery: string;
+    let parameters: Record<string, unknown> | undefined;
+    if (featureDataStableIds && featureDataStableIds.length > 0) {
+      whereQuery = `stable_id = ANY(:splitFeatureStableIds::uuid[])`;
+      parameters = { splitFeatureStableIds: featureDataStableIds };
+    } else {
+      whereQuery = `feature_id = '${id}'`;
+    }
 
     if (bbox) {
       const { westBbox, eastBbox } = antimeridianBbox(nominatim2bbox(bbox));
@@ -97,7 +106,7 @@ export class FeatureService {
       ))`;
     }
 
-    return whereQuery;
+    return { where: whereQuery, parameters };
   }
 
   /**
@@ -127,17 +136,15 @@ export class FeatureService {
                  stable_id
                  from "${this.featuresRepository.metadata.tableName}")`;
 
-    const customQuery = await this.buildFeaturesWhereQuery(
-      id,
-      forProject,
-      bbox,
-    );
+    const { where: customQuery, parameters: customQueryParameters } =
+      await this.buildFeaturesWhereQuery(id, forProject, bbox);
     return this.tileService.getTile({
       z,
       x,
       y,
       table,
       customQuery,
+      customQueryParameters,
       attributes,
     });
   }
