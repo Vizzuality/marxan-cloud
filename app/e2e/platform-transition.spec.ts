@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+import { isReportRoute } from '../layout/platform-transition/utils';
+
 const MODAL_TITLE = 'Important Platform Transition Notice';
 const COOKIE_NAME = 'platform-transition';
 
@@ -82,4 +84,38 @@ test.describe('Platform transition modal', () => {
     const cookie = (await context.cookies()).find((c) => c.name === COOKIE_NAME);
     expect(cookie?.value).toBe('true');
   });
+});
+
+test.describe('Platform transition modal — route suppression', () => {
+  const reportRoutes = [
+    '/reports/[pid]/[sid]/blm',
+    '/reports/[pid]/[sid]/solutions',
+    '/reports/[pid]/[sid]/frequency',
+    '/reports/[pid]/[sid]/compare/[sid2]/comparison-map',
+  ];
+
+  // The modal must still show while the user navigates the interface, for both
+  // registered and anonymous users (anonymous report routes redirect here).
+  const interfaceRoutes = [
+    '/',
+    '/about',
+    '/projects',
+    '/projects/[pid]',
+    '/projects/[pid]/scenarios/[sid]/edit',
+    '/community',
+    '/admin',
+    '/auth/sign-in',
+  ];
+
+  for (const route of reportRoutes) {
+    test(`suppressed on report route ${route}`, () => {
+      expect(isReportRoute(route)).toBe(true);
+    });
+  }
+
+  for (const route of interfaceRoutes) {
+    test(`shown on interface route ${route}`, () => {
+      expect(isReportRoute(route)).toBe(false);
+    });
+  }
 });
