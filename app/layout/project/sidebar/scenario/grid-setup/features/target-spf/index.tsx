@@ -246,18 +246,23 @@ const TargetAndSPFFeatures = (): JSX.Element => {
         selectedFeature.amountRange.min !== null && selectedFeature.amountRange.max !== null;
       const { splitted } = selectedFeature;
 
-      if (isContinuous) {
+      // Only genuine, non-split continuous features use the gradient renderer
+      // (useContinuousFeaturesLayers). Materialized split children are drawn as
+      // solid-color layers via their own child tiles (useTargetedPreviewLayers).
+      // Routing a split child through this branch would (a) stamp an `amountRange`
+      // into layerSettings that excludes it from useTargetedPreviewLayers, and
+      // (b) never add it to `selectedContinuousFeatures` (so the gradient renderer
+      // ignores it too) — leaving it rendered nowhere and the eye stuck on.
+      if (isContinuous && !splitted) {
         const newSelectedFeatures = [...selectedContinuousFeatures];
         const isIncluded = newSelectedFeatures.includes(id);
 
-        if (!splitted) {
-          if (!isIncluded) {
-            newSelectedFeatures.push(id);
-          } else {
-            newSelectedFeatures.splice(newSelectedFeatures.indexOf(id), 1);
-          }
-          dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
+        if (!isIncluded) {
+          newSelectedFeatures.push(id);
+        } else {
+          newSelectedFeatures.splice(newSelectedFeatures.indexOf(id), 1);
         }
+        dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
 
         dispatch(
           setLayerSettings({
