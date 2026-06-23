@@ -11,6 +11,7 @@
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "console": "NODE_CONFIG_DIR=apps/api/config ts-node --files --project tsconfig.json -r tsconfig-paths/register apps/api/src/console.ts",
+    "console:bulk-deletion": "NODE_CONFIG_DIR=apps/api/config ts-node --files --project tsconfig.json -r tsconfig-paths/register apps/api/src/maintenance/bulk-user-deletion/bulk-user-deletion.console.ts",
     "api:start:dev": "nodemon --exec 'NODE_OPTIONS=\"--max_old_space_size=3072\" NODE_CONFIG_DIR=apps/api/config ts-node --files --project tsconfig.json -r tsconfig-paths/register apps/api/src/main.ts' -L | bunyan",
     "api:start:debug": "nodemon --exec 'NODE_CONFIG_DIR=apps/api/config NODE_OPTIONS=\"--inspect=0.0.0.0 --max_old_space_size=3072\" ts-node --files --project tsconfig.json -r tsconfig-paths/register apps/api/src/main.ts' -L | bunyan",
     "geoprocessing:start:dev": "nodemon --exec 'NODE_OPTIONS=\"--max_old_space_size=4096\" NODE_CONFIG_DIR=apps/geoprocessing/config ts-node --files --project tsconfig.json -r tsconfig-paths/register apps/geoprocessing/src/main.ts' -L | bunyan",
