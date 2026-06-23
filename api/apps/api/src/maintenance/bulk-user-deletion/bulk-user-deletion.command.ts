@@ -14,6 +14,7 @@ import { DeletionDataAccess } from './deletion-data-access';
 interface RunOptions {
   emails: string;
   out: string;
+  exclude?: string;
   apply?: boolean;
   env?: string;
 }
@@ -48,6 +49,7 @@ export class BulkUserDeletionCommand {
     options: [
       { flags: '--emails <path>', required: true },
       { flags: '--out <dir>', required: true },
+      { flags: '--exclude <path>', required: false },
       { flags: '--apply', required: false },
       { flags: '--env <env>', required: false },
     ],
@@ -57,7 +59,16 @@ export class BulkUserDeletionCommand {
     const dao = new DeletionDataAccess(this.api);
 
     // ---- Phase 0: plan ----
-    const emails = readEmailList(options.emails);
+    // Read the full list, then subtract an explicit exclusion list (e.g. internal
+    // or automation accounts that must never be deleted). Excluded-but-present
+    // entries are reported so the carve-out is auditable.
+    const listed = readEmailList(options.emails);
+    const excluded = options.exclude
+      ? new Set(readEmailList(options.exclude))
+      : new Set<string>();
+    const emails = listed.filter((e) => !excluded.has(e));
+    const excludedFromList = listed.filter((e) => excluded.has(e));
+
     const users = await dao.resolveUserIds(emails);
     const deletees = new Set(users.map((u) => u.id));
     const matchedEmails = new Set(users.map((u) => u.email.toLowerCase()));
@@ -89,9 +100,13 @@ export class BulkUserDeletionCommand {
     if (unmatched.length) {
       writeCsv(`${options.out}/unmatched_emails.csv`, ['email'], unmatched.map((e) => [e]));
     }
+    if (excludedFromList.length) {
+      writeCsv(`${options.out}/excluded_emails.csv`, ['email'], excludedFromList.map((e) => [e]));
+    }
 
     this.logger.log(
-      `[plan] users=${users.length} unmatched=${unmatched.length} ` +
+      `[plan] listed=${listed.length} excluded=${excludedFromList.length} ` +
+        `users=${users.length} unmatched=${unmatched.length} ` +
         `A=${buckets.alreadyOrphaned.length} B=${buckets.becomesOrphaned.length} ` +
         `C=${buckets.kept.length} promotions=${promotions.length}`,
     );
