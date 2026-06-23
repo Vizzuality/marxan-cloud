@@ -5,11 +5,15 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AuthenticationModule } from '@marxan-api/modules/authentication/authentication.module';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { UserCommand } from '@marxan-api/modules/users/user.command';
+import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
+import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block-guard.module';
+import { BulkUserDeletionCommand } from '@marxan-api/maintenance/bulk-user-deletion/bulk-user-deletion.command';
 import { ProcessFetchSpecification } from 'nestjs-base-service';
 
 @Module({
@@ -21,9 +25,12 @@ import { ProcessFetchSpecification } from 'nestjs-base-service';
     AuthenticationModule,
     ConsoleModule,
     UsersModule,
+    CqrsModule,
+    ProjectsModule,
+    BlockGuardModule,
   ],
-  providers: [UserCommand],
-  exports: [UserCommand],
+  providers: [UserCommand, BulkUserDeletionCommand],
+  exports: [UserCommand, BulkUserDeletionCommand],
 })
 export class AppModule implements NestModule {
   /**

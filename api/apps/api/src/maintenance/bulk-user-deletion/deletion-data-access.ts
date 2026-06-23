@@ -1,6 +1,11 @@
 import { DataSource } from 'typeorm';
 import { ProjectMembership, ProjectRole } from './deletion-planner';
 
+/** Anything that can run a parameterized query: a DataSource or a transaction EntityManager. */
+export interface QueryExecutor {
+  query(sql: string, params?: unknown[]): Promise<any>;
+}
+
 export type ResidualTable = 'exports' | 'imports';
 
 export interface ResidualPlan {
@@ -59,9 +64,12 @@ export class DeletionDataAccess {
    * still-existing referenced project. `exports.resource_id` may be a project or a
    * scenario; `imports` use project_id (falling back to resource_id).
    */
-  async loadResidualOwnerRows(deletees: string[]): Promise<ResidualPlan> {
+  async loadResidualOwnerRows(
+    deletees: string[],
+    exec: QueryExecutor = this.api,
+  ): Promise<ResidualPlan> {
     const exportRows: Array<{ id: string; new_owner_id: string | null }> =
-      await this.api.query(
+      await exec.query(
         `SELECT e.id, COALESCE(po.user_id, so.user_id) AS new_owner_id
          FROM exports e
          LEFT JOIN users_projects po
@@ -73,7 +81,7 @@ export class DeletionDataAccess {
         [deletees],
       );
     const importRows: Array<{ id: string; new_owner_id: string | null }> =
-      await this.api.query(
+      await exec.query(
         `SELECT i.id, po.user_id AS new_owner_id
          FROM imports i
          LEFT JOIN users_projects po
