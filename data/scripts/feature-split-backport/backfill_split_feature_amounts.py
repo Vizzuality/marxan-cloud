@@ -31,6 +31,20 @@ NOTE: the API code path SKIPS `legacyImport`-source projects. This script does
 not special-case sources by default because every in-scope prod split lives in a
 `marxan_cloud` project; pass --skip-legacy-projects to enforce the skip anyway.
 
+GUARDRAILS (learned the hard way on prod 2026-06-22):
+  * --max-stable-ids N (default 1000): the per-feature amount is a single
+    `ST_Union` of all the split's geometries. For large global splits that union
+    is effectively unbounded -- a 3,317-geometry split ran 2h45m before being
+    killed (which is *why* those features never got amounts). Splits above the
+    threshold are SKIPPED + reported, not attempted; they are tracked in MRXNM-99
+    for a non-ST_Union computation. This is the PRIMARY guard.
+  * --statement-timeout S (default 600): secondary net bounding any single
+    compute. Best effort only -- a stuck PostGIS ST_Union may not hit an interrupt
+    checkpoint (pg_cancel_backend was observed to NOT stop one), so do not rely on
+    it; the size guard is what actually protects you.
+  * Each feature commits in its OWN transaction, so a slow/failed one can never
+    strand the features already computed (the previous all-at-once commit did).
+
 ORDER: run AFTER `backport_feature_data_stable_ids.py` (this reads the stable_ids
 that backport writes). Dry-run by default (rolls back); --apply to commit.
 Idempotent. `amount_min/max` is intentionally NOT set (it is NULL even for the
@@ -141,6 +155,17 @@ def parse_args():
     p.add_argument("--only-feature", action="append", default=[],
                    help="restrict to specific feature id(s) (repeatable; testing)")
     p.add_argument("--limit", type=int, help="process at most N features (testing)")
+    p.add_argument("--max-stable-ids", type=int, default=1000,
+                   help="PRIMARY GUARD: skip (do not compute) splits with more than "
+                        "N stable ids. Their single ST_Union of thousands of complex "
+                        "global polygons is effectively unbounded (a 3,317-geometry "
+                        "split ran 2h45m on prod) and is tracked separately in "
+                        "MRXNM-99. Default 1000; pass 0 to disable.")
+    p.add_argument("--statement-timeout", type=int, default=600,
+                   help="SECONDARY net: per-feature statement_timeout in seconds; a "
+                        "feature that exceeds it is reported and skipped, not fatal. "
+                        "Default 600; pass 0 to disable. NB PostGIS ops may not honor "
+                        "it mid-ST_Union, so --max-stable-ids is the reliable guard.")
     args = p.parse_args()
 
     preset = ENV_PRESETS.get(args.env, {})
@@ -172,10 +197,21 @@ def main():
     geo_conn.autocommit = False
 
     print(f"[amounts] host={args.host}:{args.port} api={args.api_db} "
-          f"geo={args.geo_db} mode={'DRY-RUN' if dry_run else 'APPLY'}")
+          f"geo={args.geo_db} mode={'DRY-RUN' if dry_run else 'APPLY'} "
+          f"max_stable_ids={args.max_stable_ids or 'off'} "
+          f"statement_timeout={args.statement_timeout or 'off'}s")
 
     api = api_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     geo = geo_conn.cursor()
+
+    # Secondary net: bound any single compute. Set at session level (committed via
+    # autocommit) so it survives the per-feature commits below. NB this is best
+    # effort — a stuck PostGIS ST_Union may not hit an interrupt checkpoint, so the
+    # --max-stable-ids guard below is the reliable protection.
+    if args.statement_timeout:
+        geo_conn.autocommit = True
+        geo.execute("SET statement_timeout = %s", (args.statement_timeout * 1000,))
+        geo_conn.autocommit = False
 
     api.execute(FIND_TARGETS_SQL)
     targets = api.fetchall()
@@ -187,46 +223,77 @@ def main():
     print(f"[amounts] {len(targets)} candidate split feature(s) "
           f"(split + non-empty stable_ids)\n")
 
-    computed, skipped = 0, []
+    # Per-feature transactions: each feature is committed (or rolled back) on its
+    # own, so a slow/failed one can never strand the features already computed.
+    computed, skipped, failed = 0, [], []
     for f in targets:
         fid = str(f["id"])
-        if args.skip_legacy_projects and f["project_sources"] == "legacyImport":
-            skipped.append((f, "legacyImport project"))
-            print(f"  SKIP  {fid} ({f['feature_class_name']}): legacyImport project")
-            continue
+        name = f["feature_class_name"]
+        n_ids = len(f["stable_ids"])
+        try:
+            if args.skip_legacy_projects and f["project_sources"] == "legacyImport":
+                skipped.append((f, "legacyImport project"))
+                print(f"  SKIP  {fid} ({name}): legacyImport project")
+                geo_conn.rollback()
+                continue
 
-        geo.execute(AMOUNTS_EXIST_SQL, {"feature_id": fid})
-        if geo.fetchone():
-            skipped.append((f, "amounts already present"))
-            print(f"  SKIP  {fid} ({f['feature_class_name']}): amounts already present")
-            continue
+            geo.execute(AMOUNTS_EXIST_SQL, {"feature_id": fid})
+            if geo.fetchone():
+                skipped.append((f, "amounts already present"))
+                print(f"  SKIP  {fid} ({name}): amounts already present")
+                geo_conn.rollback()
+                continue
 
-        geo.execute(COMPUTE_INSERT_SQL, {
-            "project_id": str(f["project_id"]),
-            "feature_id": fid,
-            "stable_ids": f["stable_ids"],
-        })
-        n = geo.rowcount
-        if n == 0:
-            skipped.append((f, "0 PU rows (no geometry/PU overlap)"))
-            print(f"  WARN  {fid} ({f['feature_class_name']}): computed 0 PU rows "
-                  f"(no overlap?) [{len(f['stable_ids'])} stable ids]")
-            continue
-        computed += 1
-        print(f"  OK    {fid} ({f['feature_class_name']}): inserted {n} PU amount row(s) "
-              f"[{len(f['stable_ids'])} stable ids]")
+            if args.max_stable_ids and n_ids > args.max_stable_ids:
+                skipped.append((f, f"too large ({n_ids} > {args.max_stable_ids})"))
+                print(f"  SKIP  {fid} ({name}): {n_ids} stable ids "
+                      f"> --max-stable-ids {args.max_stable_ids}; ST_Union infeasible, "
+                      f"deferred to MRXNM-99")
+                geo_conn.rollback()
+                continue
+
+            geo.execute(COMPUTE_INSERT_SQL, {
+                "project_id": str(f["project_id"]),
+                "feature_id": fid,
+                "stable_ids": f["stable_ids"],
+            })
+            n = geo.rowcount
+            if n == 0:
+                skipped.append((f, "0 PU rows (no geometry/PU overlap)"))
+                print(f"  WARN  {fid} ({name}): computed 0 PU rows (no overlap?) "
+                      f"[{n_ids} stable ids]")
+                geo_conn.rollback()
+                continue
+
+            if dry_run:
+                geo_conn.rollback()
+            else:
+                geo_conn.commit()
+            computed += 1
+            print(f"  OK    {fid} ({name}): "
+                  f"{'would insert' if dry_run else 'inserted'} {n} PU amount row(s) "
+                  f"[{n_ids} stable ids]")
+
+        except psycopg2.errors.QueryCanceled:
+            geo_conn.rollback()
+            failed.append((f, f"statement timeout (> {args.statement_timeout}s)"))
+            print(f"  FAIL  {fid} ({name}): statement timeout after "
+                  f"{args.statement_timeout}s [{n_ids} stable ids]; deferred to MRXNM-99")
+        except psycopg2.Error as e:
+            geo_conn.rollback()
+            msg = str(e).strip().splitlines()[0] if str(e).strip() else type(e).__name__
+            failed.append((f, msg))
+            print(f"  FAIL  {fid} ({name}): {msg[:120]} [{n_ids} stable ids]")
 
     print(f"\n[amounts] summary: {computed} computed, {len(skipped)} skipped, "
-          f"{len(targets)} candidates")
+          f"{len(failed)} failed, {len(targets)} candidates "
+          f"({'DRY-RUN — nothing committed' if dry_run else 'committed per feature'})")
+    if failed:
+        print("[amounts] failed/timed-out feature(s) (see MRXNM-99):")
+        for f, why in failed:
+            print(f"  {f['id']}  {f['feature_class_name']}  -- {why}")
 
-    if dry_run:
-        geo_conn.rollback()
-        print("[amounts] DRY-RUN — rolled back. Re-run with --apply to commit.")
-    else:
-        geo_conn.commit()
-        print(f"[amounts] APPLIED — committed amounts for {computed} feature(s).")
     api_conn.rollback()  # read-only
-
     api.close(); geo.close(); api_conn.close(); geo_conn.close()
     return 0
 
