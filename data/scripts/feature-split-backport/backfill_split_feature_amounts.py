@@ -31,17 +31,26 @@ NOTE: the API code path SKIPS `legacyImport`-source projects. This script does
 not special-case sources by default because every in-scope prod split lives in a
 `marxan_cloud` project; pass --skip-legacy-projects to enforce the skip anyway.
 
-GUARDRAILS (learned the hard way on prod 2026-06-22):
-  * --max-stable-ids N (default 1000): the per-feature amount is a single
-    `ST_Union` of all the split's geometries. For large global splits that union
-    is effectively unbounded -- a 3,317-geometry split ran 2h45m before being
-    killed (which is *why* those features never got amounts). Splits above the
-    threshold are SKIPPED + reported, not attempted; they are tracked in MRXNM-99
-    for a non-ST_Union computation. This is the PRIMARY guard.
-  * --statement-timeout S (default 600): secondary net bounding any single
-    compute. Best effort only -- a stuck PostGIS ST_Union may not hit an interrupt
-    checkpoint (pg_cancel_backend was observed to NOT stop one), so do not rely on
-    it; the size guard is what actually protects you.
+COMPUTE STRATEGY (per-PU union; see COMPUTE_INSERT_SQL):
+  The original API compute builds ONE global ST_Union of all the split's
+  geometries, which for large global splits is effectively unbounded -- it is what
+  ran 2h45m on prod before being killed (and why those features never got amounts
+  the first time round). This script instead intersects each geometry with each
+  overlapping project PU first, then unions the fragments per PU. The amounts are
+  numerically identical (verified on prod against both the global-union compute and
+  the API's own stored amounts) but the cost scales with the project's PU count,
+  not the feature's global vertex count -- the worst prod case (58,820 ids) went
+  from infeasible to ~19s. This is what makes the large [MRXNM-99] splits tractable.
+
+GUARDRAILS:
+  * --statement-timeout S (default 600): bounds any single compute; a feature that
+    exceeds it is reported and skipped, not fatal. With the per-PU compute this is
+    a reliable net (worst observed prod compute ~72s), unlike the old monolithic
+    ST_Union which a timeout/cancel could not interrupt mid-flight.
+  * --max-stable-ids N (default 0 = OFF): legacy size cap, kept only as optional
+    belt-and-suspenders. The per-PU compute removed the unboundedness that made
+    this necessary, so it is OFF by default; set it to re-enable skipping very
+    large splits if a host proves pathological.
   * Each feature commits in its OWN transaction, so a slow/failed one can never
     strand the features already computed (the previous all-at-once commit did).
 
@@ -107,30 +116,44 @@ AMOUNTS_EXIST_SQL = """
 """
 
 # Compute + insert in one statement, scoped to THIS feature's stable_ids and THIS
-# project's planning units. Mirrors computeMarxanAmountPerPlanningUnit exactly
-# (st_union of the feature_data matched by stable_id, && bbox prefilter, then
-# ST_Area(ST_Transform(ST_Intersection(...),3410)); amount > 0 only).
+# project's planning units.
+#
+# The API's computeMarxanAmountPerPlanningUnit builds ONE global ST_Union of every
+# feature_data row matched by stable_id, then intersects that single world-sized
+# geometry against each PU. For large/global splits (tens of thousands of complex
+# polygons) that union is effectively unbounded -- it is what ran 2h45m on prod.
+#
+# This computes the identical amounts the cheap way: intersect each feature_data
+# geometry with each *overlapping* project PU first (bounded by the project's
+# geographic extent via the && GiST index), then ST_Union the fragments PER PU.
+# Because
+#     Area( (U gi) ∩ pu )  ==  Area( U (gi ∩ pu) ),
+# the per-PU amount is numerically identical (verified on prod: max relative diff
+# 2e-15 vs the global-union compute), but each union now merges only the handful
+# of polygons that touch that one PU, so the cost scales with the project's PU
+# count rather than the feature's global vertex count. Worst case observed on prod
+# (58,820 ids over a 7,123-PU project) dropped from "killed at 2h45m" to ~19s
+# [MRXNM-99]. `amount > 0` only, matching the API.
 COMPUTE_INSERT_SQL = """
     INSERT INTO feature_amounts_per_planning_unit
         (id, project_id, feature_id, project_pu_id, amount)
     WITH all_amount_per_planning_unit AS (
-        SELECT pu.id AS projectpuid,
+        SELECT ppu.id AS projectpuid,
                ST_Area(
-                 ST_Transform(ST_Intersection(species.the_geom, pu.the_geom), 3410)
+                 ST_Transform(
+                   ST_Union(ST_Intersection(fd.the_geom, pug.the_geom)),
+                   3410
+                 )
                ) AS amount
-        FROM (
-            SELECT st_union(the_geom) AS the_geom
-            FROM features_data fd
-            WHERE fd.stable_id = ANY(%(stable_ids)s::uuid[])
-            GROUP BY fd.feature_id
-        ) species,
-        (
-            SELECT pug.the_geom, ppu.id AS id
-            FROM planning_units_geom pug
-            INNER JOIN projects_pu ppu ON pug.id = ppu.geom_id
-            WHERE ppu.project_id = %(project_id)s::uuid
-        ) pu
-        WHERE species.the_geom && pu.the_geom
+        FROM features_data fd
+        JOIN planning_units_geom pug
+          ON fd.the_geom && pug.the_geom
+         AND ST_Intersects(fd.the_geom, pug.the_geom)
+        JOIN projects_pu ppu
+          ON ppu.geom_id = pug.id
+         AND ppu.project_id = %(project_id)s::uuid
+        WHERE fd.stable_id = ANY(%(stable_ids)s::uuid[])
+        GROUP BY ppu.id
     )
     SELECT gen_random_uuid(), %(project_id)s::uuid, %(feature_id)s::uuid,
            projectpuid, amount
@@ -155,17 +178,16 @@ def parse_args():
     p.add_argument("--only-feature", action="append", default=[],
                    help="restrict to specific feature id(s) (repeatable; testing)")
     p.add_argument("--limit", type=int, help="process at most N features (testing)")
-    p.add_argument("--max-stable-ids", type=int, default=1000,
-                   help="PRIMARY GUARD: skip (do not compute) splits with more than "
-                        "N stable ids. Their single ST_Union of thousands of complex "
-                        "global polygons is effectively unbounded (a 3,317-geometry "
-                        "split ran 2h45m on prod) and is tracked separately in "
-                        "MRXNM-99. Default 1000; pass 0 to disable.")
+    p.add_argument("--max-stable-ids", type=int, default=0,
+                   help="OPTIONAL size cap: skip (do not compute) splits with more "
+                        "than N stable ids. Legacy guard from when the compute used a "
+                        "single unbounded ST_Union; the per-PU compute removed that "
+                        "unboundedness so this is OFF by default (0). Set it to "
+                        "re-enable skipping very large splits on a pathological host.")
     p.add_argument("--statement-timeout", type=int, default=600,
-                   help="SECONDARY net: per-feature statement_timeout in seconds; a "
-                        "feature that exceeds it is reported and skipped, not fatal. "
-                        "Default 600; pass 0 to disable. NB PostGIS ops may not honor "
-                        "it mid-ST_Union, so --max-stable-ids is the reliable guard.")
+                   help="Per-feature statement_timeout in seconds; a feature that "
+                        "exceeds it is reported and skipped, not fatal. Default 600 "
+                        "(worst observed prod compute ~72s); pass 0 to disable.")
     args = p.parse_args()
 
     preset = ENV_PRESETS.get(args.env, {})
@@ -245,10 +267,9 @@ def main():
                 continue
 
             if args.max_stable_ids and n_ids > args.max_stable_ids:
-                skipped.append((f, f"too large ({n_ids} > {args.max_stable_ids})"))
+                skipped.append((f, f"over --max-stable-ids ({n_ids} > {args.max_stable_ids})"))
                 print(f"  SKIP  {fid} ({name}): {n_ids} stable ids "
-                      f"> --max-stable-ids {args.max_stable_ids}; ST_Union infeasible, "
-                      f"deferred to MRXNM-99")
+                      f"> --max-stable-ids {args.max_stable_ids} (size cap enabled)")
                 geo_conn.rollback()
                 continue
 
