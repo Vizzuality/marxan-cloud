@@ -7,14 +7,18 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import {
   FeatureAmountPerPlanningUnit,
   ProjectFeatureGeoOperation,
-  ProjectFeatureAmountsPerPlanningUnitContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-feature-amounts-per-planning-unit';
 import { FeatureAmountsPerPlanningUnitEntity } from '@marxan/feature-amounts-per-planning-unit';
 import { SpecificationOperation } from '@marxan/specification';
-import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
+import { parser } from 'stream-json';
+import { pick } from 'stream-json/filters/Pick';
+import { streamArray } from 'stream-json/streamers/StreamArray';
+import { batch as groupIntoBatches } from 'stream-json/utils/Batch';
 import { EntityManager, Repository } from 'typeorm';
 import {
   ImportPieceProcessor,
@@ -26,6 +30,9 @@ type FeatureSelectResult = {
   feature_class_name: string;
 };
 
+// Cross-batch feature-name -> id caches (few distinct features per project).
+type FeatureIdByNameCache = Record<string, string>;
+
 @Injectable()
 @PieceImportProvider()
 export class ProjectFeatureAmountsPerPlanningUnitPieceImporter
@@ -34,6 +41,10 @@ export class ProjectFeatureAmountsPerPlanningUnitPieceImporter
   private readonly logger: Logger = new Logger(
     ProjectFeatureAmountsPerPlanningUnitPieceImporter.name,
   );
+
+  // Default to the prod chunk size; overridable in tests to exercise the
+  // multi-batch streaming path with small fixtures. See MRXNM-101.
+  private batchSize: number = CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS;
 
   constructor(
     private readonly fileRepository: CloningFilesRepository,
@@ -61,62 +72,50 @@ export class ProjectFeatureAmountsPerPlanningUnitPieceImporter
         this.logger.error(errorMessage);
         throw new Error(errorMessage);
       }
-      const [featureAmountsPerPlanningUnitLocation] = uris;
+      const { uri } = uris[0];
 
-      const readableOrError = await this.fileRepository.get(
-        featureAmountsPerPlanningUnitLocation.uri,
-      );
-      if (isLeft(readableOrError)) {
-        const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${featureAmountsPerPlanningUnitLocation.uri}`;
-        this.logger.error(errorMessage);
-        throw new Error(errorMessage);
+      const notAvailable = `File with piece data for ${piece}/${pieceResourceId} is not available at ${uri}`;
+
+      // Small side: the derived-feature geo operations array. Stream-picked
+      // from the same file so the (large) featureAmountsPerPlanningUnit array
+      // is never buffered or synchronously JSON.parse'd. See MRXNM-101.
+      const geoOpsReadableOrError = await this.fileRepository.get(uri);
+      if (isLeft(geoOpsReadableOrError)) {
+        this.logger.error(notAvailable);
+        throw new Error(notAvailable);
       }
-
-      const buffer = await readableToBuffer(readableOrError.right);
-      const stringFeatureAmountsPerPlanningUnitOrError = buffer.toString();
-
-      const {
-        featureAmountsPerPlanningUnit,
-        projectFeaturesGeoOperations,
-      }: ProjectFeatureAmountsPerPlanningUnitContent = JSON.parse(
-        stringFeatureAmountsPerPlanningUnitOrError,
-      );
-
-      const parsedFeatureAmountsPerPlanningUnit =
-        await this.parseFeatureAmountsPerPlanningUnit(
-          featureAmountsPerPlanningUnit,
-          projectId,
+      const projectFeaturesGeoOperations =
+        await this.collectProjectFeaturesGeoOperations(
+          geoOpsReadableOrError.right,
         );
-
       const parsedProjectFeaturesGeoOperations =
         await this.parseProjectFeaturesGeoOperations(
           projectFeaturesGeoOperations,
           projectId,
         );
 
+      // puid -> projectPuId, resolved once (bounded by project PU count).
+      const projectPusByPuid = await this.getProjectPusByPuid(projectId);
+
       await this.geoEntityManager.transaction(async (em) => {
-        const featureAmountsPerPlanningUnitRepo = em.getRepository(
-          FeatureAmountsPerPlanningUnitEntity,
-        );
-        try {
-          await featureAmountsPerPlanningUnitRepo.save(
-            parsedFeatureAmountsPerPlanningUnit,
-            {
-              chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-            },
-          );
-        } catch (e) {
-          this.logger.error(e);
-          throw new Error(
-            'error while saving parsed feature amounts per planning units',
-          );
+        const amountsReadableOrError = await this.fileRepository.get(uri);
+        if (isLeft(amountsReadableOrError)) {
+          this.logger.error(notAvailable);
+          throw new Error(notAvailable);
         }
 
-        await this.apiEntityManager.transaction(async (em) => {
+        await this.importFeatureAmounts(
+          em,
+          amountsReadableOrError.right,
+          projectId,
+          projectPusByPuid,
+        );
+
+        await this.apiEntityManager.transaction(async (apiEm) => {
           await Promise.all(
             parsedProjectFeaturesGeoOperations.map(
               ({ featureId, geoOperation }) =>
-                em
+                apiEm
                   .createQueryBuilder()
                   .update('features')
                   .set({ from_geoprocessing_ops: geoOperation })
@@ -140,43 +139,119 @@ export class ProjectFeatureAmountsPerPlanningUnitPieceImporter
     };
   }
 
-  private async parseFeatureAmountsPerPlanningUnit(
-    featureAmountsPerPlanningUnit: FeatureAmountPerPlanningUnit[],
-    projectId: string,
-  ) {
-    const customFeaturesNames = featureAmountsPerPlanningUnit
-      .filter(({ isCustom }) => isCustom)
-      .map(({ featureName }) => featureName);
-
-    const customFeaturesMap = await this.getCustomFeaturesByFeatureName(
-      customFeaturesNames,
-      projectId,
-    );
-
-    const platformFeaturesNames = featureAmountsPerPlanningUnit
-      .filter(({ isCustom }) => !isCustom)
-      .map(({ featureName }) => featureName);
-
-    const platformFeaturesMap = await this.getPlatformFeaturesByFeatureName(
-      platformFeaturesNames,
-    );
-
-    const projectPusByPuid = await this.getProjectPusByPuid(projectId);
-
-    return featureAmountsPerPlanningUnit.map(
-      ({ isCustom, featureName, amount, puid }) => {
-        const featureId = isCustom
-          ? customFeaturesMap[featureName]
-          : platformFeaturesMap[featureName];
-
-        return {
-          amount,
-          projectPuId: projectPusByPuid[puid],
-          featureId,
-          projectId: projectId,
-        };
+  /**
+   * Stream-reads the (small) `projectFeaturesGeoOperations` array, ignoring the
+   * large `featureAmountsPerPlanningUnit` array tokens, so it is never buffered.
+   */
+  private async collectProjectFeaturesGeoOperations(
+    readable: Readable,
+  ): Promise<ProjectFeatureGeoOperation[]> {
+    const operations: ProjectFeatureGeoOperation[] = [];
+    await pipeline(
+      readable,
+      parser(),
+      pick({ filter: 'projectFeaturesGeoOperations' }),
+      streamArray(),
+      async (source: AsyncIterable<{ value: ProjectFeatureGeoOperation }>) => {
+        for await (const { value } of source) operations.push(value);
       },
     );
+    return operations;
+  }
+
+  /**
+   * Streams the (potentially hundreds of MB) `featureAmountsPerPlanningUnit`
+   * array out of the clone file and inserts it batch by batch: the whole file
+   * is never buffered or `JSON.parse`d at once, and `for await` over the batch
+   * stage applies backpressure (parsing pauses while a batch is inserted) so
+   * the event loop stays responsive. Feature ids are resolved with a
+   * cross-batch cache, so each distinct feature is looked up once. See
+   * MRXNM-101 (same approach as MRXNM-94 for scenario-features-data).
+   */
+  private async importFeatureAmounts(
+    em: EntityManager,
+    readable: Readable,
+    projectId: string,
+    projectPusByPuid: Record<number, string>,
+  ): Promise<void> {
+    const repo = em.getRepository(FeatureAmountsPerPlanningUnitEntity);
+    const customFeaturesMap: FeatureIdByNameCache = {};
+    const platformFeaturesMap: FeatureIdByNameCache = {};
+
+    await pipeline(
+      readable,
+      parser(),
+      pick({ filter: 'featureAmountsPerPlanningUnit' }),
+      streamArray(),
+      groupIntoBatches({ batchSize: this.batchSize }),
+      async (
+        batches: AsyncIterable<{ value: FeatureAmountPerPlanningUnit }[]>,
+      ) => {
+        for await (const items of batches) {
+          const rows = items.map(({ value }) => value);
+
+          await this.resolveFeatureIdsForBatch(
+            rows,
+            projectId,
+            customFeaturesMap,
+            platformFeaturesMap,
+          );
+
+          const insertValues = rows.map(
+            ({ isCustom, featureName, amount, puid }) => ({
+              amount,
+              projectPuId: projectPusByPuid[puid],
+              featureId: isCustom
+                ? customFeaturesMap[featureName]
+                : platformFeaturesMap[featureName],
+              projectId,
+            }),
+          );
+
+          await repo.save(insertValues, {
+            chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+          });
+        }
+      },
+    );
+  }
+
+  /**
+   * Resolves the feature id for every feature name referenced by the batch,
+   * populating the cross-batch caches. Only names not already cached are
+   * queried.
+   */
+  private async resolveFeatureIdsForBatch(
+    batch: FeatureAmountPerPlanningUnit[],
+    projectId: string,
+    customFeaturesMap: FeatureIdByNameCache,
+    platformFeaturesMap: FeatureIdByNameCache,
+  ): Promise<void> {
+    const missingCustom = new Set<string>();
+    const missingPlatform = new Set<string>();
+
+    for (const { isCustom, featureName } of batch) {
+      const map = isCustom ? customFeaturesMap : platformFeaturesMap;
+      const missing = isCustom ? missingCustom : missingPlatform;
+      if (map[featureName] === undefined) missing.add(featureName);
+    }
+
+    if (missingCustom.size > 0)
+      Object.assign(
+        customFeaturesMap,
+        await this.getCustomFeaturesByFeatureName(
+          Array.from(missingCustom),
+          projectId,
+        ),
+      );
+
+    if (missingPlatform.size > 0)
+      Object.assign(
+        platformFeaturesMap,
+        await this.getPlatformFeaturesByFeatureName(
+          Array.from(missingPlatform),
+        ),
+      );
   }
 
   private async getCustomFeaturesByFeatureName(
