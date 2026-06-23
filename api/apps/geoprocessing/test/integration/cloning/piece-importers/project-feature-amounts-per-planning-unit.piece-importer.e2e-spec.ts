@@ -75,6 +75,19 @@ describe(ProjectCustomFeaturesPieceImporter, () => {
       .WhenPieceImporterIsInvoked(input)
       .ThenFeatureAmountsPerPlanningUnitAreImportedAndDerivedFeaturesAreUpdated();
   });
+
+  it('imports project puvspr calculations across multiple batches (MRXNM-101)', async () => {
+    await fixtures.GivenProject();
+    const archiveLocation =
+      await fixtures.GivenValidProjectFeatureAmountsPerPlanningUnitFile();
+    const input = fixtures.GivenJobInput(archiveLocation);
+    // Force many small batches so the streaming flush + cross-batch cache path
+    // is exercised with the tiny fixture instead of a multi-hundred-MB file.
+    fixtures.GivenABatchSizeSmallerThanTheNumberOfRecords();
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenFeatureAmountsPerPlanningUnitAreImportedAndDerivedFeaturesAreUpdated();
+  });
 });
 
 const getFixtures = async () => {
@@ -175,6 +188,11 @@ const getFixtures = async () => {
     },
     GivenProject: () =>
       GivenProjectExists(apiEntityManager, projectId, organizationId),
+    GivenABatchSizeSmallerThanTheNumberOfRecords: () => {
+      // The valid fixture creates 5 feature-amount records; a batch size of 2
+      // forces 3 flushes, exercising the multi-batch streaming path.
+      (sut as unknown as { batchSize: number }).batchSize = 2;
+    },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ProjectCustomFeatures,
