@@ -16,6 +16,7 @@ interface RunOptions {
   out: string;
   exclude?: string;
   apply?: boolean;
+  deleteAlreadyOrphaned?: boolean;
   env?: string;
 }
 
@@ -50,6 +51,7 @@ export class BulkUserDeletionCommand {
       { flags: '--emails <path>', required: true },
       { flags: '--out <dir>', required: true },
       { flags: '--exclude <path>', required: false },
+      { flags: '--delete-already-orphaned', required: false },
       { flags: '--apply', required: false },
       { flags: '--env <env>', required: false },
     ],
@@ -104,11 +106,20 @@ export class BulkUserDeletionCommand {
       writeCsv(`${options.out}/excluded_emails.csv`, ['email'], excludedFromList.map((e) => [e]));
     }
 
+    // Projects to delete: bucket B always; bucket A (pre-existing orphans, already
+    // inaccessible to everyone) only when --delete-already-orphaned is set.
+    const alsoDeleteOrphans = !!options.deleteAlreadyOrphaned;
+    const projectsToDelete = [
+      ...buckets.becomesOrphaned,
+      ...(alsoDeleteOrphans ? buckets.alreadyOrphaned : []),
+    ];
+
     this.logger.log(
       `[plan] listed=${listed.length} excluded=${excludedFromList.length} ` +
         `users=${users.length} unmatched=${unmatched.length} ` +
         `A=${buckets.alreadyOrphaned.length} B=${buckets.becomesOrphaned.length} ` +
-        `C=${buckets.kept.length} promotions=${promotions.length}`,
+        `C=${buckets.kept.length} promotions=${promotions.length} ` +
+        `delete-already-orphaned=${alsoDeleteOrphans} -> projectsToDelete=${projectsToDelete.length}`,
     );
 
     if (!apply) {
@@ -116,10 +127,10 @@ export class BulkUserDeletionCommand {
       return;
     }
 
-    // ---- Phase 1: delete bucket-B projects via the proper async path ----
+    // ---- Phase 1: delete target projects via the proper async path ----
     const blocked: string[] = [];
     let deleted = 0;
-    for (const p of buckets.becomesOrphaned) {
+    for (const p of projectsToDelete) {
       try {
         await this.blockGuard.ensureThatProjectIsNotBlocked(p.projectId);
       } catch {
@@ -129,7 +140,7 @@ export class BulkUserDeletionCommand {
       await this.commandBus.execute(new DeleteProject(p.projectId)); // saga enqueues geo cleanup
       deleted++;
       if (deleted % 50 === 0) {
-        this.logger.log(`[delete] ${deleted}/${buckets.becomesOrphaned.length}`);
+        this.logger.log(`[delete] ${deleted}/${projectsToDelete.length}`);
       }
     }
     writeCsv(`${options.out}/blockguard_hits.csv`, ['project_id'], blocked.map((id) => [id]));
@@ -176,15 +187,15 @@ export class BulkUserDeletionCommand {
       `SELECT count(*)::int AS remaining FROM users WHERE id = ANY($1::uuid[])`,
       [deleteeIds],
     );
-    const deletedBucketB = buckets.becomesOrphaned
+    const deletedTargets = projectsToDelete
       .filter((p) => !blocked.includes(p.projectId))
       .map((p) => p.projectId);
     const [{ bremaining }] = await this.api.query(
       `SELECT count(*)::int AS bremaining FROM projects WHERE id = ANY($1::uuid[])`,
-      [deletedBucketB],
+      [deletedTargets],
     );
     this.logger.log(
-      `[verify] users remaining: ${remaining} (expect 0); bucket-B projects remaining: ${bremaining} (expect 0)`,
+      `[verify] users remaining: ${remaining} (expect 0); target projects remaining: ${bremaining} (expect 0)`,
     );
     if (remaining !== 0 || bremaining !== 0) {
       throw new Error('[verify] post-conditions not met — investigate before VACUUM');
