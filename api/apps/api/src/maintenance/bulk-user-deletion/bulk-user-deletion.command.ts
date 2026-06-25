@@ -113,6 +113,14 @@ export class BulkUserDeletionCommand {
       ...buckets.becomesOrphaned,
       ...(alsoDeleteOrphans ? buckets.alreadyOrphaned : []),
     ];
+    // Bucket-A (already-orphaned) projects bypass the block-guard: with zero
+    // members, no user can hold in-flight work, so a "pending" flag is always
+    // stale (e.g. abandoned legacy imports frozen in 'accepting'/'running' that
+    // would otherwise block the project forever). Bucket B keeps the guard —
+    // its members may have had genuine in-flight work at freeze time.
+    const bypassGuardIds = new Set(
+      buckets.alreadyOrphaned.map((p) => p.projectId),
+    );
 
     this.logger.log(
       `[plan] listed=${listed.length} excluded=${excludedFromList.length} ` +
@@ -131,11 +139,13 @@ export class BulkUserDeletionCommand {
     const blocked: string[] = [];
     let deleted = 0;
     for (const p of projectsToDelete) {
-      try {
-        await this.blockGuard.ensureThatProjectIsNotBlocked(p.projectId);
-      } catch {
-        blocked.push(p.projectId); // skip + report (pending job)
-        continue;
+      if (!bypassGuardIds.has(p.projectId)) {
+        try {
+          await this.blockGuard.ensureThatProjectIsNotBlocked(p.projectId);
+        } catch {
+          blocked.push(p.projectId); // skip + report (pending job)
+          continue;
+        }
       }
       await this.commandBus.execute(new DeleteProject(p.projectId)); // saga enqueues geo cleanup
       deleted++;
@@ -152,6 +162,9 @@ export class BulkUserDeletionCommand {
 
     // ---- Phases 3-5: promote owners, clear residuals, hard-delete users (one txn) ----
     const deleteeIds = [...deletees];
+    const deletedProjectIds = projectsToDelete
+      .filter((p) => !blocked.includes(p.projectId))
+      .map((p) => p.projectId);
     await this.api.transaction(async (m) => {
       // Phase 3: promote a surviving member to owner on owner-less kept projects
       for (const { projectId, target } of promotions) {
@@ -174,6 +187,15 @@ export class BulkUserDeletionCommand {
       for (const r of residual.delete) {
         await m.query(`DELETE FROM ${r.table} WHERE id = $1`, [r.id]);
       }
+      // Phase 4c: delete legacy_project_imports for the projects we just removed.
+      // Its FK to projects was dropped (migration 1654769225640), so project
+      // deletion leaves these rows dangling unless the owner happens to be a
+      // deletee (then owner_id cascade clears them). Children
+      // (legacy_project_import_components/_files) cascade off this row.
+      await m.query(
+        `DELETE FROM legacy_project_imports WHERE project_id = ANY($1::uuid[])`,
+        [deletedProjectIds],
+      );
       // Phase 5: hard-delete users (FKs cascade users_projects/_organizations/_scenarios/tokens/locks/...)
       await m.query(`DELETE FROM users WHERE id = ANY($1::uuid[])`, [deleteeIds]);
       this.logger.log(
@@ -187,17 +209,19 @@ export class BulkUserDeletionCommand {
       `SELECT count(*)::int AS remaining FROM users WHERE id = ANY($1::uuid[])`,
       [deleteeIds],
     );
-    const deletedTargets = projectsToDelete
-      .filter((p) => !blocked.includes(p.projectId))
-      .map((p) => p.projectId);
     const [{ bremaining }] = await this.api.query(
       `SELECT count(*)::int AS bremaining FROM projects WHERE id = ANY($1::uuid[])`,
-      [deletedTargets],
+      [deletedProjectIds],
+    );
+    const [{ legacyremaining }] = await this.api.query(
+      `SELECT count(*)::int AS legacyremaining FROM legacy_project_imports WHERE project_id = ANY($1::uuid[])`,
+      [deletedProjectIds],
     );
     this.logger.log(
-      `[verify] users remaining: ${remaining} (expect 0); target projects remaining: ${bremaining} (expect 0)`,
+      `[verify] users remaining: ${remaining} (expect 0); target projects remaining: ${bremaining} (expect 0); ` +
+        `orphaned legacy_project_imports remaining: ${legacyremaining} (expect 0)`,
     );
-    if (remaining !== 0 || bremaining !== 0) {
+    if (remaining !== 0 || bremaining !== 0 || legacyremaining !== 0) {
       throw new Error('[verify] post-conditions not met — investigate before VACUUM');
     }
     await this.api.query(`VACUUM (ANALYZE) users, projects, scenarios, exports, imports, users_projects`);
