@@ -68,25 +68,40 @@ export class DeletionDataAccess {
     deletees: string[],
     exec: QueryExecutor = this.api,
   ): Promise<ResidualPlan> {
+    // Candidate new owner must be a SURVIVING (non-deletee) project_owner —
+    // otherwise we'd "reassign" to another deletee (no-op) and the later
+    // `DELETE FROM users` would still hit the NOT-NULL owner_id FK. When no
+    // surviving owner exists (e.g. an export/import of a blocked bucket-B
+    // project whose every owner is a deletee, or a resource already deleted in
+    // Phase 1), new_owner_id is null → the row is deleted instead. Correlated
+    // subqueries with MIN give exactly one deterministic row per export/import.
     const exportRows: Array<{ id: string; new_owner_id: string | null }> =
       await exec.query(
-        `SELECT e.id, COALESCE(po.user_id, so.user_id) AS new_owner_id
+        `SELECT e.id,
+           COALESCE(
+             (SELECT po.user_id FROM users_projects po
+               WHERE po.project_id = e.resource_id AND po.role_id = 'project_owner'
+                 AND NOT (po.user_id = ANY($1::uuid[]))
+               ORDER BY po.user_id LIMIT 1),
+             (SELECT so.user_id FROM users_projects so
+               JOIN scenarios s ON s.project_id = so.project_id
+               WHERE s.id = e.resource_id AND so.role_id = 'project_owner'
+                 AND NOT (so.user_id = ANY($1::uuid[]))
+               ORDER BY so.user_id LIMIT 1)
+           ) AS new_owner_id
          FROM exports e
-         LEFT JOIN users_projects po
-           ON po.project_id = e.resource_id AND po.role_id = 'project_owner'
-         LEFT JOIN scenarios s ON s.id = e.resource_id
-         LEFT JOIN users_projects so
-           ON so.project_id = s.project_id AND so.role_id = 'project_owner'
          WHERE e.owner_id = ANY($1::uuid[])`,
         [deletees],
       );
     const importRows: Array<{ id: string; new_owner_id: string | null }> =
       await exec.query(
-        `SELECT i.id, po.user_id AS new_owner_id
+        `SELECT i.id,
+           (SELECT po.user_id FROM users_projects po
+             WHERE po.project_id = COALESCE(i.project_id, i.resource_id)
+               AND po.role_id = 'project_owner'
+               AND NOT (po.user_id = ANY($1::uuid[]))
+             ORDER BY po.user_id LIMIT 1) AS new_owner_id
          FROM imports i
-         LEFT JOIN users_projects po
-           ON po.project_id = COALESCE(i.project_id, i.resource_id)
-          AND po.role_id = 'project_owner'
          WHERE i.owner_id = ANY($1::uuid[])`,
         [deletees],
       );
