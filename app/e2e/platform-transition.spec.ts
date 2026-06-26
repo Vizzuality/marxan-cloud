@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 import { isReportRoute } from '../layout/platform-transition/utils';
 
 const MODAL_TITLE = 'Important Platform Transition Notice';
-const COOKIE_NAME = 'platform-transition';
+const COOKIE_NAME = 'platform-transition-2026-maintenance';
 
 async function clearTransitionCookie(context: import('@playwright/test').BrowserContext) {
   const cookies = await context.cookies();
