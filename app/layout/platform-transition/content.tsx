@@ -37,13 +37,14 @@ export const PlatformTransitionContent: React.FC<PlatformTransitionContentProps>
         </p>
 
         <p>
-          MaPP will be unavailable starting June 29 while we complete the migration to QCIF-hosted
-          infrastructure.
+          <strong>MaPP will be unavailable starting June 29</strong> while we complete the migration
+          to QCIF-hosted infrastructure.
         </p>
 
         <p>
-          The main cutover is planned for June 30, followed by validation from July 1–3. We expect
-          to confirm broader access from July 4, pending successful validation.
+          The main cutover is planned for <strong>June 30</strong>, followed by validation from{' '}
+          <strong>July 1–3</strong>. We expect to confirm broader access from{' '}
+          <strong>July 4</strong>, pending successful validation.
         </p>
 
         <p>
@@ -52,8 +53,9 @@ export const PlatformTransitionContent: React.FC<PlatformTransitionContentProps>
         </p>
 
         <p>
-          Please avoid scheduling critical analyses, workshops, or trainings between June 30 and
-          July 15 while the platform is migrated, validated, and optimized.
+          Please avoid scheduling critical analyses, workshops, or trainings between{' '}
+          <strong>June 29</strong> and <strong>July 15</strong> while the platform is migrated,
+          validated, and optimized.
         </p>
 
         <p>
