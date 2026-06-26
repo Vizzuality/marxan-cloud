@@ -10,18 +10,51 @@ export interface PlatformTransitionContentProps {
   onDismiss?: () => void;
   dontShowAgain?: boolean;
   onDontShowAgainChange?: (value: boolean) => void;
+  /** When true, render the non-dismissable maintenance-mode message (no controls). */
+  maintenance?: boolean;
 }
 
 export const PlatformTransitionContent: React.FC<PlatformTransitionContentProps> = ({
   onDismiss,
   dontShowAgain = false,
   onDontShowAgainChange,
+  maintenance = false,
 }) => {
+  if (maintenance) {
+    return (
+      <div className="flex max-h-[80vh] flex-col overflow-y-auto px-10 pb-8 pt-2 text-gray-700">
+        <div className="space-y-3 text-center">
+          <p className="text-3xl font-bold text-gray-800">ATTENTION!</p>
+          <p className="text-lg font-bold text-gray-800">
+            MaPP is currently in Maintenance Mode and will remain non-usable until July 4.
+          </p>
+          <p className="text-sm leading-relaxed">
+            If you have any questions or require assistance, you can contact{' '}
+            <a
+              href="mailto:marxanadmin@tnc.org"
+              className="text-primary-500 underline hover:text-primary-700"
+            >
+              marxanadmin@tnc.org
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex max-h-[80vh] flex-col overflow-y-auto px-10 pb-8 pt-2 text-gray-700">
       <h2 className="font-heading text-2xl text-gray-800">Important Platform Transition Notice</h2>
 
       <div className="mt-4 space-y-4 text-sm leading-relaxed">
+        <div className="border-l-4 border-yellow-600 bg-yellow-50 px-4 py-3 font-bold text-gray-800">
+          <p className="text-lg">WARNING!</p>
+          <p className="text-base">
+            MaPP will switch to Maintenance Mode and will be non-usable from June 29 to July 3.
+          </p>
+        </div>
+
         <p>
           MaPP will transition from The Nature Conservancy to a new host and long-term steward
           starting July 1, 2026, an exciting new stage for the platform&apos;s future development
