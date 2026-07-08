@@ -293,7 +293,9 @@ export const useFeaturesLegend = () => {
         }
         dispatch(setSelectedFeatures(newSelectedFeatures));
 
-        const { color } = binaryFeaturesItems.find(({ id }) => id === featureId) || {};
+        // uniqueBinaryFeatures (not binaryFeaturesItems) so split-child rows
+        // — present only in the targeted expansion — resolve their color too.
+        const { color } = uniqueBinaryFeatures.find(({ id }) => id === featureId) || {};
 
         dispatch(
           setLayerSettings({
@@ -312,18 +314,49 @@ export const useFeaturesLegend = () => {
         const { color, amountRange, amountMin, amountMax, splitted } =
           uniqueContinuousFeatures.find(({ id }) => id === featureId) || {};
 
-        const newSelectedFeatures = [...selectedContinuousFeatures];
-        const isIncluded = newSelectedFeatures.includes(featureId);
-
-        if (!splitted) {
+        // Split children are bucketed here by their PARENT's amount range, but
+        // they are drawn as solid-color layers by useTargetedPreviewLayers
+        // (their own child tiles), never by the gradient renderer. Stamping an
+        // amountRange into their layerSettings excludes them from that hook —
+        // and the merging reducer makes the exclusion sticky — leaving them
+        // rendered nowhere: same failure a8b38a92 fixed in the table's eye
+        // toggle. Route them through the discrete toggle instead.
+        if (splitted) {
+          const newSelectedFeatures = [...selectedFeatures];
+          const isIncluded = newSelectedFeatures.includes(featureId);
           if (!isIncluded) {
             newSelectedFeatures.push(featureId);
           } else {
-            const i = newSelectedFeatures.indexOf(featureId);
-            newSelectedFeatures.splice(i, 1);
+            newSelectedFeatures.splice(newSelectedFeatures.indexOf(featureId), 1);
           }
-          dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
+          dispatch(setSelectedFeatures(newSelectedFeatures));
+
+          dispatch(
+            setLayerSettings({
+              id: featureId,
+              settings: {
+                visibility: !isIncluded,
+                color,
+                // null (not undefined — the reducer drops undefined) so a
+                // previously stamped amountRange is cleared and the row passes
+                // useTargetedPreviewLayers' "no amountRange" filter again.
+                amountRange: null,
+              },
+            })
+          );
+          return;
         }
+
+        const newSelectedFeatures = [...selectedContinuousFeatures];
+        const isIncluded = newSelectedFeatures.includes(featureId);
+
+        if (!isIncluded) {
+          newSelectedFeatures.push(featureId);
+        } else {
+          const i = newSelectedFeatures.indexOf(featureId);
+          newSelectedFeatures.splice(i, 1);
+        }
+        dispatch(setSelectedContinuousFeatures(newSelectedFeatures));
 
         dispatch(
           setLayerSettings({
