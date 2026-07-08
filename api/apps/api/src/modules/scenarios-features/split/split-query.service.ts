@@ -76,16 +76,21 @@ export class SplitQuery {
               : ``
           }
       ),
+      -- total_area/current_pa must reflect THIS split value's subset, not the
+      -- parent feature: the gap-analysis views derive met% from these columns,
+      -- so parent-wide sums make every sibling read identical. Requires the
+      -- child's feature_amounts_per_planning_unit rows to exist already —
+      -- SplitOperation runs ComputeArea for the child before this insert.
       total_amounts as (
         select feature_id, SUM(amount) as total_amount from feature_amounts_per_planning_unit
-        where feature_id = ${fields.baseFeatureId}
+        where feature_id = ${fields.apiFeatureId}
         group by feature_id
       ),
       protected_amounts as (
         select spd.scenario_id, fappu.feature_id, SUM(fappu.amount) as protected_amount
         from scenarios_pu_data spd inner join feature_amounts_per_planning_unit fappu on fappu.project_pu_id = spd.project_pu_id
         where spd.lockin_status = 1 and fappu.feature_id = ${
-          fields.baseFeatureId
+          fields.apiFeatureId
         } and spd.scenario_id = ${fields.scenarioId}
         group by spd.scenario_id, fappu.feature_id
       )
@@ -97,10 +102,10 @@ export class SplitQuery {
              ${fields.target},
              ${fields.prop},
              (select total_amount from total_amounts ta where ta.feature_id = ${
-               fields.baseFeatureId
+               fields.apiFeatureId
              }),
              (select protected_amount from protected_amounts pa where pa.feature_id = ${
-               fields.baseFeatureId
+               fields.apiFeatureId
              } and pa.scenario_id = ${fields.scenarioId})
       from split
              join features_data as fd
