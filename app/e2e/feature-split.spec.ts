@@ -73,4 +73,41 @@ test.describe('Feature split (materialized)', () => {
     //   .first().getByRole('button').first().click();
     // await tileRequest;
   });
+
+  /**
+   * Regression: bulk-editing split children used to resubmit the spec with
+   * `splits: []` (the modal's row snapshot never populated), which
+   * un-materialized every child — i.e. the edit reversed the split. A bulk
+   * edit must only change target/SPF; the split must survive.
+   *
+   * Requires the same env as the test above, with the scenario ALREADY
+   * containing materialized split children (run the split test first).
+   */
+  test('bulk edit of split children applies values and preserves the split', async ({ page }) => {
+    await page.goto(`/projects/${PROJECT_ID}/scenarios/${SCENARIO_ID}/edit?tab=features`);
+
+    const childRows = page.getByRole('row', { name: new RegExp(`${FEATURE_NAME} / `, 'i') });
+    await expect(childRows.first()).toBeVisible({ timeout: 60_000 });
+    const childCount = await childRows.count();
+
+    // 1. Select every split-child row via its checkbox.
+    for (let i = 0; i < childCount; i += 1) {
+      await childRows.nth(i).getByRole('checkbox').check();
+    }
+
+    // 2. Bulk menu → Edit → set a new target for the selection.
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await expect(page.getByRole('heading', { name: 'Edit selected features' })).toBeVisible();
+    await page.getByLabel('Target (%)').fill('30');
+    await page.getByLabel('SPF').fill('2');
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    // 3. The edit succeeds…
+    await expect(page.getByText('Features edited')).toBeVisible();
+
+    // 4. …and the split children are still there (the split was NOT reversed),
+    //    even after the spec read-back refreshes the table.
+    await expect(childRows.first()).toBeVisible({ timeout: 60_000 });
+    await expect(childRows).toHaveCount(childCount);
+  });
 });

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useMemo } from 'react';
+import React, { useCallback, useRef } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF, FormProps } from 'react-final-form';
 
@@ -34,7 +34,13 @@ const EditModal = ({
   handleModal,
   onDone,
 }: {
-  selectedFeatures: (Feature & { name: string; marxanSettings: { prop?: number; fpf?: number } })[];
+  selectedFeatures: (Feature & {
+    name: string;
+    marxanSettings: { prop?: number; fpf?: number };
+    // present on split-child rows only (`${parentId}-${value}` synthetic rows)
+    parentId?: Feature['id'];
+    value?: string;
+  })[];
   handleModal: (modalKey: 'split' | 'edit' | 'delete', isVisible: boolean) => void;
   onDone?: (res?: unknown) => void;
 }): JSX.Element => {
@@ -53,37 +59,17 @@ const EditModal = ({
     }
   );
 
-  const targetedFeatures = useMemo(() => {
-    let parsedData = [];
-    const formState = formRef.current?.getState();
-
-    if (!formState?.values) return [];
-
-    selectedFeaturesQuery.data?.forEach((feature) => {
-      if (feature.splitFeaturesSelected?.length > 0) {
-        const splitFeatures = feature.splitFeaturesSelected.map((splitFeature) => ({
-          ...splitFeature,
-          id: `${feature.id}-${splitFeature.name}`,
-          parentId: feature.id,
-        }));
-
-        parsedData = [...parsedData, ...splitFeatures];
-      } else {
-        parsedData = [
-          ...parsedData,
-          {
-            ...feature,
-          },
-        ];
-      }
-    });
-
-    return parsedData;
-  }, [selectedFeaturesQuery.data, formRef]);
-
   const onEditSubmit = useCallback(
     (values: FormValues) => {
       const { target, spf = 1, mode } = values;
+
+      // Layer the form values over the existing settings (fractions, as read
+      // back from the API), honouring the edition mode.
+      const applyEdits = (marxanSettings: { prop?: number; fpf?: number }) => ({
+        ...marxanSettings,
+        ...(['only-target', 'all'].includes(mode) && { prop: target / 100 }),
+        ...(['only-spf', 'all'].includes(mode) && { fpf: +spf }),
+      });
 
       const data = {
         status: 'created',
@@ -94,65 +80,26 @@ const EditModal = ({
             return {
               featureId,
               kind,
-              geoprocessingOperations: geoprocessingOperations.map((go) => {
-                const { splits } = go;
-
-                return {
-                  ...go,
-                  splits: splits
-                    .filter((s) => {
-                      return targetedFeatures.find((f) => {
-                        return f.parentId === featureId && f.value === s.value;
-                      });
-                    })
-                    .map((s) => {
-                      const {
-                        marxanSettings: { prop, fpf },
-                      } = targetedFeatures.find((f) => {
-                        return f.parentId === featureId && f.value === s.value;
-                      });
-
-                      return {
-                        ...s,
-                        marxanSettings: {
-                          prop: prop / 100,
-                          fpf,
-                        },
-                      };
-                    }),
-                };
-              }),
-            };
-          }
-
-          let newMarxanSettings = sf.marxanSettings;
-
-          if (mode === 'only-target') {
-            newMarxanSettings = {
-              ...newMarxanSettings,
-              prop: target / 100,
-            };
-          }
-
-          if (mode === 'only-spf') {
-            newMarxanSettings = {
-              ...newMarxanSettings,
-              fpf: +spf,
-            };
-          }
-
-          if (mode === 'all') {
-            newMarxanSettings = {
-              prop: target / 100,
-              fpf: +spf,
+              geoprocessingOperations: geoprocessingOperations.map((go) => ({
+                ...go,
+                // Bulk edit must never drop splits — resubmitting the spec with
+                // missing splits un-materializes those children (reverses the
+                // split). Selected split children get the new settings; the
+                // rest keep theirs.
+                splits: go.splits.map((s) =>
+                  selectedFeatures.some((f) => f.parentId === featureId && f.value === s.value)
+                    ? { ...s, marxanSettings: applyEdits(s.marxanSettings) }
+                    : s
+                ),
+              })),
             };
           }
 
           return {
             featureId,
             kind,
-            marxanSettings: selectedFeatures.find((f) => f.id === featureId)
-              ? newMarxanSettings
+            marxanSettings: selectedFeatures.some((f) => f.id === featureId)
+              ? applyEdits(sf.marxanSettings)
               : sf.marxanSettings,
           };
         }),
@@ -197,7 +144,6 @@ const EditModal = ({
     [
       addToast,
       selectedFeaturesQuery.data,
-      targetedFeatures,
       selectedFeatures,
       selectedFeaturesMutation,
       handleModal,
