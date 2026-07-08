@@ -20,11 +20,13 @@ describe('SplitOperation feature_data_stable_ids derivation', () => {
     };
     const kvStableIdRows = [{ stable_id: 's1' }, { stable_id: 's2' }];
 
-    // 1st geo query = SplitQuery (scenario prep); 2nd = the stable-id lookup.
+    // 1st geo query = the stable-id lookup; 2nd = SplitQuery (scenario prep).
+    // Stable ids must land first: ComputeArea derives the child's per-PU
+    // amounts from them, and the prep insert reads those amounts.
     const query = jest
       .fn()
-      .mockResolvedValueOnce([{ id: 'sfp-1', features_data_id: 'fd-bbox-1' }])
-      .mockResolvedValueOnce(kvStableIdRows);
+      .mockResolvedValueOnce(kvStableIdRows)
+      .mockResolvedValueOnce([{ id: 'sfp-1', features_data_id: 'fd-bbox-1' }]);
 
     const setFeatureDataStableIdsForFeature = jest.fn();
     const splitCreateFeatures = {
@@ -81,5 +83,27 @@ describe('SplitOperation feature_data_stable_ids derivation', () => {
       featureId,
       kvStableIdRows,
     );
+
+    // Gap-analysis correctness depends on this ordering: the prep insert
+    // fills total_area/current_pa from the CHILD's per-PU amounts, so
+    // ComputeArea must have run for the child before the SplitQuery insert
+    // (and after its stable ids were stored).
+    expect(
+      computeArea.computeAreaPerPlanningUnitOfFeature,
+    ).toHaveBeenCalledWith('project-1', 'scenario-1', featureId);
+
+    const computeAreaOrder =
+      computeArea.computeAreaPerPlanningUnitOfFeature.mock
+        .invocationCallOrder[0];
+    const prepInsertCallIndex = query.mock.calls.findIndex(
+      ([sql]) => sql === 'SPLIT_QUERY_SQL',
+    );
+    expect(prepInsertCallIndex).toBeGreaterThanOrEqual(0);
+    const prepInsertOrder = query.mock.invocationCallOrder[prepInsertCallIndex];
+    const stableIdsOrder =
+      setFeatureDataStableIdsForFeature.mock.invocationCallOrder[0];
+
+    expect(stableIdsOrder).toBeLessThan(computeAreaOrder);
+    expect(computeAreaOrder).toBeLessThan(prepInsertOrder);
   });
 });

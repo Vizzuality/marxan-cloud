@@ -46,21 +46,6 @@ export class SplitOperation {
       const scenarioFeaturePreparationIds: { id: string }[] = [];
 
       for (const singleSplitFeatureWithId of singleSplitFeaturesWithId) {
-        const { parameters, query } = this.splitQuery.prepareQuery(
-          singleSplitFeatureWithId,
-          data.scenarioId,
-          data.specificationId,
-          planningAreaLocation,
-          protectedAreaFilterByIds,
-          project,
-        );
-        const scenarioFeaturePreparationIdsForFeature: {
-          id: string;
-          features_data_id: string;
-        }[] = await this.geoEntityManager.query(query, parameters);
-        scenarioFeaturePreparationIds.push(
-          ...scenarioFeaturePreparationIdsForFeature,
-        );
         // Link the split feature to the FULL key/value-matching subset of the
         // parent's features_data rows — not the bbox-filtered scenario-prep rows
         // SplitQuery returns. This matches how splits render (the full class) and
@@ -81,13 +66,35 @@ export class SplitOperation {
           singleSplitFeatureWithId.id,
           featureDataStableIds,
         );
+
+        // The child's own per-PU amounts must exist BEFORE the scenario-prep
+        // insert: SplitQuery fills total_area/current_pa from them, so the
+        // gap analysis reflects each split value's subset rather than the
+        // parent's totals. ComputeArea reads the stable ids set above and is
+        // idempotent (skips children that already have amounts).
+        await this.computeArea.computeAreaPerPlanningUnitOfFeature(
+          project.id,
+          data.scenarioId,
+          singleSplitFeatureWithId.id,
+        );
+
+        const { parameters, query } = this.splitQuery.prepareQuery(
+          singleSplitFeatureWithId,
+          data.scenarioId,
+          data.specificationId,
+          planningAreaLocation,
+          protectedAreaFilterByIds,
+          project,
+        );
+        const scenarioFeaturePreparationIdsForFeature: {
+          id: string;
+          features_data_id: string;
+        }[] = await this.geoEntityManager.query(query, parameters);
+        scenarioFeaturePreparationIds.push(
+          ...scenarioFeaturePreparationIdsForFeature,
+        );
       }
 
-      await this.computeAmountPerFeature(
-        singleSplitFeaturesWithId.map(({ id }) => id),
-        project.id,
-        data.scenarioId,
-      );
       await this.events.create({
         topic: data.scenarioId,
         kind: API_EVENT_KINDS.scenario__geofeatureSplit__finished__v1__alpha1,
@@ -100,21 +107,5 @@ export class SplitOperation {
       });
       throw error;
     }
-  }
-
-  private async computeAmountPerFeature(
-    featuresIds: string[],
-    projectId: string,
-    scenarioId: string,
-  ) {
-    return Promise.all(
-      featuresIds.map((featureId) =>
-        this.computeArea.computeAreaPerPlanningUnitOfFeature(
-          projectId,
-          scenarioId,
-          featureId,
-        ),
-      ),
-    );
   }
 }
