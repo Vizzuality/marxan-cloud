@@ -4957,7 +4957,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-tree@npm:^2.2.1":
+"css-tree@npm:^2.2.1, css-tree@npm:^2.3.1":
   version: 2.3.1
   resolution: "css-tree@npm:2.3.1"
   dependencies:
@@ -8643,7 +8643,7 @@ __metadata:
     react-table: ^7.7.0
     rooks: 7.14.1
     svg-sprite-loader: 6.0.11
-    svgo: 3.0.2
+    svgo: 3.3.4
     svgo-loader: 4.0.0
     tailwind-merge: 1.13.2
     tailwindcss: 3.3.1
@@ -10940,6 +10940,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sax@npm:^1.5.0":
+  version: 1.6.0
+  resolution: "sax@npm:1.6.0"
+  checksum: 83ae2a17f524bd35b1b7d1c867700b1fab41e4cbb4f7635b7e66398421e06ff2cd43ec651c151cb99c67c3681ec7d0493cb6a98fd2e7799ea15b5d0a4615f870
+  languageName: node
+  linkType: hard
+
 "scheduler@npm:^0.23.0":
   version: 0.23.0
   resolution: "scheduler@npm:0.23.0"
@@ -11602,7 +11609,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svgo@npm:3.0.2, svgo@npm:^3.0.0":
+"svgo@npm:3.3.4":
+  version: 3.3.4
+  resolution: "svgo@npm:3.3.4"
+  dependencies:
+    commander: ^7.2.0
+    css-select: ^5.1.0
+    css-tree: ^2.3.1
+    css-what: ^6.1.0
+    csso: ^5.0.5
+    picocolors: ^1.0.0
+    sax: ^1.5.0
+  bin:
+    svgo: ./bin/svgo
+  checksum: 7828e76b42bb58867703a21aa80f2cd1a8c1828df2500a5ac58a30cca483d9c7862d07c9060a4cdf24bbb8ac3d2148ed27e42dc2794738d097fae0ce05dabd81
+  languageName: node
+  linkType: hard
+
+"svgo@npm:^3.0.0":
   version: 3.0.2
   resolution: "svgo@npm:3.0.2"
   dependencies:
