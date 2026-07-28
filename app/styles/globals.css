@@ -804,11 +804,25 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   }
 }
 
-.modal-checkbox-list::-webkit-scrollbar {
-  display: none;
+/* Categorical value lists overflow routinely, and an overlay scrollbar that
+   auto-hides reads as "nothing more to see". Declaring an explicit width keeps
+   the scrollbar rendered regardless of the OS "show scroll bars" setting. */
+.split-values-list::-webkit-scrollbar {
+  width: 6px;
 }
 
-.modal-checkbox-list {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+.split-values-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
 }
+
+.split-values-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 3px;
+}
+
+.split-values-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.28) rgba(0, 0, 0, 0.06);
+}
+
