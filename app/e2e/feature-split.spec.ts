@@ -51,7 +51,7 @@ test.describe('Feature split (materialized)', () => {
     // is not exposed as a native combobox/option.
     await page.getByText('You can split this feature into categories').click();
     await page.getByText(SPLIT_PROPERTY, { exact: true }).click();
-    await page.locator('.modal-checkbox-list input[type="checkbox"]').first().check();
+    await page.locator('[data-testid="split-values-list"] input[type="checkbox"]').first().check();
 
     // 4. Save → submits the spec as `created`, triggering BE materialization.
     await page.getByRole('button', { name: 'Save' }).click();

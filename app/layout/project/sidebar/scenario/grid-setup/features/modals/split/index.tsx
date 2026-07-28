@@ -160,6 +160,15 @@ const SplitModal = ({
     setSplitFeaturesSelected([]);
   }, []);
 
+  const onSelectAllSplitValues = useCallback(
+    (opt: FormValues['splitOption']) => {
+      setSplitFeaturesSelected(
+        (getSplitOptionValues(opt) ?? []).map((value) => ({ id: `${value.name}` }))
+      );
+    },
+    [getSplitOptionValues]
+  );
+
   return (
     <FormRFF<FormValues>
       initialValues={{
@@ -217,51 +226,80 @@ const SplitModal = ({
 
               <div>
                 <FieldRFF<string> name="splitValues">
-                  {(fprops) => (
-                    <Field id="splitValues" {...fprops} className="relative">
-                      <div className="flex justify-between">
-                        <div className="modal-checkbox-list max-h-48 w-full space-y-2 overflow-y-auto pt-1">
-                          {getSplitOptionValues(values.splitOption)?.map((value) => {
-                            const checked = !!splitFeaturesSelected.find(
-                              (sfs) => sfs.id === `${value.name}`
-                            );
-                            return (
-                              <div key={value.name} className="flex items-center space-x-2.5 pl-1">
-                                <Checkbox
-                                  id={`checkbox-${value.name}`}
-                                  value={`${value.name}`}
-                                  theme="light"
-                                  checked={checked}
-                                  className="h-4 w-4"
-                                  onChange={onSplitFeaturesChanged}
-                                />
-                                <label
-                                  htmlFor={`checkbox-${value.name}`}
-                                  className="ml-2.5 inline-block max-w-sm text-xs"
-                                >
-                                  {value.name}
-                                </label>
-                              </div>
-                            );
-                          })}
-                        </div>
+                  {(fprops) => {
+                    const splitOptionValues = getSplitOptionValues(values.splitOption);
 
-                        {getSplitOptionValues(values.splitOption) && (
-                          <div>
-                            <Button
-                              className="flex space-x-2 whitespace-nowrap"
-                              theme="secondary"
-                              size="xs"
-                              onClick={onClearSplitCheckedValues}
-                            >
-                              <p>Clear all</p>
-                              <Icon icon={CLOSE_SVG} className="h-2.5 w-2.5" />
-                            </Button>
+                    return (
+                      <Field id="splitValues" {...fprops} className="relative">
+                        {splitOptionValues && (
+                          <div className="mb-2 flex items-center justify-between">
+                            <p className="text-xs text-gray-400">
+                              {`${splitFeaturesSelected.length} of ${splitOptionValues.length} selected`}
+                            </p>
+
+                            <div className="flex space-x-2">
+                              <Button
+                                className="whitespace-nowrap"
+                                theme="secondary"
+                                size="xs"
+                                onClick={() => onSelectAllSplitValues(values.splitOption)}
+                              >
+                                Select all
+                              </Button>
+
+                              <Button
+                                className="flex space-x-2 whitespace-nowrap"
+                                theme="secondary"
+                                size="xs"
+                                onClick={onClearSplitCheckedValues}
+                              >
+                                <p>Clear all</p>
+                                <Icon icon={CLOSE_SVG} className="h-2.5 w-2.5" />
+                              </Button>
+                            </div>
                           </div>
                         )}
-                      </div>
-                    </Field>
-                  )}
+
+                        {/* `split-values-list` forces a persistently visible scrollbar (see
+                            globals.css): with a categorical attribute the list routinely
+                            overflows, and an auto-hiding scrollbar is the only cue that more
+                            values exist below the fold. */}
+                        <div
+                          className="split-values-list max-h-48 w-full overflow-y-auto"
+                          data-testid="split-values-list"
+                        >
+                          <div className="space-y-2 pr-1 pt-1">
+                            {splitOptionValues?.map((value) => {
+                              const checked = !!splitFeaturesSelected.find(
+                                (sfs) => sfs.id === `${value.name}`
+                              );
+                              return (
+                                <div
+                                  key={value.name}
+                                  className="flex items-center space-x-2.5 pl-1"
+                                >
+                                  <Checkbox
+                                    id={`checkbox-${value.name}`}
+                                    value={`${value.name}`}
+                                    theme="light"
+                                    checked={checked}
+                                    className="h-4 w-4"
+                                    onChange={onSplitFeaturesChanged}
+                                  />
+                                  <label
+                                    htmlFor={`checkbox-${value.name}`}
+                                    className="ml-2.5 inline-block max-w-sm text-xs"
+                                  >
+                                    {value.name}
+                                  </label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </Field>
+                    );
+                  }}
                 </FieldRFF>
               </div>
 
