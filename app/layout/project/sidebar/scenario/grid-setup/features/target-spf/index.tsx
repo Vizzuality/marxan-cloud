@@ -18,7 +18,12 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import Fuse from 'fuse.js';
 import { useDebouncedCallback } from 'use-debounce';
 
-import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+import {
+  useAllFeatures,
+  useColorFeatures,
+  useSaveSelectedFeatures,
+  useSelectedFeatures,
+} from 'hooks/features';
 import { useCanEditScenario } from 'hooks/permissions';
 import { useScenarioStatus } from 'hooks/scenarios';
 
@@ -96,6 +101,8 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     keepPreviousData: true,
   });
 
+  const featureColors = useColorFeatures(pid, sid);
+
   // A split materialises its child features asynchronously (the `geofeatureSplit`
   // job). Once that job finishes, refetch the specification so the real,
   // materialised child ids read back from the API replace the pending
@@ -128,9 +135,15 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           childFeatureId: splitFeature.childFeatureId ?? null, // real id, when materialized
           name: `${feature.name} / ${splitFeature.name}`,
           isVisibleOnMap: layerSettings[`${feature.id}-${splitFeature.name}`]?.visibility ?? false,
-          color: feature.color,
+          // each child gets its own ramp color (keyed by the synthetic row id),
+          // matching the legend, instead of inheriting the parent's
+          color:
+            featureColors.find(({ id }) => id === `${feature.id}-${splitFeature.name}`)?.color ??
+            feature.color,
           // prefer the materialized child's own amounts; fall back to the parent's
           amountRange: splitFeature.amountRange ?? feature.amountRange,
+          // the child's own amounts only — null until materialization computes them
+          childAmountRange: splitFeature.amountRange ?? null,
           isCustom: feature.metadata?.isCustom,
           scenarioUsageCount: featureMetadata?.scenarioUsageCount,
           type: featureMetadata?.tag,
@@ -195,7 +208,14 @@ const TargetAndSPFFeatures = (): JSX.Element => {
     }
 
     return parsedData;
-  }, [selectedFeaturesQuery.data, allFeaturesQuery.data, filters, featureValues, layerSettings]);
+  }, [
+    selectedFeaturesQuery.data,
+    allFeaturesQuery.data,
+    filters,
+    featureValues,
+    layerSettings,
+    featureColors,
+  ]);
 
   const handleSearch = useDebouncedCallback(
     (value: Parameters<ComponentProps<typeof Search>['onChange']>[0]) => {
@@ -244,16 +264,17 @@ const TargetAndSPFFeatures = (): JSX.Element => {
       const selectedFeature = targetedFeatures.find(({ id: featureId }) => featureId === id);
       const isContinuous =
         selectedFeature.amountRange.min !== null && selectedFeature.amountRange.max !== null;
-      const { splitted } = selectedFeature;
+      const { splitted, childFeatureId, childAmountRange } = selectedFeature;
 
-      // Only genuine, non-split continuous features use the gradient renderer
-      // (useContinuousFeaturesLayers). Materialized split children are drawn as
-      // solid-color layers via their own child tiles (useTargetedPreviewLayers).
-      // Routing a split child through this branch would (a) stamp an `amountRange`
-      // into layerSettings that excludes it from useTargetedPreviewLayers, and
-      // (b) never add it to `selectedContinuousFeatures` (so the gradient renderer
-      // ignores it too) — leaving it rendered nowhere and the eye stuck on.
-      if (isContinuous && !splitted) {
+      // The gradient renderer (useContinuousFeaturesLayers) needs a real feature
+      // id with per-PU amounts behind it. A materialized split child qualifies
+      // once it has both (childFeatureId + its own amount range) — from then on
+      // it renders exactly like any other continuous feature. Children still
+      // pending materialization fall through to the solid path below, which
+      // draws them from the parent's tiles with a property filter.
+      const isMaterializedContinuousChild = Boolean(childFeatureId && childAmountRange);
+
+      if (isContinuous && (!splitted || isMaterializedContinuousChild)) {
         const newSelectedFeatures = [...selectedContinuousFeatures];
         const isIncluded = newSelectedFeatures.includes(id);
 
@@ -271,6 +292,7 @@ const TargetAndSPFFeatures = (): JSX.Element => {
               visibility: !isIncluded,
               color: selectedFeature?.color,
               amountRange: selectedFeature.amountRange,
+              ...(splitted && { childFeatureId }),
             },
           })
         );
@@ -293,6 +315,9 @@ const TargetAndSPFFeatures = (): JSX.Element => {
           settings: {
             visibility: !isIncluded,
             color: selectedFeature?.color,
+            // null (not undefined — the reducer drops undefined) so a stale
+            // amountRange can't exclude the row from useTargetedPreviewLayers
+            ...(splitted && { amountRange: null }),
           },
         })
       );

@@ -187,6 +187,9 @@ export interface UsePUGridLayer {
           max: number;
         };
         color?: string;
+        // real feature id of a materialized split child, when the entry is
+        // keyed by the synthetic `${parentId}-${value}` row id
+        childFeatureId?: string;
       };
     };
   };

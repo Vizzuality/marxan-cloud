@@ -225,25 +225,35 @@ export const useFeaturesLegend = () => {
 
   const targetedFeatures = useTargetedFeatures(sid);
 
-  const parsedTargetedFeatures = targetedFeatures.data?.map(({ id, name, splitted, parentId }) => {
-    const allFeatures = queryClient.getQueryData<any>(['all-features', pid], {
-      exact: false,
-    })?.data;
+  const parsedTargetedFeatures = targetedFeatures.data?.map(
+    ({ id, name, splitted, amountRange, childFeatureId }) => {
+      const allFeatures = queryClient.getQueryData<any>(['all-features', pid], {
+        exact: false,
+      })?.data;
 
-    const f = allFeatures?.find(({ id: featureId }) =>
-      splitted ? parentId === featureId : id === featureId
-    );
+      const f = allFeatures?.find(({ id: featureId }) => id === featureId);
 
-    return {
-      id,
-      name,
-      amountRange: f?.amountRange ?? { min: null, max: null },
-      amountMin: f?.amountMin,
-      amountMax: f?.amountMax,
-      splitted,
-      color: featureColors?.find(({ id: featureId }) => featureId === id)?.color,
-    };
-  });
+      // Split children are bucketed by their OWN amount range (available once
+      // materialization computes their amounts), so the legend swatch matches
+      // what the map draws: gradient for materialized children, solid square
+      // while still pending. Using the parent's range here would promise a
+      // gradient the child renderer can't honor.
+      const featureAmountRange = splitted
+        ? amountRange ?? { min: null, max: null }
+        : f?.amountRange ?? { min: null, max: null };
+
+      return {
+        id,
+        name,
+        amountRange: featureAmountRange,
+        amountMin: splitted ? featureAmountRange.min : f?.amountMin,
+        amountMax: splitted ? featureAmountRange.max : f?.amountMax,
+        splitted,
+        ...(splitted && { childFeatureId: childFeatureId ?? null }),
+        color: featureColors?.find(({ id: featureId }) => featureId === id)?.color,
+      };
+    }
+  );
 
   const targetedFeaturesByRange = parsedTargetedFeatures?.reduce(
     (acc, x) => ({
@@ -295,7 +305,7 @@ export const useFeaturesLegend = () => {
 
         // uniqueBinaryFeatures (not binaryFeaturesItems) so split-child rows
         // — present only in the targeted expansion — resolve their color too.
-        const { color } = uniqueBinaryFeatures.find(({ id }) => id === featureId) || {};
+        const { color, splitted } = uniqueBinaryFeatures.find(({ id }) => id === featureId) || {};
 
         dispatch(
           setLayerSettings({
@@ -303,6 +313,10 @@ export const useFeaturesLegend = () => {
             settings: {
               visibility: !isIncluded,
               color,
+              // null (not undefined — the reducer drops undefined) so a stale
+              // amountRange can't exclude a pending split child from
+              // useTargetedPreviewLayers' "no amountRange" filter.
+              ...(splitted && { amountRange: null }),
             },
           })
         );
@@ -311,42 +325,14 @@ export const useFeaturesLegend = () => {
     ...LEGEND_LAYERS['continuous-features']({
       items: uniqueContinuousFeatures,
       onChangeVisibility: (featureId: Feature['id']) => {
-        const { color, amountRange, amountMin, amountMax, splitted } =
+        const { color, amountRange, amountMin, amountMax, splitted, childFeatureId } =
           uniqueContinuousFeatures.find(({ id }) => id === featureId) || {};
 
-        // Split children are bucketed here by their PARENT's amount range, but
-        // they are drawn as solid-color layers by useTargetedPreviewLayers
-        // (their own child tiles), never by the gradient renderer. Stamping an
-        // amountRange into their layerSettings excludes them from that hook —
-        // and the merging reducer makes the exclusion sticky — leaving them
-        // rendered nowhere: same failure a8b38a92 fixed in the table's eye
-        // toggle. Route them through the discrete toggle instead.
-        if (splitted) {
-          const newSelectedFeatures = [...selectedFeatures];
-          const isIncluded = newSelectedFeatures.includes(featureId);
-          if (!isIncluded) {
-            newSelectedFeatures.push(featureId);
-          } else {
-            newSelectedFeatures.splice(newSelectedFeatures.indexOf(featureId), 1);
-          }
-          dispatch(setSelectedFeatures(newSelectedFeatures));
-
-          dispatch(
-            setLayerSettings({
-              id: featureId,
-              settings: {
-                visibility: !isIncluded,
-                color,
-                // null (not undefined — the reducer drops undefined) so a
-                // previously stamped amountRange is cleared and the row passes
-                // useTargetedPreviewLayers' "no amountRange" filter again.
-                amountRange: null,
-              },
-            })
-          );
-          return;
-        }
-
+        // A split child only lands in this bucket once it is materialized with
+        // its own amounts (see parsedTargetedFeatures), so it can take the same
+        // gradient path as any other continuous feature — it just needs its
+        // real feature id stamped so the renderer requests the child's tiles
+        // rather than the synthetic `${parentId}-${value}` row id.
         const newSelectedFeatures = [...selectedContinuousFeatures];
         const isIncluded = newSelectedFeatures.includes(featureId);
 
@@ -368,6 +354,7 @@ export const useFeaturesLegend = () => {
                 max: amountMax ?? amountRange?.max,
               },
               color,
+              ...(splitted && { childFeatureId }),
             },
           })
         );

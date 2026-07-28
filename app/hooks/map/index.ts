@@ -241,11 +241,15 @@ export function useContinuousFeaturesLayers({
 
     return features
       .map((fid) => {
-        const { amountRange, color, opacity = 1 } = layerSettings[fid] || {};
+        const { amountRange, color, opacity = 1, childFeatureId } = layerSettings[fid] || {};
 
         if (!amountRange || amountRange.min == null || amountRange.max == null || !color) {
           return null;
         }
+
+        // Split-child rows are keyed by a synthetic `${parentId}-${value}` id;
+        // tiles must be requested with the materialized child's real feature id.
+        const tileFeatureId = childFeatureId ?? fid;
 
         return {
           id: `continuous-features-layer-${pid}-${fid}`,
@@ -253,7 +257,7 @@ export function useContinuousFeaturesLayers({
           source: {
             type: 'vector',
             tiles: [
-              `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/features/${fid}/preview/tiles/{z}/{x}/{y}.mvt`,
+              `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pid}/features/${tileFeatureId}/preview/tiles/{z}/{x}/{y}.mvt`,
             ],
           },
           render: {
