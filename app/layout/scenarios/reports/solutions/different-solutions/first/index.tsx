@@ -50,7 +50,7 @@ export const DifferentSolutionsPage = (): JSX.Element => {
             <div className={SOLUTION_INFO_BOX_CLASSES}>
               <p>
                 PlanningUnits:{' '}
-                <span className="font-medium">{bestSolutionQuery.data?.costValue}</span>
+                <span className="font-medium">{bestSolutionQuery.data?.planningUnits}</span>
               </p>
             </div>
           </div>
